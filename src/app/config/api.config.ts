@@ -1,8 +1,8 @@
 // API Configuration
 export const API_CONFIG = {
   // Production URLs (primary)
-  FRONTEND_URL: 'https://tmis-business-guru.vercel.app',
-  BACKEND_URL: 'https://tmis-business-guru-backend.onrender.com',
+  FRONTEND_URL: 'https://business-guru-vert.vercel.app',
+  BACKEND_URL: 'https://business-guru-backend.onrender.com',
   
   // Development URLs (for local development)
   DEV_FRONTEND_URL: 'http://localhost:4200',
