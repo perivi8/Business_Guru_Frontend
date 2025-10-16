@@ -87,8 +87,56 @@
     </mat-card-content>
   </mat-card>
 
-  <!-- Error Message -->
-  <mat-card class="error-card" *ngIf="submitted && !success">
+  <!-- Mobile Number Already Exists Message -->
+  <mat-card class="already-exists-card" *ngIf="submitted && !success && mobileExists">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon class="info-icon">info</mat-icon>
+        <span>Already Registered</span>
+      </mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="already-exists-message">
+        <p><strong>You have already filled the form with this mobile number.</strong></p>
+        
+        <!-- WhatsApp Message Status -->
+        <div class="whatsapp-status" *ngIf="whatsappSent">
+          <p class="whatsapp-success">
+            <mat-icon class="success-icon">check_circle</mat-icon>
+            <strong>WhatsApp message sent automatically!</strong>
+          </p>
+          <p>Check your WhatsApp for loan details and options.</p>
+        </div>
+        
+        <div class="whatsapp-status" *ngIf="!whatsappSent && whatsappError">
+          <p class="whatsapp-error">
+            <mat-icon class="warning-icon">warning</mat-icon>
+            WhatsApp message could not be sent automatically.
+          </p>
+        </div>
+        
+        <p>Please contact us directly via WhatsApp for any queries or updates.</p>
+      </div>
+      
+      <div class="whatsapp-actions">
+        <button 
+          mat-raised-button 
+          color="accent" 
+          (click)="openWhatsApp()" 
+          class="whatsapp-button">
+          <mat-icon>chat</mat-icon>
+          Contact us on WhatsApp
+        </button>
+        <button mat-stroked-button (click)="resetForm()" class="retry-button">
+          Try with Different Number
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- General Error Message -->
+  <mat-card class="error-card" *ngIf="submitted && !success && !mobileExists">
     <mat-card-header>
       <mat-card-title>
         <mat-icon class="error-icon">error</mat-icon>

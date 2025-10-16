@@ -13,6 +13,10 @@ export class PublicEnquiryComponent implements OnInit {
   submitted = false;
   submitting = false;
   success = false;
+  mobileExists = false;
+  whatsappNumber = '8106811285';
+  whatsappSent = false;
+  whatsappError = '';
 
   constructor(
     private fb: FormBuilder,
@@ -66,9 +70,27 @@ export class PublicEnquiryComponent implements OnInit {
           },
           error: (error) => {
             console.error('Error submitting enquiry:', error);
-            this.submitted = true;
-            this.success = false;
             this.submitting = false;
+            
+            // Check if mobile number already exists
+            if (error.status === 409 && error.error?.error === 'mobile_exists') {
+              this.mobileExists = true;
+              this.submitted = true;
+              this.success = false;
+              
+              // Check WhatsApp sending status
+              this.whatsappSent = error.error?.whatsapp_sent || false;
+              this.whatsappError = error.error?.whatsapp_error || '';
+              
+              if (this.whatsappSent) {
+                console.log('WhatsApp message sent automatically to existing user');
+              } else if (this.whatsappError) {
+                console.log('WhatsApp message failed:', this.whatsappError);
+              }
+            } else {
+              this.submitted = true;
+              this.success = false;
+            }
           }
         });
     }
@@ -82,5 +104,13 @@ export class PublicEnquiryComponent implements OnInit {
     this.enquiryForm.reset();
     this.submitted = false;
     this.success = false;
+    this.mobileExists = false;
+    this.whatsappSent = false;
+    this.whatsappError = '';
+  }
+
+  openWhatsApp(): void {
+    const whatsappUrl = `https://wa.me/${this.whatsappNumber}`;
+    window.open(whatsappUrl, '_blank');
   }
 }

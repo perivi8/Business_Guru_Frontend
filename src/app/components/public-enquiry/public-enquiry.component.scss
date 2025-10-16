@@ -7,7 +7,7 @@
   background-color: #f5f5f5;
 }
 
-.enquiry-card, .success-card, .error-card {
+.enquiry-card, .success-card, .error-card, .already-exists-card {
   width: 100%;
   max-width: 500px;
   margin: 20px;
@@ -122,12 +122,116 @@
   }
 }
 
+.already-exists-card {
+  text-align: center;
+  
+  mat-card-header {
+    justify-content: center;
+    
+    mat-card-title {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 24px;
+      font-weight: 500;
+      
+      .info-icon {
+        color: #2196f3;
+        font-size: 32px;
+        width: 32px;
+        height: 32px;
+      }
+    }
+  }
+  
+  .already-exists-message {
+    font-size: 18px;
+    line-height: 1.6;
+    margin: 30px 0;
+    
+    p {
+      margin: 10px 0;
+    }
+    
+    .whatsapp-status {
+      margin: 20px 0;
+      padding: 15px;
+      border-radius: 8px;
+      
+      .whatsapp-success {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #4caf50;
+        background-color: #e8f5e8;
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 10px;
+        
+        .success-icon {
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
+        }
+      }
+      
+      .whatsapp-error {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #ff9800;
+        background-color: #fff3e0;
+        padding: 10px;
+        border-radius: 6px;
+        
+        .warning-icon {
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
+        }
+      }
+    }
+  }
+  
+  .whatsapp-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    
+    .whatsapp-button {
+      width: 250px;
+      height: 50px;
+      font-size: 16px;
+      font-weight: 500;
+      background-color: #25d366;
+      color: white;
+      
+      &:hover {
+        background-color: #128c7e;
+      }
+      
+      mat-icon {
+        margin-right: 8px;
+      }
+    }
+    
+    .retry-button {
+      width: 200px;
+      height: 45px;
+      font-size: 16px;
+    }
+  }
+}
+
 @media (max-width: 600px) {
   .public-enquiry-container {
     padding: 10px;
   }
   
-  .enquiry-card, .success-card, .error-card {
+  .enquiry-card, .success-card, .error-card, .already-exists-card {
     margin: 10px;
   }
   
@@ -136,11 +240,26 @@
   }
   
   .success-card mat-card-header mat-card-title,
-  .error-card mat-card-header mat-card-title {
+  .error-card mat-card-header mat-card-title,
+  .already-exists-card mat-card-header mat-card-title {
     font-size: 20px;
   }
   
-  .success-message, .error-message {
+  .success-message, .error-message, .already-exists-message {
     font-size: 16px;
+  }
+  
+  .already-exists-card .whatsapp-actions {
+    .whatsapp-button {
+      width: 220px;
+      height: 45px;
+      font-size: 14px;
+    }
+    
+    .retry-button {
+      width: 180px;
+      height: 40px;
+      font-size: 14px;
+    }
   }
 }
