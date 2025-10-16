@@ -1,0 +1,992 @@
+.client-detail-container {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: var(--spacing);
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  min-height: 100vh;
+  overflow-x: hidden !important;
+  box-sizing: border-box;
+  position: relative;
+  
+  // Center content within the container
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  
+  // Lock container to screen - prevent any horizontal movement
+  touch-action: pan-y !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-x: none !important;
+  scroll-behavior: smooth !important;
+  
+  // Ensure no content can cause horizontal overflow
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  
+  // Responsive adjustments
+  @media (max-width: 1200px) {
+    max-width: 100%;
+    padding: var(--spacing);
+  }
+  
+  @media (max-width: 768px) {
+    max-width: 100%;
+    padding: var(--spacing-sm);
+    align-items: stretch; // Full width on mobile
+  }
+  
+  @media (max-width: 480px) {
+    padding: var(--spacing-xs);
+  }
+}
+
+.loading-container, .error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  text-align: center;
+  
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+    color: #666;
+  }
+  
+  h3 {
+    margin: 16px 0 8px 0;
+    color: #333;
+  }
+  
+  p {
+    color: #666;
+    margin-bottom: 24px;
+  }
+}
+
+// Saving overlay for status changes
+.saving-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(2px);
+  
+  .saving-content {
+    background: white;
+    padding: 32px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    min-width: 250px;
+    
+    mat-spinner {
+      margin-bottom: 8px;
+    }
+    
+    p {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 500;
+      color: #333;
+      text-align: center;
+    }
+  }
+}
+
+.client-details {
+  width: 100%;
+  max-width: 100%;
+  
+  .header-section {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-2xl);
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-xl) var(--spacing-2xl);
+    position: relative;
+    overflow: hidden;
+    
+    // Add gradient animation like new client page
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff);
+      background-size: 300% 100%;
+      animation: gradientShift 6s ease-in-out infinite;
+    }
+    
+    // Responsive adjustments for header
+    @media (max-width: 768px) {
+      padding: var(--spacing) var(--spacing-lg);
+      margin-bottom: var(--spacing);
+    }
+    
+    @media (max-width: 480px) {
+      padding: var(--spacing-sm) var(--spacing);
+      border-radius: var(--radius-lg);
+    }
+    
+    .header-content {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-lg);
+      position: relative;
+      z-index: 2;
+      
+      .client-title {
+        flex: 1;
+        
+        h1 {
+          margin: 0;
+          font-size: 2rem;
+          font-weight: 700;
+          color: white;
+          font-family: 'Poppins', sans-serif;
+          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .client-subtitle {
+          margin: var(--spacing-xs) 0 0 0;
+          color: rgba(255, 255, 255, 0.9);
+          font-size: 1.1rem;
+          font-weight: 500;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+      }
+      
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing);
+        
+        .status-badge {
+          padding: var(--spacing-sm) var(--spacing);
+          border-radius: var(--radius-full);
+          color: white;
+          font-weight: 600;
+          font-size: 0.875rem;
+          background: rgba(255, 255, 255, 0.2) !important;
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          backdrop-filter: blur(10px);
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+        
+        .action-buttons {
+          display: flex;
+          gap: 12px;
+          
+          .edit-actions {
+            display: flex;
+            gap: 8px;
+            
+            button {
+              position: relative;
+              min-width: 100px;
+              
+              &[disabled] {
+                opacity: 0.7;
+                cursor: not-allowed;
+              }
+              
+              mat-spinner {
+                margin-right: 8px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  .content-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    width: 100%;
+    max-width: 100%;
+    
+    .row-layout {
+      display: flex;
+      gap: var(--spacing-lg);
+      width: 100%;
+      margin-bottom: var(--spacing-lg);
+      
+      &.full-width {
+        width: 100%;
+      }
+      
+      @media (max-width: 1200px) {
+        flex-direction: column;
+      }
+      
+      .half-width {
+        flex: 1;
+        min-width: 0; // Prevent flex items from overflowing
+      }
+      
+      .full-width {
+        width: 100%;
+        flex: none;
+      }
+      
+      .right-column {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-lg);
+        min-width: 0; // Prevent flex items from overflowing
+      }
+    }
+  }
+}
+
+.info-card {
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-light);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &:hover {
+    box-shadow: var(--shadow-xl);
+    transform: translateY(-2px);
+  }
+  
+  mat-card-header {
+    padding-bottom: 16px;
+    
+    mat-card-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 18px;
+      font-weight: 500;
+      color: #333;
+      
+      mat-icon {
+        color: #1976d2;
+      }
+    }
+  }
+  
+  mat-card-content {
+    padding-top: 0;
+  }
+}
+
+// Modern tabular format for better readability
+.info-table {
+  width: 100%;
+  overflow-x: auto;
+  
+  .details-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Inter', sans-serif;
+    
+    tbody {
+      tr {
+        border-bottom: 1px solid var(--border-light);
+        transition: background-color 0.2s ease;
+        
+        &:hover {
+          background-color: var(--background-alt);
+        }
+        
+        &:last-child {
+          border-bottom: none;
+        }
+        
+        td {
+          padding: var(--spacing) var(--spacing-lg);
+          vertical-align: top;
+          
+          &.label {
+            font-weight: 600;
+            color: var(--text-secondary);
+            width: 35%;
+            min-width: 150px;
+            font-size: 0.875rem;
+            text-align: left;
+            background-color: var(--surface-alt);
+          }
+          
+          &.value {
+            color: var(--text-primary);
+            font-weight: 500;
+            font-size: 0.9rem;
+            word-break: break-word;
+            line-height: 1.5;
+            
+            .status-badge {
+              display: inline-block;
+              padding: var(--spacing-xs) var(--spacing-sm);
+              border-radius: var(--radius-full);
+              color: white;
+              font-weight: 600;
+              font-size: 0.75rem;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  // Responsive adjustments
+  @media (max-width: 768px) {
+    .details-table {
+      tbody tr td {
+        padding: var(--spacing-sm) var(--spacing);
+        
+        &.label {
+          width: 40%;
+          min-width: 120px;
+          font-size: 0.8rem;
+        }
+        
+        &.value {
+          font-size: 0.85rem;
+        }
+      }
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .details-table {
+      tbody tr {
+        display: block;
+        margin-bottom: var(--spacing);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius);
+        
+        td {
+          display: block;
+          width: 100% !important;
+          border-bottom: none !important;
+          
+          &.label {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+            padding: var(--spacing-xs) var(--spacing);
+            margin-bottom: 0;
+          }
+          
+          &.value {
+            padding: var(--spacing) var(--spacing);
+            background-color: white;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Grid layout removed - using tabular format only
+
+.documents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing);
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+  
+  .document-item {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 16px;
+    background: #fafafa;
+    
+    .document-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      
+      .document-header {
+        display: flex;
+        gap: 12px;
+        flex: 1;
+        
+        mat-icon {
+          color: #1976d2;
+          margin-top: 4px;
+        }
+        
+        .document-details {
+          flex: 1;
+          
+          h4 {
+            margin: 0 0 4px 0;
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+          }
+          
+          .file-name {
+            margin: 0 0 2px 0;
+            font-size: 14px;
+            color: #666;
+            word-break: break-all;
+          }
+          
+          .file-size {
+            margin: 0;
+            font-size: 12px;
+            color: #999;
+          }
+        }
+      }
+      
+      .document-actions {
+        display: flex;
+        gap: 8px;
+        
+        button {
+          color: #1976d2;
+          
+          &:hover {
+            background-color: rgba(25, 118, 210, 0.1);
+          }
+        }
+      }
+    }
+  }
+}
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  
+  .full-width {
+    width: 100%;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .client-detail-container {
+    padding: var(--spacing-sm);
+  }
+  
+  .client-details .header-section .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    
+    .header-actions {
+      width: 100%;
+      justify-content: space-between;
+      
+      .action-buttons {
+        flex-wrap: wrap;
+      }
+    }
+  }
+  
+  .documents-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Animation for edit mode
+.edit-actions {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Payment Gateway Styles
+.payment-gateway-info,
+.loan-status-info {
+  h4 {
+    margin: 0 0 var(--spacing) 0;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.9rem;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+.payment-gateway-section {
+  .payment-gateways-list {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: var(--spacing);
+    margin-top: var(--spacing);
+    
+    @media (max-width: 1400px) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    
+    @media (max-width: 1200px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    
+    @media (max-width: 900px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+    
+    .payment-gateway-card {
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing);
+      background: var(--surface);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--shadow-sm);
+      
+      &:hover {
+        box-shadow: var(--shadow-lg);
+        transform: translateY(-2px);
+      }
+      
+      .gateway-header {
+        margin-bottom: var(--spacing);
+        text-align: center;
+        
+        .gateway-name {
+          font-weight: 600;
+          font-size: 0.9rem;
+          color: var(--text-primary);
+          font-family: 'Inter', sans-serif;
+        }
+      }
+      
+      .gateway-actions {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-xs);
+        
+        .approval-btn, .rejection-btn {
+          width: 100%;
+          font-size: 0.8rem;
+          padding: var(--spacing-xs) var(--spacing-sm);
+          border: 1px solid transparent;
+          
+          &.selected {
+            opacity: 1;
+            font-weight: 600;
+            border-color: rgba(255, 255, 255, 0.3);
+          }
+          
+          &:not(.selected) {
+            opacity: 0.7;
+            background-color: #f5f5f5;
+            color: #666;
+            border-color: #e0e0e0;
+          }
+        }
+        
+        .approval-btn.selected {
+          background-color: #4caf50 !important;
+          color: white !important;
+          
+          // Override Material Design button colors
+          &.mat-mdc-raised-button {
+            background-color: #4caf50 !important;
+            color: white !important;
+          }
+          
+          &.mat-raised-button {
+            background-color: #4caf50 !important;
+            color: white !important;
+          }
+        }
+        
+        .rejection-btn.selected {
+          background-color: #f44336 !important;
+          color: white !important;
+          
+          // Override Material Design button colors
+          &.mat-mdc-raised-button {
+            background-color: #f44336 !important;
+            color: white !important;
+          }
+          
+          &.mat-raised-button {
+            background-color: #f44336 !important;
+            color: white !important;
+          }
+        }
+      }
+      
+      .gateway-status {
+        text-align: center;
+        
+        .status-badge {
+          padding: var(--spacing-xs) var(--spacing-sm);
+          border-radius: var(--radius-full);
+          font-size: 0.75rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          
+          &.approved {
+            background-color: #4caf50 !important;
+            color: white !important;
+          }
+          
+          &.rejected {
+            background-color: #f44336 !important;
+            color: white !important;
+          }
+          
+          // Additional fallback for not_approved status
+          &.not_approved {
+            background-color: #f44336 !important;
+            color: white !important;
+          }
+          
+          &.pending {
+            background-color: #ff9800 !important;
+            color: white !important;
+          }
+        }
+      }
+    }
+  }
+  
+  .no-payment-gateways {
+    color: #999;
+    font-style: italic;
+    padding: 16px;
+    text-align: center;
+    background: #f9f9f9;
+    border-radius: 4px;
+    margin-top: 8px;
+  }
+}
+
+// Loan Status Styles
+.loan-status-section {
+  .loan-status-info {
+    h4 {
+      margin: 0 0 var(--spacing) 0;
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 0.9rem;
+      font-family: 'Inter', sans-serif;
+    }
+  }
+  
+  .loan-status-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    
+    .current-loan-status {
+      .loan-status-badge {
+        display: inline-block;
+        padding: 8px 16px;
+        border-radius: 20px;
+        color: white;
+        font-weight: 500;
+        font-size: 14px;
+        text-transform: capitalize;
+      }
+    }
+    
+    .loan-status-actions {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--spacing-xs);
+      
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+      }
+      
+      .loan-status-btn {
+        font-size: 0.8rem;
+        padding: var(--spacing-xs) var(--spacing-sm);
+        
+        &.selected {
+          opacity: 1;
+          font-weight: 600;
+        }
+        
+        &:not(.selected) {
+          opacity: 0.7;
+          background-color: #f5f5f5;
+          color: #666;
+        }
+        
+        &.approved.selected {
+          background-color: #4caf50 !important;
+          color: white !important;
+        }
+        
+        &.rejected.selected {
+          background-color: #f44336 !important;
+          color: white !important;
+        }
+        
+        &.hold.selected {
+          background-color: #ff9800 !important;
+          color: white !important;
+        }
+        
+        &.processing.selected {
+          background-color: #00bcd4 !important;
+          color: white !important;
+        }
+      }
+    }
+  }
+}
+
+// Responsive adjustments for payment gateway section
+@media (max-width: 768px) {
+  .payment-gateway-section {
+    .payment-gateways-list {
+      grid-template-columns: 1fr !important;
+      gap: var(--spacing-sm);
+      
+      .payment-gateway-card {
+        .gateway-actions {
+          flex-direction: column;
+          
+          button {
+            width: 100%;
+            font-size: 0.85rem;
+          }
+        }
+      }
+    }
+  }
+  
+  .loan-status-section {
+    .loan-status-container .loan-status-actions {
+      flex-direction: column;
+      
+      .loan-status-btn {
+        width: 100%;
+        justify-content: flex-start;
+      }
+    }
+  }
+}
+
+// Gradient animation for header
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+// Enhanced Material Form Field Styling
+.mat-mdc-form-field {
+  width: 100%;
+  margin-bottom: 0px !important;
+  padding-top: var(--spacing) !important;
+  
+  .mat-mdc-form-field-wrapper {
+    padding-bottom: 0px !important;
+    padding-top: var(--spacing-sm) !important;
+  }
+  
+  .mat-mdc-form-field-infix {
+    min-height: 40px !important;
+    padding: var(--spacing-sm) 0 !important;
+  }
+  
+  .mat-mdc-input-element {
+    padding: var(--spacing-sm) var(--spacing) !important;
+    font-size: 0.875rem !important;
+    line-height: 1.4 !important;
+    height: auto !important;
+    min-height: 20px !important;
+  }
+  
+  .mat-mdc-form-field-outline {
+    border-radius: var(--radius-lg) !important;
+    border-width: 2px !important;
+  }
+  
+  .mat-mdc-form-field-label {
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    color: var(--text-secondary) !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+  
+  // Floating label styles
+  .mat-mdc-form-field-label.mat-mdc-form-field-label-floating {
+    top: 0.25rem !important;
+    transform: translateY(0) scale(0.75) !important;
+    background: var(--surface) !important;
+    padding: 0 var(--spacing-xs) !important;
+    z-index: 2 !important;
+  }
+  
+  &.mat-focused {
+    .mat-mdc-form-field-outline {
+      border-color: var(--primary) !important;
+      border-width: 2px !important;
+    }
+    
+    .mat-mdc-form-field-label {
+      color: var(--primary) !important;
+      top: 0.25rem !important;
+      transform: translateY(0) scale(0.75) !important;
+      background: var(--surface) !important;
+      padding: 0 var(--spacing-xs) !important;
+      z-index: 2 !important;
+    }
+  }
+  
+  &:not(.mat-focused):hover {
+    .mat-mdc-form-field-outline {
+      border-color: var(--text-muted) !important;
+    }
+  }
+}
+
+// Fix for select fields
+.mat-mdc-select {
+  .mat-mdc-select-value {
+    font-size: 0.875rem !important;
+    line-height: 1.4 !important;
+  }
+  
+  .mat-mdc-select-placeholder {
+    color: var(--text-muted) !important;
+  }
+}
+
+/* ===== OPTIMIZED STATUS UPDATE STYLES ===== */
+
+/* Success snackbar styling */
+::ng-deep .success-snackbar {
+  background-color: #4caf50 !important;
+  color: white !important;
+  font-weight: 500 !important;
+}
+
+::ng-deep .success-snackbar .mat-simple-snackbar-action {
+  color: #c8e6c9 !important;
+}
+
+/* Info snackbar styling */
+::ng-deep .info-snackbar {
+  background-color: #2196f3 !important;
+  color: white !important;
+  font-weight: 500 !important;
+}
+
+::ng-deep .info-snackbar .mat-simple-snackbar-action {
+  color: #bbdefb !important;
+}
+
+/* Error snackbar styling */
+::ng-deep .error-snackbar {
+  background-color: #f44336 !important;
+  color: white !important;
+  font-weight: 500 !important;
+}
+
+::ng-deep .error-snackbar .mat-simple-snackbar-action {
+  color: #ffcdd2 !important;
+  font-weight: 600 !important;
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  border-radius: 4px !important;
+  padding: 4px 8px !important;
+  margin-left: 8px !important;
+}
+
+::ng-deep .error-snackbar .mat-simple-snackbar-action:hover {
+  background-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Enhanced button animations for instant feedback */
+.payment-gateway-card .gateway-actions button {
+  transition: all 0.2s ease-in-out !important;
+}
+
+.payment-gateway-card .gateway-actions button:active {
+  transform: scale(0.95);
+  transition: transform 0.1s ease-in-out;
+}
+
+.loan-status-actions button {
+  transition: all 0.2s ease-in-out !important;
+}
+
+.loan-status-actions button:active {
+  transform: scale(0.95);
+  transition: transform 0.1s ease-in-out;
+}
+
+/* Instant feedback visual cues */
+.gateway-actions button.selected {
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.5) !important;
+  border: 2px solid #4caf50 !important;
+}
+
+.loan-status-actions button.selected {
+  box-shadow: 0 0 10px rgba(33, 150, 243, 0.5) !important;
+  border: 2px solid #2196f3 !important;
+}
+
+/* Fast update success animation */
+@keyframes fastUpdateSuccess {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.fast-update-success {
+  animation: fastUpdateSuccess 0.3s ease-in-out;
+}

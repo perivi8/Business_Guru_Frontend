@@ -1,0 +1,355 @@
+<div class="container">
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
+    <p>Loading dashboard data...</p>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div *ngIf="!loading">
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-content">
+            <mat-icon class="stat-icon total">people</mat-icon>
+            <div class="stat-info">
+              <h3>{{ stats.totalClients }}</h3>
+              <p>Total Clients</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-content">
+            <mat-icon class="stat-icon today">today</mat-icon>
+            <div class="stat-info">
+              <h3>{{ todayStats.newClientsToday }}</h3>
+              <p>Today New Clients</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-content">
+            <mat-icon class="stat-icon pending">schedule</mat-icon>
+            <div class="stat-info">
+              <h3>{{ stats.pendingClients }}</h3>
+              <p>Pending Review</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-content">
+            <mat-icon class="stat-icon interested">check_circle</mat-icon>
+            <div class="stat-info">
+              <h3>{{ stats.interestedClients }}</h3>
+              <p>Interested</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-content">
+            <mat-icon class="stat-icon not-interested">cancel</mat-icon>
+            <div class="stat-info">
+              <h3>{{ stats.notInterestedClients }}</h3>
+              <p>Not Interested</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-content">
+            <mat-icon class="stat-icon hold">pause</mat-icon>
+            <div class="stat-info">
+              <h3>{{ stats.onHoldClients }}</h3>
+              <p>On Hold</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-content">
+            <mat-icon class="stat-icon processing">hourglass_empty</mat-icon>
+            <div class="stat-info">
+              <h3>{{ stats.processingClients }}</h3>
+              <p>Processing</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-content">
+            <mat-icon class="stat-icon total" style="color: #673ab7;" >group</mat-icon>
+            <div class="stat-info">
+              <h3>{{ stats.totalTeam }}</h3>
+              <p>Total Team</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- User Client Counts -->
+    <mat-card class="user-stats-card" *ngIf="todayStats.userClientCounts.length > 0">
+      <mat-card-header>
+        <mat-card-title>Today's Client Additions by User</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="user-stats-list">
+          <div class="user-stat-item" *ngFor="let userStat of todayStats.userClientCounts">
+            <div class="user-info">
+              <mat-icon class="user-icon">person</mat-icon>
+              <span class="username">{{ userStat.username }}</span>
+            </div>
+            <div class="client-count">
+              <span class="count-badge">{{ userStat.count }}</span>
+              <span class="count-label">client{{ userStat.count > 1 ? 's' : '' }}</span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Report 1: Weekly Client Additions Chart -->
+    <mat-card class="report-card">
+      <mat-card-header>
+        <div class="header-content">
+          <div class="title-section">
+            <mat-card-title>
+              <mat-icon>show_chart</mat-icon>
+              Weekly Client Additions
+            </mat-card-title>
+            <mat-card-subtitle>{{ getSelectedWeekSubtitle() }}</mat-card-subtitle>
+          </div>
+          <div class="filter-section">
+            <mat-form-field appearance="outline" class="week-selector">
+              <mat-label>Select Week</mat-label>
+              <mat-select [(value)]="selectedWeekOption" (selectionChange)="onWeekSelectionChange()">
+                <mat-option value="current">Current Week</mat-option>
+                <mat-option value="last1">Last Week</mat-option>
+                <mat-option value="last2">2 Weeks Ago</mat-option>
+                <mat-option value="last3">3 Weeks Ago</mat-option>
+                <mat-option value="last4">4 Weeks Ago</mat-option>
+                <mat-option value="custom">Custom Range</mat-option>
+              </mat-select>
+            </mat-form-field>
+            
+            <!-- Custom Date Range (shown when custom is selected) -->
+            <div class="custom-range" *ngIf="selectedWeekOption === 'custom'">
+              <mat-form-field appearance="outline" class="date-picker">
+                <mat-label>Start Date</mat-label>
+                <input matInput [matDatepicker]="startPicker" [(ngModel)]="customStartDate" (dateChange)="onCustomDateChange()">
+                <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+                <mat-datepicker #startPicker></mat-datepicker>
+              </mat-form-field>
+              
+              <mat-form-field appearance="outline" class="date-picker">
+                <mat-label>End Date</mat-label>
+                <input matInput [matDatepicker]="endPicker" [(ngModel)]="customEndDate" (dateChange)="onCustomDateChange()">
+                <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+                <mat-datepicker #endPicker></mat-datepicker>
+              </mat-form-field>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+              <button mat-icon-button matTooltip="Refresh Data" (click)="refreshWeeklyData()">
+                <mat-icon>refresh</mat-icon>
+              </button>
+              <button mat-icon-button matTooltip="Compare with Previous Week" (click)="toggleComparison()">
+                <mat-icon>compare_arrows</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </mat-card-header>
+      <mat-card-content>
+        <!-- Week Comparison Banner (if comparison is enabled) -->
+        <div class="comparison-banner" *ngIf="showComparison">
+          <div class="comparison-stats">
+            <div class="stat-item">
+              <span class="label">Selected Week:</span>
+              <span class="value">{{ getSelectedWeekTotal() }}</span>
+            </div>
+            <div class="stat-item">
+              <span class="label">Previous Week:</span>
+              <span class="value">{{ getPreviousWeekTotal() }}</span>
+            </div>
+            <div class="stat-item" [class]="getComparisonClass()">
+              <mat-icon>{{ getComparisonIcon() }}</mat-icon>
+              <span class="change">{{ getWeeklyChange() }}%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Weekly Summary Cards -->
+        <div class="weekly-summary">
+          <div class="summary-card">
+            <mat-icon>today</mat-icon>
+            <div class="summary-info">
+              <h3>{{ getSelectedWeekTotal() }}</h3>
+              <p>{{ getSelectedWeekLabel() }} Total</p>
+            </div>
+          </div>
+          <div class="summary-card">
+            <mat-icon>trending_up</mat-icon>
+            <div class="summary-info">
+              <h3>{{ getSelectedWeekAverage() | number:'1.1-1' }}</h3>
+              <p>Daily Average</p>
+            </div>
+          </div>
+          <div class="summary-card" *ngIf="showComparison">
+            <mat-icon [class]="getComparisonClass()">{{ getComparisonIcon() }}</mat-icon>
+            <div class="summary-info">
+              <h3 [class]="getComparisonClass()">{{ getWeeklyChange() }}%</h3>
+              <p>Week Change</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Weekly Line Chart -->
+        <div class="weekly-chart-container">
+          <div class="chart-wrapper">
+            <canvas #weeklyChart class="weekly-line-chart" data-chart="weekly" width="600" height="300"></canvas>
+          </div>
+          
+          <!-- Chart Legend/Info -->
+          <div class="chart-info">
+            <div class="info-item">
+              <div class="color-indicator today"></div>
+              <span>Today</span>
+            </div>
+            <div class="info-item">
+              <div class="color-indicator regular"></div>
+              <span>Working Days</span>
+            </div>
+            <div class="info-item">
+              <div class="color-indicator holiday"></div>
+              <span>Holiday</span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Report 2: Client Status Report -->
+    <mat-card class="report-card" id="client-status-report">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>pie_chart</mat-icon>
+          Report 2: Client Status Report
+        </mat-card-title>
+        <mat-card-subtitle>Status breakdown: Interested, Not Interested, Hold, Pending, Processing</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <!-- 3D Pie Chart -->
+        <div class="status-chart-container">
+          <h3>Client Status Distribution</h3>
+          <div class="pie-chart-wrapper">
+            <div class="chart-container">
+              <canvas #statusChart class="status-pie-chart" data-chart="status" width="400" height="400"></canvas>
+            </div>
+            
+            <!-- Chart Statistics -->
+            <div class="chart-stats">
+              <div class="stat-item">
+                <mat-icon>assessment</mat-icon>
+                <div class="stat-info">
+                  <span class="stat-value">{{ getStatusTotal() }}</span>
+                  <span class="stat-label">Total Clients</span>
+                </div>
+              </div>
+              <div class="stat-item">
+                <mat-icon>trending_up</mat-icon>
+                <div class="stat-info">
+                  <span class="stat-value">{{ getHighestStatusPercentage() }}%</span>
+                  <span class="stat-label">Highest Category</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Report 3: Team Performance Report -->
+    <mat-card class="report-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>group</mat-icon>
+          Report 3: Team Performance Report
+        </mat-card-title>
+        <mat-card-subtitle>Individual team member client addition statistics</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="team-performance">
+          <!-- Team Stats Overview -->
+          <div class="team-overview">
+            <div class="overview-card total-team" [style.animation-delay]="'0.1s'">
+              <mat-icon style="color: #673ab7;">group</mat-icon>
+              <div class="overview-info">
+                <h3>{{ stats.totalTeam }}</h3>
+                <p>Total Team Members</p>
+              </div>
+            </div>
+            <div class="overview-card total-added" [style.animation-delay]="'0.2s'">
+              <mat-icon>add_circle</mat-icon>
+              <div class="overview-info">
+                <h3>{{ stats.totalClients }}</h3>
+                <p>Total Clients Added</p>
+              </div>
+            </div>
+            <div class="overview-card avg-per-member" [style.animation-delay]="'0.3s'">
+              <mat-icon>trending_up</mat-icon>
+              <div class="overview-info">
+                <h3>{{ getAverageClientsPerMember() }}</h3>
+                <p>Avg per Member</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Team Performance Chart -->
+          <div class="team-bar-chart">
+            <h3>Team Member Client Additions (Excluding Admin)</h3>
+            <div class="horizontal-bar-chart">
+              <div class="chart-container">
+                <canvas #teamChart class="team-horizontal-chart" data-chart="team" width="800" height="400"></canvas>
+              </div>
+              
+              <!-- Chart Info -->
+              <div class="chart-info">
+                <div class="info-item">
+                  <mat-icon>bar_chart</mat-icon>
+                  <span>Horizontal bars show client count per team member</span>
+                </div>
+                <div class="info-item">
+                  <mat-icon>trending_up</mat-icon>
+                  <span>Performance comparison across team</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+</div>

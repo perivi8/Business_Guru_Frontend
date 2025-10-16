@@ -1,0 +1,49 @@
+<div class="approval-popup-overlay" *ngIf="showPopup" (click)="hidePopup()">
+  <div class="approval-popup" (click)="$event.stopPropagation()">
+    <div class="popup-header">
+      <h3>New User Registration Request</h3>
+      <button mat-icon-button (click)="hidePopup()" class="close-btn">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    
+    <div class="popup-content" *ngIf="currentRequest">
+      <div class="user-info">
+        <div class="info-item">
+          <strong>Username:</strong> {{ currentRequest.username }}
+        </div>
+        <div class="info-item">
+          <strong>Email:</strong> {{ currentRequest.email }}
+        </div>
+        <div class="info-item">
+          <strong>Request Time:</strong> {{ currentRequest.created_at | date:'short' }}
+        </div>
+      </div>
+      
+      <div class="message">
+        <p>{{ currentRequest.message }}</p>
+      </div>
+      
+      <div class="popup-actions">
+        <button mat-raised-button 
+                color="primary" 
+                (click)="approveUser()" 
+                [disabled]="processing"
+                class="approve-btn">
+          <mat-spinner *ngIf="processing" diameter="20"></mat-spinner>
+          <mat-icon *ngIf="!processing">check</mat-icon>
+          {{ processing ? 'Processing...' : 'Yes, Approve' }}
+        </button>
+        
+        <button mat-stroked-button 
+                color="warn" 
+                (click)="rejectUser()" 
+                [disabled]="processing"
+                class="reject-btn">
+          <mat-icon>close</mat-icon>
+          No, Reject
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

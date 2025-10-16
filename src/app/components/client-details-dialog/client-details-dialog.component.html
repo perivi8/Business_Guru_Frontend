@@ -1,0 +1,258 @@
+<div class="client-details-dialog">
+  <div mat-dialog-title class="dialog-header">
+    <h2>Client Details</h2>
+    <button mat-icon-button (click)="onClose()" class="close-button" matTooltip="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div mat-dialog-content class="dialog-content">
+    <!-- Client Summary -->
+    <mat-card class="summary-card">
+      <div class="summary-content">
+        <div class="client-avatar" [class.missing]="!client.legal_name && !client.user_name">
+          <mat-icon>account_circle</mat-icon>
+        </div>
+        <div class="client-summary">
+          <h3 [class.missing]="!client.legal_name && !client.user_name">
+            {{ client.legal_name || client.user_name || 'Client Name Not Provided' }}
+          </h3>
+          <div class="client-meta">
+            <span class="client-email" [class.missing]="!client.email">
+              <mat-icon>email</mat-icon> {{ client.email || 'Email Not Provided' }}
+            </span>
+            <span class="client-phone" [class.missing]="!client.mobile_number">
+              <mat-icon>phone</mat-icon> {{ client.mobile_number || 'Phone Not Provided' }}
+            </span>
+          </div>
+          <div class="client-status">
+            <span class="status-badge" [style.background-color]="getStatusColor(client.status)">
+              {{ client.status ? (client.status | titlecase) : 'Status: N/A' }}
+            </span>
+            <span class="loan-status-badge" [style.background-color]="getLoanStatusColor(getLoanStatus())">
+              Loan Status: {{ getLoanStatus() | titlecase }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </mat-card>
+
+    <!-- Single View for All Information -->
+    <div class="info-sections">
+      <!-- Personal Information -->
+      <mat-card class="info-section" *ngIf="hasPersonalInfo()">
+        <mat-card-header>
+          <mat-card-title><mat-icon>person</mat-icon> Personal Information</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="details-grid">
+            <div class="detail-item" *ngIf="client.legal_name">
+              <div class="detail-label">Legal Name:</div>
+              <div class="detail-value">{{ client.legal_name }}</div>
+            </div>
+            <div class="detail-item" *ngIf="client['optional_mobile_number']">
+              <div class="detail-label">Optional Mobile:</div>
+              <div class="detail-value">{{ client['optional_mobile_number'] }}</div>
+            </div>
+            <div class="detail-item" *ngIf="client.email">
+              <div class="detail-label">Email:</div>
+              <div class="detail-value">{{ client.email }}</div>
+            </div>
+            <div class="detail-item" *ngIf="client.mobile_number">
+              <div class="detail-label">Mobile:</div>
+              <div class="detail-value">{{ client.mobile_number }}</div>
+            </div>
+            <div class="detail-item" *ngIf="client.date_of_birth">
+              <div class="detail-label">Date of Birth:</div>
+              <div class="detail-value">{{ formatDate(client.date_of_birth) }}</div>
+            </div>
+            <div class="detail-item" *ngIf="client.gender">
+              <div class="detail-label">Gender:</div>
+              <div class="detail-value">{{ client.gender }}</div>
+            </div>
+            <div class="detail-item" *ngIf="hasValue(client.address) || hasValue(client.district) || hasValue(client.state) || hasValue(client.pincode)">
+              <div class="detail-label">Address:</div>
+              <div class="detail-value">
+                {{ formatAddress() }}
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Business Information -->
+      <mat-card class="info-section" *ngIf="hasBusinessInfo()">
+        <mat-card-header>
+          <mat-card-title><mat-icon>business</mat-icon> Business Information</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="details-grid">
+            <div class="detail-item" *ngIf="client.business_name">
+              <div class="detail-label">Business Name:</div>
+              <div class="detail-value">{{ client.business_name }}</div>
+            </div>
+            <div class="detail-item" *ngIf="client['legal_business_name']">
+              <div class="detail-label">Legal Business Name:</div>
+              <div class="detail-value">{{ client['legal_business_name'] }}</div>
+            </div>
+            <div class="detail-item" *ngIf="client.business_type">
+              <div class="detail-label">Business Type:</div>
+              <div class="detail-value">{{ client.business_type }}</div>
+            </div>
+            <div class="detail-item" *ngIf="client['constitution_type']">
+              <div class="detail-label">Constitution Type:</div>
+              <div class="detail-value">{{ client['constitution_type'] }}</div>
+            </div>
+            <div class="detail-item" *ngIf="client['has_business_pan']">
+              <div class="detail-label">Has Business PAN:</div>
+              <div class="detail-value">{{ client['has_business_pan'] }}</div>
+            </div>
+            <div class="detail-item" *ngIf="client['number_of_partners'] !== undefined">
+              <div class="detail-label">Number of Partners:</div>
+              <div class="detail-value">{{ client['number_of_partners'] }}</div>
+            </div>
+            <div class="detail-item" *ngIf="client['business_pan']">
+              <div class="detail-label">Business PAN:</div>
+              <div class="detail-value">{{ client['business_pan'] }}</div>
+            </div>
+            <div class="detail-item" *ngIf="client['ie_code']">
+              <div class="detail-label">IE Code:</div>
+              <div class="detail-value">{{ client['ie_code'] }}</div>
+            </div>
+            <div class="detail-item" *ngIf="client['website']">
+              <div class="detail-label">Website:</div>
+              <div class="detail-value">
+                <a [href]="client['website']" target="_blank" rel="noopener">{{ client['website'] }}</a>
+              </div>
+            </div>
+            <div class="detail-item" *ngIf="client.business_address">
+              <div class="detail-label">Business Address:</div>
+              <div class="detail-value">{{ client.business_address }}</div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Banking Information -->
+      <mat-card class="info-section" *ngIf="hasBankingInfo()">
+        <mat-card-header>
+          <mat-card-title><mat-icon>account_balance</mat-icon> Banking Information</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="details-grid">
+            <div class="detail-item" *ngIf="client['bank_name']">
+              <div class="detail-label">Bank Name:</div>
+              <div class="detail-value">{{ client['bank_name'] }}</div>
+            </div>
+            <div class="detail-item" *ngIf="client['account_number']">
+              <div class="detail-label">Account Number:</div>
+              <div class="detail-value">{{ client['account_number'] }}</div>
+            </div>
+            <div class="detail-item" *ngIf="client['ifsc_code']">
+              <div class="detail-label">IFSC Code:</div>
+              <div class="detail-value">{{ client['ifsc_code'] }}</div>
+            </div>
+            <div class="detail-item" *ngIf="client['account_type'] !== undefined">
+              <div class="detail-label">Account Type:</div>
+              <div class="detail-value">{{ client['account_type'] }}</div>
+            </div>
+            <div class="detail-item" *ngIf="client['new_current_account']">
+              <div class="detail-label">New Current Account:</div>
+              <div class="detail-value">{{ client['new_current_account'] }}</div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Loan Status Section -->
+      <mat-card class="info-section">
+        <mat-card-header>
+          <mat-card-title><mat-icon>trending_up</mat-icon> Loan Status</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="details-grid">
+            <div class="detail-item">
+              <div class="detail-label">Current Loan Status:</div>
+              <div class="detail-value">
+                <span class="loan-status-badge" [style.background-color]="getLoanStatusColor(getLoanStatus())">
+                  {{ getLoanStatus() | titlecase }}
+                </span>
+              </div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Update Loan Status:</div>
+              <div class="detail-value">
+                <mat-form-field appearance="outline" style="width: 200px;">
+                  <mat-label>Select Loan Status</mat-label>
+                  <mat-select [(value)]="selectedLoanStatus" (selectionChange)="onLoanStatusChange($event)">
+                    <mat-option value="soon">Soon</mat-option>
+                    <mat-option value="processing">Processing</mat-option>
+                    <mat-option value="approved">Approved</mat-option>
+                    <mat-option value="hold">Hold</mat-option>
+                    <mat-option value="rejected">Rejected</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="detail-item" *ngIf="client.required_loan_amount">
+              <div class="detail-label">Required Loan Amount:</div>
+              <div class="detail-value">₹{{ client.required_loan_amount | number }}</div>
+            </div>
+            <div class="detail-item" *ngIf="client.loan_purpose">
+              <div class="detail-label">Loan Purpose:</div>
+              <div class="detail-value">{{ client.loan_purpose }}</div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Documents Section -->
+      <mat-card class="info-section documents-section" *ngIf="hasDocuments()">
+        <mat-card-header>
+          <mat-card-title><mat-icon>folder</mat-icon> Documents</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="documents-container">
+            <!-- Loop through all document types -->
+            <div class="document-item" *ngFor="let docType of getDocumentTypes()">
+              <div class="document-info">
+                <mat-icon>{{ getDocumentIcon(docType) }}</mat-icon>
+                <span>{{ getDocumentName(docType) }}</span>
+              </div>
+              <div class="document-actions">
+                <button mat-icon-button 
+                        (click)="previewDocument(docType)" 
+                        matTooltip="Preview {{getDocumentName(docType)}}">
+                  <mat-icon>visibility</mat-icon>
+                </button>
+                <button mat-icon-button 
+                        (click)="downloadDocument(docType)" 
+                        matTooltip="Download {{getDocumentName(docType)}}">
+                  <mat-icon>download</mat-icon>
+                </button>
+                <button mat-icon-button 
+                        (click)="openInNewTab(docType)" 
+                        matTooltip="Open {{getDocumentName(docType)}} in new tab"
+                        *ngIf="hasDocument(docType)">
+                  <mat-icon>open_in_new</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- No Documents Message -->
+      <mat-card class="info-section" *ngIf="!hasDocuments()">
+        <mat-card-content class="no-documents">
+          <mat-icon>folder_off</mat-icon>
+          <p>No documents have been uploaded for this client</p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <div mat-dialog-actions class="dialog-actions">
+    <button mat-raised-button color="primary" (click)="onClose()">Close</button>
+  </div>
+</div>

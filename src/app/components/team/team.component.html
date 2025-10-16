@@ -1,0 +1,67 @@
+<div class="container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>TMIS Team</mat-card-title>
+      <mat-card-subtitle>Users registered with tmis. email addresses</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div *ngIf="loading" class="loading">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Loading team members...</p>
+      </div>
+
+      <div *ngIf="error" class="error">{{ error }}</div>
+
+      <div *ngIf="!loading && !error && users.length === 0" class="no-users">
+        <mat-icon>group</mat-icon>
+        <h3>No team members found</h3>
+        <p>No users with tmis. email addresses are registered yet</p>
+      </div>
+
+      <div *ngIf="!loading && !error && users.length > 0" class="team-grid">
+        <mat-card *ngFor="let user of users" class="user-card">
+          <mat-card-content>
+            <div class="user-avatar">
+              <mat-icon>account_circle</mat-icon>
+            </div>
+            <div class="user-info">
+              <h3>{{ user.username }}</h3>
+              <p class="email">{{ user.email }}</p>
+              <p class="role">
+                <span class="role-badge" [ngClass]="user.role">{{ user.role }}</span>
+                <span *ngIf="user.status === 'paused'" class="status-badge paused">PAUSED</span>
+              </p>
+              <p class="joined">Joined: {{ user.created_at | date:'mediumDate' }}</p>
+            </div>
+            
+            <!-- Action buttons for admins -->
+            <div *ngIf="isAdmin && user.role !== 'admin' && user._id !== currentUser?.id" class="user-actions">
+              <!-- Pause/Resume button -->
+              <button *ngIf="user.status !== 'paused'" mat-icon-button color="accent" (click)="pauseUser(user)" 
+                      matTooltip="Pause User" class="pause-btn">
+                <mat-icon>pause</mat-icon>
+              </button>
+              <button *ngIf="user.status === 'paused'" mat-icon-button color="primary" (click)="resumeUser(user)" 
+                      matTooltip="Resume User" class="resume-btn">
+                <mat-icon>play_arrow</mat-icon>
+              </button>
+              
+              <!-- Delete button -->
+              <button mat-icon-button color="warn" (click)="deleteUser(user)" 
+                      matTooltip="Delete User" class="delete-btn">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <div *ngIf="!loading && !error && users.length > 0" class="team-stats">
+        <div class="stat-item">
+          <mat-icon>people</mat-icon>
+          <span>{{ users.length }} Team Members</span>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

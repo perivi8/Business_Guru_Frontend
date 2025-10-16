@@ -1,0 +1,115 @@
+/* Optimized Status Update Styles for Client Detail Component */
+
+/* Success snackbar styling */
+::ng-deep .success-snackbar {
+  background-color: #4caf50 !important;
+  color: white !important;
+  font-weight: 500 !important;
+}
+
+::ng-deep .success-snackbar .mat-simple-snackbar-action {
+  color: #c8e6c9 !important;
+}
+
+/* Info snackbar styling */
+::ng-deep .info-snackbar {
+  background-color: #2196f3 !important;
+  color: white !important;
+  font-weight: 500 !important;
+}
+
+::ng-deep .info-snackbar .mat-simple-snackbar-action {
+  color: #bbdefb !important;
+}
+
+/* Error snackbar styling */
+::ng-deep .error-snackbar {
+  background-color: #f44336 !important;
+  color: white !important;
+  font-weight: 500 !important;
+}
+
+::ng-deep .error-snackbar .mat-simple-snackbar-action {
+  color: #ffcdd2 !important;
+  font-weight: 600 !important;
+}
+
+/* Enhanced button animations for instant feedback */
+.payment-gateway-card .gateway-actions button {
+  transition: all 0.2s ease-in-out !important;
+}
+
+.payment-gateway-card .gateway-actions button:active {
+  transform: scale(0.95);
+  transition: transform 0.1s ease-in-out;
+}
+
+.loan-status-actions button {
+  transition: all 0.2s ease-in-out !important;
+}
+
+.loan-status-actions button:active {
+  transform: scale(0.95);
+  transition: transform 0.1s ease-in-out;
+}
+
+/* Loading state improvements */
+.gateway-actions button[disabled] {
+  opacity: 0.7 !important;
+  cursor: not-allowed !important;
+}
+
+.loan-status-actions button[disabled] {
+  opacity: 0.7 !important;
+  cursor: not-allowed !important;
+}
+
+/* Instant feedback visual cues */
+.gateway-actions button.selected {
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.5) !important;
+  border: 2px solid #4caf50 !important;
+}
+
+.loan-status-actions button.selected {
+  box-shadow: 0 0 10px rgba(33, 150, 243, 0.5) !important;
+  border: 2px solid #2196f3 !important;
+}
+
+/* Optimized spinner styling */
+.mat-spinner {
+  display: inline-block !important;
+  vertical-align: middle !important;
+}
+
+/* Status badge animations */
+.status-badge, .loan-status-badge {
+  transition: all 0.3s ease-in-out !important;
+}
+
+.status-badge:hover, .loan-status-badge:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Fast update success animation */
+@keyframes fastUpdateSuccess {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.fast-update-success {
+  animation: fastUpdateSuccess 0.3s ease-in-out;
+}
+
+/* Retry button styling */
+::ng-deep .error-snackbar .mat-simple-snackbar-action {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  border-radius: 4px !important;
+  padding: 4px 8px !important;
+  margin-left: 8px !important;
+}
+
+::ng-deep .error-snackbar .mat-simple-snackbar-action:hover {
+  background-color: rgba(255, 255, 255, 0.3) !important;
+}

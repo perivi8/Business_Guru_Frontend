@@ -1,0 +1,542 @@
+<div class="client-detail-container">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Loading client details...</p>
+  </div>
+
+  <!-- Saving Status Changes Loading Overlay -->
+  <div *ngIf="saving" class="saving-overlay">
+    <div class="saving-content">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Updating client status...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-container">
+    <mat-icon>error</mat-icon>
+    <h3>Error Loading Client</h3>
+    <p>{{ error }}</p>
+    <button mat-raised-button color="primary" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Back to Clients
+    </button>
+  </div>
+
+  <!-- Client Details -->
+  <div *ngIf="!loading && !error && client" class="client-details">
+    <!-- Header Section -->
+    <div class="header-section">
+      <div class="header-content">
+        <div class="client-title">
+          <h1>{{ client.legal_name || client.user_name }}</h1>
+          <p class="client-subtitle">{{ client.trade_name || client.business_name }}</p>
+        </div>
+        <div class="header-actions">
+          <span class="status-badge" [style.background-color]="getStatusColor(client.status || 'pending')">
+            {{ (client.status || 'pending') | titlecase }}
+          </span>
+          <div class="action-buttons" *ngIf="isAdmin()">
+            <button mat-raised-button color="primary" (click)="startEdit()" *ngIf="!isEditing">
+              <mat-icon>edit</mat-icon>
+              Edit
+            </button>
+            <button mat-raised-button color="warn" (click)="deleteClient()" *ngIf="!isEditing">
+              <mat-icon>delete</mat-icon>
+              Delete
+            </button>
+            <div *ngIf="isEditing" class="edit-actions">
+              <button mat-raised-button color="primary" (click)="saveEdit()" [disabled]="saving">
+                <mat-spinner diameter="20" *ngIf="saving"></mat-spinner>
+                <mat-icon *ngIf="!saving">save</mat-icon>
+                {{ saving ? 'Saving...' : 'Save' }}
+              </button>
+              <button mat-stroked-button (click)="cancelEdit()" [disabled]="saving">
+                <mat-icon>cancel</mat-icon>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content-section">
+      <!-- Row 1: Business Information and Financial Information side by side -->
+      <div class="row-layout">
+        <!-- Business Information Card -->
+        <mat-card class="info-card half-width">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>business</mat-icon>
+            Business Information
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="info-table">
+            <table class="details-table">
+              <tbody>
+                <tr>
+                  <td class="label">Legal Name:</td>
+                  <td class="value">{{ client.legal_name || 'N/A' }}</td>
+                </tr>
+                <tr>
+                  <td class="label">Trade Name/Business Name:</td>
+                  <td class="value">{{ client.trade_name || 'N/A' }}</td>
+                </tr>
+                <tr>
+                  <td class="label">GST Registration Number:</td>
+                  <td class="value">{{ getClientProperty('registration_number') || 'N/A' }}</td>
+                </tr>
+                <tr>
+                  <td class="label">GST Status:</td>
+                  <td class="value">{{ getGSTStatus() }}</td>
+                </tr>
+                <tr>
+                  <td class="label">Address:</td>
+                  <td class="value">{{ client.address || 'N/A' }}</td>
+                </tr>
+                <tr>
+                  <td class="label">District:</td>
+                  <td class="value">{{ client.district || 'N/A' }}</td>
+                </tr>
+                <tr>
+                  <td class="label">State:</td>
+                  <td class="value">{{ client.state || 'N/A' }}</td>
+                </tr>
+                <tr>
+                  <td class="label">Pincode:</td>
+                  <td class="value">{{ client.pincode || 'N/A' }}</td>
+                </tr>
+                <tr>
+                  <td class="label">User Email:</td>
+                  <td class="value">{{ client.user_email || 'N/A' }}</td>
+                </tr>
+                <tr>
+                  <td class="label">Company Email:</td>
+                  <td class="value">{{ getClientProperty('company_email') || 'N/A' }}</td>
+                </tr>
+                <tr>
+                  <td class="label">Mobile Number:</td>
+                  <td class="value">{{ client.mobile_number || 'N/A' }}</td>
+                </tr>
+                <tr>
+                  <td class="label">Optional Mobile Number:</td>
+                  <td class="value">{{ getClientProperty('optional_mobile_number') || 'N/A' }}</td>
+                </tr>
+                <tr>
+                  <td class="label">Constitution Type:</td>
+                  <td class="value">{{ client.constitution_type || 'N/A' }}</td>
+                </tr>
+                <tr *ngIf="getClientProperty('business_pan_name')">
+                  <td class="label">Business PAN Name:</td>
+                  <td class="value">{{ getClientProperty('business_pan_name') }}</td>
+                </tr>
+                <tr *ngIf="getClientProperty('business_pan_date')">
+                  <td class="label">Business PAN Date:</td>
+                  <td class="value">{{ getClientProperty('business_pan_date') | date:'dd/MM/yyyy' }}</td>
+                </tr>
+                <tr *ngIf="client.number_of_partners">
+                  <td class="label">Number of Partners:</td>
+                  <td class="value">{{ client.number_of_partners }}</td>
+                </tr>
+                <tr>
+                  <td class="label">IE Document:</td>
+                  <td class="value">{{ hasIEDocument() ? 'Yes' : 'No' }}</td>
+                </tr>
+                <tr>
+                  <td class="label">Website URL:</td>
+                  <td class="value">{{ getWebsiteURL() }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+        <!-- Financial Information Card -->
+        <mat-card class="info-card half-width">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>account_balance</mat-icon>
+              Financial Information
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="info-table">
+              <table class="details-table">
+                <tbody>
+                  <tr>
+                    <td class="label">Required Loan Amount:</td>
+                    <td class="value">₹{{ (client.required_loan_amount | number) || 'N/A' }}</td>
+                  </tr>
+                  <tr>
+                    <td class="label">Loan Purpose:</td>
+                    <td class="value">{{ client.loan_purpose || 'N/A' }}</td>
+                  </tr>
+                  <tr>
+                    <td class="label">Bank Name:</td>
+                    <td class="value">{{ client.bank_name || 'N/A' }}</td>
+                  </tr>
+                  <tr>
+                    <td class="label">Account Name:</td>
+                    <td class="value">{{ client.account_name || 'N/A' }}</td>
+                  </tr>
+                  <tr>
+                    <td class="label">Bank Account Number:</td>
+                    <td class="value">{{ client.account_number || 'N/A' }}</td>
+                  </tr>
+                  <tr>
+                    <td class="label">IFSC Code:</td>
+                    <td class="value">{{ client.ifsc_code || 'N/A' }}</td>
+                  </tr>
+                  <tr>
+                    <td class="label">Bank Account Type:</td>
+                    <td class="value">{{ client.bank_type || 'N/A' }}</td>
+                  </tr>
+                  <tr>
+                    <td class="label">New Current Account:</td>
+                    <td class="value">{{ client.new_current_account === 'yes' ? 'Yes' : (client.new_current_account === 'no' ? 'No' : 'N/A') }}</td>
+                  </tr>
+                  
+                  <!-- New Bank Details (Show when New Current Account is Yes) -->
+                  <tr *ngIf="client.new_current_account === 'yes' && getClientProperty('new_bank_name')">
+                    <td class="label">New Bank Name:</td>
+                    <td class="value">{{ getClientProperty('new_bank_name') }}</td>
+                  </tr>
+                  <tr *ngIf="client.new_current_account === 'yes' && getClientProperty('new_account_name')">
+                    <td class="label">New Account Name:</td>
+                    <td class="value">{{ getClientProperty('new_account_name') }}</td>
+                  </tr>
+                  <tr *ngIf="client.new_current_account === 'yes' && getClientProperty('new_bank_account_number')">
+                    <td class="label">New Bank Account Number:</td>
+                    <td class="value">{{ getClientProperty('new_bank_account_number') }}</td>
+                  </tr>
+                  <tr *ngIf="client.new_current_account === 'yes' && getClientProperty('new_ifsc_code')">
+                    <td class="label">New IFSC Code:</td>
+                    <td class="value">{{ getClientProperty('new_ifsc_code') }}</td>
+                  </tr>
+                  
+                  <tr>
+                    <td class="label">Total Credit Amount:</td>
+                    <td class="value">₹{{ (client.total_credit_amount | number) || 'N/A' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Second Row: Personal Information and Staff Information side by side -->
+      <div class="row-layout">
+        <!-- Personal Information Card -->
+        <mat-card class="info-card half-width">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>person</mat-icon>
+              Personal Information
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="info-table">
+              <table class="details-table">
+                <tbody>
+                  <!-- Owner Information (for Proprietorship and Private Limited) -->
+                  <tr *ngIf="getOwnerName()">
+                    <td class="label">Owner Name:</td>
+                    <td class="value">{{ getOwnerName() }}</td>
+                  </tr>
+                  <tr *ngIf="getOwnerDob()">
+                    <td class="label">Owner Date of Birth:</td>
+                    <td class="value">{{ getOwnerDob() | date:'dd/MM/yyyy' }}</td>
+                  </tr>
+                  
+                  <!-- Partner Information (for Partnership) -->
+                  <ng-container *ngIf="client.constitution_type === 'Partnership'">
+                    <ng-container *ngFor="let partner of getPartnersList(); let i = index">
+                      <tr *ngIf="partner.name">
+                        <td class="label">{{ i === 0 ? 'Managing Partner' : 'Partner ' + (i + 1) }} Name:</td>
+                        <td class="value">{{ partner.name }}</td>
+                      </tr>
+                      <tr *ngIf="partner.dob">
+                        <td class="label">{{ i === 0 ? 'Managing Partner' : 'Partner ' + (i + 1) }} DOB:</td>
+                        <td class="value">{{ partner.dob | date:'dd/MM/yyyy' }}</td>
+                      </tr>
+                    </ng-container>
+                  </ng-container>
+                </tbody>
+              </table>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Staff Information Card -->
+        <mat-card class="info-card half-width">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>support_agent</mat-icon>
+            Staff Information
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="info-table">
+            <table class="details-table">
+              <tbody>
+                <tr>
+                  <td class="label">Staff Name:</td>
+                  <td class="value">{{ client.staff_name || 'N/A' }}</td>
+                </tr>
+                <tr>
+                  <td class="label">Staff Email:</td>
+                  <td class="value">{{ client.staff_email || 'N/A' }}</td>
+                </tr>
+                <tr>
+                  <td class="label">Created At:</td>
+                  <td class="value">{{ (client.created_at | date:'medium') || 'N/A' }}</td>
+                </tr>
+                <tr>
+                  <td class="label">Updated At:</td>
+                  <td class="value">{{ (client.updated_at | date:'medium') || 'N/A' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Row 3: Documents & Images (Full Width) -->
+      <div class="row-layout full-width" *ngIf="getDocumentKeys().length > 0">
+        <mat-card class="info-card full-width">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>folder</mat-icon>
+              Documents & Images
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="documents-grid">
+              <div *ngFor="let docType of getDocumentKeys()" class="document-item">
+                <div class="document-info">
+                  <div class="document-header">
+                    <mat-icon>{{ isImageFile(client.processed_documents![docType].file_name) ? 'image' : 'description' }}</mat-icon>
+                    <div class="document-details">
+                      <h4>{{ formatDocumentName(docType) }}</h4>
+                      <p class="file-name">{{ client.processed_documents![docType].file_name }}</p>
+                      <p class="file-size">{{ formatFileSize(client.processed_documents![docType].file_size) }}</p>
+                    </div>
+                  </div>
+                  <div class="document-actions">
+                    <button mat-icon-button (click)="previewDocument(docType)" 
+                            matTooltip="Preview {{ formatDocumentName(docType) }}"
+                            *ngIf="canPreviewDocument(client.processed_documents![docType].file_name)">
+                      <mat-icon>visibility</mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="downloadDocument(docType)" 
+                            matTooltip="Download {{ formatDocumentName(docType) }}">
+                      <mat-icon>download</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Row 4: Payment Gateway Information Card -->
+      <mat-card class="info-card full-width">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>payment</mat-icon>
+            Payment Gateway
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="payment-gateway-section">
+            <!-- Selected Payment Gateways -->
+            <div class="payment-gateway-info">
+              <h4>Selected Payment Gateways:</h4>
+              <div *ngIf="getPaymentGateways().length > 0" class="payment-gateways-list">
+                <div *ngFor="let gateway of getPaymentGateways()" class="payment-gateway-card">
+                  <div class="gateway-header">
+                    <span class="gateway-name">{{ gateway }}</span>
+                  </div>
+                  
+                  <!-- Approval/Rejection Buttons for Admin -->
+                  <div *ngIf="isAdmin()" class="gateway-actions">
+                    <button 
+                      mat-raised-button 
+                      [color]="getPaymentGatewayStatus(gateway) === 'approved' ? 'primary' : ''"
+                      [class.selected]="getPaymentGatewayStatus(gateway) === 'approved'"
+                      [disabled]="isGatewayUpdating(gateway)"
+                      (click)="toggleGatewayApproval(gateway, 'approved')"
+                      class="approval-btn">
+                      <mat-spinner *ngIf="isGatewayUpdating(gateway)" diameter="16" style="margin-right: 8px;"></mat-spinner>
+                      <mat-icon *ngIf="!isGatewayUpdating(gateway)">check_circle</mat-icon>
+                      {{ isGatewayUpdating(gateway) ? 'Updating...' : 'Approved' }}
+                    </button>
+                    <button 
+                      mat-raised-button 
+                      [color]="getPaymentGatewayStatus(gateway) === 'not_approved' ? 'warn' : ''"
+                      [class.selected]="getPaymentGatewayStatus(gateway) === 'not_approved'"
+                      [disabled]="isGatewayUpdating(gateway)"
+                      (click)="toggleGatewayApproval(gateway, 'not_approved')"
+                      class="rejection-btn">
+                      <mat-spinner *ngIf="isGatewayUpdating(gateway)" diameter="16" style="margin-right: 8px;"></mat-spinner>
+                      <mat-icon *ngIf="!isGatewayUpdating(gateway)">cancel</mat-icon>
+                      {{ isGatewayUpdating(gateway) ? 'Updating...' : 'Not Approved' }}
+                    </button>
+                  </div>
+                  
+                  <!-- Status Display for Non-Admin -->
+                  <div *ngIf="!isAdmin()" class="gateway-status">
+                    <span class="status-badge" 
+                          [class.approved]="getPaymentGatewayStatus(gateway) === 'approved'"
+                          [class.rejected]="getPaymentGatewayStatus(gateway) === 'not_approved'"
+                          [class.pending]="getPaymentGatewayStatus(gateway) === 'pending'">
+                      {{ getPaymentGatewayStatus(gateway) === 'approved' ? 'Approved' : 
+                         getPaymentGatewayStatus(gateway) === 'not_approved' ? 'Not Approved' : 'Pending' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="getPaymentGateways().length === 0" class="no-payment-gateways">
+                <span>No payment gateway selected</span>
+              </div>
+            </div>
+            
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Row 5: Loan Status and Status & Feedback side by side -->
+      <div class="row-layout">
+        <!-- Loan Status Card -->
+        <mat-card class="info-card half-width">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>trending_up</mat-icon>
+              Loan Status
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="loan-status-section">
+              <div class="loan-status-info">
+                <div class="loan-status-container">
+                  <!-- Current Status Display -->
+                  <div class="current-loan-status">
+                    <span class="loan-status-badge" 
+                          [style.background-color]="getLoanStatusColor(getLoanStatus())">
+                      {{ getLoanStatus() | titlecase }}
+                    </span>
+                  </div>
+                  
+                  <!-- Loan Status Options for Admin -->
+                  <div *ngIf="isAdmin()" class="loan-status-actions">
+                    <button 
+                      mat-raised-button 
+                      [color]="getLoanStatus() === 'approved' ? 'primary' : ''"
+                      [class.selected]="getLoanStatus() === 'approved'"
+                      [disabled]="isLoanStatusUpdating()"
+                      (click)="updateLoanStatus('approved')"
+                      class="loan-status-btn approved">
+                      <mat-spinner *ngIf="isLoanStatusUpdating()" diameter="16" style="margin-right: 8px;"></mat-spinner>
+                      <mat-icon *ngIf="!isLoanStatusUpdating()">check_circle</mat-icon>
+                      {{ isLoanStatusUpdating() ? 'Updating...' : 'Approved' }}
+                    </button>
+                    <button 
+                      mat-raised-button 
+                      [color]="getLoanStatus() === 'hold' ? 'accent' : ''"
+                      [class.selected]="getLoanStatus() === 'hold'"
+                      [disabled]="isLoanStatusUpdating()"
+                      (click)="updateLoanStatus('hold')"
+                      class="loan-status-btn hold">
+                      <mat-spinner *ngIf="isLoanStatusUpdating()" diameter="16" style="margin-right: 8px;"></mat-spinner>
+                      <mat-icon *ngIf="!isLoanStatusUpdating()">pause_circle</mat-icon>
+                      {{ isLoanStatusUpdating() ? 'Updating...' : 'Hold' }}
+                    </button>
+                    <button 
+                      mat-raised-button 
+                      [color]="getLoanStatus() === 'processing' ? 'primary' : ''"
+                      [class.selected]="getLoanStatus() === 'processing'"
+                      [disabled]="isLoanStatusUpdating()"
+                      (click)="updateLoanStatus('processing')"
+                      class="loan-status-btn processing">
+                      <mat-spinner *ngIf="isLoanStatusUpdating()" diameter="16" style="margin-right: 8px;"></mat-spinner>
+                      <mat-icon *ngIf="!isLoanStatusUpdating()">hourglass_empty</mat-icon>
+                      {{ isLoanStatusUpdating() ? 'Updating...' : 'Processing' }}
+                    </button>
+                    <button 
+                      mat-raised-button 
+                      [color]="getLoanStatus() === 'rejected' ? 'warn' : ''"
+                      [class.selected]="getLoanStatus() === 'rejected'"
+                      [disabled]="isLoanStatusUpdating()"
+                      (click)="updateLoanStatus('rejected')"
+                      class="loan-status-btn rejected">
+                      <mat-spinner *ngIf="isLoanStatusUpdating()" diameter="16" style="margin-right: 8px;"></mat-spinner>
+                      <mat-icon *ngIf="!isLoanStatusUpdating()">cancel</mat-icon>
+                      {{ isLoanStatusUpdating() ? 'Updating...' : 'Rejected' }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Status and Feedback Card (Visible for all users) -->
+        <mat-card class="info-card half-width">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>feedback</mat-icon>
+              Status & Feedback
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div *ngIf="!isEditing" class="info-table">
+              <table class="details-table">
+                <tbody>
+                  <tr>
+                    <td class="label">Status:</td>
+                    <td class="value">
+                      <span class="status-badge" [style.background-color]="getStatusColor(client.status || 'pending')">
+                        {{ (client.status || 'pending') | titlecase }}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="label">Feedback:</td>
+                    <td class="value">{{ client.feedback || 'No feedback provided' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            
+            <div *ngIf="isEditing && isAdmin()" class="edit-form">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Status</mat-label>
+                <mat-select [(value)]="editableClient!.status">
+                  <mat-option value="pending">Pending</mat-option>
+                  <mat-option value="processing">Processing</mat-option>
+                  <mat-option value="interested">Interested</mat-option>
+                  <mat-option value="not_interested">Not Interested</mat-option>
+                  <mat-option value="hold">Hold</mat-option>
+                </mat-select>
+              </mat-form-field>
+              
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Feedback</mat-label>
+                <textarea matInput [(ngModel)]="editableClient!.feedback" 
+                          rows="4" placeholder="Enter feedback for this client"></textarea>
+              </mat-form-field>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+</div>

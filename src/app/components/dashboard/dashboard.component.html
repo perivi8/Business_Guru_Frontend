@@ -1,0 +1,245 @@
+<div class="container">
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-content">
+          <mat-icon class="stat-icon total">people</mat-icon>
+          <div class="stat-info">
+            <h3>{{ stats.totalClients }}</h3>
+            <p>Total Clients</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-content">
+          <mat-icon class="stat-icon today">today</mat-icon>
+          <div class="stat-info">
+            <h3>{{ stats.todayNewClients }}</h3>
+            <p>Today New Clients</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-content">
+          <mat-icon class="stat-icon pending">schedule</mat-icon>
+          <div class="stat-info">
+            <h3>{{ stats.pendingClients }}</h3>
+            <p>Pending Review</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-content">
+          <mat-icon class="stat-icon interested">check_circle</mat-icon>
+          <div class="stat-info">
+            <h3>{{ stats.interestedClients }}</h3>
+            <p>Interested</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-content">
+          <mat-icon class="stat-icon not-interested">cancel</mat-icon>
+          <div class="stat-info">
+            <h3>{{ stats.notInterestedClients }}</h3>
+            <p>Not Interested</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-content">
+          <mat-icon class="stat-icon hold">pause_circle</mat-icon>
+          <div class="stat-info">
+            <h3>{{ stats.onHoldClients }}</h3>
+            <p>On Hold</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-content">
+          <mat-icon class="stat-icon processing">sync</mat-icon>
+          <div class="stat-info">
+            <h3>{{ stats.processingClients }}</h3>
+            <p>Processing</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-content">
+          <mat-icon class="stat-icon team">group</mat-icon>
+          <div class="stat-info">
+            <h3>{{ stats.totalTeam }}</h3>
+            <p>Total Team</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Admin Utilities (only for admins) -->
+  <div *ngIf="currentUser?.role === 'admin'" class="admin-utilities">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Admin Utilities</mat-card-title>
+        <mat-card-subtitle>Database management tools</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="utility-buttons">
+          <button mat-stroked-button color="primary" (click)="debugAllUsers()">
+            <mat-icon>bug_report</mat-icon>
+            Debug All Users
+          </button>
+          <button mat-stroked-button color="warn" (click)="cleanupRejectedUsers()">
+            <mat-icon>cleaning_services</mat-icon>
+            Cleanup Rejected Users
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Recent Clients Table -->
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Recent Clients</mat-card-title>
+      <mat-card-subtitle>Latest client registrations</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div *ngIf="loading" class="loading">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Loading clients...</p>
+      </div>
+
+      <div *ngIf="!loading && clients.length === 0" class="no-clients">
+        <mat-icon>person_add</mat-icon>
+        <h3>No clients yet</h3>
+        <p>Start by adding your first client</p>
+        <button mat-raised-button color="primary" routerLink="/new-client">
+          Add New Client
+        </button>
+      </div>
+
+      <div *ngIf="!loading && clients.length > 0" class="clients-table">
+        <table mat-table [dataSource]="clients.slice(0, 5)" class="mat-elevation-z2">
+          <!-- Serial Number Column -->
+          <ng-container matColumnDef="serial">
+            <th mat-header-cell *matHeaderCellDef>S.No</th>
+            <td mat-cell *matCellDef="let client; let i = index">{{ i + 1 }}</td>
+          </ng-container>
+
+          <!-- Name Column -->
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Client Name</th>
+            <td mat-cell *matCellDef="let client" (click)="viewClientDetails(client)" class="clickable-cell">
+              <div class="client-info">
+                <strong>{{ client.legal_name || client.user_name || 'N/A' }}</strong>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Business Column -->
+          <ng-container matColumnDef="business">
+            <th mat-header-cell *matHeaderCellDef>Business</th>
+            <td mat-cell *matCellDef="let client" (click)="viewClientDetails(client)" class="clickable-cell">
+              <div class="business-info">
+                <strong>{{ client.trade_name || client.business_name || client.legal_name || 'N/A' }}</strong>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Staff Column -->
+          <ng-container matColumnDef="staff">
+            <th mat-header-cell *matHeaderCellDef>Staff</th>
+            <td mat-cell *matCellDef="let client">
+              <div class="staff-info">
+                <strong>{{ client.staff_name || 'Unassigned' }}</strong>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let client">
+              <span class="status-badge" [style.background-color]="getStatusColor(client.status)">
+                {{ client.status | titlecase }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Loan Status Column -->
+          <ng-container matColumnDef="loan_status">
+            <th mat-header-cell *matHeaderCellDef>Loan Status</th>
+            <td mat-cell *matCellDef="let client">
+              <span class="status-badge" [style.background-color]="getLoanStatusColor(getLoanStatus(client))">
+                {{ getLoanStatus(client) | titlecase }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Created Column -->
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef>Created</th>
+            <td mat-cell *matCellDef="let client">
+              {{ client.created_at | date:'short' }}
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let client">
+              <div class="user-actions">
+                <button mat-icon-button (click)="editClient(client); $event.stopPropagation()" class="edit-btn" matTooltip="Edit Client">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button (click)="openWhatsApp(client); $event.stopPropagation()" class="whatsapp-btn" matTooltip="WhatsApp">
+                  <mat-icon svgIcon="whatsapp"></mat-icon>
+                </button>
+                <button mat-icon-button (click)="deleteClient(client); $event.stopPropagation()" class="delete-btn" matTooltip="Delete Client">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="['serial', 'name', 'business', 'staff', 'status', 'loan_status', 'date', 'actions']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['serial', 'name', 'business', 'staff', 'status', 'loan_status', 'date', 'actions'];" 
+              [class.interested-row]="row.status === 'interested'"
+              [class.not-interested-row]="row.status === 'not_interested'"
+              [class.hold-row]="row.status === 'hold'"
+              [class.pending-row]="row.status === 'pending'"
+              [class.processing-row]="row.status === 'processing'"></tr>
+        </table>
+
+        <div class="view-all-section" *ngIf="clients.length > 5">
+          <button mat-stroked-button color="primary" routerLink="/clients">
+            View All Clients ({{ clients.length }})
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,0 +1,76 @@
+<div class="chatbot-wrapper" [class.minimized]="isMinimized" *ngIf="isVisible">
+  <!-- Chatbot Header -->
+  <div class="chatbot-header" (click)="toggleMinimize()">
+    <div class="header-left">
+      <mat-icon class="chatbot-logo">auto_awesome</mat-icon>
+      <span class="chatbot-title">TMIS AI Assistant</span>
+    </div>
+    <div class="header-right">
+      <button mat-icon-button (click)="clearChat(); $event.stopPropagation()" matTooltip="Clear Chat">
+        <mat-icon>refresh</mat-icon>
+      </button>
+      <button mat-icon-button (click)="closeChatbot(); $event.stopPropagation()" matTooltip="Close">
+        <mat-icon>close</mat-icon>
+      </button>
+      <button mat-icon-button matTooltip="Minimize/Maximize">
+        <mat-icon>{{ isMinimized ? 'expand_more' : 'expand_less' }}</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Chatbot Body -->
+  <div class="chatbot-body" *ngIf="!isMinimized">
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <button mat-stroked-button color="primary" (click)="askAboutEnquiries()" [disabled]="isLoading">
+        <mat-icon>assignment</mat-icon> Enquiry Stats
+      </button>
+      <button mat-stroked-button color="primary" (click)="askAboutClients()" [disabled]="isLoading">
+        <mat-icon>people</mat-icon> Client Stats
+      </button>
+    </div>
+
+    <!-- Messages Container -->
+    <div class="messages-container" #messagesContainer (scroll)="onScroll()">
+      <div *ngFor="let message of messages" 
+           class="message" 
+           [class.user]="message.isUser" 
+           [class.ai]="!message.isUser">
+        <div class="avatar">
+          <mat-icon *ngIf="message.isUser">person</mat-icon>
+          <mat-icon *ngIf="!message.isUser" class="ai-avatar">auto_awesome</mat-icon>
+        </div>
+        <div class="bubble">
+          <div class="text" [innerHTML]="formatMessage(message.message)"></div>
+          <div class="timestamp">{{ message.timestamp | date:'shortTime' }}</div>
+          <mat-spinner *ngIf="message.isLoading" diameter="16"></mat-spinner>
+        </div>
+      </div>
+
+      <!-- Scroll to bottom button -->
+      <button *ngIf="showScrollButton" mat-fab color="primary" class="scroll-btn" (click)="scrollToBottom()" matTooltip="Scroll to bottom">
+        <mat-icon>keyboard_arrow_down</mat-icon>
+      </button>
+    </div>
+
+    <!-- Input Area -->
+    <div class="input-area">
+      <mat-form-field appearance="outline" class="message-input">
+        <mat-label>Ask me anything about your business data...</mat-label>
+        <textarea matInput [(ngModel)]="currentMessage" (keydown)="onKeyPress($event)"
+          [disabled]="isLoading" rows="2" maxlength="1000"
+          placeholder="e.g., 'How many enquiries?', 'GST: 22AAAAA0000A1Z5'">
+        </textarea>
+        <mat-hint align="end">{{ currentMessage.length }}/1000</mat-hint>
+      </mat-form-field>
+      <button mat-fab color="primary" (click)="sendMessage()" 
+              [disabled]="!currentMessage.trim() || isLoading" class="send-button">
+        <mat-icon *ngIf="!isLoading">send</mat-icon>
+        <mat-spinner *ngIf="isLoading" diameter="24"></mat-spinner>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Mobile Backdrop -->
+<div class="chatbot-backdrop" *ngIf="!isMinimized" (click)="toggleMinimize()"></div>

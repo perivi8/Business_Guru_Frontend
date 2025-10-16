@@ -1,0 +1,32 @@
+<div class="whatsapp-link-container">
+  <button 
+    (click)="sendMessageThroughBackend()" 
+    class="whatsapp-button" 
+    mat-raised-button 
+    color="primary"
+    [disabled]="sending">
+    <mat-icon>chat</mat-icon>
+    <span *ngIf="!sending && !sent">Send "I'm Interested!" on WhatsApp</span>
+    <span *ngIf="sending">Sending...</span>
+    <span *ngIf="sent">Message Sent!</span>
+  </button>
+  
+  <div *ngIf="errorMessage" class="error-message">
+    <mat-icon>error</mat-icon>
+    {{ errorMessage }}
+  </div>
+  
+  <p class="instructions">
+    Click the button above to send a message to our WhatsApp number. No login or registration required!
+  </p>
+  
+  <p class="note" *ngIf="sent">
+    <mat-icon>info</mat-icon>
+    Your enquiry has been recorded. You will be redirected to WhatsApp to complete the conversation.
+  </p>
+  
+  <p class="note" *ngIf="errorMessage">
+    <mat-icon>info</mat-icon>
+    You will be redirected to WhatsApp to complete the conversation.
+  </p>
+</div>

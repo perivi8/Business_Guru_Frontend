@@ -1,0 +1,115 @@
+<div class="public-enquiry-container">
+  <mat-card class="enquiry-card" *ngIf="!submitted">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>contact_support</mat-icon>
+        <span>Business Enquiry Form</span>
+      </mat-card-title>
+      <mat-card-subtitle>
+        Please fill in your details and we'll contact you within 24 hours
+      </mat-card-subtitle>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <form [formGroup]="enquiryForm" (ngSubmit)="onSubmit()" class="enquiry-form">
+        <div class="form-field">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Name</mat-label>
+            <input matInput formControlName="wati_name" placeholder="Enter your full name" required>
+            <mat-error *ngIf="enquiryForm.get('wati_name')?.hasError('required')">
+              Name is required
+            </mat-error>
+            <mat-error *ngIf="enquiryForm.get('wati_name')?.hasError('minlength')">
+              Name must be at least 2 characters
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-field">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Mobile Number</mat-label>
+            <input matInput formControlName="mobile_number" placeholder="Enter your mobile number" required>
+            <mat-error *ngIf="enquiryForm.get('mobile_number')?.hasError('required')">
+              Mobile number is required
+            </mat-error>
+            <mat-error *ngIf="enquiryForm.get('mobile_number')?.hasError('pattern')">
+              Please enter a valid mobile number (10-15 digits)
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-field">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Business Name (Optional)</mat-label>
+            <input matInput formControlName="business_nature" placeholder="Enter your business name">
+          </mat-form-field>
+        </div>
+
+        <div class="form-actions">
+          <button 
+            mat-raised-button 
+            color="primary" 
+            type="submit" 
+            [disabled]="enquiryForm.invalid || submitting"
+            class="submit-button">
+            <span *ngIf="!submitting">Submit Enquiry</span>
+            <span *ngIf="submitting">
+              <mat-spinner diameter="20" class="spinner"></mat-spinner>
+              Submitting...
+            </span>
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Success Message -->
+  <mat-card class="success-card" *ngIf="submitted && success">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon class="success-icon">check_circle</mat-icon>
+        <span>Enquiry Submitted Successfully!</span>
+      </mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="success-message">
+        <p>Thank you for choosing Business GURU!</p>
+        <p>Our team will contact you within 24 hours.</p>
+        <p>Thank you!</p>
+      </div>
+      
+      <div class="success-actions">
+        <button mat-raised-button color="primary" (click)="closeWindow()" class="close-button">
+          Close
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Error Message -->
+  <mat-card class="error-card" *ngIf="submitted && !success">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon class="error-icon">error</mat-icon>
+        <span>Submission Failed</span>
+      </mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="error-message">
+        <p>Sorry, there was an error submitting your enquiry.</p>
+        <p>Please try again later.</p>
+      </div>
+      
+      <div class="error-actions">
+        <button mat-raised-button color="primary" (click)="resetForm()" class="retry-button">
+          Try Again
+        </button>
+        <button mat-stroked-button (click)="closeWindow()" class="close-button">
+          Close
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

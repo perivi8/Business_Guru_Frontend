@@ -1,0 +1,274 @@
+<mat-toolbar color="primary" class="navbar">
+  <div class="nav-container">
+    <button mat-icon-button *ngIf="showBackButton" class="back-button" (click)="goBack()" matTooltip="Go Back">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <a routerLink="/" class="nav-brand">
+      <mat-icon>business</mat-icon>
+      TMIS Business Guru
+    </a>
+
+    <div class="nav-menu" *ngIf="currentUser">
+      <!-- Admin Navigation -->
+      <ng-container *ngIf="isAdmin()">
+        <a routerLink="/admin-dashboard" routerLinkActive="active" class="nav-link">
+          <mat-icon>dashboard</mat-icon>
+          Home
+        </a>
+        <a routerLink="/team" routerLinkActive="active" class="nav-link">
+          <mat-icon>group</mat-icon>
+          Team
+        </a>
+        <a routerLink="/clients" routerLinkActive="active" class="nav-link">
+          <mat-icon>people</mat-icon>
+          Clients
+        </a>
+        <a routerLink="/enquiry" routerLinkActive="active" class="nav-link">
+          <mat-icon>assignment</mat-icon>
+          Enquiry
+        </a>
+        <!-- Removed Contact Us for admin users -->
+        <a routerLink="/transaction" routerLinkActive="active" class="nav-link">
+          <mat-icon>account_balance</mat-icon>
+          Transaction
+        </a>
+        <button mat-icon-button class="nav-link chatbot-button" (click)="openChatbot()" matTooltip="Gemini AI Assistant" type="button">
+          <mat-icon>auto_awesome</mat-icon>
+        </button>
+        <div class="notifications-wrapper">
+          <button mat-icon-button class="nav-link notifications-button" (click)="toggleNotifications()" (dblclick)="navigateToNotifications()" [class.has-notifications]="hasUnreadNotifications" matTooltip="Notifications (Double-click to view all)" type="button">
+            <mat-icon [class.shake]="hasUnreadNotifications">notifications_active</mat-icon>
+            <span class="notification-count" *ngIf="getNotificationCount() > 0">{{ getNotificationCount() }}</span>
+          </button>
+          
+          <!-- Notification Dropdown Panel -->
+          <div class="notification-panel" *ngIf="showNotifications" #notificationPanel>
+            <div class="notification-header">
+              <h3>Notifications</h3>
+              <div class="notification-actions">
+                <button mat-icon-button (click)="clearAllNotifications()" matTooltip="Clear all">
+                  <mat-icon>clear_all</mat-icon>
+                </button>
+                <button mat-icon-button (click)="closeNotifications()" matTooltip="Close">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            </div>
+            
+            <div class="notification-content">
+              <!-- No notifications state -->
+              <div *ngIf="getNotificationCount() === 0" class="no-notifications">
+                <mat-icon>notifications_none</mat-icon>
+                <p>No new notifications</p>
+              </div>
+              
+              <!-- System Notifications -->
+              <div *ngIf="notifications.length > 0" class="notification-section">
+                <h4>System Notifications</h4>
+                <div *ngFor="let notification of notifications.slice(0, 5)" class="notification-item" 
+                     [class.unread]="!notification.read" (click)="onNotificationClick(notification)">
+                  <mat-icon [ngClass]="getNotificationClass(notification.type)">{{ getNotificationIcon(notification.type) }}</mat-icon>
+                  <div class="notification-text">
+                    <div class="notification-title">{{ notification.title }}</div>
+                    <div class="notification-message">{{ notification.message }}</div>
+                    <div class="notification-meta" *ngIf="notification.data?.loanStatus">
+                      <span class="loan-status-badge" [style.background-color]="notification.data.loanStatusColor">
+                        Loan: {{ notification.data.loanStatus.toUpperCase() }}
+                      </span>
+                    </div>
+                    <div class="notification-time">{{ formatTimeAgo(notification.timestamp) }}</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- New Clients -->
+              <div *ngIf="getNewClients().length > 0" class="notification-section">
+                <h4>New Clients ({{ getNewClients().length }})</h4>
+                <div *ngFor="let client of getNewClients().slice(0, 3)" class="notification-item client-notification">
+                  <mat-icon class="new-client">person_add</mat-icon>
+                  <div class="notification-text">
+                    <div class="notification-title">{{ client.legal_name || client.user_name }}</div>
+                    <div class="notification-message">New client added</div>
+                    <div class="notification-time">{{ getTimeAgo(client.created_at) }}</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Updated Clients -->
+              <div *ngIf="getUpdatedClients().length > 0" class="notification-section">
+                <h4>Client Updates ({{ getUpdatedClients().length }})</h4>
+                <div *ngFor="let client of getUpdatedClients().slice(0, 3)" class="notification-item client-notification">
+                  <mat-icon class="update">edit</mat-icon>
+                  <div class="notification-text">
+                    <div class="notification-title">{{ client.legal_name || client.user_name }}</div>
+                    <div class="notification-message">Client updated</div>
+                    <div class="notification-time">{{ getTimeAgo(client.updated_at) }}</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Admin Status Changes (for regular users) -->
+              <div *ngIf="getAdminStatusChanges().length > 0" class="notification-section">
+                <h4>Admin Actions ({{ getAdminStatusChanges().length }})</h4>
+                <div *ngFor="let client of getAdminStatusChanges().slice(0, 3)" class="notification-item client-notification">
+                  <mat-icon class="admin-action">gavel</mat-icon>
+                  <div class="notification-text">
+                    <div class="notification-title">{{ client.legal_name || client.user_name }}</div>
+                    <div class="notification-message">Status changed to {{ client.status }}</div>
+                    <div class="notification-time">{{ getTimeAgo(client.updated_at) }}</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- View All Link -->
+              <div *ngIf="getNotificationCount() > 0" class="view-all">
+                <button mat-button color="primary" (click)="router.navigate(['/notifications']); closeNotifications()">
+                  View All Notifications
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- User Navigation -->
+      <ng-container *ngIf="!isAdmin()">
+        <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">
+          <mat-icon>home</mat-icon>
+          Home
+        </a>
+        <a routerLink="/team" routerLinkActive="active" class="nav-link">
+          <mat-icon>group</mat-icon>
+          Team
+        </a>
+        <a routerLink="/clients" routerLinkActive="active" class="nav-link">
+          <mat-icon>people</mat-icon>
+          Clients
+        </a>
+        <a routerLink="/enquiry" routerLinkActive="active" class="nav-link">
+          <mat-icon>assignment</mat-icon>
+          Enquiry
+        </a>
+        <a routerLink="/new-client" routerLinkActive="active" class="nav-link">
+          <mat-icon>person_add</mat-icon>
+          New Client
+        </a>
+        <!-- Removed Contact Us for non-admin users -->
+        <button mat-icon-button class="nav-link chatbot-button" (click)="openChatbot()" matTooltip="Gemini AI Assistant" type="button">
+          <mat-icon>auto_awesome</mat-icon>
+        </button>
+        <div class="notifications-wrapper">
+          <button mat-icon-button class="nav-link notifications-button" (click)="toggleNotifications()" (dblclick)="navigateToNotifications()" [class.has-notifications]="hasUnreadNotifications" matTooltip="Notifications (Double-click to view all)" type="button">
+            <mat-icon [class.shake]="hasUnreadNotifications">notifications_active</mat-icon>
+            <span class="notification-count" *ngIf="getNotificationCount() > 0">{{ getNotificationCount() }}</span>
+          </button>
+          
+          <!-- Notification Dropdown Panel -->
+          <div class="notification-panel" *ngIf="showNotifications" #notificationPanel>
+            <div class="notification-header">
+              <h3>Notifications</h3>
+              <div class="notification-actions">
+                <button mat-icon-button (click)="clearAllNotifications()" matTooltip="Clear all">
+                  <mat-icon>clear_all</mat-icon>
+                </button>
+                <button mat-icon-button (click)="closeNotifications()" matTooltip="Close">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            </div>
+            
+            <div class="notification-content">
+              <!-- No notifications state -->
+              <div *ngIf="getNotificationCount() === 0" class="no-notifications">
+                <mat-icon>notifications_none</mat-icon>
+                <p>No new notifications</p>
+              </div>
+              
+              <!-- System Notifications -->
+              <div *ngIf="notifications.length > 0" class="notification-section">
+                <h4>System Notifications</h4>
+                <div *ngFor="let notification of notifications.slice(0, 5)" class="notification-item" 
+                     [class.unread]="!notification.read" (click)="onNotificationClick(notification)">
+                  <mat-icon [ngClass]="getNotificationClass(notification.type)">{{ getNotificationIcon(notification.type) }}</mat-icon>
+                  <div class="notification-text">
+                    <div class="notification-title">{{ notification.title }}</div>
+                    <div class="notification-message">{{ notification.message }}</div>
+                    <div class="notification-meta" *ngIf="notification.data?.loanStatus">
+                      <span class="loan-status-badge" [style.background-color]="notification.data.loanStatusColor">
+                        Loan: {{ notification.data.loanStatus.toUpperCase() }}
+                      </span>
+                    </div>
+                    <div class="notification-time">{{ formatTimeAgo(notification.timestamp) }}</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- New Clients -->
+              <div *ngIf="getNewClients().length > 0" class="notification-section">
+                <h4>New Clients ({{ getNewClients().length }})</h4>
+                <div *ngFor="let client of getNewClients().slice(0, 3)" class="notification-item client-notification">
+                  <mat-icon class="new-client">person_add</mat-icon>
+                  <div class="notification-text">
+                    <div class="notification-title">{{ client.legal_name || client.user_name }}</div>
+                    <div class="notification-message">New client added</div>
+                    <div class="notification-time">{{ getTimeAgo(client.created_at) }}</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Updated Clients -->
+              <div *ngIf="getUpdatedClients().length > 0" class="notification-section">
+                <h4>Client Updates ({{ getUpdatedClients().length }})</h4>
+                <div *ngFor="let client of getUpdatedClients().slice(0, 3)" class="notification-item client-notification">
+                  <mat-icon class="update">edit</mat-icon>
+                  <div class="notification-text">
+                    <div class="notification-title">{{ client.legal_name || client.user_name }}</div>
+                    <div class="notification-message">Client updated</div>
+                    <div class="notification-time">{{ getTimeAgo(client.updated_at) }}</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Admin Status Changes (for regular users) -->
+              <div *ngIf="getAdminStatusChanges().length > 0" class="notification-section">
+                <h4>Admin Actions ({{ getAdminStatusChanges().length }})</h4>
+                <div *ngFor="let client of getAdminStatusChanges().slice(0, 3)" class="notification-item client-notification">
+                  <mat-icon class="admin-action">gavel</mat-icon>
+                  <div class="notification-text">
+                    <div class="notification-title">{{ client.legal_name || client.user_name }}</div>
+                    <div class="notification-message">Status changed to {{ client.status }}</div>
+                    <div class="notification-time">{{ getTimeAgo(client.updated_at) }}</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- View All Link -->
+              <div *ngIf="getNotificationCount() > 0" class="view-all">
+                <button mat-button color="primary" (click)="router.navigate(['/notifications']); closeNotifications()">
+                  View All Notifications
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- User Menu -->
+      <button mat-icon-button [matMenuTriggerFor]="userMenu" class="user-menu-button">
+        <mat-icon>account_circle</mat-icon>
+      </button>
+      <mat-menu #userMenu="matMenu">
+        <div class="user-info">
+          <p><strong>{{ currentUser && currentUser.username }}</strong></p>
+          <p>{{ currentUser && currentUser.email }}</p>
+          <p><span class="role-badge" [ngClass]="currentUser && currentUser.role">{{ currentUser && currentUser.role }}</span></p>
+        </div>
+        <mat-divider></mat-divider>
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          Logout
+        </button>
+      </mat-menu>
+    </div> <!-- Close nav-menu -->
+  </div> <!-- Close nav-container -->
+</mat-toolbar>

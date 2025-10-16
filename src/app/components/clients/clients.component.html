@@ -1,0 +1,457 @@
+<div class="container">
+  <!-- Modern Page Header -->
+
+
+  <!-- Filters and Search -->
+  <mat-card class="filters-card">
+    <mat-card-content>
+      <div class="filters-row">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search clients</mat-label>
+          <input matInput [(ngModel)]="searchTerm" (input)="onSearchChange()" 
+                 placeholder="Search by name, business, or mobile">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Filter by status</mat-label>
+          <mat-select [(value)]="statusFilter" (selectionChange)="onStatusFilterChange()">
+            <mat-option value="all">All Status</mat-option>
+            <mat-option value="pending">Pending</mat-option>
+            <mat-option value="processing">Processing</mat-option>
+            <mat-option value="interested">Interested</mat-option>
+            <mat-option value="not_interested">Not Interested</mat-option>
+            <mat-option value="hold">Hold</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Sort by</mat-label>
+          <mat-select [(value)]="sortBy" (selectionChange)="onSortChange()">
+            <mat-option value="newest">New to Old</mat-option>
+            <mat-option value="oldest">Old to New</mat-option>
+            <mat-option value="name_asc">A to Z (Name)</mat-option>
+            <mat-option value="name_desc">Z to A (Name)</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Filter by staff</mat-label>
+          <mat-select [(value)]="staffFilter" (selectionChange)="onStaffFilterChange()">
+            <mat-option value="all">All Staff</mat-option>
+            <mat-option *ngFor="let staff of uniqueStaffMembers" [value]="staff.email">
+              {{ getStaffNameFromFilter(staff) }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <div class="action-buttons">
+          <button mat-icon-button (click)="toggleView()" class="view-toggle-btn" [matTooltip]="viewMode === 'table' ? 'Switch to Card View' : 'Switch to Table View'">
+            <mat-icon>{{ viewMode === 'table' ? 'view_module' : 'table_rows' }}</mat-icon>
+          </button>
+          <button mat-icon-button color="primary" routerLink="/new-client" class="add-client-btn" matTooltip="Add New Client">
+            <mat-icon>person_add</mat-icon>
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Clients Table -->
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        Clients ({{ filteredClients.length }})
+        <span *ngIf="hasActiveFilters()" class="filter-info">
+          - Filtered by: 
+          <span *ngIf="searchTerm" class="filter-tag">Search: "{{ searchTerm }}"</span>
+          <span *ngIf="statusFilter !== 'all'" class="filter-tag">Status: {{ statusFilter | titlecase }}</span>
+          <span *ngIf="staffFilter !== 'all'" class="filter-tag">Staff: {{ getStaffNameFromFilter(getSelectedStaff()) }}</span>
+        </span>
+      </mat-card-title>
+      <div *ngIf="hasActiveFilters()" class="clear-filters-container">
+        <button mat-stroked-button color="warn" (click)="clearAllFilters()" class="clear-filters-btn">
+          <mat-icon>clear_all</mat-icon>
+          Clear Filters
+        </button>
+      </div>
+    </mat-card-header>
+    <mat-card-content>
+      <div *ngIf="loading" class="loading">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Loading clients...</p>
+      </div>
+
+      <div *ngIf="error" class="error">{{ error }}</div>
+
+      <div *ngIf="!loading && !error && filteredClients.length === 0" class="no-clients">
+        <mat-icon>people_outline</mat-icon>
+        <h3>No clients found</h3>
+        <p *ngIf="searchTerm || statusFilter !== 'all'">Try adjusting your search or filters</p>
+        <p *ngIf="!searchTerm && statusFilter === 'all'">Start by adding your first client</p>
+        <button mat-raised-button color="primary" routerLink="/new-client">
+          Add New Client
+        </button>
+      </div>
+
+      <!-- Table View -->
+      <div *ngIf="!loading && !error && filteredClients.length > 0 && viewMode === 'table'" class="table-container">
+        <table mat-table [dataSource]="filteredClients" class="clients-table mat-elevation-z2">
+          <!-- Serial Number Column -->
+          <ng-container matColumnDef="serial">
+            <th mat-header-cell *matHeaderCellDef>S.No</th>
+            <td mat-cell *matCellDef="let client; let i = index">{{ getSerialNumber(i) }}</td>
+          </ng-container>
+
+          <!-- Name Column -->
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Client Name</th>
+            <td mat-cell *matCellDef="let client" (click)="viewClientDetails(client)" class="clickable-cell">
+              <div class="client-info">
+                <strong>{{ client.legal_name || client.user_name || 'N/A' }}</strong>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Business Column -->
+          <ng-container matColumnDef="business">
+            <th mat-header-cell *matHeaderCellDef>Business</th>
+            <td mat-cell *matCellDef="let client" (click)="viewClientDetails(client)" class="clickable-cell">
+              <div class="business-info">
+                <strong>{{ client.trade_name || client.business_name || client.legal_name || 'N/A' }}</strong>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Staff Column -->
+          <ng-container matColumnDef="staff">
+            <th mat-header-cell *matHeaderCellDef>Staff</th>
+            <td mat-cell *matCellDef="let client">
+              <div class="staff-info">
+                <strong>{{ client.staff_name || 'Unassigned' }}</strong>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let client">
+              <span class="status-badge" 
+                    [style.background-color]="getStatusColor(client.status)">
+                {{ client.status || 'No Status' | titlecase }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Loan Status Column -->
+          <ng-container matColumnDef="loan_status">
+            <th mat-header-cell *matHeaderCellDef>Loan Status</th>
+            <td mat-cell *matCellDef="let client">
+              <span class="status-badge" 
+                    [style.background-color]="getLoanStatusColor(getLoanStatus(client))">
+                {{ getLoanStatus(client) | titlecase }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Created Column -->
+          <ng-container matColumnDef="created">
+            <th mat-header-cell *matHeaderCellDef>Created</th>
+            <td mat-cell *matCellDef="let client">
+              {{ client.created_at | date:'short' }}
+            </td>
+          </ng-container>
+
+          <!-- Comments Column -->
+          <ng-container matColumnDef="comments">
+            <th mat-header-cell *matHeaderCellDef>Comments</th>
+            <td mat-cell *matCellDef="let client">
+              <!-- Admin view - editable dropdown -->
+              <mat-form-field appearance="outline" class="comments-dropdown" *ngIf="isAdmin()">
+                <mat-select [(value)]="client.comments" (selectionChange)="onCommentChange(client, $event.value)" [disabled]="isClientUpdating(client._id)">
+                  <mat-option value="">Select Comment</mat-option>
+                  <mat-option value="Not Interested">Not Interested</mat-option>
+                  <mat-option value="Will call back">Will call back</mat-option>
+                  <mat-option value="1st call completed">1st call completed</mat-option>
+                  <mat-option value="2nd call completed">2nd call completed</mat-option>
+                  <mat-option value="3rd call completed">3rd call completed</mat-option>
+                  <mat-option value="4th call completed">4th call completed</mat-option>
+                  <mat-option value="5th call completed">5th call completed</mat-option>
+                  <mat-option value="rejected">rejected</mat-option>
+                  <mat-option value="cash free login completed">cash free login completed</mat-option>
+                  <mat-option value="share product images">share product images</mat-option>
+                  <mat-option value="share signature">share signature</mat-option>
+                </mat-select>
+                <mat-progress-spinner *ngIf="isClientUpdating(client._id)" mode="indeterminate" diameter="20" class="comments-loading-spinner"></mat-progress-spinner>
+              </mat-form-field>
+              
+              <!-- Non-admin view - read-only display -->
+              <div class="comments-display" *ngIf="!isAdmin()">
+                <span *ngIf="client.comments" class="comment-text">{{ client.comments }}</span>
+                <span *ngIf="!client.comments" class="no-comment">No comment</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let client">
+              <!-- User Actions (Edit, WhatsApp, Delete icons) -->
+              <div *ngIf="!isAdmin()" class="user-actions">
+                <button mat-icon-button (click)="editClient(client); $event.stopPropagation()" class="edit-btn" matTooltip="Edit Client">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button (click)="openWhatsApp(client); $event.stopPropagation()" class="whatsapp-btn" matTooltip="WhatsApp">
+                  <mat-icon svgIcon="whatsapp"></mat-icon>
+                </button>
+                <button mat-icon-button (click)="deleteClient(client); $event.stopPropagation()" class="delete-btn" matTooltip="Delete Client">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+              
+              <!-- Admin Actions (Original Menu) -->
+              <div *ngIf="isAdmin()" class="admin-actions">
+                <button mat-icon-button [matMenuTriggerFor]="actionMenu" class="action-button" 
+                        (click)="$event.stopPropagation()" [disabled]="isClientUpdating(client._id)">
+                  <mat-spinner *ngIf="isClientUpdating(client._id)" diameter="20"></mat-spinner>
+                  <mat-icon *ngIf="!isClientUpdating(client._id)">more_vert</mat-icon>
+                </button>
+                <mat-menu #actionMenu="matMenu">
+                  <button mat-menu-item (click)="viewClientDetails(client)" [disabled]="isClientUpdating(client._id)">
+                    <mat-icon>visibility</mat-icon>
+                    View Details
+                  </button>
+                  
+                  <ng-container *ngIf="isAdmin()">
+                    <mat-divider></mat-divider>
+                    
+                    <button mat-menu-item (click)="updateClientStatus(client, 'interested')" 
+                            [disabled]="client.status === 'interested' || isClientUpdating(client._id)">
+                      <mat-spinner *ngIf="isClientUpdating(client._id)" diameter="16" style="margin-right: 8px;"></mat-spinner>
+                      <mat-icon *ngIf="!isClientUpdating(client._id)" style="color: #4caf50;">check_circle</mat-icon>
+                      <span *ngIf="isClientUpdating(client._id)">Updating...</span>
+                      <span *ngIf="!isClientUpdating(client._id)">Mark Interested</span>
+                    </button>
+                    <button mat-menu-item (click)="updateClientStatus(client, 'not_interested')"
+                            [disabled]="client.status === 'not_interested' || isClientUpdating(client._id)">
+                      <mat-spinner *ngIf="isClientUpdating(client._id)" diameter="16" style="margin-right: 8px;"></mat-spinner>
+                      <mat-icon *ngIf="!isClientUpdating(client._id)" style="color: #f44336;">cancel</mat-icon>
+                      <span *ngIf="isClientUpdating(client._id)">Updating...</span>
+                      <span *ngIf="!isClientUpdating(client._id)">Mark Not Interested</span>
+                    </button>
+                    <button mat-menu-item (click)="updateClientStatus(client, 'hold')"
+                            [disabled]="client.status === 'hold' || isClientUpdating(client._id)">
+                      <mat-spinner *ngIf="isClientUpdating(client._id)" diameter="16" style="margin-right: 8px;"></mat-spinner>
+                      <mat-icon *ngIf="!isClientUpdating(client._id)" style="color: #ff9800;">pause</mat-icon>
+                      <span *ngIf="isClientUpdating(client._id)">Updating...</span>
+                      <span *ngIf="!isClientUpdating(client._id)">Mark Hold</span>
+                    </button>
+                    <button mat-menu-item (click)="updateClientStatus(client, 'pending')"
+                            [disabled]="client.status === 'pending' || isClientUpdating(client._id)">
+                      <mat-spinner *ngIf="isClientUpdating(client._id)" diameter="16" style="margin-right: 8px;"></mat-spinner>
+                      <mat-icon *ngIf="!isClientUpdating(client._id)" style="color: #9c27b0;">schedule</mat-icon>
+                      <span *ngIf="isClientUpdating(client._id)">Updating...</span>
+                      <span *ngIf="!isClientUpdating(client._id)">Mark Pending</span>
+                    </button>
+                    <button mat-menu-item (click)="updateClientStatus(client, 'processing')"
+                            [disabled]="client.status === 'processing' || isClientUpdating(client._id)">
+                      <mat-spinner *ngIf="isClientUpdating(client._id)" diameter="16" style="margin-right: 8px;"></mat-spinner>
+                      <mat-icon *ngIf="!isClientUpdating(client._id)" style="color: #2196f3;">autorenew</mat-icon>
+                      <span *ngIf="isClientUpdating(client._id)">Updating...</span>
+                      <span *ngIf="!isClientUpdating(client._id)">Mark Processing</span>
+                    </button>
+                    
+                    <mat-divider></mat-divider>
+                    
+                    <button mat-menu-item (click)="deleteClient(client)" class="delete-action" [disabled]="isClientUpdating(client._id)">
+                      <mat-icon>delete</mat-icon>
+                      Delete Client
+                    </button>
+                  </ng-container>
+                </mat-menu>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="getDisplayedColumns()"></tr>
+          <tr mat-row *matRowDef="let row; columns: getDisplayedColumns();" 
+              [class.interested-row]="row.status === 'interested'"
+              [class.not-interested-row]="row.status === 'not_interested'"
+              [class.hold-row]="row.status === 'hold'"
+              [class.pending-row]="row.status === 'pending'"
+              [class.processing-row]="row.status === 'processing'"></tr>
+        </table>
+      </div>
+
+      <!-- Enhanced Card View -->
+      <div *ngIf="!loading && !error && filteredClients.length > 0 && viewMode === 'card'" class="clients-grid">
+        <div *ngFor="let client of filteredClients; let i = index" class="client-card" (click)="viewClientDetails(client)">
+          <!-- Card Header with Serial Number and Status -->
+          <div class="card-header">
+            <div class="serial-badge">
+              <span>{{ getSerialNumber(i) }}</span>
+            </div>
+            <div class="status-section">
+              <span class="status-badge" [style.background-color]="getStatusColor(client.status || 'pending')">
+                <mat-icon class="status-icon">{{ getStatusIcon(client.status || 'pending') }}</mat-icon>
+                {{ client.status | titlecase }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Client Information -->
+          <div class="card-body">
+            <!-- Client Name Section -->
+            <div class="info-section">
+              <div class="info-header">
+                <mat-icon class="section-icon">person</mat-icon>
+                <span class="section-title">Client Name</span>
+              </div>
+              <div class="info-content">
+                <h3 class="client-name">{{ client.legal_name || client.user_name || 'N/A' }}</h3>
+              </div>
+            </div>
+
+            <!-- Business Information -->
+            <div class="info-section">
+              <div class="info-header">
+                <mat-icon class="section-icon">business</mat-icon>
+                <span class="section-title">Business</span>
+              </div>
+              <div class="info-content">
+                <p class="business-name">{{ client.trade_name || client.business_name || client.legal_name || 'N/A' }}</p>
+              </div>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="info-section" *ngIf="client.mobile_number">
+              <div class="info-header">
+                <mat-icon class="section-icon">phone</mat-icon>
+                <span class="section-title">Mobile</span>
+              </div>
+              <div class="info-content">
+                <p class="mobile-number">{{ client.mobile_number }}</p>
+              </div>
+            </div>
+
+            <!-- Staff Assignment -->
+            <div class="info-section">
+              <div class="info-header">
+                <mat-icon class="section-icon">support_agent</mat-icon>
+                <span class="section-title">Assigned Staff</span>
+              </div>
+              <div class="info-content">
+                <p class="staff-name">{{ client.staff_name || 'Unassigned' }}</p>
+              </div>
+            </div>
+
+            <!-- Loan Status -->
+            <div class="info-section" *ngIf="getLoanStatus(client) !== 'soon'">
+              <div class="info-header">
+                <mat-icon class="section-icon">account_balance</mat-icon>
+                <span class="section-title">Loan Status</span>
+              </div>
+              <div class="info-content">
+                <span class="loan-status" [style.color]="getLoanStatusColor(getLoanStatus(client))">
+                  <mat-icon class="loan-icon">{{ getLoanStatusIcon(getLoanStatus(client)) }}</mat-icon>
+                  {{ getLoanStatus(client) | titlecase }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Created Date -->
+            <div class="info-section">
+              <div class="info-header">
+                <mat-icon class="section-icon">schedule</mat-icon>
+                <span class="section-title">Created</span>
+              </div>
+              <div class="info-content">
+                <p class="created-date">{{ client.created_at | date:'short' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Actions -->
+          <div class="card-actions" (click)="$event.stopPropagation()">
+            <!-- User Actions -->
+            <div *ngIf="!isAdmin()" class="action-buttons">
+              <button mat-mini-fab color="primary" (click)="editClient(client)" class="action-btn edit-btn" matTooltip="Edit Client">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-mini-fab color="accent" (click)="openWhatsApp(client)" class="action-btn whatsapp-btn" matTooltip="WhatsApp">
+                <mat-icon svgIcon="whatsapp"></mat-icon>
+              </button>
+              <button mat-mini-fab color="warn" (click)="deleteClient(client)" class="action-btn delete-btn" matTooltip="Delete Client">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+            
+            <!-- Admin Actions -->
+            <div *ngIf="isAdmin()" class="admin-actions">
+              <button mat-icon-button [matMenuTriggerFor]="actionMenu" class="action-button" 
+                      [disabled]="isClientUpdating(client._id)">
+                <mat-spinner *ngIf="isClientUpdating(client._id)" diameter="20"></mat-spinner>
+                <mat-icon *ngIf="!isClientUpdating(client._id)">more_vert</mat-icon>
+              </button>
+              <mat-menu #actionMenu="matMenu">
+                <button mat-menu-item (click)="viewClientDetails(client)" [disabled]="isClientUpdating(client._id)">
+                  <mat-icon>visibility</mat-icon>
+                  View Details
+                </button>
+                
+                <ng-container *ngIf="isAdmin()">
+                  <mat-divider></mat-divider>
+                  
+                  <button mat-menu-item (click)="updateClientStatus(client, 'interested')" 
+                          [disabled]="client.status === 'interested' || isClientUpdating(client._id)">
+                    <mat-spinner *ngIf="isClientUpdating(client._id)" diameter="16" style="margin-right: 8px;"></mat-spinner>
+                    <mat-icon *ngIf="!isClientUpdating(client._id)" style="color: #4caf50;">check_circle</mat-icon>
+                    <span *ngIf="isClientUpdating(client._id)">Updating...</span>
+                    <span *ngIf="!isClientUpdating(client._id)">Mark Interested</span>
+                  </button>
+                  <button mat-menu-item (click)="updateClientStatus(client, 'not_interested')"
+                          [disabled]="client.status === 'not_interested' || isClientUpdating(client._id)">
+                    <mat-spinner *ngIf="isClientUpdating(client._id)" diameter="16" style="margin-right: 8px;"></mat-spinner>
+                    <mat-icon *ngIf="!isClientUpdating(client._id)" style="color: #f44336;">cancel</mat-icon>
+                    <span *ngIf="isClientUpdating(client._id)">Updating...</span>
+                    <span *ngIf="!isClientUpdating(client._id)">Mark Not Interested</span>
+                  </button>
+                  <button mat-menu-item (click)="updateClientStatus(client, 'hold')"
+                          [disabled]="client.status === 'hold' || isClientUpdating(client._id)">
+                    <mat-spinner *ngIf="isClientUpdating(client._id)" diameter="16" style="margin-right: 8px;"></mat-spinner>
+                    <mat-icon *ngIf="!isClientUpdating(client._id)" style="color: #ff9800;">pause</mat-icon>
+                    <span *ngIf="isClientUpdating(client._id)">Updating...</span>
+                    <span *ngIf="!isClientUpdating(client._id)">Mark Hold</span>
+                  </button>
+                  <button mat-menu-item (click)="updateClientStatus(client, 'pending')"
+                          [disabled]="client.status === 'pending' || isClientUpdating(client._id)">
+                    <mat-spinner *ngIf="isClientUpdating(client._id)" diameter="16" style="margin-right: 8px;"></mat-spinner>
+                    <mat-icon *ngIf="!isClientUpdating(client._id)" style="color: #9c27b0;">schedule</mat-icon>
+                    <span *ngIf="isClientUpdating(client._id)">Updating...</span>
+                    <span *ngIf="!isClientUpdating(client._id)">Mark Pending</span>
+                  </button>
+                  <button mat-menu-item (click)="updateClientStatus(client, 'processing')"
+                          [disabled]="client.status === 'processing' || isClientUpdating(client._id)">
+                    <mat-spinner *ngIf="isClientUpdating(client._id)" diameter="16" style="margin-right: 8px;"></mat-spinner>
+                    <mat-icon *ngIf="!isClientUpdating(client._id)" style="color: #2196f3;">autorenew</mat-icon>
+                    <span *ngIf="isClientUpdating(client._id)">Updating...</span>
+                    <span *ngIf="!isClientUpdating(client._id)">Mark Processing</span>
+                  </button>
+                  
+                  <mat-divider></mat-divider>
+                  
+                  <button mat-menu-item (click)="deleteClient(client)" class="delete-action" [disabled]="isClientUpdating(client._id)">
+                    <mat-icon>delete</mat-icon>
+                    Delete Client
+                  </button>
+                </ng-container>
+              </mat-menu>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

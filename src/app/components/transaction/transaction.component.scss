@@ -1,0 +1,260 @@
+.container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+mat-card {
+  margin-bottom: 20px;
+}
+
+mat-card-header {
+  margin-bottom: 20px;
+}
+
+.loading, .error, .no-clients {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.loading mat-spinner {
+  margin-bottom: 20px;
+}
+
+.error mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 10px;
+}
+
+.no-clients mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 10px;
+  opacity: 0.7;
+}
+
+.clients-list h3 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.clients-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.client-item {
+  border-bottom: 1px solid #eee;
+  padding: 15px 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  transition: all 0.2s ease;
+  
+  &:last-child {
+    border-bottom: none;
+  }
+  
+  &:hover {
+    background-color: #f5f5f5;
+    transform: translateX(2px);
+  }
+  
+  &.selected {
+    background-color: #e3f2fd;
+    border-left: 4px solid #1976d2;
+    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.1);
+  }
+  
+  .client-avatar {
+    .profile-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1976d2, #42a5f5);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 600;
+      text-transform: uppercase;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+  }
+  
+  .client-info {
+    flex: 1;
+    
+    h4 {
+      margin: 0 0 5px 0;
+      font-weight: 600;
+      font-size: 16px;
+      color: #333;
+    }
+    
+    .business-name {
+      margin: 0 0 8px 0;
+      color: #666;
+      font-size: 14px;
+      font-style: italic;
+    }
+  }
+  
+  .client-actions {
+    .chevron-icon {
+      color: #999;
+      transition: color 0.2s ease;
+    }
+  }
+  
+  &:hover .client-actions .chevron-icon {
+    color: #1976d2;
+  }
+}
+
+.client-transactions-summary {
+  display: flex;
+  gap: 15px;
+  margin-top: 8px;
+  
+  .summary-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #666;
+    background-color: #f8f9fa;
+    padding: 6px 10px;
+    border-radius: 16px;
+    border: 1px solid #e9ecef;
+    
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+    
+    &:first-child {
+      color: #1976d2;
+      background-color: #e3f2fd;
+      border-color: #bbdefb;
+      font-weight: 500;
+      
+      mat-icon {
+        color: #1976d2;
+      }
+    }
+    
+    &:last-child {
+      color: #388e3c;
+      background-color: #e8f5e8;
+      border-color: #c8e6c9;
+      font-weight: 500;
+      
+      mat-icon {
+        color: #388e3c;
+      }
+    }
+  }
+}
+
+.selected-client-section {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+  
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    
+    h3 {
+      margin: 0;
+      color: #333;
+    }
+    
+    .section-actions {
+      display: flex;
+      gap: 10px;
+    }
+  }
+}
+
+.transaction-totals {
+  display: flex;
+  justify-content: flex-end;
+  gap: 30px;
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  
+  .total-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+    .total-label {
+      font-weight: 500;
+      color: #666;
+      margin-bottom: 5px;
+    }
+    
+    .total-value {
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+    }
+  }
+}
+
+.no-transactions {
+  text-align: center;
+  padding: 40px 20px;
+  
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+  }
+  
+  p {
+    margin: 0 0 20px 0;
+    color: #666;
+  }
+}
+
+.transactions-table-container {
+  overflow-x: auto;
+}
+
+.transactions-table {
+  width: 100%;
+  box-shadow: none;
+  
+  th {
+    font-weight: 500;
+    color: #333;
+  }
+  
+  td, th {
+    padding: 12px 16px !important;
+  }
+  
+  tr:hover {
+    background-color: #f5f5f5;
+  }
+}

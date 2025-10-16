@@ -1,0 +1,891 @@
+<div class="edit-client-container">
+  <!-- Modern Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-title">
+        <div class="header-icon">
+          <mat-icon>edit</mat-icon>
+        </div>
+        <div>
+          <h1>Edit Client</h1>
+          <p class="header-subtitle">Update client information and details</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header Actions -->
+  <div class="header">
+    <div></div>
+    <div class="header-actions">
+      <button mat-button (click)="cancel()" color="warn">Cancel</button>
+      <button mat-raised-button (click)="saveClient()" color="primary" [disabled]="saving">
+        {{ saving ? 'Saving...' : 'Save Changes' }}
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner></mat-spinner>
+    <p>Loading client details...</p>
+  </div>
+
+  <div *ngIf="!loading && client && clientForm" class="form-container">
+    <form [formGroup]="clientForm" class="client-form">
+      <!-- Personal Information Section -->
+      <mat-card class="section-card personal-info-card">
+        <mat-card-header class="modern-header">
+          <div class="header-icon">
+            <mat-icon>person</mat-icon>
+          </div>
+          <div class="header-content">
+            <mat-card-title>Personal Information</mat-card-title>
+            <mat-card-subtitle>Basic business and contact details</mat-card-subtitle>
+          </div>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Legal Name</mat-label>
+              <input matInput formControlName="legal_name">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Trade Name/Business Name</mat-label>
+              <input matInput formControlName="trade_name">
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>User Email/Company Email (Optional)</mat-label>
+              <input matInput formControlName="user_email" type="email">
+              <mat-error *ngIf="clientForm.get('user_email')?.hasError('email')">
+                Please enter a valid email
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Company Email (Optional)</mat-label>
+              <input matInput formControlName="company_email" type="email">
+              <mat-error *ngIf="clientForm.get('company_email')?.hasError('email')">
+                Please enter a valid email
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Mobile Number</mat-label>
+              <input matInput formControlName="mobile_number">
+              <mat-error *ngIf="clientForm.get('mobile_number')?.hasError('pattern')">
+                Please enter a valid 10-digit mobile number
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Optional Mobile Number</mat-label>
+              <input matInput formControlName="optional_mobile_number">
+              <mat-error *ngIf="clientForm.get('optional_mobile_number')?.hasError('pattern')">
+                Please enter a valid 10-digit mobile number
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Website URL (Optional)</mat-label>
+              <input matInput formControlName="website" type="url">
+              <mat-error *ngIf="clientForm.get('website')?.hasError('pattern')">
+                Please enter a valid URL (e.g., https://example.com)
+              </mat-error>
+            </mat-form-field>
+
+            <div class="form-field"></div> <!-- Empty div for layout balance -->
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- GST Details Section -->
+      <mat-card class="section-card gst-details-card">
+        <mat-card-header class="modern-header">
+          <div class="header-icon">
+            <mat-icon>receipt</mat-icon>
+          </div>
+          <div class="header-content">
+            <mat-card-title>GST Details</mat-card-title>
+            <mat-card-subtitle>GST registration and tax information</mat-card-subtitle>
+          </div>
+        </mat-card-header>
+        <mat-card-content>
+          <!-- GST Status -->
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>GST Status</mat-label>
+              <input matInput formControlName="gst_status">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>GST Number</mat-label>
+              <input matInput formControlName="gst_number">
+            </mat-form-field>
+          </div>
+
+          <!-- Registration Number -->
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field full-width">
+              <mat-label>GST Registration Number</mat-label>
+              <input matInput formControlName="registration_number">
+            </mat-form-field>
+          </div>
+
+          <!-- IE Code Section -->
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>IE Code</mat-label>
+              <input matInput formControlName="ie_code">
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>IE Code Status</mat-label>
+              <mat-select formControlName="ie_code_status" [disabled]="true">
+                <mat-option value="Yes" *ngIf="hasExistingDocument('ie_code') || hasExistingDocument('ie_code_document')">Yes</mat-option>
+                <mat-option value="No" *ngIf="!hasExistingDocument('ie_code') && !hasExistingDocument('ie_code_document')">No</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <!-- IE Code Document Section -->
+          <div *ngIf="hasExistingDocument('ie_code') || hasExistingDocument('ie_code_document')" class="ie-code-section">
+            <h5>Existing IE Code Document</h5>
+            <div class="existing-document-display">
+              <div class="document-info">
+                <mat-icon>description</mat-icon>
+                <span>{{ getIECodeDocument()?.file_name || 'IE Code Document' }}</span>
+                <small *ngIf="getIECodeDocument()?.file_size">({{ formatFileSize(getIECodeDocument().file_size) }})</small>
+              </div>
+            </div>
+            
+            <h5>Update IE Code Document</h5>
+            <div class="file-upload">
+              <input type="file" id="ie_code_new" (change)="onFileSelected($event, 'ie_code_document')" accept=".pdf,.jpg,.jpeg,.png">
+              <label for="ie_code_new" class="file-label">
+                <mat-icon>upload_file</mat-icon>
+                Upload New IE Code Document
+              </label>
+              <div *ngIf="documents['ie_code_document']" class="file-info">
+                <small>{{ documents['ie_code_document'].name }}</small>
+                <button mat-icon-button color="warn" (click)="removeDocument('ie_code_document')" matTooltip="Remove">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- IE Code Upload (if not already uploaded) -->
+          <div *ngIf="!hasExistingDocument('ie_code') && !hasExistingDocument('ie_code_document')" class="ie-code-section">
+            <h5>IE Code Document Upload</h5>
+            <div class="file-upload">
+              <input type="file" id="ie_code" (change)="onFileSelected($event, 'ie_code_document')" accept=".pdf,.jpg,.jpeg,.png">
+              <label for="ie_code" class="file-label">
+                <mat-icon>upload_file</mat-icon>
+                Upload IE Code Document
+              </label>
+              <div *ngIf="documents['ie_code_document']" class="file-info">
+                <small>{{ documents['ie_code_document'].name }}</small>
+                <button mat-icon-button color="warn" (click)="removeDocument('ie_code_document')" matTooltip="Remove">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Document Uploads Row -->
+          <div class="form-row">
+            <div class="form-group">
+              <label>GST Document</label>
+              <div class="file-upload" [class.file-uploaded]="!!documents['gst_document']">
+                <input type="file" (change)="onFileSelected($event, 'gst_document')" accept=".pdf,.jpg,.jpeg,.png" data-field="gst_document">
+                <mat-icon>{{ documents['gst_document'] ? 'check_circle' : 'cloud_upload' }}</mat-icon>
+                <p *ngIf="!documents['gst_document']">Upload GST Document (PDF, JPG, PNG)</p>
+                <div *ngIf="documents['gst_document']" class="file-info">
+                  <p class="file-name">{{ documents['gst_document'].name }}</p>
+                  <button type="button" class="delete-btn" (click)="removeDocument('gst_document')" title="Remove file">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </div>
+              <div *ngIf="existingDocuments['gst_document']" class="existing-document">
+                <small class="document-info">
+                  {{ existingDocuments['gst_document'].file_name }} 
+                  ({{ formatFileSize(existingDocuments['gst_document'].file_size) }})
+                </small>
+                <button mat-icon-button color="primary" (click)="downloadDocument('gst_document')" matTooltip="Download">
+                  <mat-icon>download</mat-icon>
+                </button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>MSME/Udyam Document</label>
+              <div class="file-upload" [class.file-uploaded]="documents['msme_document']">
+                <input type="file" (change)="onFileSelected($event, 'msme_document')" accept=".pdf,.jpg,.jpeg,.png" data-field="msme_document">
+                <mat-icon>{{ documents['msme_document'] ? 'check_circle' : 'cloud_upload' }}</mat-icon>
+                <p *ngIf="!documents['msme_document']">Upload MSME/Udyam Document</p>
+                <div *ngIf="documents['msme_document']" class="file-info">
+                  <p class="file-name">{{ documents['msme_document'].name }}</p>
+                  <button type="button" class="delete-btn" (click)="removeDocument('msme_document')" title="Remove file">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </div>
+              <div *ngIf="existingDocuments['msme_document']" class="existing-document">
+                <small class="document-info">
+                  {{ existingDocuments['msme_document'].file_name }} 
+                  ({{ formatFileSize(existingDocuments['msme_document'].file_size) }})
+                </small>
+                <button mat-icon-button color="primary" (click)="downloadDocument('msme_document')" matTooltip="Download">
+                  <mat-icon>download</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Address Information Section -->
+      <mat-card class="section-card address-info-card">
+        <mat-card-header class="modern-header">
+          <div class="header-icon">
+            <mat-icon>location_on</mat-icon>
+          </div>
+          <div class="header-content">
+            <mat-card-title>Address Information</mat-card-title>
+            <mat-card-subtitle>Business location and contact address</mat-card-subtitle>
+          </div>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field full-width">
+              <mat-label>Complete Address</mat-label>
+              <textarea matInput formControlName="address" rows="3"></textarea>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>District</mat-label>
+              <input matInput formControlName="district">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>State</mat-label>
+              <input matInput formControlName="state">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Pincode</mat-label>
+              <input matInput formControlName="pincode">
+              <mat-error *ngIf="clientForm.get('pincode')?.hasError('pattern')">
+                Please enter a valid 6-digit pincode
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Business Information Section -->
+      <mat-card class="section-card business-info-card">
+        <mat-card-header class="modern-header">
+          <div class="header-icon">
+            <mat-icon>business</mat-icon>
+          </div>
+          <div class="header-content">
+            <mat-card-title>Business Information</mat-card-title>
+            <mat-card-subtitle>Company structure and registration details</mat-card-subtitle>
+          </div>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Trade Name / Business Name</mat-label>
+              <input matInput formControlName="trade_name">
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Constitution of Business</mat-label>
+              <mat-select formControlName="constitution_type">
+                <mat-option value="Proprietorship">Proprietorship</mat-option>
+                <mat-option value="Partnership">Partnership</mat-option>
+                <mat-option value="Private Limited">Private Limited</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Business PAN</mat-label>
+              <mat-select formControlName="has_business_pan">
+                <mat-option value="yes">Yes</mat-option>
+                <mat-option value="no">No</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Business PAN Details Section -->
+      <mat-card class="section-card business-pan-card" *ngIf="(clientForm.get('constitution_type')?.value === 'Proprietorship' || clientForm.get('constitution_type')?.value === 'Partnership' || clientForm.get('constitution_type')?.value === 'Private Limited') && (clientForm.get('has_business_pan')?.value === 'yes' || hasExistingDocument('business_pan_document'))">
+        <mat-card-header class="modern-header">
+          <div class="header-icon">
+            <mat-icon>credit_card</mat-icon>
+          </div>
+          <div class="header-content">
+            <mat-card-title>Business PAN Details</mat-card-title>
+            <mat-card-subtitle>Business PAN card information and documentation</mat-card-subtitle>
+          </div>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Business PAN Name</mat-label>
+              <input matInput formControlName="business_pan_name">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Business PAN Date</mat-label>
+              <input matInput formControlName="business_pan_date" type="date">
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Business PAN Document</label>
+              <div class="file-upload" [class.file-uploaded]="!!documents['business_pan_document']">
+                <input type="file" (change)="onFileSelected($event, 'business_pan_document')" accept=".pdf,.jpg,.jpeg,.png" data-field="business_pan_document">
+                <mat-icon>{{ documents['business_pan_document'] ? 'check_circle' : 'cloud_upload' }}</mat-icon>
+                <p *ngIf="!documents['business_pan_document']">Upload Business PAN Document (PDF, JPG, PNG)</p>
+                <div *ngIf="documents['business_pan_document']" class="file-info">
+                  <p class="file-name">{{ documents['business_pan_document'].name }}</p>
+                  <button type="button" class="delete-btn" (click)="removeDocument('business_pan_document')" title="Remove file">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </div>
+              <div *ngIf="existingDocuments['business_pan_document']" class="existing-document">
+                <small class="document-info">
+                  {{ existingDocuments['business_pan_document'].file_name }} 
+                  ({{ formatFileSize(existingDocuments['business_pan_document'].file_size) }})
+                </small>
+                <button mat-icon-button color="primary" (click)="downloadDocument('business_pan_document')" matTooltip="Download">
+                  <mat-icon>download</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Owner Details Section -->
+      <mat-card class="section-card owner-details-card" *ngIf="clientForm.get('constitution_type')?.value === 'Private Limited' || (clientForm.get('constitution_type')?.value === 'Proprietorship' && (clientForm.get('has_business_pan')?.value === 'yes' || hasExistingDocument('owner_aadhar') || hasExistingDocument('owner_pan')))">
+        <mat-card-header class="modern-header">
+          <div class="header-icon">
+            <mat-icon>person_outline</mat-icon>
+          </div>
+          <div class="header-content">
+            <mat-card-title>Owner Details</mat-card-title>
+            <mat-card-subtitle>Owner information and documentation</mat-card-subtitle>
+          </div>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Owner Name</mat-label>
+              <input matInput formControlName="owner_name">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Owner Date of Birth</mat-label>
+              <input matInput formControlName="owner_dob" type="date">
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Owner Aadhar Card</label>
+              <div class="file-upload" [class.file-uploaded]="!!documents['owner_aadhar']">
+                <input type="file" (change)="onFileSelected($event, 'owner_aadhar')" accept=".pdf,.jpg,.jpeg,.png" data-field="owner_aadhar">
+                <mat-icon>{{ documents['owner_aadhar'] ? 'check_circle' : 'cloud_upload' }}</mat-icon>
+                <p *ngIf="!documents['owner_aadhar']">Upload Owner Aadhar Card (PDF, JPG, PNG)</p>
+                <div *ngIf="documents['owner_aadhar']" class="file-info">
+                  <p class="file-name">{{ documents['owner_aadhar'].name }}</p>
+                  <button type="button" class="delete-btn" (click)="removeDocument('owner_aadhar')" title="Remove file">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </div>
+              <div *ngIf="existingDocuments['owner_aadhar']" class="existing-document">
+                <small class="document-info">
+                  {{ existingDocuments['owner_aadhar'].file_name }} 
+                  ({{ formatFileSize(existingDocuments['owner_aadhar'].file_size) }})
+                </small>
+                <button mat-icon-button color="primary" (click)="downloadDocument('owner_aadhar')" matTooltip="Download">
+                  <mat-icon>download</mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Owner PAN Card</label>
+              <div class="file-upload" [class.file-uploaded]="!!documents['owner_pan']">
+                <input type="file" (change)="onFileSelected($event, 'owner_pan')" accept=".pdf,.jpg,.jpeg,.png" data-field="owner_pan">
+                <mat-icon>{{ documents['owner_pan'] ? 'check_circle' : 'cloud_upload' }}</mat-icon>
+                <p *ngIf="!documents['owner_pan']">Upload Owner PAN Card (PDF, JPG, PNG)</p>
+                <div *ngIf="documents['owner_pan']" class="file-info">
+                  <p class="file-name">{{ documents['owner_pan'].name }}</p>
+                  <button type="button" class="delete-btn" (click)="removeDocument('owner_pan')" title="Remove file">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </div>
+              <div *ngIf="existingDocuments['owner_pan']" class="existing-document">
+                <small class="document-info">
+                  {{ existingDocuments['owner_pan'].file_name }} 
+                  ({{ formatFileSize(existingDocuments['owner_pan'].file_size) }})
+                </small>
+                <button mat-icon-button color="primary" (click)="downloadDocument('owner_pan')" matTooltip="Download">
+                  <mat-icon>download</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Partnership Details Section -->
+      <mat-card class="section-card partnership-details-card" *ngIf="clientForm.get('constitution_type')?.value === 'Partnership'">
+        <mat-card-header class="modern-header">
+          <div class="header-icon">
+            <mat-icon>group</mat-icon>
+          </div>
+          <div class="header-content">
+            <mat-card-title>Partnership Details</mat-card-title>
+            <mat-card-subtitle>Partner information and documentation</mat-card-subtitle>
+          </div>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Number of Partners</mat-label>
+              <input matInput formControlName="number_of_partners" type="number" min="2" max="10">
+            </mat-form-field>
+          </div>
+
+          <div class="partners-section">
+            <div *ngFor="let i of getPartnerArray(); let idx = index" class="partner-details">
+              <h4>{{ idx === 0 ? 'Managing Partner' : 'Partner ' + (idx + 1) }}</h4>
+              <div class="form-row">
+                <mat-form-field appearance="outline" class="form-field">
+                  <mat-label>Partner Name</mat-label>
+                  <input matInput [formControlName]="'partner_name_' + idx">
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="form-field">
+                  <mat-label>Partner Date of Birth</mat-label>
+                  <input matInput [formControlName]="'partner_dob_' + idx" type="date">
+                </mat-form-field>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Partner Aadhar Card</label>
+                  <div class="file-upload" [class.file-uploaded]="!!documents['partner_aadhar_' + idx]">
+                    <input type="file" (change)="onFileSelected($event, 'partner_aadhar_' + idx)" accept=".pdf,.jpg,.jpeg,.png">
+                    <mat-icon>{{ documents['partner_aadhar_' + idx] ? 'check_circle' : 'cloud_upload' }}</mat-icon>
+                    <p *ngIf="!documents['partner_aadhar_' + idx]">Upload Partner Aadhar Card (PDF, JPG, PNG)</p>
+                    <div *ngIf="documents['partner_aadhar_' + idx]" class="file-info">
+                      <p class="file-name">{{ documents['partner_aadhar_' + idx].name }}</p>
+                      <button type="button" class="delete-btn" (click)="removeDocument('partner_aadhar_' + idx)" title="Remove file">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                  <div *ngIf="getExistingPartnerDocument('aadhar', idx)" class="existing-document">
+                    <small class="document-info">
+                      {{ getExistingPartnerDocument('aadhar', idx).file_name }} 
+                      ({{ formatFileSize(getExistingPartnerDocument('aadhar', idx).file_size) }})
+                    </small>
+                    <button mat-icon-button color="primary" (click)="downloadPartnerDocument('aadhar', idx)" matTooltip="Download">
+                      <mat-icon>download</mat-icon>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Partner PAN Card</label>
+                  <div class="file-upload" [class.file-uploaded]="!!documents['partner_pan_' + idx]">
+                    <input type="file" (change)="onFileSelected($event, 'partner_pan_' + idx)" accept=".pdf,.jpg,.jpeg,.png">
+                    <mat-icon>{{ !!documents['partner_pan_' + idx] ? 'check_circle' : 'cloud_upload' }}</mat-icon>
+                    <p *ngIf="!documents['partner_pan_' + idx]">Upload Partner PAN Card (PDF, JPG, PNG)</p>
+                    <div *ngIf="documents['partner_pan_' + idx]" class="file-info">
+                      <p class="file-name">{{ documents['partner_pan_' + idx].name }}</p>
+                      <button type="button" class="delete-btn" (click)="removeDocument('partner_pan_' + idx)" title="Remove file">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                  <div *ngIf="getExistingPartnerDocument('pan', idx)" class="existing-document">
+                    <small class="document-info">
+                      {{ getExistingPartnerDocument('pan', idx).file_name }} 
+                      ({{ formatFileSize(getExistingPartnerDocument('pan', idx).file_size) }})
+                    </small>
+                    <button mat-icon-button color="primary" (click)="downloadPartnerDocument('pan', idx)" matTooltip="Download">
+                      <mat-icon>download</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Financial Information Section -->
+      <mat-card class="section-card financial-info-card">
+        <mat-card-header class="modern-header">
+          <div class="header-icon">
+            <mat-icon>account_balance</mat-icon>
+          </div>
+          <div class="header-content">
+            <mat-card-title>Financial Information</mat-card-title>
+            <mat-card-subtitle>Banking details and financial requirements</mat-card-subtitle>
+          </div>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Required Loan Amount</mat-label>
+              <input matInput formControlName="required_loan_amount" type="number">
+              <mat-error *ngIf="clientForm.get('required_loan_amount')?.hasError('min')">
+                Amount must be positive
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Total Credit Amount</mat-label>
+              <input matInput formControlName="total_credit_amount" type="number">
+              <mat-error *ngIf="clientForm.get('total_credit_amount')?.hasError('min')">
+                Amount must be positive
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Loan Purpose</mat-label>
+              <input matInput formControlName="loan_purpose">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Repayment Period</mat-label>
+              <input matInput formControlName="repayment_period">
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Bank Information Section -->
+      <mat-card class="section-card bank-info-card">
+        <mat-card-header class="modern-header">
+          <div class="header-icon">
+            <mat-icon>account_balance_wallet</mat-icon>
+          </div>
+          <div class="header-content">
+            <mat-card-title>Bank Information</mat-card-title>
+            <mat-card-subtitle>Current banking details and account information</mat-card-subtitle>
+          </div>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Bank Name</mat-label>
+              <input matInput formControlName="bank_name">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Account Name</mat-label>
+              <input matInput formControlName="account_name">
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Account Number</mat-label>
+              <input matInput formControlName="account_number">
+            </mat-form-field>
+
+            <div class="form-field"></div> <!-- Empty div for layout balance -->
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>IFSC Code</mat-label>
+              <input matInput formControlName="ifsc_code">
+              <mat-error *ngIf="clientForm.get('ifsc_code')?.hasError('pattern')">
+                Please enter a valid IFSC code
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Bank Account Type</mat-label>
+              <mat-select formControlName="bank_type">
+                <mat-option value="">Select Account Type</mat-option>
+                <mat-option value="Savings">Savings</mat-option>
+                <mat-option value="Current">Current</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>New Current Account</mat-label>
+              <mat-select formControlName="new_current_account" (selectionChange)="onNewCurrentAccountChange($event.value)">
+                <mat-option value="yes">Yes</mat-option>
+                <mat-option value="no">No</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <div class="form-field"></div> <!-- Empty div for layout balance -->
+          </div>
+
+          <!-- New Bank Details Section (Show when New Current Account is Yes) -->
+          <div class="new-bank-details-section" *ngIf="clientForm.get('new_current_account')?.value === 'yes'">
+            <h4>New Bank Account Details</h4>
+            
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>New Bank Name</mat-label>
+                <input matInput formControlName="new_bank_name" (input)="onNewBankNameInput($event)" placeholder="Type to search new bank name" autocomplete="off">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>New Account Name</mat-label>
+                <input matInput formControlName="new_account_name" placeholder="Enter new account holder name">
+              </mat-form-field>
+            </div>
+            
+            <div class="bank-suggestions" *ngIf="filteredNewBankNames.length > 0">
+              <div *ngFor="let bank of filteredNewBankNames.slice(0, 10)" 
+                   class="bank-suggestion-item" 
+                   (click)="selectNewBank(bank)">
+                {{ bank }}
+              </div>
+            </div>
+
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>New Bank Account Number</mat-label>
+                <input matInput formControlName="new_bank_account_number" placeholder="Enter new bank account number">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>New IFSC Code</mat-label>
+                <input matInput formControlName="new_ifsc_code" placeholder="Enter new IFSC code">
+              </mat-form-field>
+            </div>
+          </div>
+
+          <!-- Bank Statements Section -->
+          <div class="bank-statements-section">
+            <div class="statements-header">
+              <div class="header-info">
+                <mat-icon class="section-icon">description</mat-icon>
+                <div class="header-text">
+                  <h4>Bank Statements</h4>
+                  <p>Upload your recent bank statements for verification</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Existing Bank Statements -->
+            <div *ngIf="getExistingBankStatements().length > 0" class="existing-statements-container">
+              <div class="subsection-header">
+                <mat-icon>folder</mat-icon>
+                <h5>Existing Bank Statements</h5>
+              </div>
+              <div class="statements-grid">
+                <div *ngFor="let statement of getExistingBankStatements(); let i = index" class="statement-card existing">
+                  <div class="card-header">
+                    <mat-icon class="file-icon">insert_drive_file</mat-icon>
+                    <div class="file-details">
+                      <span class="file-title">Bank Statement {{ i + 1 }}</span>
+                      <div class="file-meta">
+                        <small *ngIf="statement.file_name" class="file-name">{{ statement.file_name }}</small>
+                        <small *ngIf="statement.file_size" class="file-size">{{ formatFileSize(statement.file_size) }}</small>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-actions">
+                    <button mat-icon-button color="primary" matTooltip="Download">
+                      <mat-icon>download</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- New Bank Statement Uploads -->
+            <div class="upload-statements-container">
+              <div class="subsection-header">
+                <mat-icon>cloud_upload</mat-icon>
+                <h5>{{ getExistingBankStatements().length > 0 ? 'Update Bank Statements' : 'Upload Bank Statements' }}</h5>
+              </div>
+              <div class="upload-grid">
+                <div *ngFor="let i of [].constructor(bankStatementsCount); let idx = index" class="upload-card">
+                  <div class="upload-area" [class.has-file]="documents['bank_statement_' + idx]">
+                    <input type="file" [id]="'bank_statement_' + idx" (change)="onFileSelected($event, 'bank_statement_' + idx)" accept=".pdf,.jpg,.jpeg,.png" class="file-input">
+                    <label [for]="'bank_statement_' + idx" class="upload-label">
+                      <div class="upload-content">
+                        <mat-icon class="upload-icon">{{ documents['bank_statement_' + idx] ? 'check_circle' : 'cloud_upload' }}</mat-icon>
+                        <span class="upload-text">{{ documents['bank_statement_' + idx] ? 'File Selected' : 'Bank Statement ' + (idx + 1) }}</span>
+                        <small class="upload-hint" *ngIf="!documents['bank_statement_' + idx]">Click to upload PDF, JPG, PNG</small>
+                      </div>
+                    </label>
+                    <div *ngIf="documents['bank_statement_' + idx]" class="file-preview">
+                      <div class="preview-info">
+                        <mat-icon class="preview-icon">insert_drive_file</mat-icon>
+                        <span class="preview-name">{{ documents['bank_statement_' + idx].name }}</span>
+                      </div>
+                      <button type="button" class="remove-file-btn" (click)="removeDocument('bank_statement_' + idx)" matTooltip="Remove file">
+                        <mat-icon>close</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="statement-controls">
+                <button type="button" class="control-btn add-btn" (click)="addBankStatement()" *ngIf="bankStatementsCount < 6" matTooltip="Add more bank statements">
+                  <mat-icon>add</mat-icon>
+                  <span>Add Statement</span>
+                </button>
+                <button type="button" class="control-btn remove-btn" (click)="removeBankStatement()" *ngIf="bankStatementsCount > 1" matTooltip="Remove last statement">
+                  <mat-icon>remove</mat-icon>
+                  <span>Remove Statement</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Signature Upload -->
+          <div class="document-upload-item">
+            <div class="file-upload">
+              <input type="file" id="signature" (change)="onFileSelected($event, 'signature')" accept=".jpg,.jpeg,.png">
+              <label for="signature" class="file-label">
+                <mat-icon>upload_file</mat-icon>
+                Upload Signature (JPG, PNG)
+              </label>
+              <div *ngIf="documents['signature']" class="file-info">
+                <small>{{ documents['signature'].name }}</small>
+                <button mat-icon-button color="warn" (click)="removeDocument('signature')" matTooltip="Remove">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Number of Months Transaction Shared</mat-label>
+              <input matInput formControlName="transaction_months" type="number" min="1">
+              <mat-error *ngIf="clientForm.get('transaction_months')?.hasError('min')">
+                Must be at least 1 month
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>New Business Account</mat-label>
+              <mat-select formControlName="new_business_account">
+                <mat-option value="">Select</mat-option>
+                <mat-option value="yes">Yes</mat-option>
+                <mat-option value="no">No</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Payment Gateway Section -->
+      <mat-card class="section-card payment-gateway-card">
+        <mat-card-header class="gateway-header">
+          <div class="header-icon">
+            <mat-icon>payment</mat-icon>
+          </div>
+          <div class="header-content">
+            <mat-card-title>Payment Gateway Configuration</mat-card-title>
+            <mat-card-subtitle>Select available payment methods for your business</mat-card-subtitle>
+          </div>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="payment-gateway-section">
+            <div class="gateway-selection">
+              <div class="section-title">
+                <mat-icon>tune</mat-icon>
+                <h4>Available Payment Gateways</h4>
+              </div>
+              <p class="section-description">Choose one or more payment gateways that your business will support:</p>
+              
+              <div class="gateway-options">
+                <div class="gateway-grid">
+                  <mat-checkbox 
+                    *ngFor="let gateway of availableGateways" 
+                    [checked]="isGatewaySelected(gateway)"
+                    (change)="onGatewayChange(gateway, $event.checked)"
+                    class="gateway-checkbox"
+                    [attr.data-gateway]="gateway">
+                    <div class="gateway-item">
+                      <div class="gateway-icon-wrapper" [style.background-color]="getGatewayColor(gateway) + '20'">
+                        <mat-icon class="gateway-icon" [style.color]="getGatewayColor(gateway)">{{ getGatewayIcon(gateway) }}</mat-icon>
+                      </div>
+                      <div class="gateway-info">
+                        <span class="gateway-name">{{ gateway }}</span>
+                      </div>
+                    </div>
+                  </mat-checkbox>
+                </div>
+              </div>
+            </div>
+            
+            <div class="gateway-summary">
+              <div class="selected-gateways" *ngIf="getSelectedGateways().length > 0">
+                <div class="summary-header">
+                  <mat-icon>check_circle</mat-icon>
+                  <h5>Selected Payment Gateways ({{ getSelectedGateways().length }})</h5>
+                </div>
+                <div class="selected-gateway-tags">
+                  <div class="gateway-chip" *ngFor="let gateway of getSelectedGateways()" [style.background]="'linear-gradient(135deg, ' + getGatewayColor(gateway) + ' 0%, ' + getGatewayColor(gateway) + 'dd 100%)'">
+                    <mat-icon class="chip-icon">{{ getGatewayIcon(gateway) }}</mat-icon>
+                    <span class="chip-text">{{ gateway }}</span>
+                    <button class="chip-remove" (click)="onGatewayChange(gateway, false)" matTooltip="Remove {{ gateway }}">
+                      <mat-icon>close</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="no-gateways" *ngIf="getSelectedGateways().length === 0">
+                <div class="empty-state">
+                  <mat-icon>info</mat-icon>
+                  <p>No payment gateways selected yet</p>
+                  <small>Please select at least one payment gateway above</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+    </form>
+  </div>
+</div>

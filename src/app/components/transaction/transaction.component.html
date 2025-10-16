@@ -1,0 +1,124 @@
+<div class="container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <h2>Transaction Management</h2>
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div *ngIf="loading" class="loading">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Loading approved clients...</p>
+      </div>
+
+      <div *ngIf="error" class="error">
+        <mat-icon color="warn">error</mat-icon>
+        <p>{{ error }}</p>
+      </div>
+
+      <div *ngIf="!loading && !error && approvedClients.length === 0" class="no-clients">
+        <mat-icon>account_balance</mat-icon>
+        <h3>No Approved Clients Found</h3>
+        <p>There are currently no clients with approved loan status.</p>
+      </div>
+
+      <!-- Client List -->
+      <div *ngIf="!loading && !error && approvedClients.length > 0" class="clients-list">
+        <h3>Approved Clients ({{ approvedClients.length }})</h3>
+        <div class="clients-container">
+          <div *ngFor="let client of approvedClients" class="client-item" 
+               [class.selected]="selectedClient?._id === client._id"
+               (click)="selectClient(client)">
+            <div class="client-avatar">
+              <div class="profile-icon">
+                {{ getClientInitial(client) }}
+              </div>
+            </div>
+            <div class="client-info">
+              <h4>{{ getClientDisplayName(client) }}</h4>
+              <p class="business-name">{{ getClientBusinessName(client) }}</p>
+              <!-- Display transaction totals for each client -->
+              <div class="client-transactions-summary">
+                <span class="summary-item">
+                  <mat-icon>receipt</mat-icon>
+                  {{ getTotalTransactionCount(client._id) }} Transactions
+                </span>
+                <span class="summary-item">
+                  <mat-icon>currency_rupee</mat-icon>
+                  ₹{{ getTotalTransactionAmount(client._id) | number:'1.2-2' }}
+                </span>
+              </div>
+            </div>
+            <div class="client-actions">
+              <mat-icon class="chevron-icon">chevron_right</mat-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Selected Client Transactions -->
+      <div *ngIf="selectedClient" class="selected-client-section">
+        <div class="section-header">
+          <h3>Transactions for {{ getClientDisplayName(selectedClient) }}</h3>
+          <div class="section-actions">
+            <button mat-raised-button color="primary" (click)="addTransaction()">
+              <mat-icon>add</mat-icon>
+              Add Transaction
+            </button>
+            <button mat-button (click)="clearSelection()">
+              <mat-icon>close</mat-icon>
+              Close
+            </button>
+          </div>
+        </div>
+
+        <!-- Transaction Totals -->
+        <div class="transaction-totals">
+          <div class="total-item">
+            <span class="total-label">Total Transactions:</span>
+            <span class="total-value">{{ clientTransactions.length }}</span>
+          </div>
+          <div class="total-item">
+            <span class="total-label">Total Amount:</span>
+            <span class="total-value">₹{{ getTotalTransactionAmount(selectedClient._id) | number:'1.2-2' }}</span>
+          </div>
+        </div>
+
+        <!-- No Transactions Message -->
+        <div *ngIf="clientTransactions.length === 0" class="no-transactions">
+          <mat-icon>account_balance</mat-icon>
+          <p>No transactions found for this client.</p>
+          <button mat-raised-button color="primary" (click)="addTransaction()">
+            Add First Transaction
+          </button>
+        </div>
+
+        <!-- Transactions Table -->
+        <div *ngIf="clientTransactions.length > 0" class="transactions-table-container">
+          <table mat-table [dataSource]="clientTransactions" class="transactions-table">
+            <!-- Date Column -->
+            <ng-container matColumnDef="date">
+              <th mat-header-cell *matHeaderCellDef>Date</th>
+              <td mat-cell *matCellDef="let transaction">{{ transaction.date | date:'mediumDate' }}</td>
+            </ng-container>
+
+            <!-- Order ID Column -->
+            <ng-container matColumnDef="orderId">
+              <th mat-header-cell *matHeaderCellDef>Order ID</th>
+              <td mat-cell *matCellDef="let transaction">{{ transaction.orderId }}</td>
+            </ng-container>
+
+            <!-- Amount Column -->
+            <ng-container matColumnDef="amount">
+              <th mat-header-cell *matHeaderCellDef>Amount</th>
+              <td mat-cell *matCellDef="let transaction">₹{{ transaction.amount | number:'1.2-2' }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="['date', 'orderId', 'amount']"></tr>
+            <tr mat-row *matRowDef="let row; columns: ['date', 'orderId', 'amount'];"></tr>
+          </table>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,0 +1,125 @@
+<div class="register-wrapper">
+  <div class="card">
+    <h2>Register</h2>
+    
+    <div *ngIf="error" class="error">{{ error }}</div>
+    <div *ngIf="success" class="success">{{ success }}</div>
+    
+    <!-- Waiting for approval state -->
+    <div *ngIf="waitingForApproval" class="waiting-approval">
+      <mat-spinner diameter="30"></mat-spinner>
+      <p>Waiting for admin approval...</p>
+    </div>
+    
+    <!-- Resend button -->
+    <div *ngIf="showResendButton" class="resend-section">
+      <button mat-raised-button color="accent" (click)="resendApproval()">
+        <mat-icon>refresh</mat-icon>
+        Resend Verification
+      </button>
+    </div>
+    
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <mat-form-field appearance="outline">
+          <mat-label>Username</mat-label>
+          <input matInput formControlName="username" placeholder="Enter your username">
+          <mat-error *ngIf="f['username'].invalid && f['username'].touched">
+            Username is required
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-group">
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email" placeholder="tmis.yourname&#64;domain.com or admin&#64;gmail.com">
+          <mat-error *ngIf="f['email'].invalid && f['email'].touched">
+            <span *ngIf="f['email'].errors && f['email'].errors['required']">Email is required</span>
+            <span *ngIf="f['email'].errors && f['email'].errors['email']">Please enter a valid email</span>
+            <span *ngIf="f['email'].errors && f['email'].errors['tmisEmail']">Email must start with 'tmis.' or be 'admin&#64;gmail.com'</span>
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-group">
+        <mat-form-field appearance="outline">
+          <mat-label>Password</mat-label>
+          <input matInput type="password" formControlName="password" placeholder="Enter your password">
+          <mat-error *ngIf="f['password'].invalid && f['password'].touched">
+            <span *ngIf="f['password'].errors && f['password'].errors['required']">Password is required</span>
+            <span *ngIf="f['password'].errors && f['password'].errors['minlength']">Password must be at least 6 characters</span>
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-group">
+        <mat-form-field appearance="outline">
+          <mat-label>Confirm Password</mat-label>
+          <input matInput type="password" formControlName="confirmPassword" placeholder="Confirm your password">
+          <mat-error *ngIf="f['confirmPassword'].invalid && f['confirmPassword'].touched">
+            Confirm password is required
+          </mat-error>
+          <mat-error *ngIf="registerForm.errors && registerForm.errors['passwordMismatch'] && f['confirmPassword'].touched">
+            Passwords do not match
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <button mat-raised-button color="primary" type="submit" 
+              [disabled]="loading || registerForm.invalid || showWaitingMessage">
+        <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+        {{ loading ? 'Registering...' : (showWaitingMessage ? 'Waiting for Approval...' : 'Register') }}
+      </button>
+    </form>
+
+    <!-- Waiting for Admin Verification Message -->
+    <div *ngIf="showWaitingMessage" class="waiting-approval-section">
+      <div class="waiting-message">
+        <mat-icon class="waiting-icon">hourglass_empty</mat-icon>
+        <h3>Waiting for Admin Verification</h3>
+        <p>Your registration has been submitted successfully!</p>
+        <p>Please wait while an admin reviews and approves your account.</p>
+        <div class="loading-dots">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <small>This page will automatically update when your account is approved.</small>
+      </div>
+    </div>
+
+    <div class="text-center">
+      <p>Already have an account? 
+        <a routerLink="/login">Login here</a>
+      </p>
+      <p>
+        <button mat-button color="accent" (click)="toggleStatusCheck()">
+          {{ showStatusCheck ? 'Hide Status Check' : 'Check Registration Status' }}
+        </button>
+      </p>
+    </div>
+
+    <!-- Registration Status Check Section -->
+    <div *ngIf="showStatusCheck" class="status-check-section">
+      <mat-divider></mat-divider>
+      <h3>Check Your Registration Status</h3>
+      <div class="form-group">
+        <mat-form-field appearance="outline">
+          <mat-label>Email Address</mat-label>
+          <input matInput type="email" [(ngModel)]="statusCheckEmail" placeholder="Enter your registered email">
+        </mat-form-field>
+      </div>
+      <button mat-raised-button color="accent" (click)="checkStatus()" [disabled]="statusLoading">
+        <mat-spinner *ngIf="statusLoading" diameter="20"></mat-spinner>
+        {{ statusLoading ? 'Checking...' : 'Check Status' }}
+      </button>
+      <div *ngIf="statusMessage" class="status-message" 
+           [ngClass]="{'success-message': statusMessage.includes('approved') || statusMessage.includes('active'), 
+                      'error-message': statusMessage.includes('rejected') || statusMessage.includes('not found'),
+                      'info-message': statusMessage.includes('pending')}">
+        {{ statusMessage }}
+      </div>
+    </div>
+  </div>
+</div>

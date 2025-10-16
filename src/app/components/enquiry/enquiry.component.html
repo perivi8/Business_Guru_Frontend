@@ -1,0 +1,473 @@
+<div class="container">
+  <!-- Filters and Sort Section -->
+  <mat-card class="filters-card">
+    <div class="filters-section">
+      <div class="filters-row">
+        <!-- Sort Options -->
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Sort By</mat-label>
+          <mat-select [(value)]="sortOption" (selectionChange)="onSortChange()">
+            <mat-option value="name_asc">Name (A to Z)</mat-option>
+            <mat-option value="name_desc">Name (Z to A)</mat-option>
+            <mat-option value="date_new">Date (New to Old)</mat-option>
+            <mat-option value="date_old">Date (Old to New)</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Staff Filter -->
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Filter by Staff</mat-label>
+          <mat-select [(value)]="staffFilter" (selectionChange)="applyFilters()">
+            <mat-option value="all">All Staff</mat-option>
+            <mat-option *ngFor="let staff of uniqueStaffMembers" [value]="staff">
+              {{ staff }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- GST Filter -->
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Filter by GST</mat-label>
+          <mat-select [(value)]="gstFilter" (selectionChange)="applyFilters()">
+            <mat-option value="all">All</mat-option>
+            <mat-option value="yes">GST Active</mat-option>
+            <mat-option value="not_selected">Not Selected</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Interest Level Filter -->
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Filter by Interest</mat-label>
+          <mat-select [(value)]="interestFilter" (selectionChange)="applyFilters()">
+            <mat-option value="all">All</mat-option>
+            <mat-option value="interested">Interested</mat-option>
+            <mat-option value="not_interested">Not Interested</mat-option>
+            <mat-option value="no_gst">No GST</mat-option>
+            <mat-option value="gst_cancelled">GST Cancelled</mat-option>
+            <mat-option value="pending">Pending</mat-option>
+            <mat-option value="unknown">Unknown</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Date Range Filter -->
+        <mat-form-field appearance="outline" class="filter-field date-field">
+          <mat-label>From Date</mat-label>
+          <input matInput [matDatepicker]="fromDatePicker" [(ngModel)]="fromDate" (dateChange)="applyFilters()">
+          <mat-datepicker-toggle matSuffix [for]="fromDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #fromDatePicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field date-field">
+          <mat-label>To Date</mat-label>
+          <input matInput [matDatepicker]="toDatePicker" [(ngModel)]="toDate" (dateChange)="applyFilters()">
+          <mat-datepicker-toggle matSuffix [for]="toDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #toDatePicker></mat-datepicker>
+        </mat-form-field>
+
+        <!-- Clear Filters Button -->
+        <button mat-stroked-button color="accent" class="clear-filters-btn" (click)="clearAllFilters()" *ngIf="hasActiveFilters()">
+          <mat-icon>clear</mat-icon>
+          Clear Filters
+        </button>
+      </div>
+
+      <!-- Active Filters Info -->
+      <div class="filter-info" *ngIf="hasActiveFilters()">
+        <span class="filter-count">Showing {{ filteredEnquiries.length }} of {{ enquiries.length }} enquiries</span>
+        <div class="active-filters">
+          <span class="filter-tag" *ngIf="staffFilter !== 'all'">
+            Staff: {{ staffFilter }}
+            <mat-icon (click)="clearStaffFilter()">close</mat-icon>
+          </span>
+          <span class="filter-tag" *ngIf="gstFilter !== 'all'">
+            GST: {{ getGstFilterDisplay() }}
+            <mat-icon (click)="clearGstFilter()">close</mat-icon>
+          </span>
+          <span class="filter-tag" *ngIf="interestFilter !== 'all'">
+            Interest: {{ getInterestLevelDisplay() }}
+            <mat-icon (click)="clearInterestFilter()">close</mat-icon>
+          </span>
+          <span class="filter-tag" *ngIf="fromDate || toDate">
+            Date Range: {{ formatDateRange() }}
+            <mat-icon (click)="clearDateRange()">close</mat-icon>
+          </span>
+        </div>
+      </div>
+    </div>
+  </mat-card>
+
+  <!-- Registration Form Modal -->
+  <div class="form-overlay" *ngIf="showRegistrationForm">
+    <div class="form-container">
+      <div class="form-header">
+        <h2>{{ isEditMode ? 'Edit Enquiry' : 'Add New Enquiry' }}</h2>
+        <button mat-icon-button (click)="hideAddForm()" class="close-button">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="registration-form">
+        <div class="form-grid">
+          <!-- Row 1 -->
+          <mat-form-field appearance="outline">
+            <mat-label>Date</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="date" required>
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Wati Name</mat-label>
+            <input matInput formControlName="wati_name" required>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>User Name (Optional)</mat-label>
+            <input matInput formControlName="user_name">
+          </mat-form-field>
+
+          <!-- Row 2 - Mobile Number with Country Code -->
+          <div class="mobile-number-container">
+            <mat-form-field appearance="outline" class="country-code-field">
+              <mat-label>Country</mat-label>
+              <mat-select formControlName="country_code" required>
+                <mat-option *ngFor="let country of countryCodes" [value]="country.code">
+                  <span class="country-option">
+                    <span class="flag">{{ country.flag }}</span>
+                    <span class="code">{{ country.code }}</span>
+                    <span class="name">{{ country.country }}</span>
+                  </span>
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline" class="mobile-number-field">
+              <mat-label>Mobile Number (Wati)</mat-label>
+              <input matInput 
+                     formControlName="mobile_number" 
+                     pattern="[0-9]{10}" 
+                     maxlength="10" 
+                     placeholder="Enter 10-digit mobile number"
+                     required>
+              <mat-hint>Enter 10-digit mobile number (without country code)</mat-hint>
+              <mat-error *ngIf="registrationForm.get('mobile_number')?.hasError('pattern')">
+                Please enter a valid 10-digit mobile number
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Secondary Mobile Number -->
+          <div class="mobile-number-container">
+            <mat-form-field appearance="outline" class="mobile-number-field">
+              <mat-label>Secondary Mobile Number</mat-label>
+              <input matInput 
+                     formControlName="secondary_mobile_number" 
+                     pattern="[0-9]{10}" 
+                     maxlength="10"
+                     placeholder="Enter 10-digit mobile number">
+              <mat-hint>Enter 10-digit mobile number (without country code)</mat-hint>
+              <mat-error *ngIf="registrationForm.get('secondary_mobile_number')?.hasError('pattern')">
+                Please enter a valid 10-digit mobile number
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Business Type (Optional)</mat-label>
+            <mat-select formControlName="business_type">
+              <mat-option value="">Select Business Type</mat-option>
+              <mat-option *ngFor="let type of businessTypeOptions" [value]="type">
+                {{ type }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Business Nature Field -->
+          <mat-form-field appearance="outline">
+            <mat-label>Business Nature <span *ngIf="isEditMode && registrationForm.get('comments')?.value === 'Not Eligible'" class="required-asterisk">*</span></mat-label>
+            <input matInput formControlName="business_nature" placeholder="Enter business nature">
+            <mat-error *ngIf="registrationForm.get('business_nature')?.hasError('required')">
+              Business Nature is required when "Not Eligible" comment is selected
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Row 3 - GST Section -->
+          <div class="gst-section">
+            <mat-form-field appearance="outline">
+              <mat-label>GST (Optional)</mat-label>
+              <mat-select formControlName="gst" (selectionChange)="onGstChange()">
+                <mat-option value="">Select GST (Optional)</mat-option>
+                <mat-option value="Yes">Yes</mat-option>
+                <mat-option value="No">No</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" *ngIf="registrationForm.get('gst')?.value === 'Yes'">
+              <mat-label>GST Status</mat-label>
+              <mat-select formControlName="gst_status">
+                <mat-option value="Active">Active</mat-option>
+                <mat-option value="Cancel">Cancel</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <!-- Row 4 - Staff -->
+          <mat-form-field appearance="outline">
+            <mat-label>Staff</mat-label>
+            <mat-select formControlName="staff" required>
+              <mat-option *ngFor="let staff of staffMembers" [value]="staff.username || staff.email">
+                {{ staff.username || staff.email }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Row 5 - Comments (Only show in Edit Mode) -->
+          <mat-form-field appearance="outline" class="full-width" *ngIf="isEditMode">
+            <mat-label>Comments (Optional)</mat-label>
+            <mat-select formControlName="comments">
+              <mat-option value="">Select a comment (optional)</mat-option>
+              <mat-option *ngFor="let option of commentOptions" [value]="option">
+                {{ option }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Row 6 - Additional Comments (Only show in Edit Mode) -->
+          <mat-form-field appearance="outline" class="full-width" *ngIf="isEditMode">
+            <mat-label>Additional Comments (Optional)</mat-label>
+            <textarea matInput formControlName="additional_comments" rows="3" placeholder="Enter additional comments manually..."></textarea>
+          </mat-form-field>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" mat-button (click)="hideAddForm()">
+            Cancel
+          </button>
+          <button type="submit" mat-raised-button color="primary" [disabled]="!registrationForm.valid">
+            {{ isEditMode ? 'Update Enquiry' : 'Add Enquiry' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Enquiry Records Table -->
+  <mat-card class="enquiry-records-card">
+    <mat-card-header>
+      <div class="header-left">
+        <mat-card-title>
+          <mat-icon>table_chart</mat-icon>
+          Enquiry Records
+        </mat-card-title>
+        <mat-card-subtitle>{{ filteredEnquiries.length }} total enquiries</mat-card-subtitle>
+      </div>
+      <div class="header-actions">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search enquiries...</mat-label>
+          <input matInput [(ngModel)]="searchTerm" (keyup)="applyFilters()" placeholder="Search by name, mobile, staff...">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+      </div>
+    </mat-card-header>
+    <mat-card-content>
+
+    <div class="table-wrapper" *ngIf="!loading">
+      <table mat-table [dataSource]="filteredEnquiries" class="enquiry-table">
+        <!-- S.No Column -->
+        <ng-container matColumnDef="sno">
+          <th mat-header-cell *matHeaderCellDef class="header-cell">S.No</th>
+          <td mat-cell *matCellDef="let enquiry" class="data-cell">{{ enquiry.sno }}</td>
+        </ng-container>
+
+        <!-- Date Column -->
+        <ng-container matColumnDef="date">
+          <th mat-header-cell *matHeaderCellDef class="header-cell">Date</th>
+          <td mat-cell *matCellDef="let enquiry" class="data-cell">{{ formatDate(enquiry.date) }}</td>
+        </ng-container>
+
+        <!-- Wati Name Column -->
+        <ng-container matColumnDef="wati_name">
+          <th mat-header-cell *matHeaderCellDef class="header-cell">Wati Name</th>
+          <td mat-cell *matCellDef="let enquiry" class="data-cell">{{ enquiry.wati_name }}</td>
+        </ng-container>
+
+        <!-- User Name Column -->
+        <ng-container matColumnDef="user_name">
+          <th mat-header-cell *matHeaderCellDef class="header-cell">User Name</th>
+          <td mat-cell *matCellDef="let enquiry" class="data-cell">{{ enquiry.user_name || '-' }}</td>
+        </ng-container>
+
+        <!-- Mobile Number Column -->
+        <ng-container matColumnDef="mobile_number">
+          <th mat-header-cell *matHeaderCellDef class="header-cell">Mobile Number</th>
+          <td mat-cell *matCellDef="let enquiry" class="data-cell">
+            <span class="mobile-number">{{ displayMobileNumber(enquiry.mobile_number) }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Secondary Mobile Column -->
+        <ng-container matColumnDef="secondary_mobile_number">
+          <th mat-header-cell *matHeaderCellDef class="header-cell">Secondary Mobile</th>
+          <td mat-cell *matCellDef="let enquiry" class="data-cell">
+            <mat-form-field appearance="outline" class="secondary-mobile-field">
+              <input matInput [(ngModel)]="enquiry.secondary_mobile_number" (ngModelChange)="updateSecondaryMobile(enquiry, $event)" placeholder="Enter secondary mobile (optional)" />
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <!-- GST Column -->
+        <ng-container matColumnDef="gst">
+          <th mat-header-cell *matHeaderCellDef class="header-cell">GST</th>
+          <td mat-cell *matCellDef="let enquiry" class="data-cell">
+            <div class="gst-container">
+              <mat-select [(value)]="enquiry.gst" (selectionChange)="onGstChangeForEnquiry(enquiry, $event.value)" placeholder="Select GST (Optional)">
+                <mat-option value="">Select GST</mat-option>
+                <mat-option value="Yes">Yes</mat-option>
+                <mat-option value="No">No</mat-option>
+              </mat-select>
+              <mat-select *ngIf="enquiry.gst === 'Yes'" [(value)]="enquiry.gst_status" (selectionChange)="onGstStatusChangeForEnquiry(enquiry, $event.value)" placeholder="Select Status">
+                <mat-option value="Active">Active</mat-option>
+                <mat-option value="Cancel">Cancel</mat-option>
+              </mat-select>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Business Type Column -->
+        <ng-container matColumnDef="business_type">
+          <th mat-header-cell *matHeaderCellDef class="header-cell">Business Type</th>
+          <td mat-cell *matCellDef="let enquiry" class="data-cell">
+            <mat-select [(value)]="enquiry.business_type" (selectionChange)="updateBusinessType(enquiry, $event.value)" placeholder="Select Business Type (Optional)">
+              <mat-option value="">Select Business Type</mat-option>
+              <mat-option *ngFor="let type of businessTypeOptions" [value]="type">
+                {{ type }}
+              </mat-option>
+            </mat-select>
+          </td>
+        </ng-container>
+
+        <!-- Business Nature Column -->
+        <ng-container matColumnDef="business_nature">
+          <th mat-header-cell *matHeaderCellDef class="header-cell">Business Nature</th>
+          <td mat-cell *matCellDef="let enquiry" class="data-cell">
+            <mat-form-field appearance="outline" class="business-nature-field">
+              <input matInput [(ngModel)]="enquiry.business_nature" (ngModelChange)="updateBusinessNature(enquiry, $event)" placeholder="Enter business nature (optional)" />
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <!-- Staff Column -->
+        <ng-container matColumnDef="staff">
+          <th mat-header-cell *matHeaderCellDef class="header-cell">Staff</th>
+          <td mat-cell *matCellDef="let enquiry" class="data-cell">
+            <!-- If staff is assigned and NOT "Public Form" or "WhatsApp Bot", show assigned staff name -->
+            <div *ngIf="enquiry.staff && !canAssignStaff(enquiry)" class="staff-assigned">
+              <span class="staff-name">{{ enquiry.staff }}</span>
+              <span class="staff-assigned-badge">Assigned</span>
+              <mat-icon class="info-icon" matTooltip="Staff already added to enquiry. Try another enquiry for new assignment.">info</mat-icon>
+            </div>
+            <!-- If staff assignment is allowed, show dropdown for selection -->
+            <mat-select *ngIf="canAssignStaff(enquiry) || !enquiry.staff || enquiry.staff === 'Public Form' || enquiry.staff === 'WhatsApp Bot' || enquiry.staff === 'WhatsApp Form'" 
+                        [(value)]="enquiry.staff" 
+                        (selectionChange)="updateStaff(enquiry, $event.value)" 
+                        placeholder="Select Staff">
+              <mat-option value="Public Form">Public Form</mat-option>
+              <mat-option value="WhatsApp Bot">WhatsApp Bot</mat-option>
+              <!-- Only show regular staff members (not admins) -->
+              <mat-option *ngFor="let staff of getRegularStaffMembers()" [value]="staff">
+                {{ staff }}
+                <span *ngIf="getNextStaffMember() === staff" class="suggested-badge">Next in sequence</span>
+              </mat-option>
+            </mat-select>
+            <!-- If staff assignment is locked due to sequential rules, show locked message -->
+            <div *ngIf="!canAssignStaff(enquiry) && (enquiry.staff === 'Public Form' || enquiry.staff === 'WhatsApp Bot' || !enquiry.staff)" class="staff-locked">
+              <mat-icon class="lock-icon">lock</mat-icon>
+              <span class="lock-text">Assign staff to older enquiries first</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Comments Column -->
+        <ng-container matColumnDef="comments">
+          <th mat-header-cell *matHeaderCellDef class="header-cell">Comments</th>
+          <td mat-cell *matCellDef="let enquiry" class="data-cell">
+            <!-- Lock comments section when no staff is assigned -->
+            <div *ngIf="shouldLockComments(enquiry)" class="comments-locked">
+              <mat-icon class="lock-icon">lock</mat-icon>
+              <span class="lock-text">Assign staff to enable comments</span>
+            </div>
+            <!-- Show comments dropdown when staff is assigned -->
+            <mat-select *ngIf="!shouldLockComments(enquiry)" [(value)]="enquiry.comments" (selectionChange)="updateComments(enquiry, $event.value)" placeholder="Select Comment">
+              <mat-option *ngFor="let comment of commentOptions" [value]="comment">
+                {{ comment }}
+              </mat-option>
+            </mat-select>
+          </td>
+        </ng-container>
+
+        <!-- WhatsApp Status Column -->
+        <ng-container matColumnDef="whatsapp_status">
+          <th mat-header-cell *matHeaderCellDef class="header-cell">WhatsApp</th>
+          <td mat-cell *matCellDef="let enquiry" class="data-cell whatsapp-status-cell">
+            <div class="whatsapp-status-container">
+              <mat-icon 
+                [class]="'whatsapp-status-icon ' + getWhatsAppStatusColor(enquiry)"
+                [matTooltip]="getWhatsAppStatusTooltip(enquiry)">
+                {{ getWhatsAppStatusIcon(enquiry) }}
+              </mat-icon>
+              <button 
+                mat-icon-button 
+                *ngIf="isAdmin()" 
+                (click)="testWhatsApp(enquiry)" 
+                matTooltip="Send test WhatsApp message"
+                class="whatsapp-test-btn">
+                <mat-icon>send</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Additional Comments Column -->
+        <ng-container matColumnDef="additional_comments">
+          <th mat-header-cell *matHeaderCellDef class="header-cell">Additional Comments</th>
+          <td mat-cell *matCellDef="let enquiry" class="data-cell">
+            <mat-form-field appearance="outline" class="additional-comments-field">
+              <textarea matInput [(ngModel)]="enquiry.additional_comments" (ngModelChange)="updateAdditionalComments(enquiry, $event)" placeholder="Enter additional comments (optional)" rows="3"></textarea>
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="header-cell">Actions</th>
+          <td mat-cell *matCellDef="let enquiry" class="data-cell">
+            <div class="action-buttons">
+              <button mat-icon-button color="warn" (click)="deleteEnquiry(enquiry)" matTooltip="Delete">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" [class]="getRowColorClass(row)"></tr>
+      </table>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-container" *ngIf="loading">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Loading enquiries...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!loading && filteredEnquiries.length === 0">
+      <mat-icon>inbox</mat-icon>
+      <h3>No Enquiries Found</h3>
+      <p>{{ searchTerm ? 'No enquiries match your search criteria.' : 'Start by adding your first enquiry.' }}</p>
+
+    </div>
+    </mat-card-content>
+  </mat-card>
+</div>

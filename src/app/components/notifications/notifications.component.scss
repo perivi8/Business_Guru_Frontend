@@ -1,0 +1,624 @@
+.notifications-page {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: calc(100vh - 64px);
+  background-color: #f5f5f5;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .back-button {
+      color: #666;
+      
+      &:hover {
+        background-color: rgba(0,0,0,0.04);
+      }
+    }
+
+    .header-info {
+      h1 {
+        margin: 0 0 8px 0;
+        font-size: 28px;
+        font-weight: 500;
+        color: #333;
+      }
+
+      .subtitle {
+        margin: 0;
+        color: #666;
+        font-size: 14px;
+      }
+    }
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 12px;
+
+    button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+    }
+  }
+}
+
+.notifications-container {
+  .loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+    p {
+      margin-top: 16px;
+      color: #666;
+      font-size: 16px;
+    }
+  }
+
+  .no-notifications-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+    .no-notifications-icon {
+      font-size: 64px;
+      width: 64px;
+      height: 64px;
+      color: #ccc;
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      margin: 0 0 8px 0;
+      color: #333;
+      font-weight: 400;
+    }
+
+    p {
+      margin: 0;
+      color: #666;
+      font-size: 14px;
+    }
+  }
+}
+
+.notification-section {
+  margin-bottom: 32px;
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding: 0 8px;
+
+    mat-icon {
+      color: #1976d2;
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+
+    h3 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 500;
+      color: #333;
+      flex: 1;
+    }
+
+    .count-badge {
+      background: #1976d2;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+      min-width: 20px;
+      text-align: center;
+    }
+  }
+}
+
+.notification-card {
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-left: 4px solid transparent;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+
+  &.unread {
+    border-left-color: #1976d2;
+    background-color: #f8f9ff;
+  }
+
+  &.new-client-card {
+    border-left-color: #4caf50;
+    
+    &:hover {
+      border-left-color: #388e3c;
+    }
+  }
+
+  &.updated-client-card {
+    border-left-color: #ff9800;
+    
+    &:hover {
+      border-left-color: #f57c00;
+    }
+  }
+
+  &.admin-action-card {
+    border-left-color: #9c27b0;
+    
+    &:hover {
+      border-left-color: #7b1fa2;
+    }
+  }
+
+  mat-card-content {
+    padding: 16px !important;
+  }
+}
+
+.notification-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+
+  .notification-indicator {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f5f5f5;
+    color: #666;
+
+    &.unread {
+      background-color: #1976d2;
+      color: white;
+    }
+
+    &.new-client-indicator {
+      background-color: #e8f5e8;
+      color: #4caf50;
+    }
+
+    &.updated-indicator {
+      background-color: #fff3e0;
+      color: #ff9800;
+    }
+
+    &.admin-indicator {
+      background-color: #f3e5f5;
+      color: #9c27b0;
+    }
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .notification-content {
+    flex: 1;
+    min-width: 0;
+
+    .notification-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+      gap: 16px;
+
+      .notification-title {
+        font-weight: 500;
+        color: #333;
+        font-size: 16px;
+      }
+
+      .notification-type-badge {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+        white-space: nowrap;
+
+        &.new-client {
+          background-color: #e8f5e8;
+          color: #2e7d32;
+        }
+
+        &.updated {
+          background-color: #fff3e0;
+          color: #ef6c00;
+        }
+
+        &.status-change {
+          background-color: #f3e5f5;
+          color: #7b1fa2;
+        }
+
+        mat-icon {
+          font-size: 14px;
+          width: 14px;
+          height: 14px;
+        }
+      }
+
+      .notification-time {
+        color: #666;
+        font-size: 12px;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+
+        mat-icon {
+          font-size: 14px;
+          width: 14px;
+          height: 14px;
+        }
+      }
+    }
+
+    .notification-message {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .notification-details {
+      .client-name {
+        font-weight: 500;
+        color: #333;
+        font-size: 15px;
+        margin-bottom: 4px;
+      }
+
+      .business-name {
+        color: #666;
+        font-size: 13px;
+        margin-bottom: 8px;
+      }
+
+      .client-info {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+
+        .constitution-type {
+          color: #666;
+          font-size: 12px;
+          background: #f5f5f5;
+          padding: 2px 8px;
+          border-radius: 8px;
+        }
+      }
+    }
+
+    .notification-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+      color: #666;
+      font-size: 12px;
+
+      .user-icon {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+      }
+    }
+  }
+
+  .notification-actions {
+    flex-shrink: 0;
+
+    button {
+      opacity: 0.6;
+      transition: opacity 0.2s ease;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+
+  .notification-badge {
+    flex-shrink: 0;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    text-align: center;
+    min-width: 60px;
+
+    &.new-badge {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    &.updated-badge {
+      background-color: #ff9800;
+      color: white;
+    }
+
+    &.status-badge {
+      color: white;
+
+      &.status-pending {
+        background-color: #9c27b0;
+      }
+
+      &.status-approved {
+        background-color: #4caf50;
+      }
+
+      &.status-rejected {
+        background-color: #f44336;
+      }
+
+      &.status-in_review {
+        background-color: #2196f3;
+      }
+
+      &.status-interest {
+        background-color: #4caf50;
+      }
+
+      &.status-interested {
+        background-color: #4caf50;
+      }
+
+      &.status-not_interested {
+        background-color: #f44336;
+      }
+
+      &.status-follow_up {
+        background-color: #ff9800;
+      }
+
+      &.status-contacted {
+        background-color: #2196f3;
+      }
+
+      &.status-qualified {
+        background-color: #9c27b0;
+      }
+
+      &.status-converted {
+        background-color: #4caf50;
+      }
+
+      &.status-lost {
+        background-color: #795548;
+      }
+
+      &.status-on_hold {
+        background-color: #ffeb3b;
+        color: #333;
+      }
+
+      &.status-hold {
+        background-color: #ffeb3b;
+        color: #333;
+      }
+
+      &.status-processing {
+        background-color: #87ceeb;
+        color: #333;
+      }
+
+      &.status-new {
+        background-color: #00bcd4;
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .notifications-page {
+    padding: 16px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+
+    .header-left {
+      gap: 12px;
+
+      .header-info h1 {
+        font-size: 24px;
+      }
+    }
+
+    .header-actions {
+      justify-content: flex-end;
+    }
+  }
+
+  .notification-item {
+    gap: 12px;
+
+    .notification-indicator {
+      width: 36px;
+      height: 36px;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+    }
+
+    .notification-content {
+      .notification-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+    }
+
+    .notification-badge {
+      min-width: 50px;
+      font-size: 9px;
+    }
+  }
+}
+
+// Add any additional styles here if needed
+
+// Animation for new notifications
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.notification-card {
+  animation: slideInFromRight 0.3s ease-out;
+}
+
+// Pending User Approval Styles
+.pending-user-card {
+  border-left: 4px solid #ff9800;
+  
+  .notification-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .pending-user-indicator {
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+    color: white;
+  }
+
+  .notification-type-badge.pending-user {
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+    color: white;
+  }
+
+  .user-name {
+    font-weight: 600;
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+
+  .user-email {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .notification-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 120px;
+
+    .approve-btn, .reject-btn {
+      font-size: 12px;
+      padding: 8px 16px;
+      min-width: auto;
+      
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        margin-right: 4px;
+      }
+    }
+
+    .approve-btn {
+      background: linear-gradient(135deg, #4caf50, #45a049);
+      color: white;
+      
+      &:hover {
+        background: linear-gradient(135deg, #45a049, #3d8b40);
+      }
+    }
+
+    .reject-btn {
+      border-color: #f44336;
+      color: #f44336;
+      
+      &:hover {
+        background-color: rgba(244, 67, 54, 0.04);
+      }
+    }
+  }
+}
+
+.count-badge.urgent {
+  background: linear-gradient(135deg, #f44336, #d32f2f);
+  color: white;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(244, 67, 54, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(244, 67, 54, 0);
+  }
+}
+
+.status-pending {
+  background: linear-gradient(135deg, #ff9800, #f57c00);
+  color: white;
+}

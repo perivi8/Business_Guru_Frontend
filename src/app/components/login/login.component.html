@@ -1,0 +1,82 @@
+<div class="login-wrapper">
+  <div class="card">
+    <h2>Login</h2>
+    
+    <div *ngIf="approvalMessage" class="approval-message">
+      <mat-icon>check_circle</mat-icon>
+      {{ approvalMessage }}
+    </div>
+    
+    <div *ngIf="error" class="error">{{ error }}</div>
+    
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email" placeholder="Enter your email">
+          <mat-error *ngIf="f['email'].invalid && f['email'].touched">
+            <span *ngIf="f['email'].errors && f['email'].errors['required']">Email is required</span>
+            <span *ngIf="f['email'].errors && f['email'].errors['email']">Please enter a valid email</span>
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-group">
+        <mat-form-field appearance="outline">
+          <mat-label>Password</mat-label>
+          <input matInput type="password" formControlName="password" placeholder="Enter your password">
+          <mat-error *ngIf="f['password'].invalid && f['password'].touched">
+            Password is required
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <button mat-raised-button color="primary" type="submit" 
+              [disabled]="loading || loginForm.invalid">
+        <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+        {{ loading ? 'Logging in...' : 'Login' }}
+      </button>
+    </form>
+
+    <!-- Registration Status Check Section -->
+    <div class="status-check-section">
+      <button mat-stroked-button type="button" (click)="toggleStatusCheck()" class="status-toggle-btn">
+        <mat-icon>{{ showStatusCheck ? 'expand_less' : 'expand_more' }}</mat-icon>
+        Check Registration Status
+      </button>
+
+      <div *ngIf="showStatusCheck" class="status-check-content">
+        <p class="status-help-text">
+          Can't login? Check if your registration is approved or rejected.
+        </p>
+        
+        <button mat-raised-button color="accent" type="button" 
+                (click)="checkRegistrationStatus()" 
+                [disabled]="checkingStatus">
+          <mat-spinner *ngIf="checkingStatus" diameter="20"></mat-spinner>
+          {{ checkingStatus ? 'Checking...' : 'Check Status' }}
+        </button>
+
+        <div *ngIf="statusMessage" class="status-message success">
+          <mat-icon>info</mat-icon>
+          {{ statusMessage }}
+        </div>
+
+        <div *ngIf="statusError" class="status-message error">
+          <mat-icon>error</mat-icon>
+          {{ statusError }}
+          <div class="register-again-link">
+            <a routerLink="/register">Click here to register again</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center">
+      <p><a routerLink="/forgot-password">Forgot Password?</a></p>
+      <p>Don't have an account? 
+        <a routerLink="/register">Register here</a>
+      </p>
+    </div>
+  </div>
+</div>
