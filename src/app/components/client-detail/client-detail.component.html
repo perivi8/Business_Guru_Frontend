@@ -1,59 +1,83 @@
-<div class="client-detail-container">
+<!-- Main Container with Gradient Background -->
+<div class="min-h-screen bg-gradient-body">
   <!-- Loading State -->
-  <div *ngIf="loading" class="loading-container">
-    <mat-spinner diameter="50"></mat-spinner>
-    <p>Loading client details...</p>
+  <div *ngIf="loading" class="flex flex-col items-center justify-center min-h-screen">
+    <mat-spinner diameter="50" class="mb-4"></mat-spinner>
+    <p class="text-text-secondary text-lg">Loading client details...</p>
   </div>
 
   <!-- Saving Status Changes Loading Overlay -->
-  <div *ngIf="saving" class="saving-overlay">
-    <div class="saving-content">
+  <div *ngIf="saving" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+    <div class="bg-white rounded-xl p-8 shadow-2xl flex flex-col items-center gap-4">
       <mat-spinner diameter="40"></mat-spinner>
-      <p>Updating client status...</p>
+      <p class="text-text-primary font-medium">Updating client status...</p>
     </div>
   </div>
 
   <!-- Error State -->
-  <div *ngIf="error" class="error-container">
-    <mat-icon>error</mat-icon>
-    <h3>Error Loading Client</h3>
-    <p>{{ error }}</p>
-    <button mat-raised-button color="primary" (click)="goBack()">
-      <mat-icon>arrow_back</mat-icon>
-      Back to Clients
-    </button>
+  <div *ngIf="error" class="flex flex-col items-center justify-center min-h-screen px-4">
+    <div class="bg-white rounded-xl shadow-lg border border-red-200 p-8 max-w-md w-full text-center">
+      <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <mat-icon class="text-red-600 text-2xl">error</mat-icon>
+      </div>
+      <h3 class="text-xl font-semibold text-red-800 mb-2">Error Loading Client</h3>
+      <p class="text-red-600 mb-6">{{ error }}</p>
+      <button (click)="goBack()" 
+              class="btn btn-primary flex items-center gap-2 mx-auto">
+        <mat-icon>arrow_back</mat-icon>
+        Back to Clients
+      </button>
+    </div>
   </div>
 
   <!-- Client Details -->
-  <div *ngIf="!loading && !error && client" class="client-details">
+  <div *ngIf="!loading && !error && client" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
     <!-- Header Section -->
-    <div class="header-section">
-      <div class="header-content">
-        <div class="client-title">
-          <h1>{{ client.legal_name || client.user_name }}</h1>
-          <p class="client-subtitle">{{ client.trade_name || client.business_name }}</p>
+    <div class="bg-white shadow-sm border-b border-border-light sticky top-0 z-40 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-4 mb-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <button (click)="goBack()" 
+                  class="flex items-center justify-center w-10 h-10 rounded-lg bg-surface-alt hover:bg-surface-alt/80 transition-colors">
+            <mat-icon class="text-text-secondary">arrow_back</mat-icon>
+          </button>
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-bold text-text-primary font-heading">
+              {{ client.legal_name || client.user_name }}
+            </h1>
+            <p class="text-text-secondary text-sm mt-1">
+              {{ client.trade_name || client.business_name }}
+            </p>
+          </div>
         </div>
-        <div class="header-actions">
-          <span class="status-badge" [style.background-color]="getStatusColor(client.status || 'pending')">
+        
+        <div class="flex items-center gap-3">
+          <span class="px-3 py-1.5 text-xs rounded-full font-semibold text-white"
+                [style.background-color]="getStatusColor(client.status || 'pending')">
             {{ (client.status || 'pending') | titlecase }}
           </span>
-          <div class="action-buttons" *ngIf="isAdmin()">
-            <button mat-raised-button color="primary" (click)="startEdit()" *ngIf="!isEditing">
-              <mat-icon>edit</mat-icon>
+          
+          <div *ngIf="isAdmin()" class="flex items-center gap-2">
+            <button *ngIf="!isEditing" (click)="startEdit()" 
+                    class="btn btn-primary flex items-center gap-2 px-4 py-2">
+              <mat-icon class="text-sm">edit</mat-icon>
               Edit
             </button>
-            <button mat-raised-button color="warn" (click)="deleteClient()" *ngIf="!isEditing">
-              <mat-icon>delete</mat-icon>
+            <button *ngIf="!isEditing" (click)="deleteClient()" 
+                    class="btn btn-danger flex items-center gap-2 px-4 py-2">
+              <mat-icon class="text-sm">delete</mat-icon>
               Delete
             </button>
-            <div *ngIf="isEditing" class="edit-actions">
-              <button mat-raised-button color="primary" (click)="saveEdit()" [disabled]="saving">
-                <mat-spinner diameter="20" *ngIf="saving"></mat-spinner>
-                <mat-icon *ngIf="!saving">save</mat-icon>
+            
+            <div *ngIf="isEditing" class="flex items-center gap-2">
+              <button (click)="saveEdit()" [disabled]="saving"
+                      class="btn btn-primary flex items-center gap-2 px-4 py-2 disabled:opacity-50">
+                <mat-spinner diameter="16" *ngIf="saving" class="mr-1"></mat-spinner>
+                <mat-icon *ngIf="!saving" class="text-sm">save</mat-icon>
                 {{ saving ? 'Saving...' : 'Save' }}
               </button>
-              <button mat-stroked-button (click)="cancelEdit()" [disabled]="saving">
-                <mat-icon>cancel</mat-icon>
+              <button (click)="cancelEdit()" [disabled]="saving"
+                      class="btn btn-outline flex items-center gap-2 px-4 py-2 disabled:opacity-50">
+                <mat-icon class="text-sm">cancel</mat-icon>
                 Cancel
               </button>
             </div>
@@ -63,479 +87,561 @@
     </div>
 
     <!-- Main Content -->
-    <div class="content-section">
+    <div class="space-y-6">
       <!-- Row 1: Business Information and Financial Information side by side -->
-      <div class="row-layout">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Business Information Card -->
-        <mat-card class="info-card half-width">
-        <mat-card-header>
-          <mat-card-title>
-            <mat-icon>business</mat-icon>
-            Business Information
-          </mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="info-table">
-            <table class="details-table">
-              <tbody>
-                <tr>
-                  <td class="label">Legal Name:</td>
-                  <td class="value">{{ client.legal_name || 'N/A' }}</td>
-                </tr>
-                <tr>
-                  <td class="label">Trade Name/Business Name:</td>
-                  <td class="value">{{ client.trade_name || 'N/A' }}</td>
-                </tr>
-                <tr>
-                  <td class="label">GST Registration Number:</td>
-                  <td class="value">{{ getClientProperty('registration_number') || 'N/A' }}</td>
-                </tr>
-                <tr>
-                  <td class="label">GST Status:</td>
-                  <td class="value">{{ getGSTStatus() }}</td>
-                </tr>
-                <tr>
-                  <td class="label">Address:</td>
-                  <td class="value">{{ client.address || 'N/A' }}</td>
-                </tr>
-                <tr>
-                  <td class="label">District:</td>
-                  <td class="value">{{ client.district || 'N/A' }}</td>
-                </tr>
-                <tr>
-                  <td class="label">State:</td>
-                  <td class="value">{{ client.state || 'N/A' }}</td>
-                </tr>
-                <tr>
-                  <td class="label">Pincode:</td>
-                  <td class="value">{{ client.pincode || 'N/A' }}</td>
-                </tr>
-                <tr>
-                  <td class="label">User Email:</td>
-                  <td class="value">{{ client.user_email || 'N/A' }}</td>
-                </tr>
-                <tr>
-                  <td class="label">Company Email:</td>
-                  <td class="value">{{ getClientProperty('company_email') || 'N/A' }}</td>
-                </tr>
-                <tr>
-                  <td class="label">Mobile Number:</td>
-                  <td class="value">{{ client.mobile_number || 'N/A' }}</td>
-                </tr>
-                <tr>
-                  <td class="label">Optional Mobile Number:</td>
-                  <td class="value">{{ getClientProperty('optional_mobile_number') || 'N/A' }}</td>
-                </tr>
-                <tr>
-                  <td class="label">Constitution Type:</td>
-                  <td class="value">{{ client.constitution_type || 'N/A' }}</td>
-                </tr>
-                <tr *ngIf="getClientProperty('business_pan_name')">
-                  <td class="label">Business PAN Name:</td>
-                  <td class="value">{{ getClientProperty('business_pan_name') }}</td>
-                </tr>
-                <tr *ngIf="getClientProperty('business_pan_date')">
-                  <td class="label">Business PAN Date:</td>
-                  <td class="value">{{ getClientProperty('business_pan_date') | date:'dd/MM/yyyy' }}</td>
-                </tr>
-                <tr *ngIf="client.number_of_partners">
-                  <td class="label">Number of Partners:</td>
-                  <td class="value">{{ client.number_of_partners }}</td>
-                </tr>
-                <tr>
-                  <td class="label">IE Document:</td>
-                  <td class="value">{{ hasIEDocument() ? 'Yes' : 'No' }}</td>
-                </tr>
-                <tr>
-                  <td class="label">Website URL:</td>
-                  <td class="value">{{ getWebsiteURL() }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </mat-card-content>
-      </mat-card>
-
-        <!-- Financial Information Card -->
-        <mat-card class="info-card half-width">
-          <mat-card-header>
-            <mat-card-title>
-              <mat-icon>account_balance</mat-icon>
-              Financial Information
-            </mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <div class="info-table">
-              <table class="details-table">
-                <tbody>
-                  <tr>
-                    <td class="label">Required Loan Amount:</td>
-                    <td class="value">₹{{ (client.required_loan_amount | number) || 'N/A' }}</td>
-                  </tr>
-                  <tr>
-                    <td class="label">Loan Purpose:</td>
-                    <td class="value">{{ client.loan_purpose || 'N/A' }}</td>
-                  </tr>
-                  <tr>
-                    <td class="label">Bank Name:</td>
-                    <td class="value">{{ client.bank_name || 'N/A' }}</td>
-                  </tr>
-                  <tr>
-                    <td class="label">Account Name:</td>
-                    <td class="value">{{ client.account_name || 'N/A' }}</td>
-                  </tr>
-                  <tr>
-                    <td class="label">Bank Account Number:</td>
-                    <td class="value">{{ client.account_number || 'N/A' }}</td>
-                  </tr>
-                  <tr>
-                    <td class="label">IFSC Code:</td>
-                    <td class="value">{{ client.ifsc_code || 'N/A' }}</td>
-                  </tr>
-                  <tr>
-                    <td class="label">Bank Account Type:</td>
-                    <td class="value">{{ client.bank_type || 'N/A' }}</td>
-                  </tr>
-                  <tr>
-                    <td class="label">New Current Account:</td>
-                    <td class="value">{{ client.new_current_account === 'yes' ? 'Yes' : (client.new_current_account === 'no' ? 'No' : 'N/A') }}</td>
-                  </tr>
-                  
-                  <!-- New Bank Details (Show when New Current Account is Yes) -->
-                  <tr *ngIf="client.new_current_account === 'yes' && getClientProperty('new_bank_name')">
-                    <td class="label">New Bank Name:</td>
-                    <td class="value">{{ getClientProperty('new_bank_name') }}</td>
-                  </tr>
-                  <tr *ngIf="client.new_current_account === 'yes' && getClientProperty('new_account_name')">
-                    <td class="label">New Account Name:</td>
-                    <td class="value">{{ getClientProperty('new_account_name') }}</td>
-                  </tr>
-                  <tr *ngIf="client.new_current_account === 'yes' && getClientProperty('new_bank_account_number')">
-                    <td class="label">New Bank Account Number:</td>
-                    <td class="value">{{ getClientProperty('new_bank_account_number') }}</td>
-                  </tr>
-                  <tr *ngIf="client.new_current_account === 'yes' && getClientProperty('new_ifsc_code')">
-                    <td class="label">New IFSC Code:</td>
-                    <td class="value">{{ getClientProperty('new_ifsc_code') }}</td>
-                  </tr>
-                  
-                  <tr>
-                    <td class="label">Total Credit Amount:</td>
-                    <td class="value">₹{{ (client.total_credit_amount | number) || 'N/A' }}</td>
-                  </tr>
-                </tbody>
-              </table>
+        <div class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
+          <div class="p-6 border-b border-border-light">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                <mat-icon class="text-blue-600 text-lg">business</mat-icon>
+              </div>
+              <h3 class="text-lg font-semibold text-text-primary">Business Information</h3>
             </div>
-          </mat-card-content>
-        </mat-card>
-      </div>
-
-      <!-- Second Row: Personal Information and Staff Information side by side -->
-      <div class="row-layout">
-        <!-- Personal Information Card -->
-        <mat-card class="info-card half-width">
-          <mat-card-header>
-            <mat-card-title>
-              <mat-icon>person</mat-icon>
-              Personal Information
-            </mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <div class="info-table">
-              <table class="details-table">
-                <tbody>
-                  <!-- Owner Information (for Proprietorship and Private Limited) -->
-                  <tr *ngIf="getOwnerName()">
-                    <td class="label">Owner Name:</td>
-                    <td class="value">{{ getOwnerName() }}</td>
-                  </tr>
-                  <tr *ngIf="getOwnerDob()">
-                    <td class="label">Owner Date of Birth:</td>
-                    <td class="value">{{ getOwnerDob() | date:'dd/MM/yyyy' }}</td>
-                  </tr>
-                  
-                  <!-- Partner Information (for Partnership) -->
-                  <ng-container *ngIf="client.constitution_type === 'Partnership'">
-                    <ng-container *ngFor="let partner of getPartnersList(); let i = index">
-                      <tr *ngIf="partner.name">
-                        <td class="label">{{ i === 0 ? 'Managing Partner' : 'Partner ' + (i + 1) }} Name:</td>
-                        <td class="value">{{ partner.name }}</td>
-                      </tr>
-                      <tr *ngIf="partner.dob">
-                        <td class="label">{{ i === 0 ? 'Managing Partner' : 'Partner ' + (i + 1) }} DOB:</td>
-                        <td class="value">{{ partner.dob | date:'dd/MM/yyyy' }}</td>
-                      </tr>
-                    </ng-container>
-                  </ng-container>
-                </tbody>
-              </table>
-            </div>
-          </mat-card-content>
-        </mat-card>
-
-        <!-- Staff Information Card -->
-        <mat-card class="info-card half-width">
-        <mat-card-header>
-          <mat-card-title>
-            <mat-icon>support_agent</mat-icon>
-            Staff Information
-          </mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="info-table">
-            <table class="details-table">
-              <tbody>
-                <tr>
-                  <td class="label">Staff Name:</td>
-                  <td class="value">{{ client.staff_name || 'N/A' }}</td>
-                </tr>
-                <tr>
-                  <td class="label">Staff Email:</td>
-                  <td class="value">{{ client.staff_email || 'N/A' }}</td>
-                </tr>
-                <tr>
-                  <td class="label">Created At:</td>
-                  <td class="value">{{ (client.created_at | date:'medium') || 'N/A' }}</td>
-                </tr>
-                <tr>
-                  <td class="label">Updated At:</td>
-                  <td class="value">{{ (client.updated_at | date:'medium') || 'N/A' }}</td>
-                </tr>
-              </tbody>
-            </table>
           </div>
-        </mat-card-content>
-        </mat-card>
-      </div>
-
-      <!-- Row 3: Documents & Images (Full Width) -->
-      <div class="row-layout full-width" *ngIf="getDocumentKeys().length > 0">
-        <mat-card class="info-card full-width">
-          <mat-card-header>
-            <mat-card-title>
-              <mat-icon>folder</mat-icon>
-              Documents & Images
-            </mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <div class="documents-grid">
-              <div *ngFor="let docType of getDocumentKeys()" class="document-item">
-                <div class="document-info">
-                  <div class="document-header">
-                    <mat-icon>{{ isImageFile(client.processed_documents![docType].file_name) ? 'image' : 'description' }}</mat-icon>
-                    <div class="document-details">
-                      <h4>{{ formatDocumentName(docType) }}</h4>
-                      <p class="file-name">{{ client.processed_documents![docType].file_name }}</p>
-                      <p class="file-size">{{ formatFileSize(client.processed_documents![docType].file_size) }}</p>
-                    </div>
-                  </div>
-                  <div class="document-actions">
-                    <button mat-icon-button (click)="previewDocument(docType)" 
-                            matTooltip="Preview {{ formatDocumentName(docType) }}"
-                            *ngIf="canPreviewDocument(client.processed_documents![docType].file_name)">
-                      <mat-icon>visibility</mat-icon>
-                    </button>
-                    <button mat-icon-button (click)="downloadDocument(docType)" 
-                            matTooltip="Download {{ formatDocumentName(docType) }}">
-                      <mat-icon>download</mat-icon>
-                    </button>
-                  </div>
+          <div class="p-6">
+            <div class="space-y-4">
+              <div class="space-y-3">
+                <div class="flex justify-between py-2 border-b border-gray-100">
+                  <span class="text-sm font-medium text-text-secondary">Legal Name:</span>
+                  <span class="text-sm text-text-primary">{{ client.legal_name || 'N/A' }}</span>
+                </div>
+                <div class="flex justify-between py-2 border-b border-gray-100">
+                  <span class="text-sm font-medium text-text-secondary">Trade Name/Business Name:</span>
+                  <span class="text-sm text-text-primary">{{ client.trade_name || 'N/A' }}</span>
+                </div>
+                <div class="flex justify-between py-2 border-b border-gray-100">
+                  <span class="text-sm font-medium text-text-secondary">GST Registration Number:</span>
+                  <span class="text-sm text-text-primary">{{ getClientProperty('registration_number') || 'N/A' }}</span>
+                </div>
+                <div class="flex justify-between py-2 border-b border-gray-100">
+                  <span class="text-sm font-medium text-text-secondary">GST Status:</span>
+                  <span class="text-sm text-text-primary">{{ getGSTStatus() }}</span>
+                </div>
+                <div class="flex justify-between py-2 border-b border-gray-100">
+                  <span class="text-sm font-medium text-text-secondary">Address:</span>
+                  <span class="text-sm text-text-primary">{{ client.address || 'N/A' }}</span>
+                </div>
+                <div class="flex justify-between py-2 border-b border-gray-100">
+                  <span class="text-sm font-medium text-text-secondary">District:</span>
+                  <span class="text-sm text-text-primary">{{ client.district || 'N/A' }}</span>
+                </div>
+                <div class="flex justify-between py-2 border-b border-gray-100">
+                  <span class="text-sm font-medium text-text-secondary">State:</span>
+                  <span class="text-sm text-text-primary">{{ client.state || 'N/A' }}</span>
+                </div>
+                <div class="flex justify-between py-2 border-b border-gray-100">
+                  <span class="text-sm font-medium text-text-secondary">Pincode:</span>
+                  <span class="text-sm text-text-primary">{{ client.pincode || 'N/A' }}</span>
+                </div>
+                <div class="flex justify-between py-2 border-b border-gray-100">
+                  <span class="text-sm font-medium text-text-secondary">User Email:</span>
+                  <span class="text-sm text-text-primary">{{ client.user_email || 'N/A' }}</span>
+                </div>
+                <div class="flex justify-between py-2 border-b border-gray-100">
+                  <span class="text-sm font-medium text-text-secondary">Company Email:</span>
+                  <span class="text-sm text-text-primary">{{ getClientProperty('company_email') || 'N/A' }}</span>
+                </div>
+                <div class="flex justify-between py-2 border-b border-gray-100">
+                  <span class="text-sm font-medium text-text-secondary">Mobile Number:</span>
+                  <span class="text-sm text-text-primary">{{ client.mobile_number || 'N/A' }}</span>
+                </div>
+                <div class="flex justify-between py-2 border-b border-gray-100">
+                  <span class="text-sm font-medium text-text-secondary">Optional Mobile Number:</span>
+                  <span class="text-sm text-text-primary">{{ getClientProperty('optional_mobile_number') || 'N/A' }}</span>
+                </div>
+                <div class="flex justify-between py-2 border-b border-gray-100">
+                  <span class="text-sm font-medium text-text-secondary">Constitution Type:</span>
+                  <span class="text-sm text-text-primary">{{ client.constitution_type || 'N/A' }}</span>
+                </div>
+                <div *ngIf="getClientProperty('business_pan_name')" class="flex justify-between py-2 border-b border-gray-100">
+                  <span class="text-sm font-medium text-text-secondary">Business PAN Name:</span>
+                  <span class="text-sm text-text-primary">{{ getClientProperty('business_pan_name') }}</span>
+                </div>
+                <div *ngIf="getClientProperty('business_pan_date')" class="flex justify-between py-2 border-b border-gray-100">
+                  <span class="text-sm font-medium text-text-secondary">Business PAN Date:</span>
+                  <span class="text-sm text-text-primary">{{ getClientProperty('business_pan_date') | date:'dd/MM/yyyy' }}</span>
+                </div>
+                <div *ngIf="client.number_of_partners" class="flex justify-between py-2 border-b border-gray-100">
+                  <span class="text-sm font-medium text-text-secondary">Number of Partners:</span>
+                  <span class="text-sm text-text-primary">{{ client.number_of_partners }}</span>
+                </div>
+                <div class="flex justify-between py-2 border-b border-gray-100">
+                  <span class="text-sm font-medium text-text-secondary">IE Document:</span>
+                  <span class="text-sm text-text-primary">{{ hasIEDocument() ? 'Yes' : 'No' }}</span>
+                </div>
+                <div class="flex justify-between py-2">
+                  <span class="text-sm font-medium text-text-secondary">Website URL:</span>
+                  <span class="text-sm text-text-primary">{{ getWebsiteURL() }}</span>
                 </div>
               </div>
             </div>
-          </mat-card-content>
-        </mat-card>
+          </div>
+        </div>
+
+        <!-- Financial Information Card -->
+        <div class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
+          <div class="p-6 border-b border-border-light">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                <mat-icon class="text-green-600 text-lg">account_balance</mat-icon>
+              </div>
+              <h3 class="text-lg font-semibold text-text-primary">Financial Information</h3>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="space-y-3">
+              <div class="flex justify-between py-2 border-b border-gray-100">
+                <span class="text-sm font-medium text-text-secondary">Required Loan Amount:</span>
+                <span class="text-sm text-text-primary">₹{{ (client.required_loan_amount | number) || 'N/A' }}</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-gray-100">
+                <span class="text-sm font-medium text-text-secondary">Loan Purpose:</span>
+                <span class="text-sm text-text-primary">{{ client.loan_purpose || 'N/A' }}</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-gray-100">
+                <span class="text-sm font-medium text-text-secondary">Bank Name:</span>
+                <span class="text-sm text-text-primary">{{ client.bank_name || 'N/A' }}</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-gray-100">
+                <span class="text-sm font-medium text-text-secondary">Account Name:</span>
+                <span class="text-sm text-text-primary">{{ client.account_name || 'N/A' }}</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-gray-100">
+                <span class="text-sm font-medium text-text-secondary">Bank Account Number:</span>
+                <span class="text-sm text-text-primary">{{ client.account_number || 'N/A' }}</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-gray-100">
+                <span class="text-sm font-medium text-text-secondary">IFSC Code:</span>
+                <span class="text-sm text-text-primary">{{ client.ifsc_code || 'N/A' }}</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-gray-100">
+                <span class="text-sm font-medium text-text-secondary">Bank Account Type:</span>
+                <span class="text-sm text-text-primary">{{ client.bank_type || 'N/A' }}</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-gray-100">
+                <span class="text-sm font-medium text-text-secondary">New Current Account:</span>
+                <span class="text-sm text-text-primary">{{ client.new_current_account === 'yes' ? 'Yes' : (client.new_current_account === 'no' ? 'No' : 'N/A') }}</span>
+              </div>
+              
+              <!-- New Bank Details (Show when New Current Account is Yes) -->
+              <div *ngIf="client.new_current_account === 'yes' && getClientProperty('new_bank_name')" class="flex justify-between py-2 border-b border-gray-100">
+                <span class="text-sm font-medium text-text-secondary">New Bank Name:</span>
+                <span class="text-sm text-text-primary">{{ getClientProperty('new_bank_name') }}</span>
+              </div>
+              <div *ngIf="client.new_current_account === 'yes' && getClientProperty('new_account_name')" class="flex justify-between py-2 border-b border-gray-100">
+                <span class="text-sm font-medium text-text-secondary">New Account Name:</span>
+                <span class="text-sm text-text-primary">{{ getClientProperty('new_account_name') }}</span>
+              </div>
+              <div *ngIf="client.new_current_account === 'yes' && getClientProperty('new_bank_account_number')" class="flex justify-between py-2 border-b border-gray-100">
+                <span class="text-sm font-medium text-text-secondary">New Bank Account Number:</span>
+                <span class="text-sm text-text-primary">{{ getClientProperty('new_bank_account_number') }}</span>
+              </div>
+              <div *ngIf="client.new_current_account === 'yes' && getClientProperty('new_ifsc_code')" class="flex justify-between py-2 border-b border-gray-100">
+                <span class="text-sm font-medium text-text-secondary">New IFSC Code:</span>
+                <span class="text-sm text-text-primary">{{ getClientProperty('new_ifsc_code') }}</span>
+              </div>
+              
+              <div class="flex justify-between py-2">
+                <span class="text-sm font-medium text-text-secondary">Total Credit Amount:</span>
+                <span class="text-sm text-text-primary">₹{{ (client.total_credit_amount | number) || 'N/A' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Second Row: Personal Information and Staff Information side by side -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Personal Information Card -->
+        <div class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
+          <div class="p-6 border-b border-border-light">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                <mat-icon class="text-purple-600 text-lg">person</mat-icon>
+              </div>
+              <h3 class="text-lg font-semibold text-text-primary">Personal Information</h3>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="space-y-3">
+              <!-- Owner Information (for Proprietorship and Private Limited) -->
+              <div *ngIf="getOwnerName()" class="flex justify-between py-2 border-b border-gray-100">
+                <span class="text-sm font-medium text-text-secondary">Owner Name:</span>
+                <span class="text-sm text-text-primary">{{ getOwnerName() }}</span>
+              </div>
+              <div *ngIf="getOwnerDob()" class="flex justify-between py-2 border-b border-gray-100">
+                <span class="text-sm font-medium text-text-secondary">Owner Date of Birth:</span>
+                <span class="text-sm text-text-primary">{{ getOwnerDob() | date:'dd/MM/yyyy' }}</span>
+              </div>
+              
+              <!-- Partner Information (for Partnership) -->
+              <ng-container *ngIf="client.constitution_type === 'Partnership'">
+                <ng-container *ngFor="let partner of getPartnersList(); let i = index">
+                  <div *ngIf="partner.name" class="flex justify-between py-2 border-b border-gray-100">
+                    <span class="text-sm font-medium text-text-secondary">{{ i === 0 ? 'Managing Partner' : 'Partner ' + (i + 1) }} Name:</span>
+                    <span class="text-sm text-text-primary">{{ partner.name }}</span>
+                  </div>
+                  <div *ngIf="partner.dob" class="flex justify-between py-2 border-b border-gray-100">
+                    <span class="text-sm font-medium text-text-secondary">{{ i === 0 ? 'Managing Partner' : 'Partner ' + (i + 1) }} DOB:</span>
+                    <span class="text-sm text-text-primary">{{ partner.dob | date:'dd/MM/yyyy' }}</span>
+                  </div>
+                </ng-container>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+
+        <!-- Staff Information Card -->
+        <div class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
+          <div class="p-6 border-b border-border-light">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
+                <mat-icon class="text-indigo-600 text-lg">support_agent</mat-icon>
+              </div>
+              <h3 class="text-lg font-semibold text-text-primary">Staff Information</h3>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="space-y-3">
+              <div class="flex justify-between py-2 border-b border-gray-100">
+                <span class="text-sm font-medium text-text-secondary">Staff Name:</span>
+                <span class="text-sm text-text-primary">{{ client.staff_name || 'N/A' }}</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-gray-100">
+                <span class="text-sm font-medium text-text-secondary">Staff Email:</span>
+                <span class="text-sm text-text-primary">{{ client.staff_email || 'N/A' }}</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-gray-100">
+                <span class="text-sm font-medium text-text-secondary">Created At:</span>
+                <span class="text-sm text-text-primary">{{ (client.created_at | date:'medium') || 'N/A' }}</span>
+              </div>
+              <div class="flex justify-between py-2">
+                <span class="text-sm font-medium text-text-secondary">Updated At:</span>
+                <span class="text-sm text-text-primary">{{ (client.updated_at | date:'medium') || 'N/A' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 3: Documents & Images (Full Width) -->
+      <div *ngIf="getDocumentKeys().length > 0" class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
+        <div class="p-6 border-b border-border-light">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+              <mat-icon class="text-orange-600 text-lg">folder</mat-icon>
+            </div>
+            <h3 class="text-lg font-semibold text-text-primary">Documents & Images</h3>
+          </div>
+        </div>
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div *ngFor="let docType of getDocumentKeys()" class="bg-gray-50 rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                     [ngClass]="{
+                       'bg-blue-100': isImageFile(client.processed_documents![docType].file_name),
+                       'bg-red-100': !isImageFile(client.processed_documents![docType].file_name)
+                     }">
+                  <mat-icon [ngClass]="{
+                              'text-blue-600': isImageFile(client.processed_documents![docType].file_name),
+                              'text-red-600': !isImageFile(client.processed_documents![docType].file_name)
+                            }">
+                    {{ isImageFile(client.processed_documents![docType].file_name) ? 'image' : 'description' }}
+                  </mat-icon>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h4 class="text-sm font-semibold text-text-primary mb-1">{{ formatDocumentName(docType) }}</h4>
+                  <p class="text-xs text-text-muted truncate mb-1">{{ client.processed_documents![docType].file_name }}</p>
+                  <p class="text-xs text-text-secondary">{{ formatFileSize(client.processed_documents![docType].file_size) }}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 mt-3 pt-3 border-t border-gray-200">
+                <button *ngIf="canPreviewDocument(client.processed_documents![docType].file_name)"
+                        (click)="previewDocument(docType)" 
+                        class="flex items-center gap-1 px-3 py-1.5 text-xs bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+                        [matTooltip]="'Preview ' + formatDocumentName(docType)">
+                  <mat-icon class="text-sm">visibility</mat-icon>
+                  Preview
+                </button>
+                <button (click)="downloadDocument(docType)" 
+                        class="flex items-center gap-1 px-3 py-1.5 text-xs bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
+                        [matTooltip]="'Download ' + formatDocumentName(docType)">
+                  <mat-icon class="text-sm">download</mat-icon>
+                  Download
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Row 4: Payment Gateway Information Card -->
-      <mat-card class="info-card full-width">
-        <mat-card-header>
-          <mat-card-title>
-            <mat-icon>payment</mat-icon>
-            Payment Gateway
-          </mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="payment-gateway-section">
-            <!-- Selected Payment Gateways -->
-            <div class="payment-gateway-info">
-              <h4>Selected Payment Gateways:</h4>
-              <div *ngIf="getPaymentGateways().length > 0" class="payment-gateways-list">
-                <div *ngFor="let gateway of getPaymentGateways()" class="payment-gateway-card">
-                  <div class="gateway-header">
-                    <span class="gateway-name">{{ gateway }}</span>
-                  </div>
-                  
-                  <!-- Approval/Rejection Buttons for Admin -->
-                  <div *ngIf="isAdmin()" class="gateway-actions">
-                    <button 
-                      mat-raised-button 
-                      [color]="getPaymentGatewayStatus(gateway) === 'approved' ? 'primary' : ''"
-                      [class.selected]="getPaymentGatewayStatus(gateway) === 'approved'"
-                      [disabled]="isGatewayUpdating(gateway)"
-                      (click)="toggleGatewayApproval(gateway, 'approved')"
-                      class="approval-btn">
-                      <mat-spinner *ngIf="isGatewayUpdating(gateway)" diameter="16" style="margin-right: 8px;"></mat-spinner>
-                      <mat-icon *ngIf="!isGatewayUpdating(gateway)">check_circle</mat-icon>
-                      {{ isGatewayUpdating(gateway) ? 'Updating...' : 'Approved' }}
-                    </button>
-                    <button 
-                      mat-raised-button 
-                      [color]="getPaymentGatewayStatus(gateway) === 'not_approved' ? 'warn' : ''"
-                      [class.selected]="getPaymentGatewayStatus(gateway) === 'not_approved'"
-                      [disabled]="isGatewayUpdating(gateway)"
-                      (click)="toggleGatewayApproval(gateway, 'not_approved')"
-                      class="rejection-btn">
-                      <mat-spinner *ngIf="isGatewayUpdating(gateway)" diameter="16" style="margin-right: 8px;"></mat-spinner>
-                      <mat-icon *ngIf="!isGatewayUpdating(gateway)">cancel</mat-icon>
-                      {{ isGatewayUpdating(gateway) ? 'Updating...' : 'Not Approved' }}
-                    </button>
-                  </div>
+      <div class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
+        <div class="p-6 border-b border-border-light">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
+              <mat-icon class="text-emerald-600 text-lg">payment</mat-icon>
+            </div>
+            <h3 class="text-lg font-semibold text-text-primary">Payment Gateway</h3>
+          </div>
+        </div>
+        <div class="p-6">
+          <div class="space-y-4">
+            <h4 class="text-sm font-semibold text-text-primary">Selected Payment Gateways:</h4>
+            
+            <div *ngIf="getPaymentGateways().length > 0" class="space-y-4">
+              <div *ngFor="let gateway of getPaymentGateways()" class="bg-gray-50 rounded-lg border border-gray-200 p-4">
+                <div class="flex items-center justify-between mb-3">
+                  <span class="text-sm font-semibold text-text-primary">{{ gateway }}</span>
                   
                   <!-- Status Display for Non-Admin -->
-                  <div *ngIf="!isAdmin()" class="gateway-status">
-                    <span class="status-badge" 
-                          [class.approved]="getPaymentGatewayStatus(gateway) === 'approved'"
-                          [class.rejected]="getPaymentGatewayStatus(gateway) === 'not_approved'"
-                          [class.pending]="getPaymentGatewayStatus(gateway) === 'pending'">
+                  <div *ngIf="!isAdmin()">
+                    <span class="px-3 py-1 text-xs rounded-full font-medium"
+                          [ngClass]="{
+                            'bg-green-100 text-green-800': getPaymentGatewayStatus(gateway) === 'approved',
+                            'bg-red-100 text-red-800': getPaymentGatewayStatus(gateway) === 'not_approved',
+                            'bg-yellow-100 text-yellow-800': getPaymentGatewayStatus(gateway) === 'pending'
+                          }">
                       {{ getPaymentGatewayStatus(gateway) === 'approved' ? 'Approved' : 
                          getPaymentGatewayStatus(gateway) === 'not_approved' ? 'Not Approved' : 'Pending' }}
                     </span>
                   </div>
                 </div>
-              </div>
-              <div *ngIf="getPaymentGateways().length === 0" class="no-payment-gateways">
-                <span>No payment gateway selected</span>
+                
+                <!-- Approval/Rejection Buttons for Admin -->
+                <div *ngIf="isAdmin()" class="flex items-center gap-3">
+                  <button 
+                    [disabled]="isGatewayUpdating(gateway)"
+                    (click)="toggleGatewayApproval(gateway, 'approved')"
+                    class="flex items-center gap-2 px-4 py-2 text-sm rounded-lg font-medium transition-all duration-200 disabled:opacity-50"
+                    [ngClass]="{
+                      'bg-green-600 text-white': getPaymentGatewayStatus(gateway) === 'approved',
+                      'bg-green-100 text-green-700 hover:bg-green-200': getPaymentGatewayStatus(gateway) !== 'approved'
+                    }">
+                    <mat-spinner *ngIf="isGatewayUpdating(gateway)" diameter="16" class="mr-1"></mat-spinner>
+                    <mat-icon *ngIf="!isGatewayUpdating(gateway)" class="text-sm">check_circle</mat-icon>
+                    {{ isGatewayUpdating(gateway) ? 'Updating...' : 'Approved' }}
+                  </button>
+                  
+                  <button 
+                    [disabled]="isGatewayUpdating(gateway)"
+                    (click)="toggleGatewayApproval(gateway, 'not_approved')"
+                    class="flex items-center gap-2 px-4 py-2 text-sm rounded-lg font-medium transition-all duration-200 disabled:opacity-50"
+                    [ngClass]="{
+                      'bg-red-600 text-white': getPaymentGatewayStatus(gateway) === 'not_approved',
+                      'bg-red-100 text-red-700 hover:bg-red-200': getPaymentGatewayStatus(gateway) !== 'not_approved'
+                    }">
+                    <mat-spinner *ngIf="isGatewayUpdating(gateway)" diameter="16" class="mr-1"></mat-spinner>
+                    <mat-icon *ngIf="!isGatewayUpdating(gateway)" class="text-sm">cancel</mat-icon>
+                    {{ isGatewayUpdating(gateway) ? 'Updating...' : 'Not Approved' }}
+                  </button>
+                </div>
               </div>
             </div>
             
+            <div *ngIf="getPaymentGateways().length === 0" class="text-center py-8">
+              <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <mat-icon class="text-gray-400 text-2xl">payment</mat-icon>
+              </div>
+              <span class="text-text-muted">No payment gateway selected</span>
+            </div>
           </div>
-        </mat-card-content>
-      </mat-card>
+        </div>
+      </div>
 
       <!-- Row 5: Loan Status and Status & Feedback side by side -->
-      <div class="row-layout">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Loan Status Card -->
-        <mat-card class="info-card half-width">
-          <mat-card-header>
-            <mat-card-title>
-              <mat-icon>trending_up</mat-icon>
-              Loan Status
-            </mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <div class="loan-status-section">
-              <div class="loan-status-info">
-                <div class="loan-status-container">
-                  <!-- Current Status Display -->
-                  <div class="current-loan-status">
-                    <span class="loan-status-badge" 
-                          [style.background-color]="getLoanStatusColor(getLoanStatus())">
-                      {{ getLoanStatus() | titlecase }}
+        <div class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
+          <div class="p-6 border-b border-border-light">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-cyan-100 rounded-lg flex items-center justify-center">
+                <mat-icon class="text-cyan-600 text-lg">trending_up</mat-icon>
+              </div>
+              <h3 class="text-lg font-semibold text-text-primary">Loan Status</h3>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="space-y-4">
+              <!-- Current Status Display -->
+              <div class="text-center">
+                <span class="inline-block px-4 py-2 text-sm font-semibold rounded-full text-white"
+                      [style.background-color]="getLoanStatusColor(getLoanStatus())">
+                  {{ getLoanStatus() | titlecase }}
+                </span>
+              </div>
+              
+              <!-- Loan Status Options for Admin -->
+              <div *ngIf="isAdmin()" class="grid grid-cols-2 gap-3">
+                <button 
+                  [disabled]="isLoanStatusUpdating()"
+                  (click)="updateLoanStatus('approved')"
+                  class="flex items-center justify-center gap-2 px-4 py-3 text-sm rounded-lg font-medium transition-all duration-200 disabled:opacity-50"
+                  [ngClass]="{
+                    'bg-green-600 text-white': getLoanStatus() === 'approved',
+                    'bg-green-100 text-green-700 hover:bg-green-200': getLoanStatus() !== 'approved'
+                  }">
+                  <mat-spinner *ngIf="isLoanStatusUpdating()" diameter="16" class="mr-1"></mat-spinner>
+                  <mat-icon *ngIf="!isLoanStatusUpdating()" class="text-sm">check_circle</mat-icon>
+                  {{ isLoanStatusUpdating() ? 'Updating...' : 'Approved' }}
+                </button>
+                
+                <button 
+                  [disabled]="isLoanStatusUpdating()"
+                  (click)="updateLoanStatus('hold')"
+                  class="flex items-center justify-center gap-2 px-4 py-3 text-sm rounded-lg font-medium transition-all duration-200 disabled:opacity-50"
+                  [ngClass]="{
+                    'bg-orange-600 text-white': getLoanStatus() === 'hold',
+                    'bg-orange-100 text-orange-700 hover:bg-orange-200': getLoanStatus() !== 'hold'
+                  }">
+                  <mat-spinner *ngIf="isLoanStatusUpdating()" diameter="16" class="mr-1"></mat-spinner>
+                  <mat-icon *ngIf="!isLoanStatusUpdating()" class="text-sm">pause_circle</mat-icon>
+                  {{ isLoanStatusUpdating() ? 'Updating...' : 'Hold' }}
+                </button>
+                
+                <button 
+                  [disabled]="isLoanStatusUpdating()"
+                  (click)="updateLoanStatus('processing')"
+                  class="flex items-center justify-center gap-2 px-4 py-3 text-sm rounded-lg font-medium transition-all duration-200 disabled:opacity-50"
+                  [ngClass]="{
+                    'bg-blue-600 text-white': getLoanStatus() === 'processing',
+                    'bg-blue-100 text-blue-700 hover:bg-blue-200': getLoanStatus() !== 'processing'
+                  }">
+                  <mat-spinner *ngIf="isLoanStatusUpdating()" diameter="16" class="mr-1"></mat-spinner>
+                  <mat-icon *ngIf="!isLoanStatusUpdating()" class="text-sm">hourglass_empty</mat-icon>
+                  {{ isLoanStatusUpdating() ? 'Updating...' : 'Processing' }}
+                </button>
+                
+                <button 
+                  [disabled]="isLoanStatusUpdating()"
+                  (click)="updateLoanStatus('rejected')"
+                  class="flex items-center justify-center gap-2 px-4 py-3 text-sm rounded-lg font-medium transition-all duration-200 disabled:opacity-50"
+                  [ngClass]="{
+                    'bg-red-600 text-white': getLoanStatus() === 'rejected',
+                    'bg-red-100 text-red-700 hover:bg-red-200': getLoanStatus() !== 'rejected'
+                  }">
+                  <mat-spinner *ngIf="isLoanStatusUpdating()" diameter="16" class="mr-1"></mat-spinner>
+                  <mat-icon *ngIf="!isLoanStatusUpdating()" class="text-sm">cancel</mat-icon>
+                  {{ isLoanStatusUpdating() ? 'Updating...' : 'Rejected' }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Status and Feedback Card (Visible for all users) -->
+        <div class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
+          <div class="p-6 border-b border-border-light">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-pink-100 rounded-lg flex items-center justify-center">
+                <mat-icon class="text-pink-600 text-lg">feedback</mat-icon>
+              </div>
+              <h3 class="text-lg font-semibold text-text-primary">Status & Feedback</h3>
+            </div>
+          </div>
+          <div class="p-6">
+            <div *ngIf="!isEditing" class="space-y-4">
+              <div class="flex justify-between py-2 border-b border-gray-100">
+                <span class="text-sm font-medium text-text-secondary">Status:</span>
+                <span class="px-3 py-1 text-xs rounded-full font-medium text-white"
+                      [style.background-color]="getStatusColor(client.status || 'pending')">
+                  {{ (client.status || 'pending') | titlecase }}
+                </span>
+              </div>
+              <div class="flex justify-between py-2">
+                <span class="text-sm font-medium text-text-secondary">Feedback:</span>
+                <span class="text-sm text-text-primary text-right max-w-xs">{{ client.feedback || 'No feedback provided' }}</span>
+              </div>
+            </div>
+            
+            <div *ngIf="isEditing && isAdmin()" class="space-y-6">
+              <!-- Status Dropdown -->
+              <div class="w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Status *</label>
+                <div class="relative">
+                  <button type="button"
+                          (click)="toggleStatusDropdown()"
+                          class="w-full bg-white border border-gray-300 rounded-lg px-3 py-3 text-left text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors shadow-sm"
+                          [class.border-blue-500]="isStatusDropdownOpen"
+                          [class.ring-2]="isStatusDropdownOpen"
+                          [class.ring-blue-500]="isStatusDropdownOpen">
+                    <span class="flex items-center gap-2">
+                      <span class="w-3 h-3 rounded-full"
+                            [style.background-color]="getStatusColor(editableClient?.status || 'pending')"></span>
+                      <span class="block truncate text-gray-700">
+                        {{ getStatusLabel(editableClient?.status || 'pending') }}
+                      </span>
                     </span>
-                  </div>
+                    <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                      <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                           [class.rotate-180]="isStatusDropdownOpen"
+                           fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                    </span>
+                  </button>
                   
-                  <!-- Loan Status Options for Admin -->
-                  <div *ngIf="isAdmin()" class="loan-status-actions">
-                    <button 
-                      mat-raised-button 
-                      [color]="getLoanStatus() === 'approved' ? 'primary' : ''"
-                      [class.selected]="getLoanStatus() === 'approved'"
-                      [disabled]="isLoanStatusUpdating()"
-                      (click)="updateLoanStatus('approved')"
-                      class="loan-status-btn approved">
-                      <mat-spinner *ngIf="isLoanStatusUpdating()" diameter="16" style="margin-right: 8px;"></mat-spinner>
-                      <mat-icon *ngIf="!isLoanStatusUpdating()">check_circle</mat-icon>
-                      {{ isLoanStatusUpdating() ? 'Updating...' : 'Approved' }}
+                  <!-- Dropdown Options -->
+                  <div *ngIf="isStatusDropdownOpen"
+                       class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    <button type="button"
+                            (click)="selectStatus('pending')"
+                            class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 flex items-center gap-2"
+                            [class.bg-blue-50]="editableClient?.status === 'pending'"
+                            [class.text-blue-600]="editableClient?.status === 'pending'">
+                      <span class="w-3 h-3 rounded-full bg-purple-500"></span>
+                      Pending
                     </button>
-                    <button 
-                      mat-raised-button 
-                      [color]="getLoanStatus() === 'hold' ? 'accent' : ''"
-                      [class.selected]="getLoanStatus() === 'hold'"
-                      [disabled]="isLoanStatusUpdating()"
-                      (click)="updateLoanStatus('hold')"
-                      class="loan-status-btn hold">
-                      <mat-spinner *ngIf="isLoanStatusUpdating()" diameter="16" style="margin-right: 8px;"></mat-spinner>
-                      <mat-icon *ngIf="!isLoanStatusUpdating()">pause_circle</mat-icon>
-                      {{ isLoanStatusUpdating() ? 'Updating...' : 'Hold' }}
+                    <button type="button"
+                            (click)="selectStatus('processing')"
+                            class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 flex items-center gap-2"
+                            [class.bg-blue-50]="editableClient?.status === 'processing'"
+                            [class.text-blue-600]="editableClient?.status === 'processing'">
+                      <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+                      Processing
                     </button>
-                    <button 
-                      mat-raised-button 
-                      [color]="getLoanStatus() === 'processing' ? 'primary' : ''"
-                      [class.selected]="getLoanStatus() === 'processing'"
-                      [disabled]="isLoanStatusUpdating()"
-                      (click)="updateLoanStatus('processing')"
-                      class="loan-status-btn processing">
-                      <mat-spinner *ngIf="isLoanStatusUpdating()" diameter="16" style="margin-right: 8px;"></mat-spinner>
-                      <mat-icon *ngIf="!isLoanStatusUpdating()">hourglass_empty</mat-icon>
-                      {{ isLoanStatusUpdating() ? 'Updating...' : 'Processing' }}
+                    <button type="button"
+                            (click)="selectStatus('interested')"
+                            class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 flex items-center gap-2"
+                            [class.bg-blue-50]="editableClient?.status === 'interested'"
+                            [class.text-blue-600]="editableClient?.status === 'interested'">
+                      <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                      Interested
                     </button>
-                    <button 
-                      mat-raised-button 
-                      [color]="getLoanStatus() === 'rejected' ? 'warn' : ''"
-                      [class.selected]="getLoanStatus() === 'rejected'"
-                      [disabled]="isLoanStatusUpdating()"
-                      (click)="updateLoanStatus('rejected')"
-                      class="loan-status-btn rejected">
-                      <mat-spinner *ngIf="isLoanStatusUpdating()" diameter="16" style="margin-right: 8px;"></mat-spinner>
-                      <mat-icon *ngIf="!isLoanStatusUpdating()">cancel</mat-icon>
-                      {{ isLoanStatusUpdating() ? 'Updating...' : 'Rejected' }}
+                    <button type="button"
+                            (click)="selectStatus('not_interested')"
+                            class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 flex items-center gap-2"
+                            [class.bg-blue-50]="editableClient?.status === 'not_interested'"
+                            [class.text-blue-600]="editableClient?.status === 'not_interested'">
+                      <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                      Not Interested
+                    </button>
+                    <button type="button"
+                            (click)="selectStatus('hold')"
+                            class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0 flex items-center gap-2"
+                            [class.bg-blue-50]="editableClient?.status === 'hold'"
+                            [class.text-blue-600]="editableClient?.status === 'hold'">
+                      <span class="w-3 h-3 rounded-full bg-orange-500"></span>
+                      Hold
                     </button>
                   </div>
                 </div>
               </div>
-            </div>
-          </mat-card-content>
-        </mat-card>
-
-        <!-- Status and Feedback Card (Visible for all users) -->
-        <mat-card class="info-card half-width">
-          <mat-card-header>
-            <mat-card-title>
-              <mat-icon>feedback</mat-icon>
-              Status & Feedback
-            </mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <div *ngIf="!isEditing" class="info-table">
-              <table class="details-table">
-                <tbody>
-                  <tr>
-                    <td class="label">Status:</td>
-                    <td class="value">
-                      <span class="status-badge" [style.background-color]="getStatusColor(client.status || 'pending')">
-                        {{ (client.status || 'pending') | titlecase }}
-                      </span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="label">Feedback:</td>
-                    <td class="value">{{ client.feedback || 'No feedback provided' }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            
-            <div *ngIf="isEditing && isAdmin()" class="edit-form">
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Status</mat-label>
-                <mat-select [(value)]="editableClient!.status">
-                  <mat-option value="pending">Pending</mat-option>
-                  <mat-option value="processing">Processing</mat-option>
-                  <mat-option value="interested">Interested</mat-option>
-                  <mat-option value="not_interested">Not Interested</mat-option>
-                  <mat-option value="hold">Hold</mat-option>
-                </mat-select>
-              </mat-form-field>
               
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Feedback</mat-label>
-                <textarea matInput [(ngModel)]="editableClient!.feedback" 
-                          rows="4" placeholder="Enter feedback for this client"></textarea>
-              </mat-form-field>
+              <!-- Feedback Textarea -->
+              <div class="w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Feedback</label>
+                <textarea [(ngModel)]="editableClient!.feedback" 
+                          rows="4" 
+                          placeholder="Enter feedback for this client"
+                          class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors resize-none shadow-sm"></textarea>
+              </div>
             </div>
-          </mat-card-content>
-        </mat-card>
+          </div>
+        </div>
       </div>
     </div>
   </div>

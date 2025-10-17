@@ -1,473 +1,1145 @@
-<div class="container">
-  <!-- Filters and Sort Section -->
-  <mat-card class="filters-card">
-    <div class="filters-section">
-      <div class="filters-row">
-        <!-- Sort Options -->
-        <mat-form-field appearance="outline" class="filter-field">
-          <mat-label>Sort By</mat-label>
-          <mat-select [(value)]="sortOption" (selectionChange)="onSortChange()">
-            <mat-option value="name_asc">Name (A to Z)</mat-option>
-            <mat-option value="name_desc">Name (Z to A)</mat-option>
-            <mat-option value="date_new">Date (New to Old)</mat-option>
-            <mat-option value="date_old">Date (Old to New)</mat-option>
-          </mat-select>
-        </mat-form-field>
+<!-- Main Container with Gradient Background -->
+<div class="min-h-screen bg-gradient-body">
 
-        <!-- Staff Filter -->
-        <mat-form-field appearance="outline" class="filter-field">
-          <mat-label>Filter by Staff</mat-label>
-          <mat-select [(value)]="staffFilter" (selectionChange)="applyFilters()">
-            <mat-option value="all">All Staff</mat-option>
-            <mat-option *ngFor="let staff of uniqueStaffMembers" [value]="staff">
-              {{ staff }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
+  <!-- Main Content Layout -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div class="flex flex-col lg:flex-row gap-6">
+      
+      <!-- Left Sidebar - Filters -->
+      <div class="w-full lg:w-80 order-1">
+        <div class="bg-white rounded-xl shadow-sm border border-border-light sticky top-24">
+          <!-- Filters Header -->
+          <div class="p-4 border-b border-border-light">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-semibold text-text-primary flex items-center gap-2">
+                <mat-icon class="text-primary">filter_list</mat-icon>
+                Filters
+              </h3>
+              <button 
+                *ngIf="hasActiveFilters()" 
+                (click)="clearAllFilters()"
+                class="text-primary hover:text-primary-dark text-sm font-medium">
+                Clear All
+              </button>
+            </div>
+          </div>
 
-        <!-- GST Filter -->
-        <mat-form-field appearance="outline" class="filter-field">
-          <mat-label>Filter by GST</mat-label>
-          <mat-select [(value)]="gstFilter" (selectionChange)="applyFilters()">
-            <mat-option value="all">All</mat-option>
-            <mat-option value="yes">GST Active</mat-option>
-            <mat-option value="not_selected">Not Selected</mat-option>
-          </mat-select>
-        </mat-form-field>
+          <!-- View Toggle Section -->
+          <div class="p-4 border-b border-border-light">
+            <label class="block text-sm font-medium text-text-primary mb-3">View Mode</label>
+            <div class="flex items-center gap-2">
+              <button 
+                (click)="viewMode = 'table'" 
+                [class]="viewMode === 'table' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+                class="flex items-center justify-center w-12 h-10 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                matTooltip="Table View">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 6h18m-9 8h9m-9 4h9m-9-8H3m0 4h6"></path>
+                </svg>
+              </button>
+              <button 
+                (click)="viewMode = 'card'" 
+                [class]="viewMode === 'card' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+                class="flex items-center justify-center w-12 h-10 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                matTooltip="Card View">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14-7H5a2 2 0 00-2 2v12a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2z"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
 
-        <!-- Interest Level Filter -->
-        <mat-form-field appearance="outline" class="filter-field">
-          <mat-label>Filter by Interest</mat-label>
-          <mat-select [(value)]="interestFilter" (selectionChange)="applyFilters()">
-            <mat-option value="all">All</mat-option>
-            <mat-option value="interested">Interested</mat-option>
-            <mat-option value="not_interested">Not Interested</mat-option>
-            <mat-option value="no_gst">No GST</mat-option>
-            <mat-option value="gst_cancelled">GST Cancelled</mat-option>
-            <mat-option value="pending">Pending</mat-option>
-            <mat-option value="unknown">Unknown</mat-option>
-          </mat-select>
-        </mat-form-field>
+          <!-- Search Filter (Desktop) -->
+          <div class="hidden sm:block p-4 border-b border-border-light">
+            <label class="block text-sm font-medium text-text-primary mb-2">Search Enquiries</label>
+            <div class="relative">
+              <input 
+                type="text" 
+                [(ngModel)]="searchTerm" 
+                (input)="applyFilters()"
+                placeholder="Name, mobile, business..."
+                class="w-full pl-10 pr-4 py-2 border border-border-light rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
+              <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-muted text-lg">search</mat-icon>
+            </div>
+          </div>
 
-        <!-- Date Range Filter -->
-        <mat-form-field appearance="outline" class="filter-field date-field">
-          <mat-label>From Date</mat-label>
-          <input matInput [matDatepicker]="fromDatePicker" [(ngModel)]="fromDate" (dateChange)="applyFilters()">
-          <mat-datepicker-toggle matSuffix [for]="fromDatePicker"></mat-datepicker-toggle>
-          <mat-datepicker #fromDatePicker></mat-datepicker>
-        </mat-form-field>
+          <!-- Staff Filter -->
+          <div class="p-4 border-b border-border-light">
+            <label class="block text-sm font-medium text-text-primary mb-3">Assigned Staff</label>
+            <div class="space-y-2 max-h-48 overflow-y-auto">
+              <label class="flex items-center cursor-pointer group">
+                <input 
+                  type="radio" 
+                  name="staff" 
+                  value="all" 
+                  [(ngModel)]="staffFilter" 
+                  (change)="applyFilters()"
+                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
+                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary">
+                  All Staff
+                  <span class="text-text-muted">({{ getStaffCount('all') }})</span>
+                </span>
+              </label>
+              <label *ngFor="let staff of uniqueStaffMembers" class="flex items-center cursor-pointer group">
+                <input 
+                  type="radio" 
+                  name="staff" 
+                  [value]="staff" 
+                  [(ngModel)]="staffFilter" 
+                  (change)="applyFilters()"
+                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
+                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
+                  <mat-icon class="text-lg text-text-muted">person</mat-icon>
+                  {{ staff }}
+                  <span class="text-text-muted">({{ getStaffCount(staff) }})</span>
+                </span>
+              </label>
+            </div>
+          </div>
 
-        <mat-form-field appearance="outline" class="filter-field date-field">
-          <mat-label>To Date</mat-label>
-          <input matInput [matDatepicker]="toDatePicker" [(ngModel)]="toDate" (dateChange)="applyFilters()">
-          <mat-datepicker-toggle matSuffix [for]="toDatePicker"></mat-datepicker-toggle>
-          <mat-datepicker #toDatePicker></mat-datepicker>
-        </mat-form-field>
+          <!-- GST Filter -->
+          <div class="p-4 border-b border-border-light">
+            <label class="block text-sm font-medium text-text-primary mb-3">GST Status</label>
+            <div class="space-y-2">
+              <label class="flex items-center cursor-pointer group">
+                <input 
+                  type="radio" 
+                  name="gst" 
+                  value="all" 
+                  [(ngModel)]="gstFilter" 
+                  (change)="applyFilters()"
+                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
+                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary">
+                  All GST
+                  <span class="text-text-muted">({{ getGstCount('all') }})</span>
+                </span>
+              </label>
+              <label class="flex items-center cursor-pointer group">
+                <input 
+                  type="radio" 
+                  name="gst" 
+                  value="yes" 
+                  [(ngModel)]="gstFilter" 
+                  (change)="applyFilters()"
+                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
+                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
+                  <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                  GST Active
+                  <span class="text-text-muted">({{ getGstCount('yes') }})</span>
+                </span>
+              </label>
+              <label class="flex items-center cursor-pointer group">
+                <input 
+                  type="radio" 
+                  name="gst" 
+                  value="not_selected" 
+                  [(ngModel)]="gstFilter" 
+                  (change)="applyFilters()"
+                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
+                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
+                  <span class="w-2 h-2 bg-gray-500 rounded-full"></span>
+                  Not Selected
+                  <span class="text-text-muted">({{ getGstCount('not_selected') }})</span>
+                </span>
+              </label>
+            </div>
+          </div>
 
-        <!-- Clear Filters Button -->
-        <button mat-stroked-button color="accent" class="clear-filters-btn" (click)="clearAllFilters()" *ngIf="hasActiveFilters()">
-          <mat-icon>clear</mat-icon>
-          Clear Filters
-        </button>
+          <!-- Interest Level Filter -->
+          <div class="p-4 border-b border-border-light">
+            <label class="block text-sm font-medium text-text-primary mb-3">Interest Level</label>
+            <div class="space-y-2">
+              <label class="flex items-center cursor-pointer group">
+                <input 
+                  type="radio" 
+                  name="interest" 
+                  value="all" 
+                  [(ngModel)]="interestFilter" 
+                  (change)="applyFilters()"
+                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
+                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary">
+                  All Interest
+                  <span class="text-text-muted">({{ getInterestCount('all') }})</span>
+                </span>
+              </label>
+              <label class="flex items-center cursor-pointer group">
+                <input 
+                  type="radio" 
+                  name="interest" 
+                  value="interested" 
+                  [(ngModel)]="interestFilter" 
+                  (change)="applyFilters()"
+                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
+                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
+                  <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                  Interested
+                  <span class="text-text-muted">({{ getInterestCount('interested') }})</span>
+                </span>
+              </label>
+              <label class="flex items-center cursor-pointer group">
+                <input 
+                  type="radio" 
+                  name="interest" 
+                  value="not_interested" 
+                  [(ngModel)]="interestFilter" 
+                  (change)="applyFilters()"
+                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
+                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
+                  <span class="w-2 h-2 bg-red-500 rounded-full"></span>
+                  Not Interested
+                  <span class="text-text-muted">({{ getInterestCount('not_interested') }})</span>
+                </span>
+              </label>
+              <label class="flex items-center cursor-pointer group">
+                <input 
+                  type="radio" 
+                  name="interest" 
+                  value="no_gst" 
+                  [(ngModel)]="interestFilter" 
+                  (change)="applyFilters()"
+                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
+                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
+                  <span class="w-2 h-2 bg-orange-500 rounded-full"></span>
+                  No GST
+                  <span class="text-text-muted">({{ getInterestCount('no_gst') }})</span>
+                </span>
+              </label>
+              <label class="flex items-center cursor-pointer group">
+                <input 
+                  type="radio" 
+                  name="interest" 
+                  value="gst_cancelled" 
+                  [(ngModel)]="interestFilter" 
+                  (change)="applyFilters()"
+                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
+                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
+                  <span class="w-2 h-2 bg-red-500 rounded-full"></span>
+                  GST Cancelled
+                  <span class="text-text-muted">({{ getInterestCount('gst_cancelled') }})</span>
+                </span>
+              </label>
+              <label class="flex items-center cursor-pointer group">
+                <input 
+                  type="radio" 
+                  name="interest" 
+                  value="pending" 
+                  [(ngModel)]="interestFilter" 
+                  (change)="applyFilters()"
+                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
+                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
+                  <span class="w-2 h-2 bg-yellow-500 rounded-full"></span>
+                  Pending
+                  <span class="text-text-muted">({{ getInterestCount('pending') }})</span>
+                </span>
+              </label>
+              <label class="flex items-center cursor-pointer group">
+                <input 
+                  type="radio" 
+                  name="interest" 
+                  value="unknown" 
+                  [(ngModel)]="interestFilter" 
+                  (change)="applyFilters()"
+                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
+                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
+                  <span class="w-2 h-2 bg-gray-500 rounded-full"></span>
+                  Unknown
+                  <span class="text-text-muted">({{ getInterestCount('unknown') }})</span>
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Date Range Filter -->
+          <div class="p-4 border-b border-gray-200">
+            <div class="flex items-center gap-2 mb-4">
+              <div class="w-5 h-5 bg-blue-100 rounded flex items-center justify-center">
+                <svg class="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+              </div>
+              <label class="block text-sm font-semibold text-gray-800">Date Range</label>
+            </div>
+            <div class="space-y-4">
+              <!-- From Date -->
+              <div class="w-full">
+                <label class="block text-xs font-medium text-gray-600 mb-2 uppercase tracking-wide">From Date</label>
+                <div class="relative">
+                  <input type="date" 
+                         [(ngModel)]="fromDate" 
+                         (change)="applyFilters()"
+                         class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 shadow-sm">
+                  <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <!-- To Date -->
+              <div class="w-full">
+                <label class="block text-xs font-medium text-gray-600 mb-2 uppercase tracking-wide">To Date</label>
+                <div class="relative">
+                  <input type="date" 
+                         [(ngModel)]="toDate" 
+                         (change)="applyFilters()"
+                         class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 shadow-sm">
+                  <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Clear Date Range Button -->
+              <div class="pt-2" *ngIf="fromDate || toDate">
+                <button (click)="clearDateRange()" 
+                        class="w-full px-3 py-2 text-xs font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 hover:border-red-300 transition-all duration-200 flex items-center justify-center gap-2">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                  Clear Date Range
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sort Options -->
+          <div class="p-4">
+            <label class="block text-sm font-medium text-text-primary mb-3">Sort By</label>
+            <div class="space-y-2">
+              <label class="flex items-center cursor-pointer group">
+                <input 
+                  type="radio" 
+                  name="sort" 
+                  value="date_new" 
+                  [(ngModel)]="sortOption" 
+                  (change)="onSortChange()"
+                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
+                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
+                  <mat-icon class="text-lg text-text-muted">schedule</mat-icon>
+                  Newest First
+                </span>
+              </label>
+              <label class="flex items-center cursor-pointer group">
+                <input 
+                  type="radio" 
+                  name="sort" 
+                  value="date_old" 
+                  [(ngModel)]="sortOption" 
+                  (change)="onSortChange()"
+                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
+                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
+                  <mat-icon class="text-lg text-text-muted">history</mat-icon>
+                  Oldest First
+                </span>
+              </label>
+              <label class="flex items-center cursor-pointer group">
+                <input 
+                  type="radio" 
+                  name="sort" 
+                  value="name_asc" 
+                  [(ngModel)]="sortOption" 
+                  (change)="onSortChange()"
+                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
+                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
+                  <mat-icon class="text-lg text-text-muted">sort_by_alpha</mat-icon>
+                  Name A-Z
+                </span>
+              </label>
+              <label class="flex items-center cursor-pointer group">
+                <input 
+                  type="radio" 
+                  name="sort" 
+                  value="name_desc" 
+                  [(ngModel)]="sortOption" 
+                  (change)="onSortChange()"
+                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
+                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
+                  <mat-icon class="text-lg text-text-muted">sort_by_alpha</mat-icon>
+                  Name Z-A
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- Active Filters Info -->
-      <div class="filter-info" *ngIf="hasActiveFilters()">
-        <span class="filter-count">Showing {{ filteredEnquiries.length }} of {{ enquiries.length }} enquiries</span>
-        <div class="active-filters">
-          <span class="filter-tag" *ngIf="staffFilter !== 'all'">
-            Staff: {{ staffFilter }}
-            <mat-icon (click)="clearStaffFilter()">close</mat-icon>
-          </span>
-          <span class="filter-tag" *ngIf="gstFilter !== 'all'">
-            GST: {{ getGstFilterDisplay() }}
-            <mat-icon (click)="clearGstFilter()">close</mat-icon>
-          </span>
-          <span class="filter-tag" *ngIf="interestFilter !== 'all'">
-            Interest: {{ getInterestLevelDisplay() }}
-            <mat-icon (click)="clearInterestFilter()">close</mat-icon>
-          </span>
-          <span class="filter-tag" *ngIf="fromDate || toDate">
-            Date Range: {{ formatDateRange() }}
-            <mat-icon (click)="clearDateRange()">close</mat-icon>
-          </span>
+      <!-- Main Content Area -->
+      <div class="flex-1 order-2">
+        <!-- Results Header -->
+        <div class="bg-white rounded-xl shadow-sm border border-border-light p-4 mb-6">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="flex items-center gap-4">
+              <h2 class="text-lg font-semibold text-text-primary">
+                Enquiries ({{ filteredEnquiries.length }})
+              </h2>
+              
+              <!-- Active Filters Display -->
+              <div *ngIf="hasActiveFilters()" class="flex flex-wrap gap-2">
+                <span *ngIf="searchTerm" class="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                  Search: "{{ searchTerm }}"
+                  <button (click)="searchTerm = ''; applyFilters()" class="hover:bg-blue-200 rounded-full p-0.5">
+                    <mat-icon class="text-xs">close</mat-icon>
+                  </button>
+                </span>
+                <span *ngIf="staffFilter !== 'all'" class="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                  Staff: {{ staffFilter }}
+                  <button (click)="clearStaffFilter()" class="hover:bg-green-200 rounded-full p-0.5">
+                    <mat-icon class="text-xs">close</mat-icon>
+                  </button>
+                </span>
+                <span *ngIf="gstFilter !== 'all'" class="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
+                  GST: {{ getGstFilterDisplay() }}
+                  <button (click)="clearGstFilter()" class="hover:bg-purple-200 rounded-full p-0.5">
+                    <mat-icon class="text-xs">close</mat-icon>
+                  </button>
+                </span>
+                <span *ngIf="interestFilter !== 'all'" class="inline-flex items-center gap-1 px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full">
+                  Interest: {{ getInterestLevelDisplay() }}
+                  <button (click)="clearInterestFilter()" class="hover:bg-orange-200 rounded-full p-0.5">
+                    <mat-icon class="text-xs">close</mat-icon>
+                  </button>
+                </span>
+                <span *ngIf="fromDate || toDate" class="inline-flex items-center gap-1 px-2 py-1 bg-indigo-100 text-indigo-800 text-xs rounded-full">
+                  Date: {{ formatDateRange() }}
+                  <button (click)="clearDateRange()" class="hover:bg-indigo-200 rounded-full p-0.5">
+                    <mat-icon class="text-xs">close</mat-icon>
+                  </button>
+                </span>
+              </div>
+            </div>
+            
+            <!-- Clear All Filters -->
+            <button 
+              *ngIf="hasActiveFilters()" 
+              (click)="clearAllFilters()"
+              class="btn btn-outline text-status-error border-status-error hover:bg-status-error hover:text-white flex items-center gap-2 px-3 py-1.5 text-sm">
+              <mat-icon class="text-sm">clear_all</mat-icon>
+              Clear All
+            </button>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div *ngIf="loading" class="flex flex-col items-center justify-center py-16">
+          <mat-spinner diameter="40" class="mb-4"></mat-spinner>
+          <p class="text-text-secondary">Loading enquiries...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!loading && filteredEnquiries.length === 0" class="text-center py-16">
+          <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <mat-icon class="text-gray-400 text-3xl">contact_support</mat-icon>
+          </div>
+          <h3 class="text-xl font-semibold text-text-primary mb-2">No enquiries found</h3>
+          <p class="text-text-secondary mb-6 max-w-md mx-auto">
+            <span *ngIf="hasActiveFilters()">
+              Try adjusting your search criteria or filters to find what you're looking for.
+            </span>
+            <span *ngIf="!hasActiveFilters()">
+              Start managing customer enquiries by adding your first enquiry to the system.
+            </span>
+          </p>
+          <button (click)="showAddForm()" class="btn btn-primary">
+            <mat-icon class="mr-2">add</mat-icon>
+            Add New Enquiry
+          </button>
+        </div>
+
+        <!-- Table View -->
+        <div *ngIf="!loading && filteredEnquiries.length > 0 && viewMode === 'table'" class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
+          <div class="overflow-x-auto">
+            <table mat-table [dataSource]="filteredEnquiries" class="w-full">
+              <!-- Serial Number Column -->
+              <ng-container matColumnDef="sno">
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">S.No</th>
+                <td mat-cell *matCellDef="let enquiry; let i = index" class="px-4 py-3 text-sm text-text-secondary">{{ getSerialNumber(i) }}</td>
+              </ng-container>
+
+              <!-- Date Column -->
+              <ng-container matColumnDef="date">
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Date</th>
+                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-sm text-text-secondary">
+                  {{ enquiry.date | date:'dd/MM/yyyy' }}
+                </td>
+              </ng-container>
+
+              <!-- Name Column -->
+              <ng-container matColumnDef="wati_name">
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Name</th>
+                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3">
+                  <div class="font-medium text-text-primary text-sm">
+                    {{ enquiry.wati_name }}
+                  </div>
+                  <div *ngIf="enquiry.user_name" class="text-xs text-text-muted">
+                    {{ enquiry.user_name }}
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Mobile Number Column -->
+              <ng-container matColumnDef="mobile_number">
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Mobile</th>
+                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-sm text-text-secondary">
+                  {{ enquiry.mobile_number }}
+                </td>
+              </ng-container>
+
+              <!-- GST Column -->
+              <ng-container matColumnDef="gst">
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">GST</th>
+                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3">
+                  <span class="px-2 py-1 text-xs rounded-full font-medium"
+                        [ngClass]="{
+                          'bg-green-100 text-green-800': enquiry.gst === 'Yes' && enquiry.gst_status === 'Active',
+                          'bg-red-100 text-red-800': enquiry.gst === 'Yes' && enquiry.gst_status === 'Cancel',
+                          'bg-gray-100 text-gray-800': enquiry.gst !== 'Yes'
+                        }">
+                    {{ enquiry.gst === 'Yes' ? (enquiry.gst_status || 'Yes') : (enquiry.gst || 'Not Selected') }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <!-- Business Type Column -->
+              <ng-container matColumnDef="business_type">
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Business Type</th>
+                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-sm text-text-secondary">
+                  {{ enquiry.business_type || '-' }}
+                </td>
+              </ng-container>
+
+              <!-- Staff Column -->
+              <ng-container matColumnDef="staff">
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Staff</th>
+                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-sm text-text-secondary">
+                  {{ enquiry.staff || 'Unassigned' }}
+                </td>
+              </ng-container>
+
+              <!-- Comments Column -->
+              <ng-container matColumnDef="comments">
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Comments</th>
+                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3">
+                  <span class="inline-block px-3 py-1 text-xs rounded-full font-medium whitespace-nowrap truncate max-w-[150px]"
+                        [style.background-color]="getStatusColor(enquiry.comments)"
+                        [style.color]="'white'"
+                        [title]="enquiry.comments || 'No Comment'">
+                    {{ enquiry.comments || 'No Comment' }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <!-- Actions Column -->
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Actions</th>
+                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3">
+                  <div class="flex items-center gap-2">
+                    <!-- Edit Action -->
+                    <button (click)="editEnquiry(enquiry)" 
+                            class="w-9 h-9 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-200 hover:scale-110 group"
+                            matTooltip="Edit Enquiry"
+                            matTooltipPosition="above">
+                      <mat-icon class="text-blue-600 group-hover:text-blue-700 text-xl">edit_note</mat-icon>
+                    </button>
+                    
+                    <!-- Delete Action -->
+                    <button (click)="deleteEnquiry(enquiry)" 
+                            class="w-9 h-9 rounded-lg bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-200 hover:scale-110 group"
+                            matTooltip="Delete Enquiry"
+                            matTooltipPosition="above">
+                      <mat-icon class="text-red-600 group-hover:text-red-700 text-xl">delete_forever</mat-icon>
+                    </button>
+                  </div>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns" class="border-b border-border-light"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
+                  class="border-b border-border-light hover:bg-surface-alt transition-colors"
+                  [ngClass]="getRowColorClass(row)"></tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- Card View - 2 Column Grid -->
+        <div *ngIf="!loading && filteredEnquiries.length > 0 && viewMode === 'card'" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div *ngFor="let enquiry of filteredEnquiries; let i = index" 
+               class="bg-white rounded-2xl shadow-lg border border-border-light overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer group">
+            
+            <!-- Card Header with Gradient -->
+            <div class="relative bg-gradient-to-r from-primary/5 to-secondary/5 p-6 border-b border-border-light">
+              <div class="flex items-start justify-between">
+                <div class="flex items-center gap-4">
+                  <!-- Profile Avatar -->
+                  <div class="w-14 h-14 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+                    <mat-icon class="text-white text-xl">contact_support</mat-icon>
+                  </div>
+                  <div>
+                    <h3 class="font-bold text-text-primary text-lg group-hover:text-primary transition-colors leading-tight">
+                      {{ enquiry.wati_name }}
+                    </h3>
+                    <div class="flex items-center gap-2 mt-1">
+                      <span class="text-text-muted text-sm">#{{ getSerialNumber(i) }}</span>
+                      <span class="w-1 h-1 bg-text-muted rounded-full"></span>
+                      <span class="text-text-muted text-xs">{{ enquiry.date | date:'MMM dd' }}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Status Badge -->
+                <div class="flex flex-col items-end gap-2">
+                  <span class="px-3 py-1.5 text-xs rounded-full font-semibold shadow-sm"
+                        [style.background-color]="getStatusColor(enquiry.comments)"
+                        [style.color]="'white'">
+                    {{ enquiry.comments || 'No Comment' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card Body -->
+            <div class="p-6">
+              <!-- Enquiry Information -->
+              <div class="space-y-4 mb-6">
+                <!-- Mobile Number -->
+                <div class="flex items-start gap-3">
+                  <div class="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <mat-icon class="text-green-600 text-lg">phone</mat-icon>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-xs font-medium text-text-muted uppercase tracking-wide mb-1">Mobile Number</p>
+                    <p class="text-sm font-medium text-text-primary">{{ displayMobileNumber(enquiry.mobile_number) }}</p>
+                  </div>
+                </div>
+
+                <!-- Business Type -->
+                <div *ngIf="enquiry.business_type" class="flex items-start gap-3">
+                  <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <mat-icon class="text-blue-600 text-lg">business</mat-icon>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-xs font-medium text-text-muted uppercase tracking-wide mb-1">Business Type</p>
+                    <p class="text-sm font-medium text-text-primary">{{ enquiry.business_type }}</p>
+                  </div>
+                </div>
+
+                <!-- GST Status -->
+                <div class="flex items-start gap-3">
+                  <div class="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <mat-icon class="text-indigo-600 text-lg">receipt</mat-icon>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-xs font-medium text-text-muted uppercase tracking-wide mb-1">GST Status</p>
+                    <span class="inline-flex items-center gap-1.5 px-2 py-1 text-xs rounded-full font-medium"
+                          [ngClass]="{
+                            'bg-green-100 text-green-800': enquiry.gst === 'Yes' && enquiry.gst_status === 'Active',
+                            'bg-red-100 text-red-800': enquiry.gst === 'Yes' && enquiry.gst_status === 'Cancel',
+                            'bg-gray-100 text-gray-800': enquiry.gst !== 'Yes'
+                          }">
+                      {{ enquiry.gst === 'Yes' ? (enquiry.gst_status || 'Yes') : (enquiry.gst || 'Not Selected') }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Staff Assignment -->
+                <div class="flex items-start gap-3">
+                  <div class="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <mat-icon class="text-purple-600 text-lg">support_agent</mat-icon>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-xs font-medium text-text-muted uppercase tracking-wide mb-1">Assigned Staff</p>
+                    <p class="text-sm font-medium text-text-primary">{{ enquiry.staff || 'Unassigned' }}</p>
+                  </div>
+                </div>
+
+                <!-- WhatsApp Status -->
+                <div class="flex items-start gap-3">
+                  <div class="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <mat-icon class="text-green-600 text-lg">whatsapp</mat-icon>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-xs font-medium text-text-muted uppercase tracking-wide mb-1">WhatsApp Status</p>
+                    <div class="flex items-center gap-2">
+                      <mat-icon 
+                        class="text-lg"
+                        [ngClass]="{
+                          'text-green-600': enquiry.whatsapp_sent === true,
+                          'text-red-600': enquiry.whatsapp_sent === false,
+                          'text-gray-400': enquiry.whatsapp_sent === null || enquiry.whatsapp_sent === undefined
+                        }">
+                        {{ getWhatsAppStatusIcon(enquiry) }}
+                      </mat-icon>
+                      <span class="text-sm text-text-primary">{{ getWhatsAppStatusTooltip(enquiry) }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Business Nature (if available) -->
+                <div *ngIf="enquiry.business_nature" class="flex items-start gap-3">
+                  <div class="w-8 h-8 bg-orange-50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <mat-icon class="text-orange-600 text-lg">category</mat-icon>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-xs font-medium text-text-muted uppercase tracking-wide mb-1">Business Nature</p>
+                    <p class="text-sm text-text-primary">{{ enquiry.business_nature }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card Footer Actions -->
+              <div class="flex items-center justify-center pt-6 border-t border-gray-100" (click)="$event.stopPropagation()">
+                <div class="flex items-center gap-3">
+                  <!-- Edit Action -->
+                  <button (click)="editEnquiry(enquiry)" 
+                          class="w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-200 hover:scale-110 group"
+                          matTooltip="Edit Enquiry"
+                          matTooltipPosition="above">
+                    <mat-icon class="text-blue-600 group-hover:text-blue-700 text-xl">edit_note</mat-icon>
+                  </button>
+                  
+                  <!-- Delete Action -->
+                  <button (click)="deleteEnquiry(enquiry)" 
+                          class="w-10 h-10 rounded-lg bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-200 hover:scale-110 group"
+                          matTooltip="Delete Enquiry"
+                          matTooltipPosition="above">
+                    <mat-icon class="text-red-600 group-hover:text-red-700 text-xl">delete_forever</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </mat-card>
+  </div>
+</div>
 
   <!-- Registration Form Modal -->
-  <div class="form-overlay" *ngIf="showRegistrationForm">
-    <div class="form-container">
-      <div class="form-header">
-        <h2>{{ isEditMode ? 'Edit Enquiry' : 'Add New Enquiry' }}</h2>
-        <button mat-icon-button (click)="hideAddForm()" class="close-button">
-          <mat-icon>close</mat-icon>
-        </button>
+  <div *ngIf="showRegistrationForm" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[95vh] overflow-hidden">
+      <!-- Modal Header with Enhanced Styling -->
+      <div class="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 p-6 text-white relative overflow-hidden">
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 bg-white/10 opacity-20"></div>
+        
+        <div class="flex items-center justify-between relative z-10">
+          <div class="flex items-center gap-4">
+            <!-- Icon -->
+            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+              <mat-icon class="text-white text-2xl">{{ isEditMode ? 'edit' : 'add_circle' }}</mat-icon>
+            </div>
+            <div>
+              <h2 class="text-2xl font-bold tracking-tight">{{ isEditMode ? 'Edit Enquiry' : 'Add New Enquiry' }}</h2>
+              <p class="text-white/90 text-sm mt-1 font-medium">{{ isEditMode ? 'Update enquiry information below' : 'Fill in the details to create a new enquiry' }}</p>
+            </div>
+          </div>
+          <button (click)="hideAddForm()" 
+                  class="w-11 h-11 rounded-xl bg-white/20 hover:bg-white/30 flex items-center justify-center transition-all duration-200 hover:scale-105 backdrop-blur-sm">
+            <mat-icon class="text-white">close</mat-icon>
+          </button>
+        </div>
       </div>
 
-      <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="registration-form">
-        <div class="form-grid">
-          <!-- Row 1 -->
-          <mat-form-field appearance="outline">
-            <mat-label>Date</mat-label>
-            <input matInput [matDatepicker]="picker" formControlName="date" required>
-            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-            <mat-datepicker #picker></mat-datepicker>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Wati Name</mat-label>
-            <input matInput formControlName="wati_name" required>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>User Name (Optional)</mat-label>
-            <input matInput formControlName="user_name">
-          </mat-form-field>
-
-          <!-- Row 2 - Mobile Number with Country Code -->
-          <div class="mobile-number-container">
-            <mat-form-field appearance="outline" class="country-code-field">
-              <mat-label>Country</mat-label>
-              <mat-select formControlName="country_code" required>
-                <mat-option *ngFor="let country of countryCodes" [value]="country.code">
-                  <span class="country-option">
-                    <span class="flag">{{ country.flag }}</span>
-                    <span class="code">{{ country.code }}</span>
-                    <span class="name">{{ country.country }}</span>
-                  </span>
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
+      <!-- Modal Body with Enhanced Layout -->
+      <div class="p-8 overflow-y-auto max-h-[calc(95vh-140px)] bg-gray-50">
+        <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="space-y-8">
+          
+          <!-- Personal Information Section -->
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <div class="flex items-center gap-3 mb-6">
+              <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                <mat-icon class="text-blue-600 text-lg">person</mat-icon>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-900">Personal Information</h3>
+            </div>
             
-            <mat-form-field appearance="outline" class="mobile-number-field">
-              <mat-label>Mobile Number (Wati)</mat-label>
-              <input matInput 
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Date -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Date *</label>
+              <div class="relative">
+                <input type="date" 
+                       formControlName="date" 
+                       required
+                       class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors">
+              </div>
+            </div>
+
+            <!-- Wati Name -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Wati Name *</label>
+              <input type="text" 
+                     formControlName="wati_name" 
+                     required
+                     placeholder="Enter Wati name"
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors">
+            </div>
+
+            <!-- User Name -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">User Name (Optional)</label>
+              <input type="text" 
+                     formControlName="user_name"
+                     placeholder="Enter user name"
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors">
+            </div>
+
+            <!-- Country Code -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Country Code *</label>
+              <div class="relative">
+                <button type="button"
+                        (click)="toggleDropdown('countryCode')"
+                        class="w-full bg-white border border-gray-300 rounded-lg px-3 py-3 text-left text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors"
+                        [class.border-blue-500]="isDropdownOpen('countryCode')"
+                        [class.ring-2]="isDropdownOpen('countryCode')"
+                        [class.ring-blue-500]="isDropdownOpen('countryCode')">
+                  <span class="flex items-center gap-2">
+                    <span *ngIf="getSelectedCountry()">{{ getSelectedCountry().flag }}</span>
+                    <span class="block truncate text-gray-700">
+                      {{ getSelectedCountry()?.code || 'Select Country Code' }}
+                      <span *ngIf="getSelectedCountry()" class="text-gray-500">- {{ getSelectedCountry().country }}</span>
+                    </span>
+                  </span>
+                  <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                    <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                         [class.rotate-180]="isDropdownOpen('countryCode')"
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </span>
+                </button>
+                
+                <!-- Dropdown Options -->
+                <div *ngIf="isDropdownOpen('countryCode')"
+                     class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  <button type="button"
+                          *ngFor="let country of countryCodes"
+                          (click)="selectCountryCode(country.code)"
+                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
+                          [class.bg-blue-50]="registrationForm.get('country_code')?.value === country.code"
+                          [class.text-blue-600]="registrationForm.get('country_code')?.value === country.code">
+                    <span class="flex items-center gap-2">
+                      <span>{{ country.flag }}</span>
+                      <span>{{ country.code }}</span>
+                      <span class="text-gray-600">{{ country.country }}</span>
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mobile Number -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Mobile Number *</label>
+              <input type="tel" 
                      formControlName="mobile_number" 
                      pattern="[0-9]{10}" 
                      maxlength="10" 
-                     placeholder="Enter 10-digit mobile number"
-                     required>
-              <mat-hint>Enter 10-digit mobile number (without country code)</mat-hint>
-              <mat-error *ngIf="registrationForm.get('mobile_number')?.hasError('pattern')">
-                Please enter a valid 10-digit mobile number
-              </mat-error>
-            </mat-form-field>
-          </div>
+                     placeholder="Enter 10-digit number"
+                     required
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors">
+            </div>
 
-          <!-- Secondary Mobile Number -->
-          <div class="mobile-number-container">
-            <mat-form-field appearance="outline" class="mobile-number-field">
-              <mat-label>Secondary Mobile Number</mat-label>
-              <input matInput 
+            <!-- Secondary Mobile -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Secondary Mobile (Optional)</label>
+              <input type="tel" 
                      formControlName="secondary_mobile_number" 
                      pattern="[0-9]{10}" 
-                     maxlength="10"
-                     placeholder="Enter 10-digit mobile number">
-              <mat-hint>Enter 10-digit mobile number (without country code)</mat-hint>
-              <mat-error *ngIf="registrationForm.get('secondary_mobile_number')?.hasError('pattern')">
-                Please enter a valid 10-digit mobile number
-              </mat-error>
-            </mat-form-field>
+                     maxlength="10" 
+                     placeholder="Enter 10-digit number"
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors">
+            </div>
           </div>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Business Type (Optional)</mat-label>
-            <mat-select formControlName="business_type">
-              <mat-option value="">Select Business Type</mat-option>
-              <mat-option *ngFor="let type of businessTypeOptions" [value]="type">
-                {{ type }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <!-- Business Nature Field -->
-          <mat-form-field appearance="outline">
-            <mat-label>Business Nature <span *ngIf="isEditMode && registrationForm.get('comments')?.value === 'Not Eligible'" class="required-asterisk">*</span></mat-label>
-            <input matInput formControlName="business_nature" placeholder="Enter business nature">
-            <mat-error *ngIf="registrationForm.get('business_nature')?.hasError('required')">
-              Business Nature is required when "Not Eligible" comment is selected
-            </mat-error>
-          </mat-form-field>
-
-          <!-- Row 3 - GST Section -->
-          <div class="gst-section">
-            <mat-form-field appearance="outline">
-              <mat-label>GST (Optional)</mat-label>
-              <mat-select formControlName="gst" (selectionChange)="onGstChange()">
-                <mat-option value="">Select GST (Optional)</mat-option>
-                <mat-option value="Yes">Yes</mat-option>
-                <mat-option value="No">No</mat-option>
-              </mat-select>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" *ngIf="registrationForm.get('gst')?.value === 'Yes'">
-              <mat-label>GST Status</mat-label>
-              <mat-select formControlName="gst_status">
-                <mat-option value="Active">Active</mat-option>
-                <mat-option value="Cancel">Cancel</mat-option>
-              </mat-select>
-            </mat-form-field>
-          </div>
-
-          <!-- Row 4 - Staff -->
-          <mat-form-field appearance="outline">
-            <mat-label>Staff</mat-label>
-            <mat-select formControlName="staff" required>
-              <mat-option *ngFor="let staff of staffMembers" [value]="staff.username || staff.email">
-                {{ staff.username || staff.email }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <!-- Row 5 - Comments (Only show in Edit Mode) -->
-          <mat-form-field appearance="outline" class="full-width" *ngIf="isEditMode">
-            <mat-label>Comments (Optional)</mat-label>
-            <mat-select formControlName="comments">
-              <mat-option value="">Select a comment (optional)</mat-option>
-              <mat-option *ngFor="let option of commentOptions" [value]="option">
-                {{ option }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <!-- Row 6 - Additional Comments (Only show in Edit Mode) -->
-          <mat-form-field appearance="outline" class="full-width" *ngIf="isEditMode">
-            <mat-label>Additional Comments (Optional)</mat-label>
-            <textarea matInput formControlName="additional_comments" rows="3" placeholder="Enter additional comments manually..."></textarea>
-          </mat-form-field>
         </div>
 
-        <div class="form-actions">
-          <button type="button" mat-button (click)="hideAddForm()">
-            Cancel
-          </button>
-          <button type="submit" mat-raised-button color="primary" [disabled]="!registrationForm.valid">
-            {{ isEditMode ? 'Update Enquiry' : 'Add Enquiry' }}
-          </button>
-        </div>
-      </form>
+        <!-- Business Information Section -->
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+              <mat-icon class="text-green-600 text-lg">business</mat-icon>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900">Business Information</h3>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <!-- Business Type -->
+              <div class="w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Business Type (Optional)</label>
+                <div class="relative">
+                  <button type="button"
+                          (click)="toggleDropdown('businessType')"
+                          class="w-full bg-white border border-gray-300 rounded-lg px-3 py-3 text-left text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors"
+                          [class.border-blue-500]="isDropdownOpen('businessType')"
+                          [class.ring-2]="isDropdownOpen('businessType')"
+                          [class.ring-blue-500]="isDropdownOpen('businessType')">
+                    <span class="block truncate text-gray-700">
+                      {{ registrationForm.get('business_type')?.value || 'Select Business Type' }}
+                    </span>
+                    <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                      <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                           [class.rotate-180]="isDropdownOpen('businessType')"
+                           fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                    </span>
+                  </button>
+                  
+                  <!-- Dropdown Options -->
+                  <div *ngIf="isDropdownOpen('businessType')"
+                       class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    <button type="button"
+                            (click)="selectBusinessType('')"
+                            class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
+                            [class.bg-blue-50]="registrationForm.get('business_type')?.value === ''"
+                            [class.text-blue-600]="registrationForm.get('business_type')?.value === ''">
+                      Select Business Type
+                    </button>
+                    <button type="button"
+                            *ngFor="let type of businessTypes"
+                            (click)="selectBusinessType(type)"
+                            class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
+                            [class.bg-blue-50]="registrationForm.get('business_type')?.value === type"
+                            [class.text-blue-600]="registrationForm.get('business_type')?.value === type">
+                      {{ type }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Business Nature -->
+              <div class="w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Business Nature (Optional)</label>
+                <input type="text" 
+                       formControlName="business_nature" 
+                       placeholder="e.g., Electronics, Clothing"
+                       class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors">
+              </div>
+
+              <!-- GST -->
+              <div class="w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-2">GST (Optional)</label>
+                <div class="relative">
+                  <button type="button"
+                          (click)="toggleDropdown('gst')"
+                          class="w-full bg-white border border-gray-300 rounded-lg px-3 py-3 text-left text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors"
+                          [class.border-blue-500]="isDropdownOpen('gst')"
+                          [class.ring-2]="isDropdownOpen('gst')"
+                          [class.ring-blue-500]="isDropdownOpen('gst')">
+                    <span class="block truncate text-gray-700">
+                      {{ registrationForm.get('gst')?.value || 'Select GST Status' }}
+                    </span>
+                    <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                      <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                           [class.rotate-180]="isDropdownOpen('gst')"
+                           fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                    </span>
+                  </button>
+                  
+                  <!-- Dropdown Options -->
+                  <div *ngIf="isDropdownOpen('gst')"
+                       class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    <button type="button"
+                            (click)="selectGst('')"
+                            class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
+                            [class.bg-blue-50]="registrationForm.get('gst')?.value === ''"
+                            [class.text-blue-600]="registrationForm.get('gst')?.value === ''">
+                      Select GST Status
+                    </button>
+                    <button type="button"
+                            (click)="selectGst('Yes')"
+                            class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
+                            [class.bg-blue-50]="registrationForm.get('gst')?.value === 'Yes'"
+                            [class.text-blue-600]="registrationForm.get('gst')?.value === 'Yes'">
+                      Yes
+                    </button>
+                    <button type="button"
+                            (click)="selectGst('No')"
+                            class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
+                            [class.bg-blue-50]="registrationForm.get('gst')?.value === 'No'"
+                            [class.text-blue-600]="registrationForm.get('gst')?.value === 'No'">
+                      No
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- GST Status (if GST is Yes) -->
+              <div class="w-full" *ngIf="registrationForm.get('gst')?.value === 'Yes'">
+                <label class="block text-sm font-medium text-gray-700 mb-2">GST Status</label>
+                <div class="relative">
+                  <button type="button"
+                          (click)="toggleDropdown('gstStatus')"
+                          class="w-full bg-white border border-gray-300 rounded-lg px-3 py-3 text-left text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors"
+                          [class.border-blue-500]="isDropdownOpen('gstStatus')"
+                          [class.ring-2]="isDropdownOpen('gstStatus')"
+                          [class.ring-blue-500]="isDropdownOpen('gstStatus')">
+                    <span class="block truncate text-gray-700">
+                      {{ registrationForm.get('gst_status')?.value || 'Select GST Status' }}
+                    </span>
+                    <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                      <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                           [class.rotate-180]="isDropdownOpen('gstStatus')"
+                           fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                    </span>
+                  </button>
+                  
+                  <!-- Dropdown Options -->
+                  <div *ngIf="isDropdownOpen('gstStatus')"
+                       class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    <button type="button"
+                            (click)="selectGstStatus('Active')"
+                            class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
+                            [class.bg-blue-50]="registrationForm.get('gst_status')?.value === 'Active'"
+                            [class.text-blue-600]="registrationForm.get('gst_status')?.value === 'Active'">
+                      Active
+                    </button>
+                    <button type="button"
+                            (click)="selectGstStatus('Cancel')"
+                            class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
+                            [class.bg-blue-50]="registrationForm.get('gst_status')?.value === 'Cancel'"
+                            [class.text-blue-600]="registrationForm.get('gst_status')?.value === 'Cancel'">
+                      Cancelled
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Assignment & Comments Section -->
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <div class="flex items-center gap-3 mb-6">
+              <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                <mat-icon class="text-purple-600 text-lg">assignment</mat-icon>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-900">Assignment & Comments</h3>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Staff Assignment -->
+              <div class="w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Assign Staff *</label>
+                <div class="relative">
+                  <button type="button"
+                          (click)="toggleDropdown('staff')"
+                          class="w-full bg-white border border-gray-300 rounded-lg px-3 py-3 text-left text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors"
+                          [class.border-blue-500]="isDropdownOpen('staff')"
+                          [class.ring-2]="isDropdownOpen('staff')"
+                          [class.ring-blue-500]="isDropdownOpen('staff')">
+                    <span class="block truncate text-gray-700">
+                      {{ registrationForm.get('staff')?.value || 'Select Staff' }}
+                    </span>
+                    <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                      <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                           [class.rotate-180]="isDropdownOpen('staff')"
+                           fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                    </span>
+                  </button>
+                  
+                  <!-- Dropdown Options -->
+                  <div *ngIf="isDropdownOpen('staff')"
+                       class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    <button type="button"
+                            (click)="selectStaff('')"
+                            class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
+                            [class.bg-blue-50]="registrationForm.get('staff')?.value === ''"
+                            [class.text-blue-600]="registrationForm.get('staff')?.value === ''">
+                      Select Staff
+                    </button>
+                    <button type="button"
+                            *ngFor="let staff of uniqueStaffMembers"
+                            (click)="selectStaff(staff)"
+                            class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
+                            [class.bg-blue-50]="registrationForm.get('staff')?.value === staff"
+                            [class.text-blue-600]="registrationForm.get('staff')?.value === staff">
+                      {{ staff }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Comments (Only show in Edit Mode) -->
+              <div class="w-full" *ngIf="isEditMode">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Comments (Optional)</label>
+                <div class="relative">
+                  <button type="button"
+                          (click)="toggleDropdown('comments')"
+                          class="w-full bg-white border border-gray-300 rounded-lg px-3 py-3 text-left text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors"
+                          [class.border-blue-500]="isDropdownOpen('comments')"
+                          [class.ring-2]="isDropdownOpen('comments')"
+                          [class.ring-blue-500]="isDropdownOpen('comments')">
+                    <span class="block truncate text-gray-700">
+                      {{ registrationForm.get('comments')?.value || 'Select Comment' }}
+                    </span>
+                    <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                      <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                           [class.rotate-180]="isDropdownOpen('comments')"
+                           fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                    </span>
+                  </button>
+                  
+                  <!-- Dropdown Options -->
+                  <div *ngIf="isDropdownOpen('comments')"
+                       class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    <button type="button"
+                            (click)="selectComment('')"
+                            class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
+                            [class.bg-blue-50]="registrationForm.get('comments')?.value === ''"
+                            [class.text-blue-600]="registrationForm.get('comments')?.value === ''">
+                      Select Comment
+                    </button>
+                    <button type="button"
+                            *ngFor="let comment of predefinedComments"
+                            (click)="selectComment(comment)"
+                            class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
+                            [class.bg-blue-50]="registrationForm.get('comments')?.value === comment"
+                            [class.text-blue-600]="registrationForm.get('comments')?.value === comment">
+                      {{ comment }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Additional Comments (Only show in Edit Mode) -->
+              <div class="md:col-span-2" *ngIf="isEditMode">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Additional Comments (Optional)</label>
+                <textarea formControlName="additional_comments" 
+                          rows="3" 
+                          placeholder="Enter any additional comments or notes..."
+                          class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors resize-none"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="flex items-center justify-end gap-4 pt-6 border-t border-gray-200 bg-white rounded-xl p-6 shadow-sm">
+            <button type="button" 
+                    (click)="hideAddForm()"
+                    class="px-8 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium transition-all duration-200 hover:scale-105 flex items-center gap-2">
+              <mat-icon>close</mat-icon>
+              Cancel
+            </button>
+            <button type="submit" 
+                    [disabled]="registrationForm.invalid || loading"
+                    class="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl font-medium transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center gap-2 shadow-lg">
+              <mat-spinner *ngIf="loading" diameter="16" class="mr-2"></mat-spinner>
+              <mat-icon *ngIf="!loading">{{ isEditMode ? 'save' : 'add_circle' }}</mat-icon>
+              {{ isEditMode ? 'Update Enquiry' : 'Create Enquiry' }}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
-
-  <!-- Enquiry Records Table -->
-  <mat-card class="enquiry-records-card">
-    <mat-card-header>
-      <div class="header-left">
-        <mat-card-title>
-          <mat-icon>table_chart</mat-icon>
-          Enquiry Records
-        </mat-card-title>
-        <mat-card-subtitle>{{ filteredEnquiries.length }} total enquiries</mat-card-subtitle>
-      </div>
-      <div class="header-actions">
-        <mat-form-field appearance="outline" class="search-field">
-          <mat-label>Search enquiries...</mat-label>
-          <input matInput [(ngModel)]="searchTerm" (keyup)="applyFilters()" placeholder="Search by name, mobile, staff...">
-          <mat-icon matSuffix>search</mat-icon>
-        </mat-form-field>
-
-      </div>
-    </mat-card-header>
-    <mat-card-content>
-
-    <div class="table-wrapper" *ngIf="!loading">
-      <table mat-table [dataSource]="filteredEnquiries" class="enquiry-table">
-        <!-- S.No Column -->
-        <ng-container matColumnDef="sno">
-          <th mat-header-cell *matHeaderCellDef class="header-cell">S.No</th>
-          <td mat-cell *matCellDef="let enquiry" class="data-cell">{{ enquiry.sno }}</td>
-        </ng-container>
-
-        <!-- Date Column -->
-        <ng-container matColumnDef="date">
-          <th mat-header-cell *matHeaderCellDef class="header-cell">Date</th>
-          <td mat-cell *matCellDef="let enquiry" class="data-cell">{{ formatDate(enquiry.date) }}</td>
-        </ng-container>
-
-        <!-- Wati Name Column -->
-        <ng-container matColumnDef="wati_name">
-          <th mat-header-cell *matHeaderCellDef class="header-cell">Wati Name</th>
-          <td mat-cell *matCellDef="let enquiry" class="data-cell">{{ enquiry.wati_name }}</td>
-        </ng-container>
-
-        <!-- User Name Column -->
-        <ng-container matColumnDef="user_name">
-          <th mat-header-cell *matHeaderCellDef class="header-cell">User Name</th>
-          <td mat-cell *matCellDef="let enquiry" class="data-cell">{{ enquiry.user_name || '-' }}</td>
-        </ng-container>
-
-        <!-- Mobile Number Column -->
-        <ng-container matColumnDef="mobile_number">
-          <th mat-header-cell *matHeaderCellDef class="header-cell">Mobile Number</th>
-          <td mat-cell *matCellDef="let enquiry" class="data-cell">
-            <span class="mobile-number">{{ displayMobileNumber(enquiry.mobile_number) }}</span>
-          </td>
-        </ng-container>
-
-        <!-- Secondary Mobile Column -->
-        <ng-container matColumnDef="secondary_mobile_number">
-          <th mat-header-cell *matHeaderCellDef class="header-cell">Secondary Mobile</th>
-          <td mat-cell *matCellDef="let enquiry" class="data-cell">
-            <mat-form-field appearance="outline" class="secondary-mobile-field">
-              <input matInput [(ngModel)]="enquiry.secondary_mobile_number" (ngModelChange)="updateSecondaryMobile(enquiry, $event)" placeholder="Enter secondary mobile (optional)" />
-            </mat-form-field>
-          </td>
-        </ng-container>
-
-        <!-- GST Column -->
-        <ng-container matColumnDef="gst">
-          <th mat-header-cell *matHeaderCellDef class="header-cell">GST</th>
-          <td mat-cell *matCellDef="let enquiry" class="data-cell">
-            <div class="gst-container">
-              <mat-select [(value)]="enquiry.gst" (selectionChange)="onGstChangeForEnquiry(enquiry, $event.value)" placeholder="Select GST (Optional)">
-                <mat-option value="">Select GST</mat-option>
-                <mat-option value="Yes">Yes</mat-option>
-                <mat-option value="No">No</mat-option>
-              </mat-select>
-              <mat-select *ngIf="enquiry.gst === 'Yes'" [(value)]="enquiry.gst_status" (selectionChange)="onGstStatusChangeForEnquiry(enquiry, $event.value)" placeholder="Select Status">
-                <mat-option value="Active">Active</mat-option>
-                <mat-option value="Cancel">Cancel</mat-option>
-              </mat-select>
-            </div>
-          </td>
-        </ng-container>
-
-        <!-- Business Type Column -->
-        <ng-container matColumnDef="business_type">
-          <th mat-header-cell *matHeaderCellDef class="header-cell">Business Type</th>
-          <td mat-cell *matCellDef="let enquiry" class="data-cell">
-            <mat-select [(value)]="enquiry.business_type" (selectionChange)="updateBusinessType(enquiry, $event.value)" placeholder="Select Business Type (Optional)">
-              <mat-option value="">Select Business Type</mat-option>
-              <mat-option *ngFor="let type of businessTypeOptions" [value]="type">
-                {{ type }}
-              </mat-option>
-            </mat-select>
-          </td>
-        </ng-container>
-
-        <!-- Business Nature Column -->
-        <ng-container matColumnDef="business_nature">
-          <th mat-header-cell *matHeaderCellDef class="header-cell">Business Nature</th>
-          <td mat-cell *matCellDef="let enquiry" class="data-cell">
-            <mat-form-field appearance="outline" class="business-nature-field">
-              <input matInput [(ngModel)]="enquiry.business_nature" (ngModelChange)="updateBusinessNature(enquiry, $event)" placeholder="Enter business nature (optional)" />
-            </mat-form-field>
-          </td>
-        </ng-container>
-
-        <!-- Staff Column -->
-        <ng-container matColumnDef="staff">
-          <th mat-header-cell *matHeaderCellDef class="header-cell">Staff</th>
-          <td mat-cell *matCellDef="let enquiry" class="data-cell">
-            <!-- If staff is assigned and NOT "Public Form" or "WhatsApp Bot", show assigned staff name -->
-            <div *ngIf="enquiry.staff && !canAssignStaff(enquiry)" class="staff-assigned">
-              <span class="staff-name">{{ enquiry.staff }}</span>
-              <span class="staff-assigned-badge">Assigned</span>
-              <mat-icon class="info-icon" matTooltip="Staff already added to enquiry. Try another enquiry for new assignment.">info</mat-icon>
-            </div>
-            <!-- If staff assignment is allowed, show dropdown for selection -->
-            <mat-select *ngIf="canAssignStaff(enquiry) || !enquiry.staff || enquiry.staff === 'Public Form' || enquiry.staff === 'WhatsApp Bot' || enquiry.staff === 'WhatsApp Form'" 
-                        [(value)]="enquiry.staff" 
-                        (selectionChange)="updateStaff(enquiry, $event.value)" 
-                        placeholder="Select Staff">
-              <mat-option value="Public Form">Public Form</mat-option>
-              <mat-option value="WhatsApp Bot">WhatsApp Bot</mat-option>
-              <!-- Only show regular staff members (not admins) -->
-              <mat-option *ngFor="let staff of getRegularStaffMembers()" [value]="staff">
-                {{ staff }}
-                <span *ngIf="getNextStaffMember() === staff" class="suggested-badge">Next in sequence</span>
-              </mat-option>
-            </mat-select>
-            <!-- If staff assignment is locked due to sequential rules, show locked message -->
-            <div *ngIf="!canAssignStaff(enquiry) && (enquiry.staff === 'Public Form' || enquiry.staff === 'WhatsApp Bot' || !enquiry.staff)" class="staff-locked">
-              <mat-icon class="lock-icon">lock</mat-icon>
-              <span class="lock-text">Assign staff to older enquiries first</span>
-            </div>
-          </td>
-        </ng-container>
-
-        <!-- Comments Column -->
-        <ng-container matColumnDef="comments">
-          <th mat-header-cell *matHeaderCellDef class="header-cell">Comments</th>
-          <td mat-cell *matCellDef="let enquiry" class="data-cell">
-            <!-- Lock comments section when no staff is assigned -->
-            <div *ngIf="shouldLockComments(enquiry)" class="comments-locked">
-              <mat-icon class="lock-icon">lock</mat-icon>
-              <span class="lock-text">Assign staff to enable comments</span>
-            </div>
-            <!-- Show comments dropdown when staff is assigned -->
-            <mat-select *ngIf="!shouldLockComments(enquiry)" [(value)]="enquiry.comments" (selectionChange)="updateComments(enquiry, $event.value)" placeholder="Select Comment">
-              <mat-option *ngFor="let comment of commentOptions" [value]="comment">
-                {{ comment }}
-              </mat-option>
-            </mat-select>
-          </td>
-        </ng-container>
-
-        <!-- WhatsApp Status Column -->
-        <ng-container matColumnDef="whatsapp_status">
-          <th mat-header-cell *matHeaderCellDef class="header-cell">WhatsApp</th>
-          <td mat-cell *matCellDef="let enquiry" class="data-cell whatsapp-status-cell">
-            <div class="whatsapp-status-container">
-              <mat-icon 
-                [class]="'whatsapp-status-icon ' + getWhatsAppStatusColor(enquiry)"
-                [matTooltip]="getWhatsAppStatusTooltip(enquiry)">
-                {{ getWhatsAppStatusIcon(enquiry) }}
-              </mat-icon>
-              <button 
-                mat-icon-button 
-                *ngIf="isAdmin()" 
-                (click)="testWhatsApp(enquiry)" 
-                matTooltip="Send test WhatsApp message"
-                class="whatsapp-test-btn">
-                <mat-icon>send</mat-icon>
-              </button>
-            </div>
-          </td>
-        </ng-container>
-
-        <!-- Additional Comments Column -->
-        <ng-container matColumnDef="additional_comments">
-          <th mat-header-cell *matHeaderCellDef class="header-cell">Additional Comments</th>
-          <td mat-cell *matCellDef="let enquiry" class="data-cell">
-            <mat-form-field appearance="outline" class="additional-comments-field">
-              <textarea matInput [(ngModel)]="enquiry.additional_comments" (ngModelChange)="updateAdditionalComments(enquiry, $event)" placeholder="Enter additional comments (optional)" rows="3"></textarea>
-            </mat-form-field>
-          </td>
-        </ng-container>
-
-        <!-- Actions Column -->
-        <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef class="header-cell">Actions</th>
-          <td mat-cell *matCellDef="let enquiry" class="data-cell">
-            <div class="action-buttons">
-              <button mat-icon-button color="warn" (click)="deleteEnquiry(enquiry)" matTooltip="Delete">
-                <mat-icon>delete</mat-icon>
-              </button>
-            </div>
-          </td>
-        </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;" [class]="getRowColorClass(row)"></tr>
-      </table>
-    </div>
-
-    <!-- Loading State -->
-    <div class="loading-container" *ngIf="loading">
-      <mat-spinner diameter="50"></mat-spinner>
-      <p>Loading enquiries...</p>
-    </div>
-
-    <!-- Empty State -->
-    <div class="empty-state" *ngIf="!loading && filteredEnquiries.length === 0">
-      <mat-icon>inbox</mat-icon>
-      <h3>No Enquiries Found</h3>
-      <p>{{ searchTerm ? 'No enquiries match your search criteria.' : 'Start by adding your first enquiry.' }}</p>
-
-    </div>
-    </mat-card-content>
-  </mat-card>
-</div>

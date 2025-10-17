@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -71,6 +71,9 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
   
   // Week ranges for filtering
   weekRanges: { [key: string]: { start: Date; end: Date } } = {};
+
+  // Custom dropdown properties
+  isWeekDropdownOpen: boolean = false;
 
   constructor(
     private authService: AuthService,
@@ -2050,5 +2053,26 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
       duration: 5000,
       panelClass: ['error-snackbar']
     });
+  }
+
+  // Custom dropdown methods for week selection
+  toggleWeekDropdown(): void {
+    this.isWeekDropdownOpen = !this.isWeekDropdownOpen;
+  }
+
+  selectWeekOption(option: string): void {
+    this.selectedWeekOption = option;
+    this.isWeekDropdownOpen = false;
+    this.onWeekSelectionChange();
+  }
+
+  // Close dropdown when clicking outside
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    const target = event.target as HTMLElement;
+    // Check if the click is outside the dropdown
+    if (!target.closest('.relative')) {
+      this.isWeekDropdownOpen = false;
+    }
   }
 }

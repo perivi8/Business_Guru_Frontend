@@ -1,49 +1,113 @@
-<div class="approval-popup-overlay" *ngIf="showPopup" (click)="hidePopup()">
-  <div class="approval-popup" (click)="$event.stopPropagation()">
-    <div class="popup-header">
-      <h3>New User Registration Request</h3>
-      <button mat-icon-button (click)="hidePopup()" class="close-btn">
-        <mat-icon>close</mat-icon>
-      </button>
+<!-- Admin Approval Popup Modal -->
+<div *ngIf="showPopup" 
+     class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-300"
+     (click)="hidePopup()">
+  
+  <!-- Modal Content -->
+  <div class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-2xl border border-gray-200 w-full max-w-md transform transition-all duration-300 animate-in zoom-in-95"
+       (click)="$event.stopPropagation()">
+    
+    <!-- Modal Header -->
+    <div class="bg-gradient-to-r from-orange-500 to-red-500 px-6 py-4 rounded-t-2xl">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+            <mat-icon class="text-white text-xl">person_add_alt</mat-icon>
+          </div>
+          <h3 class="text-xl font-bold text-white">New Registration Request</h3>
+        </div>
+        <button mat-icon-button 
+                (click)="hidePopup()" 
+                class="text-white hover:bg-white/20 transition-colors duration-200 rounded-full">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
     </div>
     
-    <div class="popup-content" *ngIf="currentRequest">
-      <div class="user-info">
-        <div class="info-item">
-          <strong>Username:</strong> {{ currentRequest.username }}
-        </div>
-        <div class="info-item">
-          <strong>Email:</strong> {{ currentRequest.email }}
-        </div>
-        <div class="info-item">
-          <strong>Request Time:</strong> {{ currentRequest.created_at | date:'short' }}
+    <!-- Modal Content -->
+    <div *ngIf="currentRequest" class="p-6 space-y-6">
+      
+      <!-- User Information -->
+      <div class="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl p-4 space-y-3">
+        <h4 class="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+          <mat-icon class="text-orange-500">account_circle</mat-icon>
+          User Details
+        </h4>
+        
+        <div class="space-y-3">
+          <!-- Username -->
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <mat-icon class="text-blue-600 text-sm">person</mat-icon>
+            </div>
+            <div class="flex-1">
+              <span class="text-sm text-gray-500">Username</span>
+              <div class="font-semibold text-gray-800">{{ currentRequest.username }}</div>
+            </div>
+          </div>
+          
+          <!-- Email -->
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <mat-icon class="text-green-600 text-sm">email</mat-icon>
+            </div>
+            <div class="flex-1">
+              <span class="text-sm text-gray-500">Email</span>
+              <div class="font-semibold text-gray-800">{{ currentRequest.email }}</div>
+            </div>
+          </div>
+          
+          <!-- Request Time -->
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <mat-icon class="text-purple-600 text-sm">schedule</mat-icon>
+            </div>
+            <div class="flex-1">
+              <span class="text-sm text-gray-500">Request Time</span>
+              <div class="font-semibold text-gray-800">{{ currentRequest.created_at | date:'short' }}</div>
+            </div>
+          </div>
         </div>
       </div>
       
-      <div class="message">
-        <p>{{ currentRequest.message }}</p>
+      <!-- Status Section -->
+      <div class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4">
+        <h4 class="text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">
+          <mat-icon class="text-blue-500">info</mat-icon>
+          Registration Status
+        </h4>
+        <p class="text-gray-700 text-sm leading-relaxed">
+          This user is waiting for admin approval to access the system. Current status: 
+          <span class="font-semibold text-orange-600">{{ currentRequest.status | titlecase }}</span>
+        </p>
       </div>
       
-      <div class="popup-actions">
+      <!-- Action Buttons -->
+      <div class="flex flex-col sm:flex-row gap-3 pt-4">
+        <!-- Approve Button -->
         <button mat-raised-button 
-                color="primary" 
                 (click)="approveUser()" 
                 [disabled]="processing"
-                class="approve-btn">
-          <mat-spinner *ngIf="processing" diameter="20"></mat-spinner>
-          <mat-icon *ngIf="!processing">check</mat-icon>
-          {{ processing ? 'Processing...' : 'Yes, Approve' }}
+                class="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed py-3">
+          <mat-spinner *ngIf="processing" diameter="20" class="mr-2"></mat-spinner>
+          <span class="flex items-center justify-center gap-2">
+            <mat-icon *ngIf="!processing">check</mat-icon>
+            {{ processing ? 'Processing...' : 'Yes, Approve' }}
+          </span>
         </button>
         
+        <!-- Reject Button -->
         <button mat-stroked-button 
-                color="warn" 
                 (click)="rejectUser()" 
                 [disabled]="processing"
-                class="reject-btn">
-          <mat-icon>close</mat-icon>
-          No, Reject
+                class="flex-1 border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed py-3">
+          <span class="flex items-center justify-center gap-2">
+            <mat-icon>close</mat-icon>
+            No, Reject
+          </span>
         </button>
       </div>
+      
     </div>
   </div>
 </div>

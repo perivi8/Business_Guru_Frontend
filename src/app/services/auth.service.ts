@@ -202,6 +202,24 @@ export class AuthService {
     return this.http.get<RegistrationStatusResponse>(`${environment.apiUrl}/check-registration-status/${email}`);
   }
 
+  // Get pending registrations (admin only)
+  getPendingRegistrations(): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/pending-registrations`);
+  }
+
+  // Approve registration (admin only)
+  approveRegistration(userId: string): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/approve-registration`, { userId });
+  }
+
+  // Reject registration (admin only)
+  rejectRegistration(userId: string, reason?: string): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/reject-registration`, { 
+      userId, 
+      reason: reason || 'Registration rejected by admin' 
+    });
+  }
+
   // Real-time registration method
   registerRealtime(username: string, email: string, password: string, confirmPassword: string, sessionId: string): Observable<any> {
     return this.http.post<any>(`${environment.apiUrl}/register-realtime`, {

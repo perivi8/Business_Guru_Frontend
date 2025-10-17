@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -13,7 +13,7 @@ import { ConfirmDeleteDialogComponent } from '../confirm-delete-dialog/confirm-d
   templateUrl: './clients.component.html',
   styleUrls: ['./clients.component.scss']
 })
-export class ClientsComponent implements OnInit {
+export class ClientsComponent implements OnInit, OnDestroy {
   clients: Client[] = [];
   filteredClients: Client[] = [];
   users: User[] = [];
@@ -28,7 +28,26 @@ export class ClientsComponent implements OnInit {
   applyUpdatedClientsFilter: Date | null = null;
   updatingClientId: string | null = null;
   viewMode: 'table' | 'card' = 'table';
-  
+
+  // Custom dropdown state management
+  openDropdownId: string | null = null;
+  currentDropdownClient: Client | null = null;
+  private scrollListener?: () => void;
+  commentOptions = [
+    { value: '', label: 'Select Comment' },
+    { value: 'Not Interested', label: 'Not Interested' },
+    { value: 'Will call back', label: 'Will call back' },
+    { value: '1st call completed', label: '1st call completed' },
+    { value: '2nd call completed', label: '2nd call completed' },
+    { value: '3rd call completed', label: '3rd call completed' },
+    { value: '4th call completed', label: '4th call completed' },
+    { value: '5th call completed', label: '5th call completed' },
+    { value: 'rejected', label: 'rejected' },
+    { value: 'cash free login completed', label: 'cash free login completed' },
+    { value: 'share product images', label: 'share product images' },
+    { value: 'share signature', label: 'share signature' }
+  ];
+
   displayedColumns: string[] = ['serial', 'name', 'business', 'staff', 'status', 'loan_status', 'created', 'comments', 'actions'];
   userDisplayedColumns: string[] = ['serial', 'name', 'business', 'staff', 'status', 'loan_status', 'created', 'comments', 'actions']; // Include 'comments' for regular users (read-only)
   adminDisplayedColumns: string[] = ['serial', 'name', 'business', 'staff', 'status', 'loan_status', 'created', 'comments', 'actions'];
@@ -629,4 +648,180 @@ export class ClientsComponent implements OnInit {
       }
     });
   }
+
+  // Helper methods for filter counts
+  getStatusCount(status: string): number {
+    if (status === 'all') {
+      return this.clients.length;
+    }
+    return this.clients.filter(client => client.status === status).length;
+  }
+
+  getStaffCount(staffEmail: string): number {
+    if (staffEmail === 'all') {
+      return this.clients.length;
+    }
+    return this.clients.filter(client => client.staff_email === staffEmail).length;
+  }
+
+  // Custom dropdown methods
+  toggleDropdown(clientId: string): void {
+    if (this.isClientUpdating(clientId)) return;
+    const wasOpen = this.openDropdownId === clientId;
+    this.openDropdownId = wasOpen ? null : clientId;
+    
+    if (!wasOpen) {
+      // Find the client and store reference
+      this.currentDropdownClient = this.filteredClients.find(c => c._id === clientId) || null;
+      // Position dropdown after DOM update
+      setTimeout(() => {
+        this.positionGlobalDropdown(clientId);
+        this.addScrollListeners(clientId);
+      }, 0);
+    } else {
+      this.currentDropdownClient = null;
+      this.removeScrollListeners();
+    }
+    
+    console.log('Dropdown toggled for client:', clientId, 'Now open:', !wasOpen);
+  }
+
+  closeDropdown(): void {
+    this.openDropdownId = null;
+    this.currentDropdownClient = null;
+    this.removeScrollListeners();
+  }
+
+  isDropdownOpen(clientId: string): boolean {
+    return this.openDropdownId === clientId;
+  }
+
+  selectComment(client: Client, comment: string): void {
+    this.onCommentChange(client, comment);
+    this.closeDropdown();
+  }
+
+  getSelectedCommentLabel(client: Client): string {
+    if (!client.comments) return 'Select Comment';
+    const option = this.commentOptions.find(opt => opt.value === client.comments);
+    return option ? option.label : client.comments;
+  }
+
+  onOptionHover(event: Event, client: Client, option: any, isEntering: boolean): void {
+    const target = event.target as HTMLElement;
+    if (target) {
+      if (client.comments === option.value) {
+        target.style.backgroundColor = '#3b82f6';
+      } else {
+        target.style.backgroundColor = isEntering ? '#f3f4f6' : 'transparent';
+      }
+    }
+  }
+
+  // Global dropdown methods
+  positionGlobalDropdown(clientId: string): void {
+    const buttonElement = document.querySelector(`[data-client-id="${clientId}"]`) as HTMLElement;
+    const dropdownElement = document.getElementById(`dropdown-${clientId}`) as HTMLElement;
+    
+    if (buttonElement && dropdownElement) {
+      const rect = buttonElement.getBoundingClientRect();
+      const viewport = {
+        width: window.innerWidth,
+        height: window.innerHeight
+      };
+      
+      // Calculate position relative to viewport with scroll offset
+      let top = rect.bottom + window.scrollY + 4; // 4px gap below button
+      let left = rect.left + window.scrollX;
+      
+      // Ensure dropdown doesn't go off-screen horizontally
+      const dropdownWidth = 192; // 12rem = 192px
+      if (left + dropdownWidth > viewport.width) {
+        left = viewport.width - dropdownWidth - 10; // 10px margin from edge
+      }
+      
+      // Ensure dropdown doesn't go off-screen vertically
+      const dropdownMaxHeight = 240; // 15rem = 240px
+      if (top + dropdownMaxHeight > viewport.height + window.scrollY) {
+        // Position above the button if there's not enough space below
+        top = rect.top + window.scrollY - dropdownMaxHeight - 4;
+      }
+      
+      // Apply positioning
+      dropdownElement.style.position = 'absolute';
+      dropdownElement.style.top = top + 'px';
+      dropdownElement.style.left = left + 'px';
+      
+      console.log('Positioning dropdown:', { 
+        top, 
+        left, 
+        buttonRect: rect,
+        viewport,
+        scrollY: window.scrollY,
+        buttonBottom: rect.bottom,
+        calculatedTop: rect.bottom + window.scrollY + 4
+      });
+    }
+  }
+
+  getCurrentClientComment(): string {
+    return this.currentDropdownClient?.comments || '';
+  }
+
+  selectCommentFromGlobalDropdown(comment: string): void {
+    if (this.currentDropdownClient) {
+      this.onCommentChange(this.currentDropdownClient, comment);
+    }
+    this.closeDropdown();
+  }
+
+  onGlobalOptionHover(event: Event, option: any, isEntering: boolean): void {
+    const target = event.target as HTMLElement;
+    if (target) {
+      const currentComment = this.getCurrentClientComment();
+      if (currentComment === option.value) {
+        target.style.backgroundColor = '#3b82f6';
+      } else {
+        target.style.backgroundColor = isEntering ? '#f3f4f6' : 'transparent';
+      }
+    }
+  }
+
+  // Scroll listener methods
+  addScrollListeners(clientId: string): void {
+    this.scrollListener = () => {
+      if (this.openDropdownId === clientId) {
+        this.positionGlobalDropdown(clientId);
+      }
+    };
+
+    // Add listeners to table container and window
+    const tableContainer = document.querySelector('.overflow-x-auto');
+    if (tableContainer) {
+      tableContainer.addEventListener('scroll', this.scrollListener);
+    }
+    
+    // Also listen to window scroll
+    window.addEventListener('scroll', this.scrollListener);
+    window.addEventListener('resize', this.scrollListener);
+  }
+
+  removeScrollListeners(): void {
+    if (this.scrollListener) {
+      const tableContainer = document.querySelector('.overflow-x-auto');
+      if (tableContainer) {
+        tableContainer.removeEventListener('scroll', this.scrollListener);
+      }
+      
+      window.removeEventListener('scroll', this.scrollListener);
+      window.removeEventListener('resize', this.scrollListener);
+      this.scrollListener = undefined;
+    }
+  }
+
+  ngOnDestroy(): void {
+    // Clean up scroll listeners when component is destroyed
+    this.removeScrollListeners();
+  }
+
 }

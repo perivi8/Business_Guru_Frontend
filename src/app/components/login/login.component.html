@@ -1,82 +1,135 @@
-<div class="login-wrapper">
-  <div class="card">
-    <h2>Login</h2>
-    
-    <div *ngIf="approvalMessage" class="approval-message">
-      <mat-icon>check_circle</mat-icon>
-      {{ approvalMessage }}
-    </div>
-    
-    <div *ngIf="error" class="error">{{ error }}</div>
-    
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-      <div class="form-group">
-        <mat-form-field appearance="outline">
-          <mat-label>Email</mat-label>
-          <input matInput type="email" formControlName="email" placeholder="Enter your email">
-          <mat-error *ngIf="f['email'].invalid && f['email'].touched">
+<!-- Login Page -->
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center p-4">
+  <div class="w-full max-w-md">
+    <!-- Main Card -->
+    <div class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-200 p-8 space-y-6">
+      <!-- Header -->
+      <div class="text-center">
+        <h2 class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+          Welcome Back
+        </h2>
+        <p class="text-gray-600">Sign in to your account</p>
+      </div>
+      
+      <!-- Approval Message -->
+      <div *ngIf="approvalMessage" 
+           class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
+        <mat-icon class="text-green-500">check_circle</mat-icon>
+        <span class="text-green-700 text-sm font-medium">{{ approvalMessage }}</span>
+      </div>
+      
+      <!-- Error Message -->
+      <div *ngIf="error" 
+           class="bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-lg p-4 flex items-center gap-3">
+        <mat-icon class="text-red-500">error_outline</mat-icon>
+        <span class="text-red-700 text-sm">{{ error }}</span>
+      </div>
+      
+      <!-- Login Form -->
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6">
+        <!-- Email Field -->
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+          <div class="relative">
+            <input type="email" 
+                   formControlName="email" 
+                   placeholder="Enter your email"
+                   (input)="onEmailChange($event)"
+                   class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors shadow-sm text-gray-800"
+                   [class.border-red-500]="f['email'].invalid && f['email'].touched"
+                   [class.focus:ring-red-500]="f['email'].invalid && f['email'].touched">
+            <span class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+              </svg>
+            </span>
+          </div>
+          <div *ngIf="f['email'].invalid && f['email'].touched" class="mt-1 text-sm text-red-600">
             <span *ngIf="f['email'].errors && f['email'].errors['required']">Email is required</span>
             <span *ngIf="f['email'].errors && f['email'].errors['email']">Please enter a valid email</span>
-          </mat-error>
-        </mat-form-field>
-      </div>
-
-      <div class="form-group">
-        <mat-form-field appearance="outline">
-          <mat-label>Password</mat-label>
-          <input matInput type="password" formControlName="password" placeholder="Enter your password">
-          <mat-error *ngIf="f['password'].invalid && f['password'].touched">
-            Password is required
-          </mat-error>
-        </mat-form-field>
-      </div>
-
-      <button mat-raised-button color="primary" type="submit" 
-              [disabled]="loading || loginForm.invalid">
-        <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
-        {{ loading ? 'Logging in...' : 'Login' }}
-      </button>
-    </form>
-
-    <!-- Registration Status Check Section -->
-    <div class="status-check-section">
-      <button mat-stroked-button type="button" (click)="toggleStatusCheck()" class="status-toggle-btn">
-        <mat-icon>{{ showStatusCheck ? 'expand_less' : 'expand_more' }}</mat-icon>
-        Check Registration Status
-      </button>
-
-      <div *ngIf="showStatusCheck" class="status-check-content">
-        <p class="status-help-text">
-          Can't login? Check if your registration is approved or rejected.
-        </p>
-        
-        <button mat-raised-button color="accent" type="button" 
-                (click)="checkRegistrationStatus()" 
-                [disabled]="checkingStatus">
-          <mat-spinner *ngIf="checkingStatus" diameter="20"></mat-spinner>
-          {{ checkingStatus ? 'Checking...' : 'Check Status' }}
-        </button>
-
-        <div *ngIf="statusMessage" class="status-message success">
-          <mat-icon>info</mat-icon>
-          {{ statusMessage }}
+          </div>
         </div>
 
-        <div *ngIf="statusError" class="status-message error">
-          <mat-icon>error</mat-icon>
-          {{ statusError }}
-          <div class="register-again-link">
-            <a routerLink="/register">Click here to register again</a>
+        <!-- Password Field -->
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+          <div class="relative">
+            <input type="password" 
+                   formControlName="password" 
+                   placeholder="Enter your password"
+                   class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors shadow-sm text-gray-800"
+                   [class.border-red-500]="f['password'].invalid && f['password'].touched"
+                   [class.focus:ring-red-500]="f['password'].invalid && f['password'].touched">
+            <span class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+              </svg>
+            </span>
+          </div>
+          <div *ngIf="f['password'].invalid && f['password'].touched" class="mt-1 text-sm text-red-600">
+            Password is required
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" 
+                [disabled]="loading || loginForm.invalid"
+                class="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+          <span class="flex items-center justify-center gap-2">
+            <svg *ngIf="loading" class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <svg *ngIf="!loading" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+            </svg>
+            {{ loading ? 'Logging in...' : 'Sign In' }}
+          </span>
+        </button>
+      </form>
+
+      <!-- Automatic Registration Status Display -->
+      <div *ngIf="statusMessage || statusError" class="space-y-4">
+        <!-- Success Status Message -->
+        <div *ngIf="statusMessage" 
+             class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
+          <mat-icon class="text-green-500">check_circle</mat-icon>
+          <span class="text-green-700 text-sm font-medium">{{ statusMessage }}</span>
+        </div>
+
+        <!-- Error Status Message -->
+        <div *ngIf="statusError" 
+             class="bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-lg p-4 space-y-3">
+          <div class="flex items-center gap-3">
+            <mat-icon class="text-red-500">error</mat-icon>
+            <span class="text-red-700 text-sm font-medium">{{ statusError }}</span>
+          </div>
+          <div class="text-center">
+            <a routerLink="/register" 
+               class="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 font-medium transition-colors duration-200 hover:underline">
+              <mat-icon class="text-sm">person_add</mat-icon>
+              Click here to register again
+            </a>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="text-center">
-      <p><a routerLink="/forgot-password">Forgot Password?</a></p>
-      <p>Don't have an account? 
-        <a routerLink="/register">Register here</a>
-      </p>
+      <!-- Footer Links -->
+      <div class="text-center space-y-4 pt-6 border-t border-gray-200">
+        <p class="text-gray-600">
+          <a routerLink="/forgot-password" 
+             class="text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200 hover:underline">
+            Forgot Password?
+          </a>
+        </p>
+        <p class="text-gray-600">
+          Don't have an account? 
+          <a routerLink="/register" 
+             class="text-indigo-600 hover:text-indigo-700 font-medium transition-colors duration-200 hover:underline">
+            Register here
+          </a>
+        </p>
+      </div>
     </div>
   </div>
 </div>

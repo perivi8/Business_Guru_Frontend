@@ -1,158 +1,232 @@
-<div class="edit-client-container">
-  <!-- Modern Page Header -->
-  <div class="page-header">
-    <div class="header-content">
-      <div class="header-title">
-        <div class="header-icon">
-          <mat-icon>edit</mat-icon>
+<!-- Main Container with Gradient Background -->
+<div class="min-h-screen bg-gradient-body">
+  <!-- Page Header -->
+  <div class="bg-white shadow-sm border-b border-border-light sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <button (click)="cancel()" 
+                  class="flex items-center justify-center w-10 h-10 rounded-lg bg-surface-alt hover:bg-surface-alt/80 transition-colors">
+            <mat-icon class="text-text-secondary">arrow_back</mat-icon>
+          </button>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center shadow-lg">
+              <mat-icon class="text-white text-lg">edit</mat-icon>
+            </div>
+            <div>
+              <h1 class="text-2xl sm:text-3xl font-bold text-text-primary font-heading">
+                Edit Client
+              </h1>
+              <p class="text-text-secondary text-sm mt-1">
+                Update client information and details
+              </p>
+            </div>
+          </div>
         </div>
-        <div>
-          <h1>Edit Client</h1>
-          <p class="header-subtitle">Update client information and details</p>
+        
+        <!-- Header Actions -->
+        <div class="flex items-center gap-3">
+          <button (click)="cancel()" 
+                  class="btn btn-outline text-status-error border-status-error hover:bg-status-error hover:text-white flex items-center gap-2 px-4 py-2">
+            <mat-icon class="text-sm">cancel</mat-icon>
+            Cancel
+          </button>
+          <button (click)="saveClient()" [disabled]="saving"
+                  class="btn btn-primary flex items-center gap-2 px-6 py-2 disabled:opacity-50">
+            <mat-spinner *ngIf="saving" diameter="16" class="mr-1"></mat-spinner>
+            <mat-icon *ngIf="!saving" class="text-sm">save</mat-icon>
+            {{ saving ? 'Saving...' : 'Save Changes' }}
+          </button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Header Actions -->
-  <div class="header">
-    <div></div>
-    <div class="header-actions">
-      <button mat-button (click)="cancel()" color="warn">Cancel</button>
-      <button mat-raised-button (click)="saveClient()" color="primary" [disabled]="saving">
-        {{ saving ? 'Saving...' : 'Save Changes' }}
-      </button>
-    </div>
+  <!-- Loading State -->
+  <div *ngIf="loading" class="flex flex-col items-center justify-center min-h-[60vh]">
+    <mat-spinner diameter="50" class="mb-4"></mat-spinner>
+    <p class="text-text-secondary text-lg">Loading client details...</p>
   </div>
 
-  <div *ngIf="loading" class="loading-container">
-    <mat-spinner></mat-spinner>
-    <p>Loading client details...</p>
-  </div>
-
-  <div *ngIf="!loading && client && clientForm" class="form-container">
-    <form [formGroup]="clientForm" class="client-form">
+  <!-- Form Container -->
+  <div *ngIf="!loading && client && clientForm" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <form [formGroup]="clientForm" class="space-y-6">
       <!-- Personal Information Section -->
-      <mat-card class="section-card personal-info-card">
-        <mat-card-header class="modern-header">
-          <div class="header-icon">
-            <mat-icon>person</mat-icon>
+      <div class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
+        <div class="p-6 border-b border-border-light">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+              <mat-icon class="text-purple-600 text-lg">person</mat-icon>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-text-primary">Personal Information</h3>
+              <p class="text-sm text-text-secondary">Basic business and contact details</p>
+            </div>
           </div>
-          <div class="header-content">
-            <mat-card-title>Personal Information</mat-card-title>
-            <mat-card-subtitle>Basic business and contact details</mat-card-subtitle>
-          </div>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="form-row">
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Legal Name</mat-label>
-              <input matInput formControlName="legal_name">
-            </mat-form-field>
+        </div>
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Legal Name -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Legal Name *</label>
+              <input type="text" 
+                     formControlName="legal_name"
+                     placeholder="Enter legal name"
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 hover:border-gray-400 transition-colors shadow-sm">
+            </div>
 
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Trade Name/Business Name</mat-label>
-              <input matInput formControlName="trade_name">
-            </mat-form-field>
-          </div>
+            <!-- Trade Name/Business Name -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Trade Name/Business Name</label>
+              <input type="text" 
+                     formControlName="trade_name"
+                     placeholder="Enter trade or business name"
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 hover:border-gray-400 transition-colors shadow-sm">
+            </div>
 
-          <div class="form-row">
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>User Email/Company Email (Optional)</mat-label>
-              <input matInput formControlName="user_email" type="email">
-              <mat-error *ngIf="clientForm.get('user_email')?.hasError('email')">
+            <!-- User Email/Company Email -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">User Email/Company Email (Optional)</label>
+              <input type="email" 
+                     formControlName="user_email"
+                     placeholder="Enter email address"
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 hover:border-gray-400 transition-colors shadow-sm"
+                     [class.border-red-500]="clientForm.get('user_email')?.hasError('email') && clientForm.get('user_email')?.touched"
+                     [class.focus:ring-red-500]="clientForm.get('user_email')?.hasError('email') && clientForm.get('user_email')?.touched">
+              <div *ngIf="clientForm.get('user_email')?.hasError('email') && clientForm.get('user_email')?.touched" class="mt-1 text-sm text-red-600">
                 Please enter a valid email
-              </mat-error>
-            </mat-form-field>
+              </div>
+            </div>
 
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Company Email (Optional)</mat-label>
-              <input matInput formControlName="company_email" type="email">
-              <mat-error *ngIf="clientForm.get('company_email')?.hasError('email')">
+            <!-- Company Email -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Company Email (Optional)</label>
+              <input type="email" 
+                     formControlName="company_email"
+                     placeholder="Enter company email"
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 hover:border-gray-400 transition-colors shadow-sm"
+                     [class.border-red-500]="clientForm.get('company_email')?.hasError('email') && clientForm.get('company_email')?.touched"
+                     [class.focus:ring-red-500]="clientForm.get('company_email')?.hasError('email') && clientForm.get('company_email')?.touched">
+              <div *ngIf="clientForm.get('company_email')?.hasError('email') && clientForm.get('company_email')?.touched" class="mt-1 text-sm text-red-600">
                 Please enter a valid email
-              </mat-error>
-            </mat-form-field>
-          </div>
+              </div>
+            </div>
 
-          <div class="form-row">
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Mobile Number</mat-label>
-              <input matInput formControlName="mobile_number">
-              <mat-error *ngIf="clientForm.get('mobile_number')?.hasError('pattern')">
+            <!-- Mobile Number -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Mobile Number *</label>
+              <input type="tel" 
+                     formControlName="mobile_number"
+                     placeholder="Enter 10-digit mobile number"
+                     maxlength="10"
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 hover:border-gray-400 transition-colors shadow-sm"
+                     [class.border-red-500]="clientForm.get('mobile_number')?.hasError('pattern') && clientForm.get('mobile_number')?.touched"
+                     [class.focus:ring-red-500]="clientForm.get('mobile_number')?.hasError('pattern') && clientForm.get('mobile_number')?.touched">
+              <div *ngIf="clientForm.get('mobile_number')?.hasError('pattern') && clientForm.get('mobile_number')?.touched" class="mt-1 text-sm text-red-600">
                 Please enter a valid 10-digit mobile number
-              </mat-error>
-            </mat-form-field>
+              </div>
+            </div>
 
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Optional Mobile Number</mat-label>
-              <input matInput formControlName="optional_mobile_number">
-              <mat-error *ngIf="clientForm.get('optional_mobile_number')?.hasError('pattern')">
+            <!-- Optional Mobile Number -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Optional Mobile Number</label>
+              <input type="tel" 
+                     formControlName="optional_mobile_number"
+                     placeholder="Enter 10-digit mobile number"
+                     maxlength="10"
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 hover:border-gray-400 transition-colors shadow-sm"
+                     [class.border-red-500]="clientForm.get('optional_mobile_number')?.hasError('pattern') && clientForm.get('optional_mobile_number')?.touched"
+                     [class.focus:ring-red-500]="clientForm.get('optional_mobile_number')?.hasError('pattern') && clientForm.get('optional_mobile_number')?.touched">
+              <div *ngIf="clientForm.get('optional_mobile_number')?.hasError('pattern') && clientForm.get('optional_mobile_number')?.touched" class="mt-1 text-sm text-red-600">
                 Please enter a valid 10-digit mobile number
-              </mat-error>
-            </mat-form-field>
-          </div>
+              </div>
+            </div>
 
-          <div class="form-row">
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Website URL (Optional)</mat-label>
-              <input matInput formControlName="website" type="url">
-              <mat-error *ngIf="clientForm.get('website')?.hasError('pattern')">
+            <!-- Website URL -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Website URL (Optional)</label>
+              <input type="url" 
+                     formControlName="website"
+                     placeholder="https://example.com"
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 hover:border-gray-400 transition-colors shadow-sm"
+                     [class.border-red-500]="clientForm.get('website')?.hasError('pattern') && clientForm.get('website')?.touched"
+                     [class.focus:ring-red-500]="clientForm.get('website')?.hasError('pattern') && clientForm.get('website')?.touched">
+              <div *ngIf="clientForm.get('website')?.hasError('pattern') && clientForm.get('website')?.touched" class="mt-1 text-sm text-red-600">
                 Please enter a valid URL (e.g., https://example.com)
-              </mat-error>
-            </mat-form-field>
-
-            <div class="form-field"></div> <!-- Empty div for layout balance -->
+              </div>
+            </div>
           </div>
-        </mat-card-content>
-      </mat-card>
+        </div>
+      </div>
 
       <!-- GST Details Section -->
-      <mat-card class="section-card gst-details-card">
-        <mat-card-header class="modern-header">
-          <div class="header-icon">
-            <mat-icon>receipt</mat-icon>
+      <div class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
+        <div class="p-6 border-b border-border-light">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+              <mat-icon class="text-green-600 text-lg">receipt</mat-icon>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-text-primary">GST Details</h3>
+              <p class="text-sm text-text-secondary">GST registration and tax information</p>
+            </div>
           </div>
-          <div class="header-content">
-            <mat-card-title>GST Details</mat-card-title>
-            <mat-card-subtitle>GST registration and tax information</mat-card-subtitle>
-          </div>
-        </mat-card-header>
-        <mat-card-content>
-          <!-- GST Status -->
-          <div class="form-row">
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>GST Status</mat-label>
-              <input matInput formControlName="gst_status">
-            </mat-form-field>
+        </div>
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- GST Status -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">GST Status</label>
+              <input type="text" 
+                     formControlName="gst_status"
+                     placeholder="Enter GST status"
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-400 transition-colors shadow-sm">
+            </div>
 
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>GST Number</mat-label>
-              <input matInput formControlName="gst_number">
-            </mat-form-field>
-          </div>
+            <!-- GST Number -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">GST Number</label>
+              <input type="text" 
+                     formControlName="gst_number"
+                     placeholder="Enter GST number"
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-400 transition-colors shadow-sm">
+            </div>
 
-          <!-- Registration Number -->
-          <div class="form-row">
-            <mat-form-field appearance="outline" class="form-field full-width">
-              <mat-label>GST Registration Number</mat-label>
-              <input matInput formControlName="registration_number">
-            </mat-form-field>
-          </div>
+            <!-- GST Registration Number -->
+            <div class="w-full md:col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-2">GST Registration Number</label>
+              <input type="text" 
+                     formControlName="registration_number"
+                     placeholder="Enter GST registration number"
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-400 transition-colors shadow-sm">
+            </div>
 
-          <!-- IE Code Section -->
-          <div class="form-row">
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>IE Code</mat-label>
-              <input matInput formControlName="ie_code">
-            </mat-form-field>
+            <!-- IE Code -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">IE Code</label>
+              <input type="text" 
+                     formControlName="ie_code"
+                     placeholder="Enter IE code"
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-400 transition-colors shadow-sm">
+            </div>
             
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>IE Code Status</mat-label>
-              <mat-select formControlName="ie_code_status" [disabled]="true">
-                <mat-option value="Yes" *ngIf="hasExistingDocument('ie_code') || hasExistingDocument('ie_code_document')">Yes</mat-option>
-                <mat-option value="No" *ngIf="!hasExistingDocument('ie_code') && !hasExistingDocument('ie_code_document')">No</mat-option>
-              </mat-select>
-            </mat-form-field>
+            <!-- IE Code Status -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">IE Code Status</label>
+              <div class="relative">
+                <select formControlName="ie_code_status" 
+                        [disabled]="true"
+                        class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-gray-50 text-gray-500 focus:outline-none cursor-not-allowed shadow-sm">
+                  <option value="Yes" *ngIf="hasExistingDocument('ie_code') || hasExistingDocument('ie_code_document')">Yes</option>
+                  <option value="No" *ngIf="!hasExistingDocument('ie_code') && !hasExistingDocument('ie_code_document')">No</option>
+                </select>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- IE Code Document Section -->
@@ -200,348 +274,509 @@
             </div>
           </div>
 
-          <!-- Document Uploads Row -->
-          <div class="form-row">
-            <div class="form-group">
-              <label>GST Document</label>
-              <div class="file-upload" [class.file-uploaded]="!!documents['gst_document']">
-                <input type="file" (change)="onFileSelected($event, 'gst_document')" accept=".pdf,.jpg,.jpeg,.png" data-field="gst_document">
-                <mat-icon>{{ documents['gst_document'] ? 'check_circle' : 'cloud_upload' }}</mat-icon>
-                <p *ngIf="!documents['gst_document']">Upload GST Document (PDF, JPG, PNG)</p>
-                <div *ngIf="documents['gst_document']" class="file-info">
-                  <p class="file-name">{{ documents['gst_document'].name }}</p>
-                  <button type="button" class="delete-btn" (click)="removeDocument('gst_document')" title="Remove file">
-                    <mat-icon>delete</mat-icon>
-                  </button>
-                </div>
+          <!-- Document Uploads -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <div class="space-y-3">
+              <label class="text-sm font-medium text-text-primary">GST Document</label>
+              <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors"
+                   [ngClass]="{'border-green-500 bg-green-50': documents['gst_document']}">
+                <input type="file" (change)="onFileSelected($event, 'gst_document')" accept=".pdf,.jpg,.jpeg,.png" 
+                       class="hidden" id="gst_document">
+                <label for="gst_document" class="cursor-pointer">
+                  <mat-icon class="text-3xl mb-2" [ngClass]="{'text-green-600': documents['gst_document'], 'text-gray-400': !documents['gst_document']}">{{ documents['gst_document'] ? 'check_circle' : 'cloud_upload' }}</mat-icon>
+                  <p class="text-sm" *ngIf="!documents['gst_document']">Upload GST Document (PDF, JPG, PNG)</p>
+                  <div *ngIf="documents['gst_document']" class="flex items-center justify-between">
+                    <span class="text-sm font-medium">{{ documents['gst_document'].name }}</span>
+                    <button type="button" (click)="removeDocument('gst_document')" class="text-red-600 hover:text-red-800">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </label>
               </div>
-              <div *ngIf="existingDocuments['gst_document']" class="existing-document">
-                <small class="document-info">
+              <div *ngIf="existingDocuments['gst_document']" class="flex items-center justify-between p-2 bg-blue-50 rounded">
+                <small class="text-blue-800">
                   {{ existingDocuments['gst_document'].file_name }} 
                   ({{ formatFileSize(existingDocuments['gst_document'].file_size) }})
                 </small>
-                <button mat-icon-button color="primary" (click)="downloadDocument('gst_document')" matTooltip="Download">
+                <button (click)="downloadDocument('gst_document')" class="text-blue-600 hover:text-blue-800">
                   <mat-icon>download</mat-icon>
                 </button>
               </div>
             </div>
-            <div class="form-group">
-              <label>MSME/Udyam Document</label>
-              <div class="file-upload" [class.file-uploaded]="documents['msme_document']">
-                <input type="file" (change)="onFileSelected($event, 'msme_document')" accept=".pdf,.jpg,.jpeg,.png" data-field="msme_document">
-                <mat-icon>{{ documents['msme_document'] ? 'check_circle' : 'cloud_upload' }}</mat-icon>
-                <p *ngIf="!documents['msme_document']">Upload MSME/Udyam Document</p>
-                <div *ngIf="documents['msme_document']" class="file-info">
-                  <p class="file-name">{{ documents['msme_document'].name }}</p>
-                  <button type="button" class="delete-btn" (click)="removeDocument('msme_document')" title="Remove file">
-                    <mat-icon>delete</mat-icon>
-                  </button>
-                </div>
+            
+            <div class="space-y-3">
+              <label class="text-sm font-medium text-text-primary">MSME/Udyam Document</label>
+              <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors"
+                   [ngClass]="{'border-green-500 bg-green-50': documents['msme_document']}">
+                <input type="file" (change)="onFileSelected($event, 'msme_document')" accept=".pdf,.jpg,.jpeg,.png" 
+                       class="hidden" id="msme_document">
+                <label for="msme_document" class="cursor-pointer">
+                  <mat-icon class="text-3xl mb-2" [ngClass]="{'text-green-600': documents['msme_document'], 'text-gray-400': !documents['msme_document']}">{{ documents['msme_document'] ? 'check_circle' : 'cloud_upload' }}</mat-icon>
+                  <p class="text-sm" *ngIf="!documents['msme_document']">Upload MSME/Udyam Document</p>
+                  <div *ngIf="documents['msme_document']" class="flex items-center justify-between">
+                    <span class="text-sm font-medium">{{ documents['msme_document'].name }}</span>
+                    <button type="button" (click)="removeDocument('msme_document')" class="text-red-600 hover:text-red-800">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </label>
               </div>
-              <div *ngIf="existingDocuments['msme_document']" class="existing-document">
-                <small class="document-info">
+              <div *ngIf="existingDocuments['msme_document']" class="flex items-center justify-between p-2 bg-blue-50 rounded">
+                <small class="text-blue-800">
                   {{ existingDocuments['msme_document'].file_name }} 
                   ({{ formatFileSize(existingDocuments['msme_document'].file_size) }})
                 </small>
-                <button mat-icon-button color="primary" (click)="downloadDocument('msme_document')" matTooltip="Download">
+                <button (click)="downloadDocument('msme_document')" class="text-blue-600 hover:text-blue-800">
                   <mat-icon>download</mat-icon>
                 </button>
               </div>
             </div>
           </div>
-        </mat-card-content>
-      </mat-card>
+        </div>
+      </div>
 
       <!-- Address Information Section -->
-      <mat-card class="section-card address-info-card">
-        <mat-card-header class="modern-header">
-          <div class="header-icon">
-            <mat-icon>location_on</mat-icon>
+      <div class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
+        <div class="p-6 border-b border-border-light">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+              <mat-icon class="text-orange-600 text-lg">location_on</mat-icon>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-text-primary">Address Information</h3>
+              <p class="text-sm text-text-secondary">Business location and contact address</p>
+            </div>
           </div>
-          <div class="header-content">
-            <mat-card-title>Address Information</mat-card-title>
-            <mat-card-subtitle>Business location and contact address</mat-card-subtitle>
-          </div>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="form-row">
-            <mat-form-field appearance="outline" class="form-field full-width">
-              <mat-label>Complete Address</mat-label>
-              <textarea matInput formControlName="address" rows="3"></textarea>
-            </mat-form-field>
-          </div>
+        </div>
+        <div class="p-6">
+          <div class="space-y-6">
+            <!-- Complete Address -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Complete Address *</label>
+              <textarea formControlName="address" 
+                        rows="3"
+                        placeholder="Enter complete business address"
+                        class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 hover:border-gray-400 transition-colors resize-none shadow-sm"></textarea>
+            </div>
 
-          <div class="form-row">
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>District</mat-label>
-              <input matInput formControlName="district">
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>State</mat-label>
-              <input matInput formControlName="state">
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Pincode</mat-label>
-              <input matInput formControlName="pincode">
-              <mat-error *ngIf="clientForm.get('pincode')?.hasError('pattern')">
-                Please enter a valid 6-digit pincode
-              </mat-error>
-            </mat-form-field>
-          </div>
-
-        </mat-card-content>
-      </mat-card>
-
-      <!-- Business Information Section -->
-      <mat-card class="section-card business-info-card">
-        <mat-card-header class="modern-header">
-          <div class="header-icon">
-            <mat-icon>business</mat-icon>
-          </div>
-          <div class="header-content">
-            <mat-card-title>Business Information</mat-card-title>
-            <mat-card-subtitle>Company structure and registration details</mat-card-subtitle>
-          </div>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="form-row">
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Trade Name / Business Name</mat-label>
-              <input matInput formControlName="trade_name">
-            </mat-form-field>
-          </div>
-
-          <div class="form-row">
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Constitution of Business</mat-label>
-              <mat-select formControlName="constitution_type">
-                <mat-option value="Proprietorship">Proprietorship</mat-option>
-                <mat-option value="Partnership">Partnership</mat-option>
-                <mat-option value="Private Limited">Private Limited</mat-option>
-              </mat-select>
-            </mat-form-field>
-          </div>
-
-          <div class="form-row">
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Business PAN</mat-label>
-              <mat-select formControlName="has_business_pan">
-                <mat-option value="yes">Yes</mat-option>
-                <mat-option value="no">No</mat-option>
-              </mat-select>
-            </mat-form-field>
-          </div>
-        </mat-card-content>
-      </mat-card>
-
-      <!-- Business PAN Details Section -->
-      <mat-card class="section-card business-pan-card" *ngIf="(clientForm.get('constitution_type')?.value === 'Proprietorship' || clientForm.get('constitution_type')?.value === 'Partnership' || clientForm.get('constitution_type')?.value === 'Private Limited') && (clientForm.get('has_business_pan')?.value === 'yes' || hasExistingDocument('business_pan_document'))">
-        <mat-card-header class="modern-header">
-          <div class="header-icon">
-            <mat-icon>credit_card</mat-icon>
-          </div>
-          <div class="header-content">
-            <mat-card-title>Business PAN Details</mat-card-title>
-            <mat-card-subtitle>Business PAN card information and documentation</mat-card-subtitle>
-          </div>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="form-row">
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Business PAN Name</mat-label>
-              <input matInput formControlName="business_pan_name">
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Business PAN Date</mat-label>
-              <input matInput formControlName="business_pan_date" type="date">
-            </mat-form-field>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label>Business PAN Document</label>
-              <div class="file-upload" [class.file-uploaded]="!!documents['business_pan_document']">
-                <input type="file" (change)="onFileSelected($event, 'business_pan_document')" accept=".pdf,.jpg,.jpeg,.png" data-field="business_pan_document">
-                <mat-icon>{{ documents['business_pan_document'] ? 'check_circle' : 'cloud_upload' }}</mat-icon>
-                <p *ngIf="!documents['business_pan_document']">Upload Business PAN Document (PDF, JPG, PNG)</p>
-                <div *ngIf="documents['business_pan_document']" class="file-info">
-                  <p class="file-name">{{ documents['business_pan_document'].name }}</p>
-                  <button type="button" class="delete-btn" (click)="removeDocument('business_pan_document')" title="Remove file">
-                    <mat-icon>delete</mat-icon>
-                  </button>
-                </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <!-- District -->
+              <div class="w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-2">District</label>
+                <input type="text" 
+                       formControlName="district"
+                       placeholder="Enter district"
+                       class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 hover:border-gray-400 transition-colors shadow-sm">
               </div>
-              <div *ngIf="existingDocuments['business_pan_document']" class="existing-document">
-                <small class="document-info">
-                  {{ existingDocuments['business_pan_document'].file_name }} 
-                  ({{ formatFileSize(existingDocuments['business_pan_document'].file_size) }})
-                </small>
-                <button mat-icon-button color="primary" (click)="downloadDocument('business_pan_document')" matTooltip="Download">
-                  <mat-icon>download</mat-icon>
-                </button>
+
+              <!-- State -->
+              <div class="w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-2">State</label>
+                <input type="text" 
+                       formControlName="state"
+                       placeholder="Enter state"
+                       class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 hover:border-gray-400 transition-colors shadow-sm">
+              </div>
+
+              <!-- Pincode -->
+              <div class="w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Pincode</label>
+                <input type="text" 
+                       formControlName="pincode"
+                       placeholder="Enter 6-digit pincode"
+                       maxlength="6"
+                       class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 hover:border-gray-400 transition-colors shadow-sm"
+                       [class.border-red-500]="clientForm.get('pincode')?.hasError('pattern') && clientForm.get('pincode')?.touched"
+                       [class.focus:ring-red-500]="clientForm.get('pincode')?.hasError('pattern') && clientForm.get('pincode')?.touched">
+                <div *ngIf="clientForm.get('pincode')?.hasError('pattern') && clientForm.get('pincode')?.touched" class="mt-1 text-sm text-red-600">
+                  Please enter a valid 6-digit pincode
+                </div>
               </div>
             </div>
           </div>
-        </mat-card-content>
-      </mat-card>
+        </div>
+      </div>
 
-      <!-- Owner Details Section -->
-      <mat-card class="section-card owner-details-card" *ngIf="clientForm.get('constitution_type')?.value === 'Private Limited' || (clientForm.get('constitution_type')?.value === 'Proprietorship' && (clientForm.get('has_business_pan')?.value === 'yes' || hasExistingDocument('owner_aadhar') || hasExistingDocument('owner_pan')))">
-        <mat-card-header class="modern-header">
-          <div class="header-icon">
-            <mat-icon>person_outline</mat-icon>
+      <!-- Business Information Section -->
+      <div class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
+        <div class="p-6 border-b border-border-light">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+              <mat-icon class="text-blue-600 text-lg">business</mat-icon>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-text-primary">Business Information</h3>
+              <p class="text-sm text-text-secondary">Company structure and registration details</p>
+            </div>
           </div>
-          <div class="header-content">
-            <mat-card-title>Owner Details</mat-card-title>
-            <mat-card-subtitle>Owner information and documentation</mat-card-subtitle>
-          </div>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="form-row">
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Owner Name</mat-label>
-              <input matInput formControlName="owner_name">
-            </mat-form-field>
+        </div>
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Trade Name / Business Name -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Trade Name / Business Name</label>
+              <input type="text" 
+                     formControlName="trade_name"
+                     placeholder="Enter trade or business name"
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors shadow-sm">
+            </div>
 
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Owner Date of Birth</mat-label>
-              <input matInput formControlName="owner_dob" type="date">
-            </mat-form-field>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label>Owner Aadhar Card</label>
-              <div class="file-upload" [class.file-uploaded]="!!documents['owner_aadhar']">
-                <input type="file" (change)="onFileSelected($event, 'owner_aadhar')" accept=".pdf,.jpg,.jpeg,.png" data-field="owner_aadhar">
-                <mat-icon>{{ documents['owner_aadhar'] ? 'check_circle' : 'cloud_upload' }}</mat-icon>
-                <p *ngIf="!documents['owner_aadhar']">Upload Owner Aadhar Card (PDF, JPG, PNG)</p>
-                <div *ngIf="documents['owner_aadhar']" class="file-info">
-                  <p class="file-name">{{ documents['owner_aadhar'].name }}</p>
-                  <button type="button" class="delete-btn" (click)="removeDocument('owner_aadhar')" title="Remove file">
-                    <mat-icon>delete</mat-icon>
+            <!-- Constitution of Business -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Constitution of Business</label>
+              <div class="relative">
+                <button type="button"
+                        (click)="toggleConstitutionDropdown()"
+                        class="w-full bg-white border border-gray-300 rounded-lg px-3 py-3 text-left text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors shadow-sm"
+                        [class.border-blue-500]="isConstitutionDropdownOpen"
+                        [class.ring-2]="isConstitutionDropdownOpen"
+                        [class.ring-blue-500]="isConstitutionDropdownOpen">
+                  <span class="block truncate text-gray-700">
+                    {{ getConstitutionLabel(clientForm.get('constitution_type')?.value) }}
+                  </span>
+                  <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                    <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                         [class.rotate-180]="isConstitutionDropdownOpen"
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </span>
+                </button>
+                
+                <!-- Dropdown Options -->
+                <div *ngIf="isConstitutionDropdownOpen"
+                     class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  <button type="button"
+                          (click)="selectConstitution('Proprietorship')"
+                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
+                          [class.bg-blue-50]="clientForm.get('constitution_type')?.value === 'Proprietorship'"
+                          [class.text-blue-600]="clientForm.get('constitution_type')?.value === 'Proprietorship'">
+                    Proprietorship
+                  </button>
+                  <button type="button"
+                          (click)="selectConstitution('Partnership')"
+                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
+                          [class.bg-blue-50]="clientForm.get('constitution_type')?.value === 'Partnership'"
+                          [class.text-blue-600]="clientForm.get('constitution_type')?.value === 'Partnership'">
+                    Partnership
+                  </button>
+                  <button type="button"
+                          (click)="selectConstitution('Private Limited')"
+                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
+                          [class.bg-blue-50]="clientForm.get('constitution_type')?.value === 'Private Limited'"
+                          [class.text-blue-600]="clientForm.get('constitution_type')?.value === 'Private Limited'">
+                    Private Limited
                   </button>
                 </div>
               </div>
-              <div *ngIf="existingDocuments['owner_aadhar']" class="existing-document">
-                <small class="document-info">
+            </div>
+
+            <!-- Business PAN -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Business PAN</label>
+              <div class="relative">
+                <button type="button"
+                        (click)="toggleBusinessPanDropdown()"
+                        class="w-full bg-white border border-gray-300 rounded-lg px-3 py-3 text-left text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors shadow-sm"
+                        [class.border-blue-500]="isBusinessPanDropdownOpen"
+                        [class.ring-2]="isBusinessPanDropdownOpen"
+                        [class.ring-blue-500]="isBusinessPanDropdownOpen">
+                  <span class="block truncate text-gray-700">
+                    {{ getBusinessPanLabel(clientForm.get('has_business_pan')?.value) }}
+                  </span>
+                  <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                    <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                         [class.rotate-180]="isBusinessPanDropdownOpen"
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </span>
+                </button>
+                
+                <!-- Dropdown Options -->
+                <div *ngIf="isBusinessPanDropdownOpen"
+                     class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  <button type="button"
+                          (click)="selectBusinessPan('yes')"
+                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
+                          [class.bg-blue-50]="clientForm.get('has_business_pan')?.value === 'yes'"
+                          [class.text-blue-600]="clientForm.get('has_business_pan')?.value === 'yes'">
+                    Yes
+                  </button>
+                  <button type="button"
+                          (click)="selectBusinessPan('no')"
+                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
+                          [class.bg-blue-50]="clientForm.get('has_business_pan')?.value === 'no'"
+                          [class.text-blue-600]="clientForm.get('has_business_pan')?.value === 'no'">
+                    No
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Business PAN Details Section -->
+      <div *ngIf="(clientForm.get('constitution_type')?.value === 'Proprietorship' || clientForm.get('constitution_type')?.value === 'Partnership' || clientForm.get('constitution_type')?.value === 'Private Limited') && (clientForm.get('has_business_pan')?.value === 'yes' || hasExistingDocument('business_pan_document'))" 
+           class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
+        <div class="p-6 border-b border-border-light">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
+              <mat-icon class="text-indigo-600 text-lg">credit_card</mat-icon>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-text-primary">Business PAN Details</h3>
+              <p class="text-sm text-text-secondary">Business PAN card information and documentation</p>
+            </div>
+          </div>
+        </div>
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <!-- Business PAN Name -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Business PAN Name</label>
+              <input type="text" 
+                     formControlName="business_pan_name"
+                     placeholder="Enter business PAN name"
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400 transition-colors shadow-sm">
+            </div>
+
+            <!-- Business PAN Date -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Business PAN Date</label>
+              <input type="date" 
+                     formControlName="business_pan_date"
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400 transition-colors shadow-sm">
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <label class="text-sm font-medium text-text-primary">Business PAN Document</label>
+            <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors"
+                 [ngClass]="{'border-green-500 bg-green-50': documents['business_pan_document']}">
+              <input type="file" (change)="onFileSelected($event, 'business_pan_document')" accept=".pdf,.jpg,.jpeg,.png" 
+                     class="hidden" id="business_pan_document">
+              <label for="business_pan_document" class="cursor-pointer">
+                <mat-icon class="text-3xl mb-2" [ngClass]="{'text-green-600': documents['business_pan_document'], 'text-gray-400': !documents['business_pan_document']}">{{ documents['business_pan_document'] ? 'check_circle' : 'cloud_upload' }}</mat-icon>
+                <p class="text-sm" *ngIf="!documents['business_pan_document']">Upload Business PAN Document (PDF, JPG, PNG)</p>
+                <div *ngIf="documents['business_pan_document']" class="flex items-center justify-between">
+                  <span class="text-sm font-medium">{{ documents['business_pan_document'].name }}</span>
+                  <button type="button" (click)="removeDocument('business_pan_document')" class="text-red-600 hover:text-red-800">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </label>
+            </div>
+            <div *ngIf="existingDocuments['business_pan_document']" class="flex items-center justify-between p-2 bg-blue-50 rounded">
+              <small class="text-blue-800">
+                {{ existingDocuments['business_pan_document'].file_name }} 
+                ({{ formatFileSize(existingDocuments['business_pan_document'].file_size) }})
+              </small>
+              <button (click)="downloadDocument('business_pan_document')" class="text-blue-600 hover:text-blue-800">
+                <mat-icon>download</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Owner Details Section -->
+      <div *ngIf="clientForm.get('constitution_type')?.value === 'Private Limited' || (clientForm.get('constitution_type')?.value === 'Proprietorship' && (clientForm.get('has_business_pan')?.value === 'yes' || hasExistingDocument('owner_aadhar') || hasExistingDocument('owner_pan')))"
+           class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
+        <div class="p-6 border-b border-border-light">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center">
+              <mat-icon class="text-teal-600 text-lg">person_outline</mat-icon>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-text-primary">Owner Details</h3>
+              <p class="text-sm text-text-secondary">Owner information and documentation</p>
+            </div>
+          </div>
+        </div>
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <!-- Owner Name -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Owner Name</label>
+              <input type="text" 
+                     formControlName="owner_name"
+                     placeholder="Enter owner name"
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 hover:border-gray-400 transition-colors shadow-sm">
+            </div>
+
+            <!-- Owner Date of Birth -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Owner Date of Birth</label>
+              <input type="date" 
+                     formControlName="owner_dob"
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 hover:border-gray-400 transition-colors shadow-sm">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-3">
+              <label class="text-sm font-medium text-text-primary">Owner Aadhar Card</label>
+              <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors"
+                   [ngClass]="{'border-green-500 bg-green-50': documents['owner_aadhar']}">
+                <input type="file" (change)="onFileSelected($event, 'owner_aadhar')" accept=".pdf,.jpg,.jpeg,.png" 
+                       class="hidden" id="owner_aadhar">
+                <label for="owner_aadhar" class="cursor-pointer">
+                  <mat-icon class="text-3xl mb-2" [ngClass]="{'text-green-600': documents['owner_aadhar'], 'text-gray-400': !documents['owner_aadhar']}">{{ documents['owner_aadhar'] ? 'check_circle' : 'cloud_upload' }}</mat-icon>
+                  <p class="text-sm" *ngIf="!documents['owner_aadhar']">Upload Owner Aadhar Card (PDF, JPG, PNG)</p>
+                  <div *ngIf="documents['owner_aadhar']" class="flex items-center justify-between">
+                    <span class="text-sm font-medium">{{ documents['owner_aadhar'].name }}</span>
+                    <button type="button" (click)="removeDocument('owner_aadhar')" class="text-red-600 hover:text-red-800">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </label>
+              </div>
+              <div *ngIf="existingDocuments['owner_aadhar']" class="flex items-center justify-between p-2 bg-blue-50 rounded">
+                <small class="text-blue-800">
                   {{ existingDocuments['owner_aadhar'].file_name }} 
                   ({{ formatFileSize(existingDocuments['owner_aadhar'].file_size) }})
                 </small>
-                <button mat-icon-button color="primary" (click)="downloadDocument('owner_aadhar')" matTooltip="Download">
+                <button (click)="downloadDocument('owner_aadhar')" class="text-blue-600 hover:text-blue-800">
                   <mat-icon>download</mat-icon>
                 </button>
               </div>
             </div>
 
-            <div class="form-group">
-              <label>Owner PAN Card</label>
-              <div class="file-upload" [class.file-uploaded]="!!documents['owner_pan']">
-                <input type="file" (change)="onFileSelected($event, 'owner_pan')" accept=".pdf,.jpg,.jpeg,.png" data-field="owner_pan">
-                <mat-icon>{{ documents['owner_pan'] ? 'check_circle' : 'cloud_upload' }}</mat-icon>
-                <p *ngIf="!documents['owner_pan']">Upload Owner PAN Card (PDF, JPG, PNG)</p>
-                <div *ngIf="documents['owner_pan']" class="file-info">
-                  <p class="file-name">{{ documents['owner_pan'].name }}</p>
-                  <button type="button" class="delete-btn" (click)="removeDocument('owner_pan')" title="Remove file">
-                    <mat-icon>delete</mat-icon>
-                  </button>
-                </div>
+            <div class="space-y-3">
+              <label class="text-sm font-medium text-text-primary">Owner PAN Card</label>
+              <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors"
+                   [ngClass]="{'border-green-500 bg-green-50': documents['owner_pan']}">
+                <input type="file" (change)="onFileSelected($event, 'owner_pan')" accept=".pdf,.jpg,.jpeg,.png" 
+                       class="hidden" id="owner_pan">
+                <label for="owner_pan" class="cursor-pointer">
+                  <mat-icon class="text-3xl mb-2" [ngClass]="{'text-green-600': documents['owner_pan'], 'text-gray-400': !documents['owner_pan']}">{{ documents['owner_pan'] ? 'check_circle' : 'cloud_upload' }}</mat-icon>
+                  <p class="text-sm" *ngIf="!documents['owner_pan']">Upload Owner PAN Card (PDF, JPG, PNG)</p>
+                  <div *ngIf="documents['owner_pan']" class="flex items-center justify-between">
+                    <span class="text-sm font-medium">{{ documents['owner_pan'].name }}</span>
+                    <button type="button" (click)="removeDocument('owner_pan')" class="text-red-600 hover:text-red-800">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </label>
               </div>
-              <div *ngIf="existingDocuments['owner_pan']" class="existing-document">
-                <small class="document-info">
+              <div *ngIf="existingDocuments['owner_pan']" class="flex items-center justify-between p-2 bg-blue-50 rounded">
+                <small class="text-blue-800">
                   {{ existingDocuments['owner_pan'].file_name }} 
                   ({{ formatFileSize(existingDocuments['owner_pan'].file_size) }})
                 </small>
-                <button mat-icon-button color="primary" (click)="downloadDocument('owner_pan')" matTooltip="Download">
+                <button (click)="downloadDocument('owner_pan')" class="text-blue-600 hover:text-blue-800">
                   <mat-icon>download</mat-icon>
                 </button>
               </div>
             </div>
           </div>
-        </mat-card-content>
-      </mat-card>
+        </div>
+      </div>
 
       <!-- Partnership Details Section -->
-      <mat-card class="section-card partnership-details-card" *ngIf="clientForm.get('constitution_type')?.value === 'Partnership'">
-        <mat-card-header class="modern-header">
-          <div class="header-icon">
-            <mat-icon>group</mat-icon>
+      <div *ngIf="clientForm.get('constitution_type')?.value === 'Partnership'" class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
+        <div class="p-6 border-b border-border-light">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+              <mat-icon class="text-amber-600 text-lg">group</mat-icon>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-text-primary">Partnership Details</h3>
+              <p class="text-sm text-text-secondary">Partner information and documentation</p>
+            </div>
           </div>
-          <div class="header-content">
-            <mat-card-title>Partnership Details</mat-card-title>
-            <mat-card-subtitle>Partner information and documentation</mat-card-subtitle>
-          </div>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="form-row">
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Number of Partners</mat-label>
-              <input matInput formControlName="number_of_partners" type="number" min="2" max="10">
-            </mat-form-field>
+        </div>
+        <div class="p-6">
+          <div class="mb-6">
+            <!-- Number of Partners -->
+            <div class="w-full md:w-1/2">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Number of Partners</label>
+              <input type="number" 
+                     formControlName="number_of_partners"
+                     min="2" 
+                     max="10"
+                     placeholder="Enter number of partners"
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 hover:border-gray-400 transition-colors shadow-sm">
+            </div>
           </div>
 
-          <div class="partners-section">
-            <div *ngFor="let i of getPartnerArray(); let idx = index" class="partner-details">
-              <h4>{{ idx === 0 ? 'Managing Partner' : 'Partner ' + (idx + 1) }}</h4>
-              <div class="form-row">
-                <mat-form-field appearance="outline" class="form-field">
-                  <mat-label>Partner Name</mat-label>
-                  <input matInput [formControlName]="'partner_name_' + idx">
-                </mat-form-field>
+          <div class="space-y-8">
+            <div *ngFor="let i of getPartnerArray(); let idx = index" class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <h4 class="text-base font-semibold text-text-primary mb-4">{{ idx === 0 ? 'Managing Partner' : 'Partner ' + (idx + 1) }}</h4>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <!-- Partner Name -->
+                <div class="w-full">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Partner Name</label>
+                  <input type="text" 
+                         [formControlName]="'partner_name_' + idx"
+                         placeholder="Enter partner name"
+                         class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 hover:border-gray-400 transition-colors shadow-sm">
+                </div>
 
-                <mat-form-field appearance="outline" class="form-field">
-                  <mat-label>Partner Date of Birth</mat-label>
-                  <input matInput [formControlName]="'partner_dob_' + idx" type="date">
-                </mat-form-field>
+                <!-- Partner Date of Birth -->
+                <div class="w-full">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Partner Date of Birth</label>
+                  <input type="date" 
+                         [formControlName]="'partner_dob_' + idx"
+                         class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 hover:border-gray-400 transition-colors shadow-sm">
+                </div>
               </div>
 
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Partner Aadhar Card</label>
-                  <div class="file-upload" [class.file-uploaded]="!!documents['partner_aadhar_' + idx]">
-                    <input type="file" (change)="onFileSelected($event, 'partner_aadhar_' + idx)" accept=".pdf,.jpg,.jpeg,.png">
-                    <mat-icon>{{ documents['partner_aadhar_' + idx] ? 'check_circle' : 'cloud_upload' }}</mat-icon>
-                    <p *ngIf="!documents['partner_aadhar_' + idx]">Upload Partner Aadhar Card (PDF, JPG, PNG)</p>
-                    <div *ngIf="documents['partner_aadhar_' + idx]" class="file-info">
-                      <p class="file-name">{{ documents['partner_aadhar_' + idx].name }}</p>
-                      <button type="button" class="delete-btn" (click)="removeDocument('partner_aadhar_' + idx)" title="Remove file">
-                        <mat-icon>delete</mat-icon>
-                      </button>
-                    </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-3">
+                  <label class="text-sm font-medium text-text-primary">Partner Aadhar Card</label>
+                  <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors"
+                       [ngClass]="{'border-green-500 bg-green-50': documents['partner_aadhar_' + idx]}">
+                    <input type="file" (change)="onFileSelected($event, 'partner_aadhar_' + idx)" accept=".pdf,.jpg,.jpeg,.png" 
+                           class="hidden" [id]="'partner_aadhar_' + idx">
+                    <label [for]="'partner_aadhar_' + idx" class="cursor-pointer">
+                      <mat-icon class="text-3xl mb-2" [ngClass]="{'text-green-600': documents['partner_aadhar_' + idx], 'text-gray-400': !documents['partner_aadhar_' + idx]}">{{ documents['partner_aadhar_' + idx] ? 'check_circle' : 'cloud_upload' }}</mat-icon>
+                      <p class="text-sm" *ngIf="!documents['partner_aadhar_' + idx]">Upload Partner Aadhar Card (PDF, JPG, PNG)</p>
+                      <div *ngIf="documents['partner_aadhar_' + idx]" class="flex items-center justify-between">
+                        <span class="text-sm font-medium">{{ documents['partner_aadhar_' + idx].name }}</span>
+                        <button type="button" (click)="removeDocument('partner_aadhar_' + idx)" class="text-red-600 hover:text-red-800">
+                          <mat-icon>delete</mat-icon>
+                        </button>
+                      </div>
+                    </label>
                   </div>
-                  <div *ngIf="getExistingPartnerDocument('aadhar', idx)" class="existing-document">
-                    <small class="document-info">
+                  <div *ngIf="getExistingPartnerDocument('aadhar', idx)" class="flex items-center justify-between p-2 bg-blue-50 rounded">
+                    <small class="text-blue-800">
                       {{ getExistingPartnerDocument('aadhar', idx).file_name }} 
                       ({{ formatFileSize(getExistingPartnerDocument('aadhar', idx).file_size) }})
                     </small>
-                    <button mat-icon-button color="primary" (click)="downloadPartnerDocument('aadhar', idx)" matTooltip="Download">
+                    <button (click)="downloadPartnerDocument('aadhar', idx)" class="text-blue-600 hover:text-blue-800">
                       <mat-icon>download</mat-icon>
                     </button>
                   </div>
                 </div>
 
-                <div class="form-group">
-                  <label>Partner PAN Card</label>
-                  <div class="file-upload" [class.file-uploaded]="!!documents['partner_pan_' + idx]">
-                    <input type="file" (change)="onFileSelected($event, 'partner_pan_' + idx)" accept=".pdf,.jpg,.jpeg,.png">
-                    <mat-icon>{{ !!documents['partner_pan_' + idx] ? 'check_circle' : 'cloud_upload' }}</mat-icon>
-                    <p *ngIf="!documents['partner_pan_' + idx]">Upload Partner PAN Card (PDF, JPG, PNG)</p>
-                    <div *ngIf="documents['partner_pan_' + idx]" class="file-info">
-                      <p class="file-name">{{ documents['partner_pan_' + idx].name }}</p>
-                      <button type="button" class="delete-btn" (click)="removeDocument('partner_pan_' + idx)" title="Remove file">
-                        <mat-icon>delete</mat-icon>
-                      </button>
-                    </div>
+                <div class="space-y-3">
+                  <label class="text-sm font-medium text-text-primary">Partner PAN Card</label>
+                  <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors"
+                       [ngClass]="{'border-green-500 bg-green-50': documents['partner_pan_' + idx]}">
+                    <input type="file" (change)="onFileSelected($event, 'partner_pan_' + idx)" accept=".pdf,.jpg,.jpeg,.png" 
+                           class="hidden" [id]="'partner_pan_' + idx">
+                    <label [for]="'partner_pan_' + idx" class="cursor-pointer">
+                      <mat-icon class="text-3xl mb-2" [ngClass]="{'text-green-600': documents['partner_pan_' + idx], 'text-gray-400': !documents['partner_pan_' + idx]}">{{ documents['partner_pan_' + idx] ? 'check_circle' : 'cloud_upload' }}</mat-icon>
+                      <p class="text-sm" *ngIf="!documents['partner_pan_' + idx]">Upload Partner PAN Card (PDF, JPG, PNG)</p>
+                      <div *ngIf="documents['partner_pan_' + idx]" class="flex items-center justify-between">
+                        <span class="text-sm font-medium">{{ documents['partner_pan_' + idx].name }}</span>
+                        <button type="button" (click)="removeDocument('partner_pan_' + idx)" class="text-red-600 hover:text-red-800">
+                          <mat-icon>delete</mat-icon>
+                        </button>
+                      </div>
+                    </label>
                   </div>
-                  <div *ngIf="getExistingPartnerDocument('pan', idx)" class="existing-document">
-                    <small class="document-info">
+                  <div *ngIf="getExistingPartnerDocument('pan', idx)" class="flex items-center justify-between p-2 bg-blue-50 rounded">
+                    <small class="text-blue-800">
                       {{ getExistingPartnerDocument('pan', idx).file_name }} 
                       ({{ formatFileSize(getExistingPartnerDocument('pan', idx).file_size) }})
                     </small>
-                    <button mat-icon-button color="primary" (click)="downloadPartnerDocument('pan', idx)" matTooltip="Download">
+                    <button (click)="downloadPartnerDocument('pan', idx)" class="text-blue-600 hover:text-blue-800">
                       <mat-icon>download</mat-icon>
                     </button>
                   </div>
@@ -549,187 +784,323 @@
               </div>
             </div>
           </div>
-        </mat-card-content>
-      </mat-card>
+        </div>
+      </div>
 
       <!-- Financial Information Section -->
-      <mat-card class="section-card financial-info-card">
-        <mat-card-header class="modern-header">
-          <div class="header-icon">
-            <mat-icon>account_balance</mat-icon>
-          </div>
-          <div class="header-content">
-            <mat-card-title>Financial Information</mat-card-title>
-            <mat-card-subtitle>Banking details and financial requirements</mat-card-subtitle>
-          </div>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="form-row">
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Required Loan Amount</mat-label>
-              <input matInput formControlName="required_loan_amount" type="number">
-              <mat-error *ngIf="clientForm.get('required_loan_amount')?.hasError('min')">
-                Amount must be positive
-              </mat-error>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Total Credit Amount</mat-label>
-              <input matInput formControlName="total_credit_amount" type="number">
-              <mat-error *ngIf="clientForm.get('total_credit_amount')?.hasError('min')">
-                Amount must be positive
-              </mat-error>
-            </mat-form-field>
-          </div>
-
-          <div class="form-row">
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Loan Purpose</mat-label>
-              <input matInput formControlName="loan_purpose">
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Repayment Period</mat-label>
-              <input matInput formControlName="repayment_period">
-            </mat-form-field>
-          </div>
-        </mat-card-content>
-      </mat-card>
-
-      <!-- Bank Information Section -->
-      <mat-card class="section-card bank-info-card">
-        <mat-card-header class="modern-header">
-          <div class="header-icon">
-            <mat-icon>account_balance_wallet</mat-icon>
-          </div>
-          <div class="header-content">
-            <mat-card-title>Bank Information</mat-card-title>
-            <mat-card-subtitle>Current banking details and account information</mat-card-subtitle>
-          </div>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="form-row">
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Bank Name</mat-label>
-              <input matInput formControlName="bank_name">
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Account Name</mat-label>
-              <input matInput formControlName="account_name">
-            </mat-form-field>
-          </div>
-
-          <div class="form-row">
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Account Number</mat-label>
-              <input matInput formControlName="account_number">
-            </mat-form-field>
-
-            <div class="form-field"></div> <!-- Empty div for layout balance -->
-          </div>
-
-          <div class="form-row">
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>IFSC Code</mat-label>
-              <input matInput formControlName="ifsc_code">
-              <mat-error *ngIf="clientForm.get('ifsc_code')?.hasError('pattern')">
-                Please enter a valid IFSC code
-              </mat-error>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Bank Account Type</mat-label>
-              <mat-select formControlName="bank_type">
-                <mat-option value="">Select Account Type</mat-option>
-                <mat-option value="Savings">Savings</mat-option>
-                <mat-option value="Current">Current</mat-option>
-              </mat-select>
-            </mat-form-field>
-          </div>
-
-          <div class="form-row">
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>New Current Account</mat-label>
-              <mat-select formControlName="new_current_account" (selectionChange)="onNewCurrentAccountChange($event.value)">
-                <mat-option value="yes">Yes</mat-option>
-                <mat-option value="no">No</mat-option>
-              </mat-select>
-            </mat-form-field>
-
-            <div class="form-field"></div> <!-- Empty div for layout balance -->
-          </div>
-
-          <!-- New Bank Details Section (Show when New Current Account is Yes) -->
-          <div class="new-bank-details-section" *ngIf="clientForm.get('new_current_account')?.value === 'yes'">
-            <h4>New Bank Account Details</h4>
-            
-            <div class="form-row">
-              <mat-form-field appearance="outline" class="form-field">
-                <mat-label>New Bank Name</mat-label>
-                <input matInput formControlName="new_bank_name" (input)="onNewBankNameInput($event)" placeholder="Type to search new bank name" autocomplete="off">
-              </mat-form-field>
-
-              <mat-form-field appearance="outline" class="form-field">
-                <mat-label>New Account Name</mat-label>
-                <input matInput formControlName="new_account_name" placeholder="Enter new account holder name">
-              </mat-form-field>
+      <div class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
+        <div class="p-6 border-b border-border-light">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
+              <mat-icon class="text-emerald-600 text-lg">account_balance</mat-icon>
             </div>
-            
-            <div class="bank-suggestions" *ngIf="filteredNewBankNames.length > 0">
-              <div *ngFor="let bank of filteredNewBankNames.slice(0, 10)" 
-                   class="bank-suggestion-item" 
-                   (click)="selectNewBank(bank)">
-                {{ bank }}
+            <div>
+              <h3 class="text-lg font-semibold text-text-primary">Financial Information</h3>
+              <p class="text-sm text-text-secondary">Banking details and financial requirements</p>
+            </div>
+          </div>
+        </div>
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Required Loan Amount -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Required Loan Amount</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <span class="text-emerald-600 font-semibold text-lg">₹</span>
+                </div>
+                <input type="number" 
+                       formControlName="required_loan_amount"
+                       placeholder="0.00"
+                       min="0"
+                       step="1000"
+                       class="w-full pl-8 pr-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-gray-400 transition-colors shadow-sm"
+                       [class.border-red-500]="clientForm.get('required_loan_amount')?.hasError('min') && clientForm.get('required_loan_amount')?.touched"
+                       [class.focus:ring-red-500]="clientForm.get('required_loan_amount')?.hasError('min') && clientForm.get('required_loan_amount')?.touched">
+              </div>
+              <div *ngIf="clientForm.get('required_loan_amount')?.hasError('min') && clientForm.get('required_loan_amount')?.touched" class="mt-1 text-sm text-red-600">
+                Amount must be positive
               </div>
             </div>
 
-            <div class="form-row">
-              <mat-form-field appearance="outline" class="form-field">
-                <mat-label>New Bank Account Number</mat-label>
-                <input matInput formControlName="new_bank_account_number" placeholder="Enter new bank account number">
-              </mat-form-field>
+            <!-- Total Credit Amount -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Total Credit Amount</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <span class="text-emerald-600 font-semibold text-lg">₹</span>
+                </div>
+                <input type="number" 
+                       formControlName="total_credit_amount"
+                       placeholder="0.00"
+                       min="0"
+                       step="1000"
+                       class="w-full pl-8 pr-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-gray-400 transition-colors shadow-sm"
+                       [class.border-red-500]="clientForm.get('total_credit_amount')?.hasError('min') && clientForm.get('total_credit_amount')?.touched"
+                       [class.focus:ring-red-500]="clientForm.get('total_credit_amount')?.hasError('min') && clientForm.get('total_credit_amount')?.touched">
+              </div>
+              <div *ngIf="clientForm.get('total_credit_amount')?.hasError('min') && clientForm.get('total_credit_amount')?.touched" class="mt-1 text-sm text-red-600">
+                Amount must be positive
+              </div>
+            </div>
 
-              <mat-form-field appearance="outline" class="form-field">
-                <mat-label>New IFSC Code</mat-label>
-                <input matInput formControlName="new_ifsc_code" placeholder="Enter new IFSC code">
-              </mat-form-field>
+            <!-- Loan Purpose -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Loan Purpose</label>
+              <input type="text" 
+                     formControlName="loan_purpose"
+                     placeholder="Enter loan purpose"
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-gray-400 transition-colors shadow-sm">
+            </div>
+
+            <!-- Repayment Period -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Repayment Period</label>
+              <input type="text" 
+                     formControlName="repayment_period"
+                     placeholder="Enter repayment period"
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 hover:border-gray-400 transition-colors shadow-sm">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bank Information Section -->
+      <div class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
+        <div class="p-6 border-b border-border-light">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-cyan-100 rounded-lg flex items-center justify-center">
+              <mat-icon class="text-cyan-600 text-lg">account_balance_wallet</mat-icon>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-text-primary">Bank Information</h3>
+              <p class="text-sm text-text-secondary">Current banking details and account information</p>
+            </div>
+          </div>
+        </div>
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Bank Name -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Bank Name</label>
+              <input type="text" 
+                     formControlName="bank_name"
+                     placeholder="Enter bank name"
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 hover:border-gray-400 transition-colors shadow-sm">
+            </div>
+
+            <!-- Account Name -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Account Name</label>
+              <input type="text" 
+                     formControlName="account_name"
+                     placeholder="Enter account holder name"
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 hover:border-gray-400 transition-colors shadow-sm">
+            </div>
+
+            <!-- Account Number -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Account Number</label>
+              <input type="text" 
+                     formControlName="account_number"
+                     placeholder="Enter account number"
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 hover:border-gray-400 transition-colors shadow-sm">
+            </div>
+
+            <!-- IFSC Code -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">IFSC Code</label>
+              <input type="text" 
+                     formControlName="ifsc_code"
+                     placeholder="Enter IFSC code"
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 hover:border-gray-400 transition-colors shadow-sm"
+                     [class.border-red-500]="clientForm.get('ifsc_code')?.hasError('pattern') && clientForm.get('ifsc_code')?.touched"
+                     [class.focus:ring-red-500]="clientForm.get('ifsc_code')?.hasError('pattern') && clientForm.get('ifsc_code')?.touched">
+              <div *ngIf="clientForm.get('ifsc_code')?.hasError('pattern') && clientForm.get('ifsc_code')?.touched" class="mt-1 text-sm text-red-600">
+                Please enter a valid IFSC code
+              </div>
+            </div>
+
+            <!-- Bank Account Type -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Bank Account Type</label>
+              <div class="relative">
+                <button type="button"
+                        (click)="toggleBankTypeDropdown()"
+                        class="w-full bg-white border border-gray-300 rounded-lg px-3 py-3 text-left text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 hover:border-gray-400 transition-colors shadow-sm"
+                        [class.border-cyan-500]="isBankTypeDropdownOpen"
+                        [class.ring-2]="isBankTypeDropdownOpen"
+                        [class.ring-cyan-500]="isBankTypeDropdownOpen">
+                  <span class="block truncate text-gray-700">
+                    {{ getBankTypeLabel(clientForm.get('bank_type')?.value) }}
+                  </span>
+                  <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                    <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                         [class.rotate-180]="isBankTypeDropdownOpen"
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </span>
+                </button>
+                
+                <!-- Dropdown Options -->
+                <div *ngIf="isBankTypeDropdownOpen"
+                     class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  <button type="button"
+                          (click)="selectBankType('')"
+                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
+                          [class.bg-cyan-50]="clientForm.get('bank_type')?.value === ''"
+                          [class.text-cyan-600]="clientForm.get('bank_type')?.value === ''">
+                    Select Account Type
+                  </button>
+                  <button type="button"
+                          (click)="selectBankType('Savings')"
+                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
+                          [class.bg-cyan-50]="clientForm.get('bank_type')?.value === 'Savings'"
+                          [class.text-cyan-600]="clientForm.get('bank_type')?.value === 'Savings'">
+                    Savings
+                  </button>
+                  <button type="button"
+                          (click)="selectBankType('Current')"
+                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
+                          [class.bg-cyan-50]="clientForm.get('bank_type')?.value === 'Current'"
+                          [class.text-cyan-600]="clientForm.get('bank_type')?.value === 'Current'">
+                    Current
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- New Current Account -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">New Current Account</label>
+              <div class="relative">
+                <button type="button"
+                        (click)="toggleNewCurrentAccountDropdown()"
+                        class="w-full bg-white border border-gray-300 rounded-lg px-3 py-3 text-left text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 hover:border-gray-400 transition-colors shadow-sm"
+                        [class.border-cyan-500]="isNewCurrentAccountDropdownOpen"
+                        [class.ring-2]="isNewCurrentAccountDropdownOpen"
+                        [class.ring-cyan-500]="isNewCurrentAccountDropdownOpen">
+                  <span class="block truncate text-gray-700">
+                    {{ getNewCurrentAccountLabel(clientForm.get('new_current_account')?.value) }}
+                  </span>
+                  <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                    <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                         [class.rotate-180]="isNewCurrentAccountDropdownOpen"
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </span>
+                </button>
+                
+                <!-- Dropdown Options -->
+                <div *ngIf="isNewCurrentAccountDropdownOpen"
+                     class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  <button type="button"
+                          (click)="selectNewCurrentAccount('yes')"
+                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
+                          [class.bg-cyan-50]="clientForm.get('new_current_account')?.value === 'yes'"
+                          [class.text-cyan-600]="clientForm.get('new_current_account')?.value === 'yes'">
+                    Yes
+                  </button>
+                  <button type="button"
+                          (click)="selectNewCurrentAccount('no')"
+                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
+                          [class.bg-cyan-50]="clientForm.get('new_current_account')?.value === 'no'"
+                          [class.text-cyan-600]="clientForm.get('new_current_account')?.value === 'no'">
+                    No
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- New Bank Details Section (Show when New Current Account is Yes) -->
+          <div *ngIf="clientForm.get('new_current_account')?.value === 'yes'" class="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <h4 class="text-base font-semibold text-text-primary mb-4">New Bank Account Details</h4>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+              <!-- New Bank Name -->
+              <div class="w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-2">New Bank Name</label>
+                <input type="text" 
+                       formControlName="new_bank_name" 
+                       (input)="onNewBankNameInput($event)" 
+                       placeholder="Type to search new bank name" 
+                       autocomplete="off"
+                       class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors shadow-sm">
+              </div>
+
+              <!-- New Account Name -->
+              <div class="w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-2">New Account Name</label>
+                <input type="text" 
+                       formControlName="new_account_name" 
+                       placeholder="Enter new account holder name"
+                       class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors shadow-sm">
+              </div>
+            </div>
+            
+            <div *ngIf="filteredNewBankNames.length > 0" class="mb-4">
+              <div class="max-h-40 overflow-y-auto border border-gray-300 rounded-lg">
+                <div *ngFor="let bank of filteredNewBankNames.slice(0, 10)" 
+                     class="px-3 py-2 hover:bg-blue-100 cursor-pointer border-b border-gray-200 last:border-b-0" 
+                     (click)="selectNewBank(bank)">
+                  {{ bank }}
+                </div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- New Bank Account Number -->
+              <div class="w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-2">New Bank Account Number</label>
+                <input type="text" 
+                       formControlName="new_bank_account_number" 
+                       placeholder="Enter new bank account number"
+                       class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors shadow-sm">
+              </div>
+
+              <!-- New IFSC Code -->
+              <div class="w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-2">New IFSC Code</label>
+                <input type="text" 
+                       formControlName="new_ifsc_code" 
+                       placeholder="Enter new IFSC code"
+                       class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors shadow-sm">
+              </div>
             </div>
           </div>
 
           <!-- Bank Statements Section -->
-          <div class="bank-statements-section">
-            <div class="statements-header">
-              <div class="header-info">
-                <mat-icon class="section-icon">description</mat-icon>
-                <div class="header-text">
-                  <h4>Bank Statements</h4>
-                  <p>Upload your recent bank statements for verification</p>
-                </div>
+          <div class="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <div class="flex items-center gap-3 mb-4">
+              <mat-icon class="text-blue-600">description</mat-icon>
+              <div>
+                <h4 class="text-base font-semibold text-text-primary">Bank Statements</h4>
+                <p class="text-sm text-text-secondary">Upload your recent bank statements for verification</p>
               </div>
             </div>
             
             <!-- Existing Bank Statements -->
-            <div *ngIf="getExistingBankStatements().length > 0" class="existing-statements-container">
-              <div class="subsection-header">
-                <mat-icon>folder</mat-icon>
-                <h5>Existing Bank Statements</h5>
+            <div *ngIf="getExistingBankStatements().length > 0" class="mb-6">
+              <div class="flex items-center gap-2 mb-3">
+                <mat-icon class="text-green-600">folder</mat-icon>
+                <h5 class="text-sm font-semibold text-text-primary">Existing Bank Statements</h5>
               </div>
-              <div class="statements-grid">
-                <div *ngFor="let statement of getExistingBankStatements(); let i = index" class="statement-card existing">
-                  <div class="card-header">
-                    <mat-icon class="file-icon">insert_drive_file</mat-icon>
-                    <div class="file-details">
-                      <span class="file-title">Bank Statement {{ i + 1 }}</span>
-                      <div class="file-meta">
-                        <small *ngIf="statement.file_name" class="file-name">{{ statement.file_name }}</small>
-                        <small *ngIf="statement.file_size" class="file-size">{{ formatFileSize(statement.file_size) }}</small>
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div *ngFor="let statement of getExistingBankStatements(); let i = index" class="bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
+                  <div class="flex items-start gap-3">
+                    <mat-icon class="text-blue-600 mt-1">insert_drive_file</mat-icon>
+                    <div class="flex-1 min-w-0">
+                      <span class="text-sm font-medium text-text-primary block">Bank Statement {{ i + 1 }}</span>
+                      <div class="space-y-1">
+                        <small *ngIf="statement.file_name" class="text-xs text-text-muted block truncate">{{ statement.file_name }}</small>
+                        <small *ngIf="statement.file_size" class="text-xs text-text-secondary block">{{ formatFileSize(statement.file_size) }}</small>
                       </div>
                     </div>
-                  </div>
-                  <div class="card-actions">
-                    <button mat-icon-button color="primary" matTooltip="Download">
-                      <mat-icon>download</mat-icon>
+                    <button class="w-8 h-8 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-colors" matTooltip="Download">
+                      <mat-icon class="text-blue-600 text-sm">download</mat-icon>
                     </button>
                   </div>
                 </div>
@@ -737,41 +1108,44 @@
             </div>
 
             <!-- New Bank Statement Uploads -->
-            <div class="upload-statements-container">
-              <div class="subsection-header">
-                <mat-icon>cloud_upload</mat-icon>
-                <h5>{{ getExistingBankStatements().length > 0 ? 'Update Bank Statements' : 'Upload Bank Statements' }}</h5>
+            <div>
+              <div class="flex items-center gap-2 mb-3">
+                <mat-icon class="text-purple-600">cloud_upload</mat-icon>
+                <h5 class="text-sm font-semibold text-text-primary">{{ getExistingBankStatements().length > 0 ? 'Update Bank Statements' : 'Upload Bank Statements' }}</h5>
               </div>
-              <div class="upload-grid">
-                <div *ngFor="let i of [].constructor(bankStatementsCount); let idx = index" class="upload-card">
-                  <div class="upload-area" [class.has-file]="documents['bank_statement_' + idx]">
-                    <input type="file" [id]="'bank_statement_' + idx" (change)="onFileSelected($event, 'bank_statement_' + idx)" accept=".pdf,.jpg,.jpeg,.png" class="file-input">
-                    <label [for]="'bank_statement_' + idx" class="upload-label">
-                      <div class="upload-content">
-                        <mat-icon class="upload-icon">{{ documents['bank_statement_' + idx] ? 'check_circle' : 'cloud_upload' }}</mat-icon>
-                        <span class="upload-text">{{ documents['bank_statement_' + idx] ? 'File Selected' : 'Bank Statement ' + (idx + 1) }}</span>
-                        <small class="upload-hint" *ngIf="!documents['bank_statement_' + idx]">Click to upload PDF, JPG, PNG</small>
-                      </div>
-                    </label>
-                    <div *ngIf="documents['bank_statement_' + idx]" class="file-preview">
-                      <div class="preview-info">
-                        <mat-icon class="preview-icon">insert_drive_file</mat-icon>
-                        <span class="preview-name">{{ documents['bank_statement_' + idx].name }}</span>
-                      </div>
-                      <button type="button" class="remove-file-btn" (click)="removeDocument('bank_statement_' + idx)" matTooltip="Remove file">
-                        <mat-icon>close</mat-icon>
-                      </button>
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+                <div *ngFor="let i of [].constructor(bankStatementsCount); let idx = index" class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors"
+                     [ngClass]="{'border-green-500 bg-green-50': documents['bank_statement_' + idx]}">
+                  <input type="file" [id]="'bank_statement_' + idx" (change)="onFileSelected($event, 'bank_statement_' + idx)" accept=".pdf,.jpg,.jpeg,.png" class="hidden">
+                  <label [for]="'bank_statement_' + idx" class="cursor-pointer">
+                    <div *ngIf="!documents['bank_statement_' + idx]">
+                      <mat-icon class="text-3xl mb-2 text-gray-400">cloud_upload</mat-icon>
+                      <span class="block text-sm font-medium text-text-primary">Bank Statement {{ idx + 1 }}</span>
+                      <small class="text-xs text-text-secondary">Click to upload PDF, JPG, PNG</small>
                     </div>
-                  </div>
+                    <div *ngIf="documents['bank_statement_' + idx]" class="space-y-2">
+                      <mat-icon class="text-3xl text-green-600">check_circle</mat-icon>
+                      <div class="flex items-center justify-between">
+                        <span class="text-sm font-medium text-text-primary truncate">{{ documents['bank_statement_' + idx].name }}</span>
+                        <button type="button" (click)="removeDocument('bank_statement_' + idx)" class="text-red-600 hover:text-red-800 ml-2" matTooltip="Remove file">
+                          <mat-icon class="text-sm">close</mat-icon>
+                        </button>
+                      </div>
+                    </div>
+                  </label>
                 </div>
               </div>
-              <div class="statement-controls">
-                <button type="button" class="control-btn add-btn" (click)="addBankStatement()" *ngIf="bankStatementsCount < 6" matTooltip="Add more bank statements">
-                  <mat-icon>add</mat-icon>
+              <div class="flex items-center gap-3">
+                <button type="button" (click)="addBankStatement()" *ngIf="bankStatementsCount < 6" 
+                        class="flex items-center gap-2 px-3 py-2 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors" 
+                        matTooltip="Add more bank statements">
+                  <mat-icon class="text-sm">add</mat-icon>
                   <span>Add Statement</span>
                 </button>
-                <button type="button" class="control-btn remove-btn" (click)="removeBankStatement()" *ngIf="bankStatementsCount > 1" matTooltip="Remove last statement">
-                  <mat-icon>remove</mat-icon>
+                <button type="button" (click)="removeBankStatement()" *ngIf="bankStatementsCount > 1" 
+                        class="flex items-center gap-2 px-3 py-2 text-sm bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors" 
+                        matTooltip="Remove last statement">
+                  <mat-icon class="text-sm">remove</mat-icon>
                   <span>Remove Statement</span>
                 </button>
               </div>
@@ -779,112 +1153,168 @@
           </div>
 
           <!-- Signature Upload -->
-          <div class="document-upload-item">
-            <div class="file-upload">
-              <input type="file" id="signature" (change)="onFileSelected($event, 'signature')" accept=".jpg,.jpeg,.png">
-              <label for="signature" class="file-label">
-                <mat-icon>upload_file</mat-icon>
-                Upload Signature (JPG, PNG)
-              </label>
-              <div *ngIf="documents['signature']" class="file-info">
-                <small>{{ documents['signature'].name }}</small>
-                <button mat-icon-button color="warn" (click)="removeDocument('signature')" matTooltip="Remove">
-                  <mat-icon>delete</mat-icon>
-                </button>
+          <div class="mt-6">
+            <div class="space-y-3">
+              <label class="text-sm font-medium text-text-primary">Signature Upload</label>
+              <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors"
+                   [ngClass]="{'border-green-500 bg-green-50': documents['signature']}">
+                <input type="file" id="signature" (change)="onFileSelected($event, 'signature')" accept=".jpg,.jpeg,.png" class="hidden">
+                <label for="signature" class="cursor-pointer">
+                  <mat-icon class="text-3xl mb-2" [ngClass]="{'text-green-600': documents['signature'], 'text-gray-400': !documents['signature']}">{{ documents['signature'] ? 'check_circle' : 'upload_file' }}</mat-icon>
+                  <p class="text-sm" *ngIf="!documents['signature']">Upload Signature (JPG, PNG)</p>
+                  <div *ngIf="documents['signature']" class="flex items-center justify-between">
+                    <span class="text-sm font-medium">{{ documents['signature'].name }}</span>
+                    <button type="button" (click)="removeDocument('signature')" class="text-red-600 hover:text-red-800" matTooltip="Remove">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </label>
               </div>
             </div>
           </div>
 
-          <div class="form-row">
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Number of Months Transaction Shared</mat-label>
-              <input matInput formControlName="transaction_months" type="number" min="1">
-              <mat-error *ngIf="clientForm.get('transaction_months')?.hasError('min')">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <!-- Number of Months Transaction Shared -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Number of Months Transaction Shared</label>
+              <input type="number" 
+                     formControlName="transaction_months" 
+                     min="1"
+                     placeholder="Enter number of months"
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 hover:border-gray-400 transition-colors shadow-sm"
+                     [class.border-red-500]="clientForm.get('transaction_months')?.hasError('min') && clientForm.get('transaction_months')?.touched"
+                     [class.focus:ring-red-500]="clientForm.get('transaction_months')?.hasError('min') && clientForm.get('transaction_months')?.touched">
+              <div *ngIf="clientForm.get('transaction_months')?.hasError('min') && clientForm.get('transaction_months')?.touched" class="mt-1 text-sm text-red-600">
                 Must be at least 1 month
-              </mat-error>
-            </mat-form-field>
+              </div>
+            </div>
 
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>New Business Account</mat-label>
-              <mat-select formControlName="new_business_account">
-                <mat-option value="">Select</mat-option>
-                <mat-option value="yes">Yes</mat-option>
-                <mat-option value="no">No</mat-option>
-              </mat-select>
-            </mat-form-field>
+            <!-- New Business Account -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">New Business Account</label>
+              <div class="relative">
+                <button type="button"
+                        (click)="toggleNewBusinessAccountDropdown()"
+                        class="w-full bg-white border border-gray-300 rounded-lg px-3 py-3 text-left text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 hover:border-gray-400 transition-colors shadow-sm"
+                        [class.border-cyan-500]="isNewBusinessAccountDropdownOpen"
+                        [class.ring-2]="isNewBusinessAccountDropdownOpen"
+                        [class.ring-cyan-500]="isNewBusinessAccountDropdownOpen">
+                  <span class="block truncate text-gray-700">
+                    {{ getNewBusinessAccountLabel(clientForm.get('new_business_account')?.value) }}
+                  </span>
+                  <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                    <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                         [class.rotate-180]="isNewBusinessAccountDropdownOpen"
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </span>
+                </button>
+                
+                <!-- Dropdown Options -->
+                <div *ngIf="isNewBusinessAccountDropdownOpen"
+                     class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  <button type="button"
+                          (click)="selectNewBusinessAccount('')"
+                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
+                          [class.bg-cyan-50]="clientForm.get('new_business_account')?.value === ''"
+                          [class.text-cyan-600]="clientForm.get('new_business_account')?.value === ''">
+                    Select
+                  </button>
+                  <button type="button"
+                          (click)="selectNewBusinessAccount('yes')"
+                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
+                          [class.bg-cyan-50]="clientForm.get('new_business_account')?.value === 'yes'"
+                          [class.text-cyan-600]="clientForm.get('new_business_account')?.value === 'yes'">
+                    Yes
+                  </button>
+                  <button type="button"
+                          (click)="selectNewBusinessAccount('no')"
+                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
+                          [class.bg-cyan-50]="clientForm.get('new_business_account')?.value === 'no'"
+                          [class.text-cyan-600]="clientForm.get('new_business_account')?.value === 'no'">
+                    No
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
-        </mat-card-content>
-      </mat-card>
+        </div>
+      </div>
 
       <!-- Payment Gateway Section -->
-      <mat-card class="section-card payment-gateway-card">
-        <mat-card-header class="gateway-header">
-          <div class="header-icon">
-            <mat-icon>payment</mat-icon>
+      <div class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
+        <div class="p-6 border-b border-border-light">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-rose-100 rounded-lg flex items-center justify-center">
+              <mat-icon class="text-rose-600 text-lg">payment</mat-icon>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-text-primary">Payment Gateway Configuration</h3>
+              <p class="text-sm text-text-secondary">Select available payment methods for your business</p>
+            </div>
           </div>
-          <div class="header-content">
-            <mat-card-title>Payment Gateway Configuration</mat-card-title>
-            <mat-card-subtitle>Select available payment methods for your business</mat-card-subtitle>
-          </div>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="payment-gateway-section">
-            <div class="gateway-selection">
-              <div class="section-title">
-                <mat-icon>tune</mat-icon>
-                <h4>Available Payment Gateways</h4>
+        </div>
+        <div class="p-6">
+          <div class="space-y-6">
+            <div class="space-y-4">
+              <div class="flex items-center gap-3">
+                <mat-icon class="text-primary">tune</mat-icon>
+                <h4 class="text-base font-semibold text-text-primary">Available Payment Gateways</h4>
               </div>
-              <p class="section-description">Choose one or more payment gateways that your business will support:</p>
+              <p class="text-sm text-text-secondary">Choose one or more payment gateways that your business will support:</p>
               
-              <div class="gateway-options">
-                <div class="gateway-grid">
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div *ngFor="let gateway of availableGateways" class="relative">
                   <mat-checkbox 
-                    *ngFor="let gateway of availableGateways" 
                     [checked]="isGatewaySelected(gateway)"
                     (change)="onGatewayChange(gateway, $event.checked)"
-                    class="gateway-checkbox"
-                    [attr.data-gateway]="gateway">
-                    <div class="gateway-item">
-                      <div class="gateway-icon-wrapper" [style.background-color]="getGatewayColor(gateway) + '20'">
-                        <mat-icon class="gateway-icon" [style.color]="getGatewayColor(gateway)">{{ getGatewayIcon(gateway) }}</mat-icon>
+                    class="w-full">
+                    <div class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:border-primary transition-colors"
+                         [ngClass]="{'border-primary bg-primary/5': isGatewaySelected(gateway)}">
+                      <div class="w-10 h-10 rounded-lg flex items-center justify-center"
+                           [style.background-color]="getGatewayColor(gateway) + '20'">
+                        <mat-icon class="text-lg" [style.color]="getGatewayColor(gateway)">{{ getGatewayIcon(gateway) }}</mat-icon>
                       </div>
-                      <div class="gateway-info">
-                        <span class="gateway-name">{{ gateway }}</span>
-                      </div>
+                      <span class="text-sm font-medium text-text-primary">{{ gateway }}</span>
                     </div>
                   </mat-checkbox>
                 </div>
               </div>
             </div>
             
-            <div class="gateway-summary">
-              <div class="selected-gateways" *ngIf="getSelectedGateways().length > 0">
-                <div class="summary-header">
-                  <mat-icon>check_circle</mat-icon>
-                  <h5>Selected Payment Gateways ({{ getSelectedGateways().length }})</h5>
+            <div class="border-t border-gray-200 pt-6">
+              <div *ngIf="getSelectedGateways().length > 0" class="space-y-4">
+                <div class="flex items-center gap-3">
+                  <mat-icon class="text-green-600">check_circle</mat-icon>
+                  <h5 class="text-base font-semibold text-text-primary">Selected Payment Gateways ({{ getSelectedGateways().length }})</h5>
                 </div>
-                <div class="selected-gateway-tags">
-                  <div class="gateway-chip" *ngFor="let gateway of getSelectedGateways()" [style.background]="'linear-gradient(135deg, ' + getGatewayColor(gateway) + ' 0%, ' + getGatewayColor(gateway) + 'dd 100%)'">
-                    <mat-icon class="chip-icon">{{ getGatewayIcon(gateway) }}</mat-icon>
-                    <span class="chip-text">{{ gateway }}</span>
-                    <button class="chip-remove" (click)="onGatewayChange(gateway, false)" matTooltip="Remove {{ gateway }}">
-                      <mat-icon>close</mat-icon>
+                <div class="flex flex-wrap gap-3">
+                  <div *ngFor="let gateway of getSelectedGateways()" 
+                       class="flex items-center gap-2 px-3 py-2 rounded-lg text-white text-sm font-medium"
+                       [style.background]="'linear-gradient(135deg, ' + getGatewayColor(gateway) + ' 0%, ' + getGatewayColor(gateway) + 'dd 100%)'">
+                    <mat-icon class="text-sm">{{ getGatewayIcon(gateway) }}</mat-icon>
+                    <span>{{ gateway }}</span>
+                    <button (click)="onGatewayChange(gateway, false)" 
+                            class="ml-1 w-4 h-4 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
+                            [matTooltip]="'Remove ' + gateway">
+                      <mat-icon class="text-xs">close</mat-icon>
                     </button>
                   </div>
                 </div>
               </div>
               
-              <div class="no-gateways" *ngIf="getSelectedGateways().length === 0">
-                <div class="empty-state">
-                  <mat-icon>info</mat-icon>
-                  <p>No payment gateways selected yet</p>
-                  <small>Please select at least one payment gateway above</small>
+              <div *ngIf="getSelectedGateways().length === 0" class="text-center py-8">
+                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <mat-icon class="text-gray-400 text-2xl">info</mat-icon>
                 </div>
+                <p class="text-text-muted font-medium">No payment gateways selected yet</p>
+                <p class="text-sm text-text-secondary mt-1">Please select at least one payment gateway above</p>
               </div>
             </div>
           </div>
-        </mat-card-content>
-      </mat-card>
+        </div>
+      </div>
 
     </form>
   </div>

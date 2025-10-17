@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -18,8 +18,8 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   filteredEnquiries: Enquiry[] = [];
   displayedColumns: string[] = [
     'sno', 'date', 'wati_name', 'mobile_number', 
-    'secondary_mobile_number', 'gst', 'business_type', 'business_nature', 'staff', 
-    'comments', 'whatsapp_status', 'additional_comments', 'actions'
+    'gst', 'business_type', 'staff', 
+    'comments', 'actions'
   ];
   
   staffMembers: User[] = [];
@@ -132,6 +132,10 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     'Proprietorship', 
     'Partnership'
   ];
+
+  // Custom dropdown properties
+  openDropdownId: string | null = null;
+  businessTypes = ['Retail', 'Wholesale', 'Manufacturing', 'Service', 'Trading', 'Other'];
 
   constructor(
     private fb: FormBuilder,
@@ -964,25 +968,6 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     return '';
   }
 
-  getInterestLevelDisplay(): string {
-    switch (this.interestFilter) {
-      case 'interested': return 'Interested';
-      case 'not_interested': return 'Not Interested';
-      case 'no_gst': return 'No GST';
-      case 'gst_cancelled': return 'GST Cancelled';
-      case 'pending': return 'Pending';
-      case 'unknown': return 'Unknown';
-      default: return '';
-    }
-  }
-
-  getGstFilterDisplay(): string {
-    switch (this.gstFilter) {
-      case 'yes': return 'GST Active';
-      case 'not_selected': return 'Not Selected';
-      default: return '';
-    }
-  }
 
   getRowColorClass(enquiry: Enquiry): string {
     // Check for GST Cancelled first
@@ -1029,6 +1014,109 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     }
   }
 
+  viewMode: 'table' | 'card' = 'table';
+
+  toggleView(): void {
+    this.viewMode = this.viewMode === 'table' ? 'card' : 'table';
+  }
+
+  goBack(): void {
+    window.history.back();
+  }
+
+  getStaffCount(staff: string): number {
+    if (staff === 'all') {
+      return this.enquiries.length;
+    }
+    return this.enquiries.filter(enquiry => enquiry.staff === staff).length;
+  }
+
+  getGstCount(gstType: string): number {
+    if (gstType === 'all') {
+      return this.enquiries.length;
+    } else if (gstType === 'yes') {
+      return this.enquiries.filter(enquiry => enquiry.gst === 'Yes' && enquiry.gst_status === 'Active').length;
+    } else if (gstType === 'not_selected') {
+      return this.enquiries.filter(enquiry => !enquiry.gst || enquiry.gst === 'Not Selected').length;
+    }
+    return 0;
+  }
+
+  getInterestCount(interestType: string): number {
+    if (interestType === 'all') {
+      return this.enquiries.length;
+    } else if (interestType === 'interested') {
+      return this.enquiries.filter(enquiry => this.interestComments.includes(enquiry.comments)).length;
+    } else if (interestType === 'not_interested') {
+      return this.enquiries.filter(enquiry => this.notInterestedComments.includes(enquiry.comments)).length;
+    } else if (interestType === 'no_gst') {
+      return this.enquiries.filter(enquiry => this.noGstComments.includes(enquiry.comments)).length;
+    } else if (interestType === 'gst_cancelled') {
+      return this.enquiries.filter(enquiry => this.gstCancelledComments.includes(enquiry.comments)).length;
+    } else if (interestType === 'pending') {
+      return this.enquiries.filter(enquiry => this.pendingComments.includes(enquiry.comments)).length;
+    } else if (interestType === 'unknown') {
+      return this.enquiries.filter(enquiry => this.unknownComments.includes(enquiry.comments)).length;
+    }
+    return 0;
+  }
+
+  // Add missing display methods
+  getGstFilterDisplay(): string {
+    switch (this.gstFilter) {
+      case 'yes': return 'GST Active';
+      case 'not_selected': return 'Not Selected';
+      default: return 'All';
+    }
+  }
+
+  getInterestLevelDisplay(): string {
+    switch (this.interestFilter) {
+      case 'interested': return 'Interested';
+      case 'not_interested': return 'Not Interested';
+      case 'no_gst': return 'No GST';
+      case 'gst_cancelled': return 'GST Cancelled';
+      case 'pending': return 'Pending';
+      case 'unknown': return 'Unknown';
+      default: return 'All';
+    }
+  }
+
+  // Get serial number for display
+  getSerialNumber(index: number): number {
+    return index + 1;
+  }
+
+  // Get status icon for enquiry comments
+  getStatusIcon(comment: string): string {
+    if (this.interestComments.includes(comment)) {
+      return 'check_circle';
+    } else if (this.notInterestedComments.includes(comment)) {
+      return 'cancel';
+    } else if (this.pendingComments.includes(comment)) {
+      return 'schedule';
+    } else if (this.noGstComments.includes(comment) || this.gstCancelledComments.includes(comment)) {
+      return 'error';
+    } else {
+      return 'help_outline';
+    }
+  }
+
+  // Get status color for enquiry comments
+  getStatusColor(comment: string): string {
+    if (this.interestComments.includes(comment)) {
+      return '#4caf50'; // Green
+    } else if (this.notInterestedComments.includes(comment)) {
+      return '#f44336'; // Red
+    } else if (this.pendingComments.includes(comment)) {
+      return '#ff9800'; // Orange
+    } else if (this.noGstComments.includes(comment) || this.gstCancelledComments.includes(comment)) {
+      return '#f44336'; // Red
+    } else {
+      return '#666'; // Gray
+    }
+  }
+
   showAddForm(): void {
     this.showRegistrationForm = true;
     this.registrationForm.reset();
@@ -1038,6 +1126,62 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     });
     this.isEditMode = false;
     this.editingEnquiryId = null;
+  }
+
+  // Edit enquiry method
+  editEnquiry(enquiry: Enquiry): void {
+    this.isEditMode = true;
+    this.editingEnquiryId = enquiry._id || null;
+    this.showRegistrationForm = true;
+    
+    // Split mobile number into country code and number
+    const { countryCode, number } = this.splitMobileNumber(enquiry.mobile_number);
+    
+    // Populate form with enquiry data
+    this.registrationForm.patchValue({
+      date: new Date(enquiry.date),
+      wati_name: enquiry.wati_name || '',
+      user_name: enquiry.user_name || '',
+      country_code: countryCode,
+      mobile_number: number,
+      secondary_mobile_number: enquiry.secondary_mobile_number || '',
+      gst: enquiry.gst || '',
+      gst_status: enquiry.gst_status || '',
+      business_type: enquiry.business_type || '',
+      business_nature: enquiry.business_nature || '',
+      staff: enquiry.staff || '',
+      comments: enquiry.comments || '',
+      additional_comments: enquiry.additional_comments || ''
+    });
+  }
+
+  // Delete enquiry method
+  deleteEnquiry(enquiry: Enquiry): void {
+    if (confirm(`Are you sure you want to delete the enquiry for ${enquiry.wati_name}?`)) {
+      if (enquiry._id) {
+        this.enquiryService.deleteEnquiry(enquiry._id)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: () => {
+              // Remove from local arrays
+              this.enquiries = this.enquiries.filter(e => e._id !== enquiry._id);
+              this.applyFilters();
+              
+              this.snackBar.open('Enquiry deleted successfully', 'Close', {
+                duration: 3000,
+                panelClass: ['success-snackbar']
+              });
+            },
+            error: (error) => {
+              console.error('Error deleting enquiry:', error);
+              this.snackBar.open('Error deleting enquiry', 'Close', {
+                duration: 3000,
+                panelClass: ['error-snackbar']
+              });
+            }
+          });
+      }
+    }
   }
 
   hideAddForm(): void {
@@ -1228,60 +1372,9 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     }
   }
 
-  editEnquiry(enquiry: Enquiry): void {
-    // Create a copy of the enquiry to avoid modifying the original
-    const enquiryCopy: any = { ...enquiry };
-    
-    // Ensure GST field has a value (preserve empty values)
-    if (enquiryCopy.gst === undefined || enquiryCopy.gst === null) {
-      enquiryCopy.gst = '';
-    }
-    
-    // Handle "Not Selected" case - convert back to empty string for the form
-    if (enquiryCopy.gst === 'Not Selected') {
-      enquiryCopy.gst = '';
-    }
-    
-    // Split the mobile number into country code and number for editing
-    const mobileParts = this.splitMobileNumber(enquiry.mobile_number);
-    enquiryCopy.country_code = mobileParts.countryCode;
-    enquiryCopy.mobile_number = mobileParts.number;
-    
-    // Handle secondary mobile number if it exists
-    if (enquiry.secondary_mobile_number) {
-      const secondaryParts = this.splitMobileNumber(enquiry.secondary_mobile_number);
-      enquiryCopy.secondary_mobile_number = secondaryParts.number;
-    }
-    
-    this.registrationForm.patchValue(enquiryCopy);
-    this.showRegistrationForm = true;
-    this.isEditMode = true;
-    this.editingEnquiryId = enquiry._id || null;
-  }
-
-  deleteEnquiry(enquiry: Enquiry): void {
-    if (confirm('Are you sure you want to delete this enquiry?')) {
-      this.enquiryService.deleteEnquiry(enquiry._id!)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-        next: () => {
-          this.snackBar.open('Enquiry deleted successfully!', 'Close', { duration: 3000 });
-          this.loadEnquiries();
-        },
-        error: (error) => {
-          console.error('Error deleting enquiry:', error);
-          this.snackBar.open('Error deleting enquiry', 'Close', { duration: 3000 });
-        }
-      });
-    }
-  }
 
   formatDate(date: Date): string {
     return new Date(date).toLocaleDateString('en-IN');
-  }
-
-  goBack(): void {
-    window.history.back();
   }
 
   // WhatsApp Status Methods
@@ -1518,5 +1611,88 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     // Comments should be locked if no real staff member is assigned
     // Only enable comments when a real staff member is assigned (not Public Form or WhatsApp Bot)
     return !this.isStaffAssigned(enquiry);
+  }
+
+
+  // Reset form to initial state
+  resetForm(): void {
+    this.registrationForm.reset();
+    this.registrationForm.patchValue({
+      date: new Date(),
+      country_code: '+91',
+      gst: ''
+    });
+  }
+
+  // Custom dropdown methods
+  toggleDropdown(dropdownId: string): void {
+    if (this.openDropdownId === dropdownId) {
+      this.openDropdownId = null;
+    } else {
+      this.openDropdownId = dropdownId;
+    }
+  }
+
+  isDropdownOpen(dropdownId: string): boolean {
+    return this.openDropdownId === dropdownId;
+  }
+
+  closeDropdown(): void {
+    this.openDropdownId = null;
+  }
+
+  // Country Code dropdown methods
+  getSelectedCountry(): any {
+    const countryCode = this.registrationForm.get('country_code')?.value;
+    return this.countryCodes.find(country => country.code === countryCode);
+  }
+
+  selectCountryCode(code: string): void {
+    this.registrationForm.patchValue({ country_code: code });
+    this.closeDropdown();
+  }
+
+  // Business Type dropdown methods
+  selectBusinessType(type: string): void {
+    this.registrationForm.patchValue({ business_type: type });
+    this.closeDropdown();
+  }
+
+  // GST dropdown methods
+  selectGst(value: string): void {
+    this.registrationForm.patchValue({ gst: value });
+    // Clear GST status if GST is not Yes
+    if (value !== 'Yes') {
+      this.registrationForm.patchValue({ gst_status: '' });
+    }
+    this.closeDropdown();
+  }
+
+  // GST Status dropdown methods
+  selectGstStatus(status: string): void {
+    this.registrationForm.patchValue({ gst_status: status });
+    this.closeDropdown();
+  }
+
+  // Staff dropdown methods
+  selectStaff(staff: string): void {
+    this.registrationForm.patchValue({ staff: staff });
+    this.closeDropdown();
+  }
+
+  // Comments dropdown methods
+  selectComment(comment: string): void {
+    this.registrationForm.patchValue({ comments: comment });
+    this.closeDropdown();
+  }
+
+  // Close dropdown when clicking outside
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    const target = event.target as HTMLElement;
+    // Check if the click is outside any dropdown
+    if (!target.closest('.relative')) {
+      this.closeDropdown();
+    }
   }
 }

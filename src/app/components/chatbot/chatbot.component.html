@@ -1,76 +1,211 @@
-<div class="chatbot-wrapper" [class.minimized]="isMinimized" *ngIf="isVisible">
-  <!-- Chatbot Header -->
-  <div class="chatbot-header" (click)="toggleMinimize()">
-    <div class="header-left">
-      <mat-icon class="chatbot-logo">auto_awesome</mat-icon>
-      <span class="chatbot-title">TMIS AI Assistant</span>
-    </div>
-    <div class="header-right">
-      <button mat-icon-button (click)="clearChat(); $event.stopPropagation()" matTooltip="Clear Chat">
-        <mat-icon>refresh</mat-icon>
-      </button>
-      <button mat-icon-button (click)="closeChatbot(); $event.stopPropagation()" matTooltip="Close">
-        <mat-icon>close</mat-icon>
-      </button>
-      <button mat-icon-button matTooltip="Minimize/Maximize">
-        <mat-icon>{{ isMinimized ? 'expand_more' : 'expand_less' }}</mat-icon>
-      </button>
-    </div>
-  </div>
-
-  <!-- Chatbot Body -->
-  <div class="chatbot-body" *ngIf="!isMinimized">
-    <!-- Quick Actions -->
-    <div class="quick-actions">
-      <button mat-stroked-button color="primary" (click)="askAboutEnquiries()" [disabled]="isLoading">
-        <mat-icon>assignment</mat-icon> Enquiry Stats
-      </button>
-      <button mat-stroked-button color="primary" (click)="askAboutClients()" [disabled]="isLoading">
-        <mat-icon>people</mat-icon> Client Stats
-      </button>
-    </div>
-
-    <!-- Messages Container -->
-    <div class="messages-container" #messagesContainer (scroll)="onScroll()">
-      <div *ngFor="let message of messages" 
-           class="message" 
-           [class.user]="message.isUser" 
-           [class.ai]="!message.isUser">
-        <div class="avatar">
-          <mat-icon *ngIf="message.isUser">person</mat-icon>
-          <mat-icon *ngIf="!message.isUser" class="ai-avatar">auto_awesome</mat-icon>
+<!-- Modern AI Chatbot -->
+<div class="fixed bottom-4 right-4 z-50 w-96 max-w-[calc(100vw-2rem)] transition-all duration-300 ease-in-out" 
+     [ngClass]="{
+       'h-16': isMinimized,
+       'h-[500px]': !isMinimized
+     }" 
+     *ngIf="isVisible">
+  
+  <!-- Chatbot Container -->
+  <div class="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden h-full flex flex-col">
+    
+    <!-- Chatbot Header -->
+    <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-3 cursor-pointer select-none" 
+         (click)="toggleMinimize()">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center animate-pulse">
+            <mat-icon class="text-white text-lg">auto_awesome</mat-icon>
+          </div>
+          <div>
+            <h3 class="text-white font-semibold text-sm">TMIS AI Assistant</h3>
+            <div class="flex items-center gap-1">
+              <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span class="text-white/80 text-xs">Online</span>
+            </div>
+          </div>
         </div>
-        <div class="bubble">
-          <div class="text" [innerHTML]="formatMessage(message.message)"></div>
-          <div class="timestamp">{{ message.timestamp | date:'shortTime' }}</div>
-          <mat-spinner *ngIf="message.isLoading" diameter="16"></mat-spinner>
+        
+        <div class="flex items-center gap-1">
+          <button mat-icon-button 
+                  (click)="clearChat(); $event.stopPropagation()" 
+                  class="text-white/80 hover:text-white hover:bg-white/10 transition-colors duration-200 w-8 h-8"
+                  matTooltip="Clear Chat">
+            <mat-icon class="text-lg">refresh</mat-icon>
+          </button>
+          <button mat-icon-button 
+                  (click)="closeChatbot(); $event.stopPropagation()" 
+                  class="text-white/80 hover:text-white hover:bg-white/10 transition-colors duration-200 w-8 h-8"
+                  matTooltip="Close">
+            <mat-icon class="text-lg">close</mat-icon>
+          </button>
+          <button mat-icon-button 
+                  class="text-white/80 hover:text-white hover:bg-white/10 transition-colors duration-200 w-8 h-8"
+                  matTooltip="Minimize/Maximize">
+            <mat-icon class="text-lg transition-transform duration-200" 
+                      [ngClass]="{'rotate-180': isMinimized}">expand_less</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chatbot Body -->
+    <div class="flex-1 flex flex-col" *ngIf="!isMinimized">
+      <!-- Quick Actions -->
+      <div class="p-3 border-b border-gray-100 bg-gray-50">
+        <div class="flex gap-2">
+          <button mat-stroked-button 
+                  (click)="askAboutEnquiries()" 
+                  [disabled]="isLoading"
+                  class="flex-1 border-indigo-200 text-indigo-600 hover:bg-indigo-50 disabled:opacity-50 text-xs py-2 px-3 rounded-lg transition-all duration-200">
+            <mat-icon class="text-sm mr-1">assignment</mat-icon>
+            Enquiry Stats
+          </button>
+          <button mat-stroked-button 
+                  (click)="askAboutClients()" 
+                  [disabled]="isLoading"
+                  class="flex-1 border-purple-200 text-purple-600 hover:bg-purple-50 disabled:opacity-50 text-xs py-2 px-3 rounded-lg transition-all duration-200">
+            <mat-icon class="text-sm mr-1">people</mat-icon>
+            Client Stats
+          </button>
         </div>
       </div>
 
-      <!-- Scroll to bottom button -->
-      <button *ngIf="showScrollButton" mat-fab color="primary" class="scroll-btn" (click)="scrollToBottom()" matTooltip="Scroll to bottom">
-        <mat-icon>keyboard_arrow_down</mat-icon>
-      </button>
-    </div>
+      <!-- Messages Container -->
+      <div class="flex-1 overflow-y-auto p-3 space-y-3 bg-gradient-to-b from-gray-50 to-white relative min-h-0 scrollbar-thin scrollbar-thumb-indigo-300 scrollbar-track-gray-100" 
+           #messagesContainer 
+           (scroll)="onScroll()"
+           style="scrollbar-width: thin; scrollbar-color: #a5b4fc #f3f4f6;">
+        
+        <div *ngFor="let message of messages" 
+             class="flex gap-3 animate-fadeIn"
+             [ngClass]="{
+               'justify-end': message.isUser,
+               'justify-start': !message.isUser
+             }">
+          
+          <!-- Avatar -->
+          <div *ngIf="!message.isUser" 
+               class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
+            <mat-icon class="text-white text-sm">auto_awesome</mat-icon>
+          </div>
+          
+          <!-- Message Bubble -->
+          <div class="max-w-[80%] group">
+            <div class="relative"
+                 [ngClass]="{
+                   'bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-2xl rounded-br-md': message.isUser,
+                   'bg-white border border-gray-200 text-gray-800 rounded-2xl rounded-bl-md shadow-sm': !message.isUser
+                 }">
+              
+              <!-- Message Content -->
+              <div class="px-4 py-3">
+                <div class="text-sm leading-relaxed" 
+                     [innerHTML]="formatMessage(message.message)"></div>
+                
+                <!-- Loading Spinner -->
+                <div *ngIf="message.isLoading" class="flex items-center gap-2 mt-2">
+                  <mat-spinner diameter="16"></mat-spinner>
+                  <span class="text-xs opacity-70">AI is thinking...</span>
+                </div>
+              </div>
+              
+              <!-- Timestamp -->
+              <div class="px-4 pb-2">
+                <div class="text-xs opacity-70" 
+                     [ngClass]="{
+                       'text-white/70': message.isUser,
+                       'text-gray-500': !message.isUser
+                     }">
+                  {{ message.timestamp | date:'shortTime' }}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- User Avatar -->
+          <div *ngIf="message.isUser" 
+               class="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
+            <mat-icon class="text-white text-sm">person</mat-icon>
+          </div>
+        </div>
 
-    <!-- Input Area -->
-    <div class="input-area">
-      <mat-form-field appearance="outline" class="message-input">
-        <mat-label>Ask me anything about your business data...</mat-label>
-        <textarea matInput [(ngModel)]="currentMessage" (keydown)="onKeyPress($event)"
-          [disabled]="isLoading" rows="2" maxlength="1000"
-          placeholder="e.g., 'How many enquiries?', 'GST: 22AAAAA0000A1Z5'">
-        </textarea>
-        <mat-hint align="end">{{ currentMessage.length }}/1000</mat-hint>
-      </mat-form-field>
-      <button mat-fab color="primary" (click)="sendMessage()" 
-              [disabled]="!currentMessage.trim() || isLoading" class="send-button">
-        <mat-icon *ngIf="!isLoading">send</mat-icon>
-        <mat-spinner *ngIf="isLoading" diameter="24"></mat-spinner>
-      </button>
+        <!-- Scroll Indicators -->
+        <div class="absolute top-0 left-0 right-0 h-4 bg-gradient-to-b from-gray-200 to-transparent pointer-events-none opacity-50" 
+             *ngIf="!isAtTop()"></div>
+        
+        <div class="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-gray-200 to-transparent pointer-events-none opacity-50" 
+             *ngIf="showScrollButton"></div>
+        
+        <!-- Scroll to bottom button -->
+        <button *ngIf="showScrollButton" 
+                (click)="scrollToBottom()" 
+                class="absolute bottom-2 right-2 w-8 h-8 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 transform hover:scale-110 z-10"
+                matTooltip="Scroll to bottom">
+          <mat-icon class="text-sm">keyboard_arrow_down</mat-icon>
+        </button>
+      </div>
+
+      <!-- Enhanced Input Area -->
+      <div class="border-t border-gray-200 bg-gradient-to-r from-white to-gray-50 p-3 flex-shrink-0">
+        <div class="flex gap-2 items-end">
+          <div class="flex-1">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Type your message...</mat-label>
+              <textarea matInput 
+                        [(ngModel)]="currentMessage" 
+                        (keydown)="onKeyPress($event)"
+                        [disabled]="isLoading" 
+                        rows="1" 
+                        maxlength="1000"
+                        class="resize-none text-sm"
+                        placeholder="Ask about enquiries, clients, or search by GST/mobile..."
+                        style="min-height: 40px;">
+              </textarea>
+              <mat-hint align="end" class="text-xs text-gray-500">
+                <span [ngClass]="{'text-orange-500': currentMessage.length > 800, 'text-red-500': currentMessage.length > 950}">
+                  {{ currentMessage.length }}/1000
+                </span>
+              </mat-hint>
+              <mat-icon matSuffix class="text-gray-400 cursor-pointer" 
+                        *ngIf="currentMessage.length > 0 && !isLoading"
+                        (click)="currentMessage = ''"
+                        matTooltip="Clear message">clear</mat-icon>
+            </mat-form-field>
+          </div>
+          
+          <!-- Send Button -->
+          <button mat-fab 
+                  (click)="sendMessage()" 
+                  [disabled]="!currentMessage.trim() || isLoading"
+                  class="bg-gradient-to-br from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 disabled:transform-none w-10 h-10 flex-shrink-0"
+                  matTooltip="Send message (Enter)">
+            <mat-icon *ngIf="!isLoading" class="text-white text-lg">send</mat-icon>
+            <mat-spinner *ngIf="isLoading" diameter="20" class="text-white"></mat-spinner>
+          </button>
+        </div>
+        
+        <!-- Quick Suggestions -->
+        <div class="flex flex-wrap gap-1 mt-2" *ngIf="!isLoading && currentMessage.length === 0">
+          <button class="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded-full hover:bg-indigo-100 transition-colors duration-200"
+                  (click)="currentMessage = 'How many enquiries do we have?'">
+            📊 Enquiry Count
+          </button>
+          <button class="text-xs bg-purple-50 text-purple-600 px-2 py-1 rounded-full hover:bg-purple-100 transition-colors duration-200"
+                  (click)="currentMessage = 'Show client statistics'">
+            👥 Client Stats
+          </button>
+          <button class="text-xs bg-green-50 text-green-600 px-2 py-1 rounded-full hover:bg-green-100 transition-colors duration-200"
+                  (click)="currentMessage = 'GST: '">
+            🔍 Search GST
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
 <!-- Mobile Backdrop -->
-<div class="chatbot-backdrop" *ngIf="!isMinimized" (click)="toggleMinimize()"></div>
+<div class="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 md:hidden" 
+     *ngIf="!isMinimized && isVisible" 
+     (click)="toggleMinimize()"></div>

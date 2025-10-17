@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -8,7 +8,7 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, OnDestroy {
   loginForm!: FormGroup;
   loading = false;
   error = '';
@@ -18,7 +18,7 @@ export class LoginComponent implements OnInit {
   checkingStatus = false;
   statusMessage = '';
   statusError = '';
-  showStatusCheck = false;
+  private emailCheckTimeout: any;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -98,22 +98,36 @@ export class LoginComponent implements OnInit {
       });
   }
 
-  // Toggle registration status check section
-  toggleStatusCheck(): void {
-    this.showStatusCheck = !this.showStatusCheck;
+  // Automatic email change handler with debouncing
+  onEmailChange(event: any): void {
+    const email = event.target.value;
+    
+    // Clear previous timeout
+    if (this.emailCheckTimeout) {
+      clearTimeout(this.emailCheckTimeout);
+    }
+    
+    // Clear status messages when email is being typed
     this.statusMessage = '';
     this.statusError = '';
+    
+    // Only check if email is valid and has content
+    if (email && this.isValidEmail(email)) {
+      // Debounce the API call by 1 second
+      this.emailCheckTimeout = setTimeout(() => {
+        this.checkRegistrationStatus(email);
+      }, 1000);
+    }
+  }
+  
+  // Helper method to validate email format
+  private isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   }
 
-  // Check registration status
-  checkRegistrationStatus(): void {
-    const email = this.loginForm.get('email')?.value;
-    
-    if (!email) {
-      this.statusError = 'Please enter your email address first';
-      return;
-    }
-
+  // Check registration status for given email
+  private checkRegistrationStatus(email: string): void {
     this.checkingStatus = true;
     this.statusMessage = '';
     this.statusError = '';
@@ -143,5 +157,12 @@ export class LoginComponent implements OnInit {
         }
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    // Clean up timeout to prevent memory leaks
+    if (this.emailCheckTimeout) {
+      clearTimeout(this.emailCheckTimeout);
+    }
   }
 }

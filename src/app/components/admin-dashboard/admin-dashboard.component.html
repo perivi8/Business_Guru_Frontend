@@ -1,355 +1,517 @@
-<div class="container">
-  <!-- Loading Spinner -->
-  <div *ngIf="loading" class="loading-container">
-    <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
-    <p>Loading dashboard data...</p>
-  </div>
-
-  <!-- Dashboard Content -->
-  <div *ngIf="!loading">
-
-    <!-- Stats Cards -->
-    <div class="stats-grid">
-      <mat-card class="stat-card">
-        <mat-card-content>
-          <div class="stat-content">
-            <mat-icon class="stat-icon total">people</mat-icon>
-            <div class="stat-info">
-              <h3>{{ stats.totalClients }}</h3>
-              <p>Total Clients</p>
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-
-      <mat-card class="stat-card">
-        <mat-card-content>
-          <div class="stat-content">
-            <mat-icon class="stat-icon today">today</mat-icon>
-            <div class="stat-info">
-              <h3>{{ todayStats.newClientsToday }}</h3>
-              <p>Today New Clients</p>
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-
-      <mat-card class="stat-card">
-        <mat-card-content>
-          <div class="stat-content">
-            <mat-icon class="stat-icon pending">schedule</mat-icon>
-            <div class="stat-info">
-              <h3>{{ stats.pendingClients }}</h3>
-              <p>Pending Review</p>
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-
-      <mat-card class="stat-card">
-        <mat-card-content>
-          <div class="stat-content">
-            <mat-icon class="stat-icon interested">check_circle</mat-icon>
-            <div class="stat-info">
-              <h3>{{ stats.interestedClients }}</h3>
-              <p>Interested</p>
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-
-      <mat-card class="stat-card">
-        <mat-card-content>
-          <div class="stat-content">
-            <mat-icon class="stat-icon not-interested">cancel</mat-icon>
-            <div class="stat-info">
-              <h3>{{ stats.notInterestedClients }}</h3>
-              <p>Not Interested</p>
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-
-      <mat-card class="stat-card">
-        <mat-card-content>
-          <div class="stat-content">
-            <mat-icon class="stat-icon hold">pause</mat-icon>
-            <div class="stat-info">
-              <h3>{{ stats.onHoldClients }}</h3>
-              <p>On Hold</p>
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-
-      <mat-card class="stat-card">
-        <mat-card-content>
-          <div class="stat-content">
-            <mat-icon class="stat-icon processing">hourglass_empty</mat-icon>
-            <div class="stat-info">
-              <h3>{{ stats.processingClients }}</h3>
-              <p>Processing</p>
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-
-      <mat-card class="stat-card">
-        <mat-card-content>
-          <div class="stat-content">
-            <mat-icon class="stat-icon total" style="color: #673ab7;" >group</mat-icon>
-            <div class="stat-info">
-              <h3>{{ stats.totalTeam }}</h3>
-              <p>Total Team</p>
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
+<!-- Modern Admin Dashboard -->
+<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- Loading Spinner -->
+    <div *ngIf="loading" class="flex flex-col items-center justify-center py-16">
+      <mat-progress-spinner mode="indeterminate" diameter="50" class="mb-4"></mat-progress-spinner>
+      <p class="text-gray-600 font-medium">Loading dashboard data...</p>
     </div>
 
-    <!-- User Client Counts -->
-    <mat-card class="user-stats-card" *ngIf="todayStats.userClientCounts.length > 0">
-      <mat-card-header>
-        <mat-card-title>Today's Client Additions by User</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="user-stats-list">
-          <div class="user-stat-item" *ngFor="let userStat of todayStats.userClientCounts">
-            <div class="user-info">
-              <mat-icon class="user-icon">person</mat-icon>
-              <span class="username">{{ userStat.username }}</span>
+    <!-- Dashboard Content -->
+    <div *ngIf="!loading" class="space-y-8">
+
+      <!-- Stats Cards Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Total Clients Card -->
+        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 group">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-blue-100 text-sm font-medium">Total Clients</p>
+              <h3 class="text-3xl font-bold mt-1">{{ stats.totalClients }}</h3>
             </div>
-            <div class="client-count">
-              <span class="count-badge">{{ userStat.count }}</span>
-              <span class="count-label">client{{ userStat.count > 1 ? 's' : '' }}</span>
+            <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+              <mat-icon class="text-2xl">people</mat-icon>
             </div>
           </div>
         </div>
-      </mat-card-content>
-    </mat-card>
 
-    <!-- Report 1: Weekly Client Additions Chart -->
-    <mat-card class="report-card">
-      <mat-card-header>
-        <div class="header-content">
-          <div class="title-section">
-            <mat-card-title>
-              <mat-icon>show_chart</mat-icon>
-              Weekly Client Additions
-            </mat-card-title>
-            <mat-card-subtitle>{{ getSelectedWeekSubtitle() }}</mat-card-subtitle>
+        <!-- Today New Clients Card -->
+        <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 group">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-green-100 text-sm font-medium">Today New Clients</p>
+              <h3 class="text-3xl font-bold mt-1">{{ todayStats.newClientsToday }}</h3>
+            </div>
+            <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+              <mat-icon class="text-2xl">today</mat-icon>
+            </div>
           </div>
-          <div class="filter-section">
-            <mat-form-field appearance="outline" class="week-selector">
-              <mat-label>Select Week</mat-label>
-              <mat-select [(value)]="selectedWeekOption" (selectionChange)="onWeekSelectionChange()">
-                <mat-option value="current">Current Week</mat-option>
-                <mat-option value="last1">Last Week</mat-option>
-                <mat-option value="last2">2 Weeks Ago</mat-option>
-                <mat-option value="last3">3 Weeks Ago</mat-option>
-                <mat-option value="last4">4 Weeks Ago</mat-option>
-                <mat-option value="custom">Custom Range</mat-option>
-              </mat-select>
-            </mat-form-field>
+        </div>
+
+        <!-- Pending Review Card -->
+        <div class="bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 group">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-yellow-100 text-sm font-medium">Pending Review</p>
+              <h3 class="text-3xl font-bold mt-1">{{ stats.pendingClients }}</h3>
+            </div>
+            <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+              <mat-icon class="text-2xl">schedule</mat-icon>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interested Card -->
+        <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 group">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-emerald-100 text-sm font-medium">Interested</p>
+              <h3 class="text-3xl font-bold mt-1">{{ stats.interestedClients }}</h3>
+            </div>
+            <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+              <mat-icon class="text-2xl">check_circle</mat-icon>
+            </div>
+          </div>
+        </div>
+
+        <!-- Not Interested Card -->
+        <div class="bg-gradient-to-br from-red-500 to-pink-600 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 group">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-red-100 text-sm font-medium">Not Interested</p>
+              <h3 class="text-3xl font-bold mt-1">{{ stats.notInterestedClients }}</h3>
+            </div>
+            <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+              <mat-icon class="text-2xl">cancel</mat-icon>
+            </div>
+          </div>
+        </div>
+
+        <!-- On Hold Card -->
+        <div class="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 group">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-purple-100 text-sm font-medium">On Hold</p>
+              <h3 class="text-3xl font-bold mt-1">{{ stats.onHoldClients }}</h3>
+            </div>
+            <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+              <mat-icon class="text-2xl">pause</mat-icon>
+            </div>
+          </div>
+        </div>
+
+        <!-- Processing Card -->
+        <div class="bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 group">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-cyan-100 text-sm font-medium">Processing</p>
+              <h3 class="text-3xl font-bold mt-1">{{ stats.processingClients }}</h3>
+            </div>
+            <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+              <mat-icon class="text-2xl">hourglass_empty</mat-icon>
+            </div>
+          </div>
+        </div>
+
+        <!-- Total Team Card -->
+        <div class="bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 group">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-violet-100 text-sm font-medium">Total Team</p>
+              <h3 class="text-3xl font-bold mt-1">{{ stats.totalTeam }}</h3>
+            </div>
+            <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+              <mat-icon class="text-2xl">group</mat-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Today's User Performance -->
+      <div *ngIf="todayStats.userClientCounts.length > 0" class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+        <div class="bg-gradient-to-r from-indigo-50 to-purple-50 px-6 py-4 border-b border-gray-200">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
+              <mat-icon class="text-indigo-600 text-lg">today</mat-icon>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900">Today's Client Additions by User</h3>
+          </div>
+        </div>
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div *ngFor="let userStat of todayStats.userClientCounts" 
+                 class="bg-gradient-to-br from-gray-50 to-white rounded-lg p-4 border border-gray-200 hover:shadow-md transition-all duration-200">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                    {{ userStat.username.charAt(0).toUpperCase() }}
+                  </div>
+                  <span class="font-medium text-gray-900">{{ userStat.username }}</span>
+                </div>
+                <div class="text-right">
+                  <div class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-bold">
+                    {{ userStat.count }}
+                  </div>
+                  <p class="text-xs text-gray-500 mt-1">client{{ userStat.count > 1 ? 's' : '' }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Report 1: Weekly Client Additions Chart -->
+      <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
+          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                <mat-icon class="text-blue-600 text-lg">show_chart</mat-icon>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900">Weekly Client Additions</h3>
+                <p class="text-sm text-gray-600">{{ getSelectedWeekSubtitle() }}</p>
+              </div>
+            </div>
             
-            <!-- Custom Date Range (shown when custom is selected) -->
-            <div class="custom-range" *ngIf="selectedWeekOption === 'custom'">
-              <mat-form-field appearance="outline" class="date-picker">
-                <mat-label>Start Date</mat-label>
-                <input matInput [matDatepicker]="startPicker" [(ngModel)]="customStartDate" (dateChange)="onCustomDateChange()">
-                <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
-                <mat-datepicker #startPicker></mat-datepicker>
-              </mat-form-field>
-              
-              <mat-form-field appearance="outline" class="date-picker">
-                <mat-label>End Date</mat-label>
-                <input matInput [matDatepicker]="endPicker" [(ngModel)]="customEndDate" (dateChange)="onCustomDateChange()">
-                <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
-                <mat-datepicker #endPicker></mat-datepicker>
-              </mat-form-field>
+            <!-- Select Week Dropdown -->
+            <div class="w-48">
+              <label class="block text-xs font-medium text-gray-600 mb-2 uppercase tracking-wide">Select Week</label>
+              <div class="relative">
+                <button type="button"
+                        (click)="toggleWeekDropdown()"
+                        class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2.5 text-left text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors shadow-sm"
+                        [class.border-blue-500]="isWeekDropdownOpen"
+                        [class.ring-2]="isWeekDropdownOpen"
+                        [class.ring-blue-500]="isWeekDropdownOpen">
+                  <span class="block truncate text-gray-700">
+                    {{ getSelectedWeekLabel() }}
+                  </span>
+                  <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                    <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                         [class.rotate-180]="isWeekDropdownOpen"
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </span>
+                </button>
+                
+                <!-- Dropdown Options -->
+                <div *ngIf="isWeekDropdownOpen"
+                     class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  <button type="button"
+                          (click)="selectWeekOption('current')"
+                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
+                          [class.bg-blue-50]="selectedWeekOption === 'current'"
+                          [class.text-blue-600]="selectedWeekOption === 'current'">
+                    Current Week
+                  </button>
+                  <button type="button"
+                          (click)="selectWeekOption('last1')"
+                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
+                          [class.bg-blue-50]="selectedWeekOption === 'last1'"
+                          [class.text-blue-600]="selectedWeekOption === 'last1'">
+                    Last Week
+                  </button>
+                  <button type="button"
+                          (click)="selectWeekOption('last2')"
+                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
+                          [class.bg-blue-50]="selectedWeekOption === 'last2'"
+                          [class.text-blue-600]="selectedWeekOption === 'last2'">
+                    2 Weeks Ago
+                  </button>
+                  <button type="button"
+                          (click)="selectWeekOption('last3')"
+                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
+                          [class.bg-blue-50]="selectedWeekOption === 'last3'"
+                          [class.text-blue-600]="selectedWeekOption === 'last3'">
+                    3 Weeks Ago
+                  </button>
+                  <button type="button"
+                          (click)="selectWeekOption('last4')"
+                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
+                          [class.bg-blue-50]="selectedWeekOption === 'last4'"
+                          [class.text-blue-600]="selectedWeekOption === 'last4'">
+                    4 Weeks Ago
+                  </button>
+                  <button type="button"
+                          (click)="selectWeekOption('custom')"
+                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
+                          [class.bg-blue-50]="selectedWeekOption === 'custom'"
+                          [class.text-blue-600]="selectedWeekOption === 'custom'">
+                    Custom Range
+                  </button>
+                </div>
+              </div>
             </div>
-            
-            <!-- Quick Actions -->
-            <div class="quick-actions">
-              <button mat-icon-button matTooltip="Refresh Data" (click)="refreshWeeklyData()">
-                <mat-icon>refresh</mat-icon>
-              </button>
-              <button mat-icon-button matTooltip="Compare with Previous Week" (click)="toggleComparison()">
-                <mat-icon>compare_arrows</mat-icon>
-              </button>
-            </div>
-          </div>
-        </div>
-      </mat-card-header>
-      <mat-card-content>
-        <!-- Week Comparison Banner (if comparison is enabled) -->
-        <div class="comparison-banner" *ngIf="showComparison">
-          <div class="comparison-stats">
-            <div class="stat-item">
-              <span class="label">Selected Week:</span>
-              <span class="value">{{ getSelectedWeekTotal() }}</span>
-            </div>
-            <div class="stat-item">
-              <span class="label">Previous Week:</span>
-              <span class="value">{{ getPreviousWeekTotal() }}</span>
-            </div>
-            <div class="stat-item" [class]="getComparisonClass()">
-              <mat-icon>{{ getComparisonIcon() }}</mat-icon>
-              <span class="change">{{ getWeeklyChange() }}%</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Weekly Summary Cards -->
-        <div class="weekly-summary">
-          <div class="summary-card">
-            <mat-icon>today</mat-icon>
-            <div class="summary-info">
-              <h3>{{ getSelectedWeekTotal() }}</h3>
-              <p>{{ getSelectedWeekLabel() }} Total</p>
-            </div>
-          </div>
-          <div class="summary-card">
-            <mat-icon>trending_up</mat-icon>
-            <div class="summary-info">
-              <h3>{{ getSelectedWeekAverage() | number:'1.1-1' }}</h3>
-              <p>Daily Average</p>
-            </div>
-          </div>
-          <div class="summary-card" *ngIf="showComparison">
-            <mat-icon [class]="getComparisonClass()">{{ getComparisonIcon() }}</mat-icon>
-            <div class="summary-info">
-              <h3 [class]="getComparisonClass()">{{ getWeeklyChange() }}%</h3>
-              <p>Week Change</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Weekly Line Chart -->
-        <div class="weekly-chart-container">
-          <div class="chart-wrapper">
-            <canvas #weeklyChart class="weekly-line-chart" data-chart="weekly" width="600" height="300"></canvas>
           </div>
           
-          <!-- Chart Legend/Info -->
-          <div class="chart-info">
-            <div class="info-item">
-              <div class="color-indicator today"></div>
-              <span>Today</span>
-            </div>
-            <div class="info-item">
-              <div class="color-indicator regular"></div>
-              <span>Working Days</span>
-            </div>
-            <div class="info-item">
-              <div class="color-indicator holiday"></div>
-              <span>Holiday</span>
-            </div>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Report 2: Client Status Report -->
-    <mat-card class="report-card" id="client-status-report">
-      <mat-card-header>
-        <mat-card-title>
-          <mat-icon>pie_chart</mat-icon>
-          Report 2: Client Status Report
-        </mat-card-title>
-        <mat-card-subtitle>Status breakdown: Interested, Not Interested, Hold, Pending, Processing</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <!-- 3D Pie Chart -->
-        <div class="status-chart-container">
-          <h3>Client Status Distribution</h3>
-          <div class="pie-chart-wrapper">
-            <div class="chart-container">
-              <canvas #statusChart class="status-pie-chart" data-chart="status" width="400" height="400"></canvas>
+          <!-- Custom Date Range -->
+          <div *ngIf="selectedWeekOption === 'custom'" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Start Date -->
+            <div class="flex-1">
+              <label class="block text-xs font-medium text-gray-600 mb-2 uppercase tracking-wide">Start Date</label>
+              <div class="relative">
+                <input type="date" 
+                       [(ngModel)]="customStartDate" 
+                       (change)="onCustomDateChange()"
+                       class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors shadow-sm">
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                </div>
+              </div>
             </div>
             
-            <!-- Chart Statistics -->
-            <div class="chart-stats">
-              <div class="stat-item">
-                <mat-icon>assessment</mat-icon>
-                <div class="stat-info">
-                  <span class="stat-value">{{ getStatusTotal() }}</span>
-                  <span class="stat-label">Total Clients</span>
-                </div>
-              </div>
-              <div class="stat-item">
-                <mat-icon>trending_up</mat-icon>
-                <div class="stat-info">
-                  <span class="stat-value">{{ getHighestStatusPercentage() }}%</span>
-                  <span class="stat-label">Highest Category</span>
+            <!-- End Date -->
+            <div class="flex-1">
+              <label class="block text-xs font-medium text-gray-600 mb-2 uppercase tracking-wide">End Date</label>
+              <div class="relative">
+                <input type="date" 
+                       [(ngModel)]="customEndDate" 
+                       (change)="onCustomDateChange()"
+                       class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors shadow-sm">
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </mat-card-content>
-    </mat-card>
+        
+        <div class="p-6">
+          <!-- Week Comparison Banner -->
+          <div *ngIf="showComparison" class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-4 mb-6 border border-purple-200">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="text-center">
+                <p class="text-sm text-gray-600">Selected Week</p>
+                <p class="text-2xl font-bold text-purple-600">{{ getSelectedWeekTotal() }}</p>
+              </div>
+              <div class="text-center">
+                <p class="text-sm text-gray-600">Previous Week</p>
+                <p class="text-2xl font-bold text-blue-600">{{ getPreviousWeekTotal() }}</p>
+              </div>
+              <div class="text-center">
+                <div class="flex items-center justify-center gap-2">
+                  <mat-icon [ngClass]="{
+                    'text-green-600': getWeeklyChange() > 0,
+                    'text-red-600': getWeeklyChange() < 0,
+                    'text-gray-600': getWeeklyChange() === 0
+                  }">{{ getComparisonIcon() }}</mat-icon>
+                  <p class="text-2xl font-bold" [ngClass]="{
+                    'text-green-600': getWeeklyChange() > 0,
+                    'text-red-600': getWeeklyChange() < 0,
+                    'text-gray-600': getWeeklyChange() === 0
+                  }">{{ getWeeklyChange() }}%</p>
+                </div>
+                <p class="text-sm text-gray-600">Change</p>
+              </div>
+            </div>
+          </div>
 
-    <!-- Report 3: Team Performance Report -->
-    <mat-card class="report-card">
-      <mat-card-header>
-        <mat-card-title>
-          <mat-icon>group</mat-icon>
-          Report 3: Team Performance Report
-        </mat-card-title>
-        <mat-card-subtitle>Individual team member client addition statistics</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="team-performance">
+          <!-- Weekly Summary Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <mat-icon class="text-blue-600">today</mat-icon>
+                </div>
+                <div>
+                  <h3 class="text-2xl font-bold text-blue-600">{{ getSelectedWeekTotal() }}</h3>
+                  <p class="text-sm text-gray-600">{{ getSelectedWeekLabel() }} Total</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                  <mat-icon class="text-green-600">trending_up</mat-icon>
+                </div>
+                <div>
+                  <h3 class="text-2xl font-bold text-green-600">{{ getSelectedWeekAverage() | number:'1.1-1' }}</h3>
+                  <p class="text-sm text-gray-600">Daily Average</p>
+                </div>
+              </div>
+            </div>
+            
+            <div *ngIf="showComparison" class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-4 border border-purple-200">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <mat-icon class="text-purple-600" [ngClass]="{
+                    'text-green-600': getWeeklyChange() > 0,
+                    'text-red-600': getWeeklyChange() < 0
+                  }">{{ getComparisonIcon() }}</mat-icon>
+                </div>
+                <div>
+                  <h3 class="text-2xl font-bold" [ngClass]="{
+                    'text-green-600': getWeeklyChange() > 0,
+                    'text-red-600': getWeeklyChange() < 0,
+                    'text-purple-600': getWeeklyChange() === 0
+                  }">{{ getWeeklyChange() }}%</h3>
+                  <p class="text-sm text-gray-600">Week Change</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Weekly Line Chart -->
+          <div class="bg-gray-50 rounded-lg p-6">
+            <div class="mb-4">
+              <canvas #weeklyChart class="w-full h-80" data-chart="weekly" width="600" height="300"></canvas>
+            </div>
+            
+            <!-- Chart Legend -->
+            <div class="flex flex-wrap justify-center gap-6 pt-4 border-t border-gray-200">
+              <div class="flex items-center gap-2">
+                <div class="w-4 h-4 bg-blue-500 rounded-full"></div>
+                <span class="text-sm text-gray-600">Today</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <div class="w-4 h-4 bg-green-500 rounded-full"></div>
+                <span class="text-sm text-gray-600">Working Days</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <div class="w-4 h-4 bg-red-500 rounded-full"></div>
+                <span class="text-sm text-gray-600">Holiday</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Report 2: Client Status Report -->
+      <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden" id="client-status-report">
+        <div class="bg-gradient-to-r from-green-50 to-emerald-50 px-6 py-4 border-b border-gray-200">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+              <mat-icon class="text-green-600 text-lg">pie_chart</mat-icon>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900">Client Status Report</h3>
+              <p class="text-sm text-gray-600">Status breakdown: Interested, Not Interested, Hold, Pending, Processing</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="p-6">
+          <div class="mb-6">
+            <h4 class="text-lg font-semibold text-gray-900 mb-4">Client Status Distribution</h4>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+              <!-- Pie Chart -->
+              <div class="flex justify-center">
+                <div class="bg-gray-50 rounded-lg p-6">
+                  <canvas #statusChart class="max-w-full h-auto" data-chart="status" width="400" height="400"></canvas>
+                </div>
+              </div>
+              
+              <!-- Chart Statistics -->
+              <div class="space-y-4">
+                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <mat-icon class="text-blue-600">assessment</mat-icon>
+                    </div>
+                    <div>
+                      <p class="text-2xl font-bold text-blue-600">{{ getStatusTotal() }}</p>
+                      <p class="text-sm text-gray-600">Total Clients</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-4 border border-purple-200">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                      <mat-icon class="text-purple-600">trending_up</mat-icon>
+                    </div>
+                    <div>
+                      <p class="text-2xl font-bold text-purple-600">{{ getHighestStatusPercentage() }}%</p>
+                      <p class="text-sm text-gray-600">Highest Category</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Report 3: Team Performance Report -->
+      <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+        <div class="bg-gradient-to-r from-orange-50 to-yellow-50 px-6 py-4 border-b border-gray-200">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+              <mat-icon class="text-orange-600 text-lg">group</mat-icon>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900">Team Performance Report</h3>
+              <p class="text-sm text-gray-600">Individual team member client addition statistics</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="p-6">
           <!-- Team Stats Overview -->
-          <div class="team-overview">
-            <div class="overview-card total-team" [style.animation-delay]="'0.1s'">
-              <mat-icon style="color: #673ab7;">group</mat-icon>
-              <div class="overview-info">
-                <h3>{{ stats.totalTeam }}</h3>
-                <p>Total Team Members</p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-gradient-to-br from-violet-50 to-purple-50 rounded-lg p-4 border border-violet-200 transform hover:scale-105 transition-transform duration-200" style="animation-delay: 0.1s">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-violet-100 rounded-lg flex items-center justify-center">
+                  <mat-icon class="text-violet-600">group</mat-icon>
+                </div>
+                <div>
+                  <h3 class="text-2xl font-bold text-violet-600">{{ stats.totalTeam }}</h3>
+                  <p class="text-sm text-gray-600">Total Team Members</p>
+                </div>
               </div>
             </div>
-            <div class="overview-card total-added" [style.animation-delay]="'0.2s'">
-              <mat-icon>add_circle</mat-icon>
-              <div class="overview-info">
-                <h3>{{ stats.totalClients }}</h3>
-                <p>Total Clients Added</p>
+            
+            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200 transform hover:scale-105 transition-transform duration-200" style="animation-delay: 0.2s">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <mat-icon class="text-blue-600">add_circle</mat-icon>
+                </div>
+                <div>
+                  <h3 class="text-2xl font-bold text-blue-600">{{ stats.totalClients }}</h3>
+                  <p class="text-sm text-gray-600">Total Clients Added</p>
+                </div>
               </div>
             </div>
-            <div class="overview-card avg-per-member" [style.animation-delay]="'0.3s'">
-              <mat-icon>trending_up</mat-icon>
-              <div class="overview-info">
-                <h3>{{ getAverageClientsPerMember() }}</h3>
-                <p>Avg per Member</p>
+            
+            <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200 transform hover:scale-105 transition-transform duration-200" style="animation-delay: 0.3s">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                  <mat-icon class="text-green-600">trending_up</mat-icon>
+                </div>
+                <div>
+                  <h3 class="text-2xl font-bold text-green-600">{{ getAverageClientsPerMember() }}</h3>
+                  <p class="text-sm text-gray-600">Avg per Member</p>
+                </div>
               </div>
             </div>
           </div>
 
           <!-- Team Performance Chart -->
-          <div class="team-bar-chart">
-            <h3>Team Member Client Additions (Excluding Admin)</h3>
-            <div class="horizontal-bar-chart">
-              <div class="chart-container">
-                <canvas #teamChart class="team-horizontal-chart" data-chart="team" width="800" height="400"></canvas>
+          <div class="space-y-6">
+            <div class="text-center">
+              <h4 class="text-lg font-semibold text-gray-900 mb-2">Team Member Client Additions (Excluding Admin)</h4>
+            </div>
+            
+            <div class="bg-gray-50 rounded-lg p-6">
+              <div class="mb-4">
+                <canvas #teamChart class="w-full h-96" data-chart="team" width="800" height="400"></canvas>
               </div>
               
               <!-- Chart Info -->
-              <div class="chart-info">
-                <div class="info-item">
-                  <mat-icon>bar_chart</mat-icon>
-                  <span>Horizontal bars show client count per team member</span>
+              <div class="flex flex-wrap justify-center gap-6 pt-4 border-t border-gray-200">
+                <div class="flex items-center gap-2">
+                  <mat-icon class="text-blue-600">bar_chart</mat-icon>
+                  <span class="text-sm text-gray-600">Horizontal bars show client count per team member</span>
                 </div>
-                <div class="info-item">
-                  <mat-icon>trending_up</mat-icon>
-                  <span>Performance comparison across team</span>
+                <div class="flex items-center gap-2">
+                  <mat-icon class="text-green-600">trending_up</mat-icon>
+                  <span class="text-sm text-gray-600">Performance comparison across team</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </mat-card-content>
-    </mat-card>
+      </div>
 
+    </div>
   </div>
 </div>

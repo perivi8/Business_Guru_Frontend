@@ -234,6 +234,7 @@
 
 .table-container {
   overflow-x: auto;
+  overflow-y: visible; // Allow dropdown to overflow vertically
   -webkit-overflow-scrolling: touch;
   
   .clients-table {
@@ -596,4 +597,96 @@
   100% {
     opacity: 1;
   }
+}
+
+// User Action Menu Horizontal Layout
+::ng-deep .user-action-menu.mat-mdc-menu-panel {
+  border-radius: 12px !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+  border: 1px solid #e5e7eb !important;
+  overflow: hidden !important;
+  min-width: auto !important;
+  
+  .mat-mdc-menu-content {
+    padding: 0 !important;
+  }
+  
+  // Horizontal layout for action buttons
+  .mat-mdc-menu-item {
+    height: auto !important;
+    padding: 0 !important;
+    min-height: auto !important;
+    
+    &:hover {
+      background-color: transparent !important;
+    }
+    
+    // The flex container with buttons
+    > div {
+      display: flex !important;
+      align-items: center !important;
+      gap: 4px !important;
+      padding: 8px 12px !important;
+      background: #f8f9fa !important;
+      
+      // Individual action buttons
+      button {
+        transition: all 0.2s ease !important;
+        border-radius: 8px !important;
+        
+        &:hover {
+          transform: translateY(-1px) !important;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+        }
+        
+        // Edit button
+        &.text-primary {
+          &:hover {
+            background-color: rgba(37, 99, 235, 0.15) !important;
+          }
+        }
+        
+        // WhatsApp button
+        &.text-green-600 {
+          &:hover {
+            background-color: rgba(34, 197, 94, 0.15) !important;
+          }
+        }
+        
+        // Delete button
+        &.text-status-error {
+          &:hover {
+            background-color: rgba(239, 68, 68, 0.15) !important;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Custom dropdown styles to ensure proper overflow
+.custom-dropdown {
+  position: relative;
+  z-index: 1;
+}
+
+// Ensure table cells don't clip dropdown
+td.mat-cell {
+  overflow: visible !important;
+  position: relative;
+}
+
+// Table container should allow vertical overflow for dropdowns
+.table-container {
+  overflow-x: auto;
+  overflow-y: visible !important;
+  
+  .clients-table {
+    overflow: visible !important;
+  }
+}
+
+// Ensure table rows don't clip dropdowns
+tr.mat-row {
+  overflow: visible !important;
 }

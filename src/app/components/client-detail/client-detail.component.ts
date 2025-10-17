@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -22,6 +22,9 @@ export class ClientDetailComponent implements OnInit {
   editableClient: Client | null = null;
   updatingLoanStatus = false;
   updatingGatewayStatus: string | null = null;
+
+  // Custom dropdown properties
+  isStatusDropdownOpen = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -1093,6 +1096,39 @@ export class ClientDetailComponent implements OnInit {
 
   isLoanStatusUpdating(): boolean {
     return this.updatingLoanStatus;
+  }
+
+  // Custom dropdown methods for status selection
+  toggleStatusDropdown(): void {
+    this.isStatusDropdownOpen = !this.isStatusDropdownOpen;
+  }
+
+  selectStatus(status: string): void {
+    if (this.editableClient) {
+      this.editableClient.status = status;
+    }
+    this.isStatusDropdownOpen = false;
+  }
+
+  getStatusLabel(status: string): string {
+    switch (status) {
+      case 'pending': return 'Pending';
+      case 'processing': return 'Processing';
+      case 'interested': return 'Interested';
+      case 'not_interested': return 'Not Interested';
+      case 'hold': return 'Hold';
+      default: return 'Pending';
+    }
+  }
+
+  // Close dropdown when clicking outside
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    const target = event.target as HTMLElement;
+    // Check if the click is outside the dropdown
+    if (!target.closest('.relative')) {
+      this.isStatusDropdownOpen = false;
+    }
   }
 
 }

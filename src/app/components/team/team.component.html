@@ -1,67 +1,144 @@
-<div class="container">
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>TMIS Team</mat-card-title>
-      <mat-card-subtitle>Users registered with tmis. email addresses</mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
-      <div *ngIf="loading" class="loading">
-        <mat-spinner diameter="40"></mat-spinner>
-        <p>Loading team members...</p>
-      </div>
-
-      <div *ngIf="error" class="error">{{ error }}</div>
-
-      <div *ngIf="!loading && !error && users.length === 0" class="no-users">
-        <mat-icon>group</mat-icon>
-        <h3>No team members found</h3>
-        <p>No users with tmis. email addresses are registered yet</p>
-      </div>
-
-      <div *ngIf="!loading && !error && users.length > 0" class="team-grid">
-        <mat-card *ngFor="let user of users" class="user-card">
-          <mat-card-content>
-            <div class="user-avatar">
-              <mat-icon>account_circle</mat-icon>
-            </div>
-            <div class="user-info">
-              <h3>{{ user.username }}</h3>
-              <p class="email">{{ user.email }}</p>
-              <p class="role">
-                <span class="role-badge" [ngClass]="user.role">{{ user.role }}</span>
-                <span *ngIf="user.status === 'paused'" class="status-badge paused">PAUSED</span>
-              </p>
-              <p class="joined">Joined: {{ user.created_at | date:'mediumDate' }}</p>
-            </div>
-            
-            <!-- Action buttons for admins -->
-            <div *ngIf="isAdmin && user.role !== 'admin' && user._id !== currentUser?.id" class="user-actions">
-              <!-- Pause/Resume button -->
-              <button *ngIf="user.status !== 'paused'" mat-icon-button color="accent" (click)="pauseUser(user)" 
-                      matTooltip="Pause User" class="pause-btn">
-                <mat-icon>pause</mat-icon>
-              </button>
-              <button *ngIf="user.status === 'paused'" mat-icon-button color="primary" (click)="resumeUser(user)" 
-                      matTooltip="Resume User" class="resume-btn">
-                <mat-icon>play_arrow</mat-icon>
-              </button>
-              
-              <!-- Delete button -->
-              <button mat-icon-button color="warn" (click)="deleteUser(user)" 
-                      matTooltip="Delete User" class="delete-btn">
-                <mat-icon>delete</mat-icon>
-              </button>
-            </div>
-          </mat-card-content>
-        </mat-card>
-      </div>
-
-      <div *ngIf="!loading && !error && users.length > 0" class="team-stats">
-        <div class="stat-item">
-          <mat-icon>people</mat-icon>
-          <span>{{ users.length }} Team Members</span>
+<!-- Modern Team Management Page -->
+<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- Page Header -->
+    <div class="mb-8">
+      <div class="flex items-center gap-4 mb-6">
+        <div class="w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+          <mat-icon class="text-white text-2xl">group</mat-icon>
+        </div>
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">TMIS Team</h1>
+          <p class="text-gray-600">Users registered with tmis. email addresses</p>
         </div>
       </div>
-    </mat-card-content>
-  </mat-card>
+    </div>
+
+    <!-- Main Content Card -->
+    <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+      <div class="p-8">
+        
+        <!-- Loading State -->
+        <div *ngIf="loading" class="flex flex-col items-center justify-center py-16">
+          <mat-spinner diameter="40" class="mb-4"></mat-spinner>
+          <p class="text-gray-600 font-medium">Loading team members...</p>
+        </div>
+
+        <!-- Error State -->
+        <div *ngIf="error" class="flex items-center justify-center py-12">
+          <div class="text-center">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <mat-icon class="text-red-600 text-4xl">error</mat-icon>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Error Loading Team</h3>
+            <p class="text-red-600 mb-4">{{ error }}</p>
+            <button mat-raised-button (click)="loadUsers()" class="btn btn-primary">
+              <mat-icon class="mr-2">refresh</mat-icon>
+              Try Again
+            </button>
+          </div>
+        </div>
+
+        <!-- No Users State -->
+        <div *ngIf="!loading && !error && users.length === 0" class="flex flex-col items-center justify-center py-16">
+          <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6">
+            <mat-icon class="text-gray-400 text-6xl">group</mat-icon>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">No team members found</h3>
+          <p class="text-gray-600 text-center max-w-md">No users with tmis. email addresses are registered yet</p>
+        </div>
+
+        <!-- Team Grid -->
+        <div *ngIf="!loading && !error && users.length > 0" class="space-y-6">
+          
+          <!-- Team Stats Header -->
+          <div class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-6 border border-indigo-200">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+                <mat-icon class="text-indigo-600">people</mat-icon>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900">Team Overview</h3>
+                <p class="text-sm text-gray-600">{{ users.length }} Team Members</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Team Members Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div *ngFor="let user of users" 
+                 class="bg-gradient-to-br from-white to-gray-50 rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 group">
+              
+              <!-- User Avatar -->
+              <div class="flex items-center gap-4 mb-4">
+                <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <mat-icon class="text-white text-2xl">account_circle</mat-icon>
+                </div>
+                <div class="flex-1">
+                  <h3 class="font-semibold text-gray-900 text-lg">{{ user.username }}</h3>
+                  <p class="text-sm text-gray-600 truncate">{{ user.email }}</p>
+                </div>
+              </div>
+              
+              <!-- User Details -->
+              <div class="space-y-3 mb-4">
+                <!-- Role Badge -->
+                <div class="flex items-center gap-2">
+                  <span class="px-3 py-1 rounded-full text-xs font-medium"
+                        [ngClass]="{
+                          'bg-purple-100 text-purple-800': user.role === 'admin',
+                          'bg-blue-100 text-blue-800': user.role === 'user',
+                          'bg-green-100 text-green-800': user.role === 'manager'
+                        }">
+                    {{ user.role | titlecase }}
+                  </span>
+                  <span *ngIf="user.status === 'paused'" 
+                        class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
+                    PAUSED
+                  </span>
+                </div>
+                
+                <!-- Join Date -->
+                <div class="flex items-center gap-2 text-sm text-gray-500">
+                  <mat-icon class="text-sm">calendar_today</mat-icon>
+                  <span>Joined: {{ user.created_at | date:'mediumDate' }}</span>
+                </div>
+              </div>
+              
+              <!-- Admin Actions -->
+              <div *ngIf="isAdmin && user.role !== 'admin' && user._id !== currentUser?.id" 
+                   class="flex items-center gap-2 pt-4 border-t border-gray-200">
+                
+                <!-- Pause/Resume Button -->
+                <button *ngIf="user.status !== 'paused'" 
+                        mat-icon-button 
+                        (click)="pauseUser(user)" 
+                        class="text-orange-600 hover:bg-orange-50 transition-colors duration-200"
+                        matTooltip="Pause User">
+                  <mat-icon>pause</mat-icon>
+                </button>
+                
+                <button *ngIf="user.status === 'paused'" 
+                        mat-icon-button 
+                        (click)="resumeUser(user)" 
+                        class="text-green-600 hover:bg-green-50 transition-colors duration-200"
+                        matTooltip="Resume User">
+                  <mat-icon>play_arrow</mat-icon>
+                </button>
+                
+                <!-- Delete Button -->
+                <button mat-icon-button 
+                        (click)="deleteUser(user)" 
+                        class="text-red-600 hover:bg-red-50 transition-colors duration-200"
+                        matTooltip="Delete User">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

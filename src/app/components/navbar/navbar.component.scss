@@ -954,27 +954,65 @@
 }
 
 // Media Queries
-// Modern Profile Dropdown Menu Styling
-::ng-deep .mat-mdc-menu-panel {
-  border-radius: var(--radius-xl) !important;
-  box-shadow: var(--shadow-2xl) !important;
-  border: 1px solid var(--border-light) !important;
+// Enhanced User Dropdown Menu with Tailwind Integration
+::ng-deep .user-dropdown-menu.mat-mdc-menu-panel {
+  border-radius: 12px !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+  border: 1px solid #e5e7eb !important;
   overflow: hidden !important;
-  min-width: 240px !important; // Reduced from 280px
-  max-height: 300px !important; // Added max height constraint
+  min-width: 280px !important;
+  max-height: 320px !important;
   
   .mat-mdc-menu-content {
     padding: 0 !important;
-    max-height: 280px !important; // Reduced content height
+    max-height: 300px !important;
     overflow-y: auto !important;
   }
   
   .mat-mdc-menu-item {
     height: auto !important;
-    padding: var(--spacing-sm) var(--spacing) !important; // Reduced padding
+    padding: 0 !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    border: none !important;
+    min-height: auto !important;
+    
+    &:hover {
+      background-color: transparent !important;
+      transform: none !important;
+    }
+    
+    // Override default Material styles to allow Tailwind classes
+    &.mat-mdc-menu-item {
+      background: transparent !important;
+      
+      &:hover {
+        background: transparent !important;
+      }
+    }
+  }
+}
+
+// Modern Profile Dropdown Menu Styling (fallback)
+::ng-deep .mat-mdc-menu-panel:not(.user-dropdown-menu) {
+  border-radius: var(--radius-xl) !important;
+  box-shadow: var(--shadow-2xl) !important;
+  border: 1px solid var(--border-light) !important;
+  overflow: hidden !important;
+  min-width: 240px !important;
+  max-height: 300px !important;
+  
+  .mat-mdc-menu-content {
+    padding: 0 !important;
+    max-height: 280px !important;
+    overflow-y: auto !important;
+  }
+  
+  .mat-mdc-menu-item {
+    height: auto !important;
+    padding: var(--spacing-sm) var(--spacing) !important;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
     border-bottom: 1px solid var(--border-light) !important;
-    min-height: 40px !important; // Set minimum height
+    min-height: 40px !important;
     
     &:last-child {
       border-bottom: none !important;

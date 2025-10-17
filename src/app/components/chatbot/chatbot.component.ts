@@ -261,6 +261,20 @@ What would you like to know?`,
     }
   }
 
+  // Check if user is at top of messages
+  isAtTop(): boolean {
+    try {
+      if (this.messagesContainer) {
+        const element = this.messagesContainer.nativeElement;
+        const threshold = 10; // 10px threshold
+        return element.scrollTop <= threshold;
+      }
+      return true;
+    } catch (err) {
+      return true;
+    }
+  }
+
   private generateId(): string {
     return Date.now().toString() + Math.random().toString(36).substr(2, 9);
   }
@@ -311,5 +325,10 @@ What would you like to know?`,
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
       .replace(/\n/g, '<br>')
       .replace(/•/g, '&bull;');
+  }
+
+  // Track by function for better performance (optional)
+  trackByMessageId(index: number, message: ChatMessage): string {
+    return message.id;
   }
 }

@@ -1,188 +1,218 @@
-<div class="client-details-dialog">
-  <div mat-dialog-title class="dialog-header">
-    <h2>Client Details</h2>
-    <button mat-icon-button (click)="onClose()" class="close-button" matTooltip="Close">
-      <mat-icon>close</mat-icon>
+<!-- Modern Dialog Container -->
+<div class="max-w-4xl mx-auto">
+  <!-- Dialog Header -->
+  <div mat-dialog-title class="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-primary/5 to-secondary/5">
+    <h2 class="text-xl font-bold text-text-primary">Client Details</h2>
+    <button (click)="onClose()" 
+            class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+            matTooltip="Close">
+      <mat-icon class="text-gray-600 text-lg">close</mat-icon>
     </button>
   </div>
 
-  <div mat-dialog-content class="dialog-content">
+  <div mat-dialog-content class="p-6 max-h-[70vh] overflow-y-auto">
     <!-- Client Summary -->
-    <mat-card class="summary-card">
-      <div class="summary-content">
-        <div class="client-avatar" [class.missing]="!client.legal_name && !client.user_name">
-          <mat-icon>account_circle</mat-icon>
+    <div class="bg-white rounded-xl shadow-sm border border-border-light p-6 mb-6">
+      <div class="flex items-start gap-4">
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg flex-shrink-0"
+             [ngClass]="{'bg-gray-200': !client.legal_name && !client.user_name}">
+          <mat-icon class="text-white text-2xl">account_circle</mat-icon>
         </div>
-        <div class="client-summary">
-          <h3 [class.missing]="!client.legal_name && !client.user_name">
+        <div class="flex-1 min-w-0">
+          <h3 class="text-lg font-bold text-text-primary mb-2"
+              [ngClass]="{'text-gray-400': !client.legal_name && !client.user_name}">
             {{ client.legal_name || client.user_name || 'Client Name Not Provided' }}
           </h3>
-          <div class="client-meta">
-            <span class="client-email" [class.missing]="!client.email">
-              <mat-icon>email</mat-icon> {{ client.email || 'Email Not Provided' }}
-            </span>
-            <span class="client-phone" [class.missing]="!client.mobile_number">
-              <mat-icon>phone</mat-icon> {{ client.mobile_number || 'Phone Not Provided' }}
-            </span>
+          <div class="space-y-2 mb-3">
+            <div class="flex items-center gap-2 text-sm"
+                 [ngClass]="{'text-gray-400': !client.email}">
+              <mat-icon class="text-lg">email</mat-icon>
+              <span>{{ client.email || 'Email Not Provided' }}</span>
+            </div>
+            <div class="flex items-center gap-2 text-sm"
+                 [ngClass]="{'text-gray-400': !client.mobile_number}">
+              <mat-icon class="text-lg">phone</mat-icon>
+              <span>{{ client.mobile_number || 'Phone Not Provided' }}</span>
+            </div>
           </div>
-          <div class="client-status">
-            <span class="status-badge" [style.background-color]="getStatusColor(client.status)">
+          <div class="flex flex-wrap gap-2">
+            <span class="px-3 py-1 text-xs rounded-full font-medium text-white"
+                  [style.background-color]="getStatusColor(client.status)">
               {{ client.status ? (client.status | titlecase) : 'Status: N/A' }}
             </span>
-            <span class="loan-status-badge" [style.background-color]="getLoanStatusColor(getLoanStatus())">
+            <span class="px-3 py-1 text-xs rounded-full font-medium text-white"
+                  [style.background-color]="getLoanStatusColor(getLoanStatus())">
               Loan Status: {{ getLoanStatus() | titlecase }}
             </span>
           </div>
         </div>
       </div>
-    </mat-card>
+    </div>
 
-    <!-- Single View for All Information -->
-    <div class="info-sections">
+    <!-- Information Sections -->
+    <div class="space-y-6">
       <!-- Personal Information -->
-      <mat-card class="info-section" *ngIf="hasPersonalInfo()">
-        <mat-card-header>
-          <mat-card-title><mat-icon>person</mat-icon> Personal Information</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="details-grid">
-            <div class="detail-item" *ngIf="client.legal_name">
-              <div class="detail-label">Legal Name:</div>
-              <div class="detail-value">{{ client.legal_name }}</div>
+      <div *ngIf="hasPersonalInfo()" class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
+        <div class="p-4 border-b border-border-light">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+              <mat-icon class="text-purple-600 text-lg">person</mat-icon>
             </div>
-            <div class="detail-item" *ngIf="client['optional_mobile_number']">
-              <div class="detail-label">Optional Mobile:</div>
-              <div class="detail-value">{{ client['optional_mobile_number'] }}</div>
+            <h3 class="text-lg font-semibold text-text-primary">Personal Information</h3>
+          </div>
+        </div>
+        <div class="p-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div *ngIf="client.legal_name" class="flex justify-between py-2 border-b border-gray-100">
+              <span class="text-sm font-medium text-text-secondary">Legal Name:</span>
+              <span class="text-sm text-text-primary">{{ client.legal_name }}</span>
             </div>
-            <div class="detail-item" *ngIf="client.email">
-              <div class="detail-label">Email:</div>
-              <div class="detail-value">{{ client.email }}</div>
+            <div *ngIf="client['optional_mobile_number']" class="flex justify-between py-2 border-b border-gray-100">
+              <span class="text-sm font-medium text-text-secondary">Optional Mobile:</span>
+              <span class="text-sm text-text-primary">{{ client['optional_mobile_number'] }}</span>
             </div>
-            <div class="detail-item" *ngIf="client.mobile_number">
-              <div class="detail-label">Mobile:</div>
-              <div class="detail-value">{{ client.mobile_number }}</div>
+            <div *ngIf="client.email" class="flex justify-between py-2 border-b border-gray-100">
+              <span class="text-sm font-medium text-text-secondary">Email:</span>
+              <span class="text-sm text-text-primary">{{ client.email }}</span>
             </div>
-            <div class="detail-item" *ngIf="client.date_of_birth">
-              <div class="detail-label">Date of Birth:</div>
-              <div class="detail-value">{{ formatDate(client.date_of_birth) }}</div>
+            <div *ngIf="client.mobile_number" class="flex justify-between py-2 border-b border-gray-100">
+              <span class="text-sm font-medium text-text-secondary">Mobile:</span>
+              <span class="text-sm text-text-primary">{{ client.mobile_number }}</span>
             </div>
-            <div class="detail-item" *ngIf="client.gender">
-              <div class="detail-label">Gender:</div>
-              <div class="detail-value">{{ client.gender }}</div>
+            <div *ngIf="client.date_of_birth" class="flex justify-between py-2 border-b border-gray-100">
+              <span class="text-sm font-medium text-text-secondary">Date of Birth:</span>
+              <span class="text-sm text-text-primary">{{ formatDate(client.date_of_birth) }}</span>
             </div>
-            <div class="detail-item" *ngIf="hasValue(client.address) || hasValue(client.district) || hasValue(client.state) || hasValue(client.pincode)">
-              <div class="detail-label">Address:</div>
-              <div class="detail-value">
-                {{ formatAddress() }}
-              </div>
+            <div *ngIf="client.gender" class="flex justify-between py-2 border-b border-gray-100">
+              <span class="text-sm font-medium text-text-secondary">Gender:</span>
+              <span class="text-sm text-text-primary">{{ client.gender }}</span>
+            </div>
+            <div *ngIf="hasValue(client.address) || hasValue(client.district) || hasValue(client.state) || hasValue(client.pincode)" 
+                 class="md:col-span-2 flex justify-between py-2">
+              <span class="text-sm font-medium text-text-secondary">Address:</span>
+              <span class="text-sm text-text-primary text-right max-w-xs">{{ formatAddress() }}</span>
             </div>
           </div>
-        </mat-card-content>
-      </mat-card>
+        </div>
+      </div>
 
       <!-- Business Information -->
-      <mat-card class="info-section" *ngIf="hasBusinessInfo()">
-        <mat-card-header>
-          <mat-card-title><mat-icon>business</mat-icon> Business Information</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="details-grid">
-            <div class="detail-item" *ngIf="client.business_name">
-              <div class="detail-label">Business Name:</div>
-              <div class="detail-value">{{ client.business_name }}</div>
+      <div *ngIf="hasBusinessInfo()" class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
+        <div class="p-4 border-b border-border-light">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+              <mat-icon class="text-blue-600 text-lg">business</mat-icon>
             </div>
-            <div class="detail-item" *ngIf="client['legal_business_name']">
-              <div class="detail-label">Legal Business Name:</div>
-              <div class="detail-value">{{ client['legal_business_name'] }}</div>
+            <h3 class="text-lg font-semibold text-text-primary">Business Information</h3>
+          </div>
+        </div>
+        <div class="p-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div *ngIf="client.business_name" class="flex justify-between py-2 border-b border-gray-100">
+              <span class="text-sm font-medium text-text-secondary">Business Name:</span>
+              <span class="text-sm text-text-primary">{{ client.business_name }}</span>
             </div>
-            <div class="detail-item" *ngIf="client.business_type">
-              <div class="detail-label">Business Type:</div>
-              <div class="detail-value">{{ client.business_type }}</div>
+            <div *ngIf="client['legal_business_name']" class="flex justify-between py-2 border-b border-gray-100">
+              <span class="text-sm font-medium text-text-secondary">Legal Business Name:</span>
+              <span class="text-sm text-text-primary">{{ client['legal_business_name'] }}</span>
             </div>
-            <div class="detail-item" *ngIf="client['constitution_type']">
-              <div class="detail-label">Constitution Type:</div>
-              <div class="detail-value">{{ client['constitution_type'] }}</div>
+            <div *ngIf="client.business_type" class="flex justify-between py-2 border-b border-gray-100">
+              <span class="text-sm font-medium text-text-secondary">Business Type:</span>
+              <span class="text-sm text-text-primary">{{ client.business_type }}</span>
             </div>
-            <div class="detail-item" *ngIf="client['has_business_pan']">
-              <div class="detail-label">Has Business PAN:</div>
-              <div class="detail-value">{{ client['has_business_pan'] }}</div>
+            <div *ngIf="client['constitution_type']" class="flex justify-between py-2 border-b border-gray-100">
+              <span class="text-sm font-medium text-text-secondary">Constitution Type:</span>
+              <span class="text-sm text-text-primary">{{ client['constitution_type'] }}</span>
             </div>
-            <div class="detail-item" *ngIf="client['number_of_partners'] !== undefined">
-              <div class="detail-label">Number of Partners:</div>
-              <div class="detail-value">{{ client['number_of_partners'] }}</div>
+            <div *ngIf="client['has_business_pan']" class="flex justify-between py-2 border-b border-gray-100">
+              <span class="text-sm font-medium text-text-secondary">Has Business PAN:</span>
+              <span class="text-sm text-text-primary">{{ client['has_business_pan'] }}</span>
             </div>
-            <div class="detail-item" *ngIf="client['business_pan']">
-              <div class="detail-label">Business PAN:</div>
-              <div class="detail-value">{{ client['business_pan'] }}</div>
+            <div *ngIf="client['number_of_partners'] !== undefined" class="flex justify-between py-2 border-b border-gray-100">
+              <span class="text-sm font-medium text-text-secondary">Number of Partners:</span>
+              <span class="text-sm text-text-primary">{{ client['number_of_partners'] }}</span>
             </div>
-            <div class="detail-item" *ngIf="client['ie_code']">
-              <div class="detail-label">IE Code:</div>
-              <div class="detail-value">{{ client['ie_code'] }}</div>
+            <div *ngIf="client['business_pan']" class="flex justify-between py-2 border-b border-gray-100">
+              <span class="text-sm font-medium text-text-secondary">Business PAN:</span>
+              <span class="text-sm text-text-primary">{{ client['business_pan'] }}</span>
             </div>
-            <div class="detail-item" *ngIf="client['website']">
-              <div class="detail-label">Website:</div>
-              <div class="detail-value">
+            <div *ngIf="client['ie_code']" class="flex justify-between py-2 border-b border-gray-100">
+              <span class="text-sm font-medium text-text-secondary">IE Code:</span>
+              <span class="text-sm text-text-primary">{{ client['ie_code'] }}</span>
+            </div>
+            <div *ngIf="client['website']" class="flex justify-between py-2 border-b border-gray-100">
+              <span class="text-sm font-medium text-text-secondary">Website:</span>
+              <span class="text-sm text-primary hover:text-primary-dark">
                 <a [href]="client['website']" target="_blank" rel="noopener">{{ client['website'] }}</a>
-              </div>
+              </span>
             </div>
-            <div class="detail-item" *ngIf="client.business_address">
-              <div class="detail-label">Business Address:</div>
-              <div class="detail-value">{{ client.business_address }}</div>
+            <div *ngIf="client.business_address" class="md:col-span-2 flex justify-between py-2">
+              <span class="text-sm font-medium text-text-secondary">Business Address:</span>
+              <span class="text-sm text-text-primary text-right max-w-xs">{{ client.business_address }}</span>
             </div>
           </div>
-        </mat-card-content>
-      </mat-card>
+        </div>
+      </div>
 
       <!-- Banking Information -->
-      <mat-card class="info-section" *ngIf="hasBankingInfo()">
-        <mat-card-header>
-          <mat-card-title><mat-icon>account_balance</mat-icon> Banking Information</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="details-grid">
-            <div class="detail-item" *ngIf="client['bank_name']">
-              <div class="detail-label">Bank Name:</div>
-              <div class="detail-value">{{ client['bank_name'] }}</div>
+      <div *ngIf="hasBankingInfo()" class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
+        <div class="p-4 border-b border-border-light">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+              <mat-icon class="text-green-600 text-lg">account_balance</mat-icon>
             </div>
-            <div class="detail-item" *ngIf="client['account_number']">
-              <div class="detail-label">Account Number:</div>
-              <div class="detail-value">{{ client['account_number'] }}</div>
+            <h3 class="text-lg font-semibold text-text-primary">Banking Information</h3>
+          </div>
+        </div>
+        <div class="p-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div *ngIf="client['bank_name']" class="flex justify-between py-2 border-b border-gray-100">
+              <span class="text-sm font-medium text-text-secondary">Bank Name:</span>
+              <span class="text-sm text-text-primary">{{ client['bank_name'] }}</span>
             </div>
-            <div class="detail-item" *ngIf="client['ifsc_code']">
-              <div class="detail-label">IFSC Code:</div>
-              <div class="detail-value">{{ client['ifsc_code'] }}</div>
+            <div *ngIf="client['account_number']" class="flex justify-between py-2 border-b border-gray-100">
+              <span class="text-sm font-medium text-text-secondary">Account Number:</span>
+              <span class="text-sm text-text-primary">{{ client['account_number'] }}</span>
             </div>
-            <div class="detail-item" *ngIf="client['account_type'] !== undefined">
-              <div class="detail-label">Account Type:</div>
-              <div class="detail-value">{{ client['account_type'] }}</div>
+            <div *ngIf="client['ifsc_code']" class="flex justify-between py-2 border-b border-gray-100">
+              <span class="text-sm font-medium text-text-secondary">IFSC Code:</span>
+              <span class="text-sm text-text-primary">{{ client['ifsc_code'] }}</span>
             </div>
-            <div class="detail-item" *ngIf="client['new_current_account']">
-              <div class="detail-label">New Current Account:</div>
-              <div class="detail-value">{{ client['new_current_account'] }}</div>
+            <div *ngIf="client['account_type'] !== undefined" class="flex justify-between py-2 border-b border-gray-100">
+              <span class="text-sm font-medium text-text-secondary">Account Type:</span>
+              <span class="text-sm text-text-primary">{{ client['account_type'] }}</span>
+            </div>
+            <div *ngIf="client['new_current_account']" class="flex justify-between py-2">
+              <span class="text-sm font-medium text-text-secondary">New Current Account:</span>
+              <span class="text-sm text-text-primary">{{ client['new_current_account'] }}</span>
             </div>
           </div>
-        </mat-card-content>
-      </mat-card>
+        </div>
+      </div>
 
       <!-- Loan Status Section -->
-      <mat-card class="info-section">
-        <mat-card-header>
-          <mat-card-title><mat-icon>trending_up</mat-icon> Loan Status</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="details-grid">
-            <div class="detail-item">
-              <div class="detail-label">Current Loan Status:</div>
-              <div class="detail-value">
-                <span class="loan-status-badge" [style.background-color]="getLoanStatusColor(getLoanStatus())">
-                  {{ getLoanStatus() | titlecase }}
-                </span>
-              </div>
+      <div class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
+        <div class="p-4 border-b border-border-light">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-cyan-100 rounded-lg flex items-center justify-center">
+              <mat-icon class="text-cyan-600 text-lg">trending_up</mat-icon>
             </div>
-            <div class="detail-item">
-              <div class="detail-label">Update Loan Status:</div>
-              <div class="detail-value">
-                <mat-form-field appearance="outline" style="width: 200px;">
+            <h3 class="text-lg font-semibold text-text-primary">Loan Status</h3>
+          </div>
+        </div>
+        <div class="p-4">
+          <div class="space-y-4">
+            <div class="flex justify-between items-center py-2 border-b border-gray-100">
+              <span class="text-sm font-medium text-text-secondary">Current Loan Status:</span>
+              <span class="px-3 py-1 text-xs rounded-full font-medium text-white"
+                    [style.background-color]="getLoanStatusColor(getLoanStatus())">
+                {{ getLoanStatus() | titlecase }}
+              </span>
+            </div>
+            <div class="flex justify-between items-center py-2 border-b border-gray-100">
+              <span class="text-sm font-medium text-text-secondary">Update Loan Status:</span>
+              <div class="w-48">
+                <mat-form-field appearance="outline" class="w-full">
                   <mat-label>Select Loan Status</mat-label>
                   <mat-select [(value)]="selectedLoanStatus" (selectionChange)="onLoanStatusChange($event)">
                     <mat-option value="soon">Soon</mat-option>
@@ -194,65 +224,78 @@
                 </mat-form-field>
               </div>
             </div>
-            <div class="detail-item" *ngIf="client.required_loan_amount">
-              <div class="detail-label">Required Loan Amount:</div>
-              <div class="detail-value">₹{{ client.required_loan_amount | number }}</div>
+            <div *ngIf="client.required_loan_amount" class="flex justify-between py-2 border-b border-gray-100">
+              <span class="text-sm font-medium text-text-secondary">Required Loan Amount:</span>
+              <span class="text-sm text-text-primary font-semibold">₹{{ client.required_loan_amount | number }}</span>
             </div>
-            <div class="detail-item" *ngIf="client.loan_purpose">
-              <div class="detail-label">Loan Purpose:</div>
-              <div class="detail-value">{{ client.loan_purpose }}</div>
+            <div *ngIf="client.loan_purpose" class="flex justify-between py-2">
+              <span class="text-sm font-medium text-text-secondary">Loan Purpose:</span>
+              <span class="text-sm text-text-primary">{{ client.loan_purpose }}</span>
             </div>
           </div>
-        </mat-card-content>
-      </mat-card>
+        </div>
+      </div>
 
       <!-- Documents Section -->
-      <mat-card class="info-section documents-section" *ngIf="hasDocuments()">
-        <mat-card-header>
-          <mat-card-title><mat-icon>folder</mat-icon> Documents</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="documents-container">
-            <!-- Loop through all document types -->
-            <div class="document-item" *ngFor="let docType of getDocumentTypes()">
-              <div class="document-info">
-                <mat-icon>{{ getDocumentIcon(docType) }}</mat-icon>
-                <span>{{ getDocumentName(docType) }}</span>
+      <div *ngIf="hasDocuments()" class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
+        <div class="p-4 border-b border-border-light">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+              <mat-icon class="text-orange-600 text-lg">folder</mat-icon>
+            </div>
+            <h3 class="text-lg font-semibold text-text-primary">Documents</h3>
+          </div>
+        </div>
+        <div class="p-4">
+          <div class="space-y-3">
+            <div *ngFor="let docType of getDocumentTypes()" class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200 hover:shadow-sm transition-shadow">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <mat-icon class="text-blue-600 text-lg">{{ getDocumentIcon(docType) }}</mat-icon>
+                </div>
+                <span class="text-sm font-medium text-text-primary">{{ getDocumentName(docType) }}</span>
               </div>
-              <div class="document-actions">
-                <button mat-icon-button 
-                        (click)="previewDocument(docType)" 
-                        matTooltip="Preview {{getDocumentName(docType)}}">
-                  <mat-icon>visibility</mat-icon>
+              <div class="flex items-center gap-1">
+                <button (click)="previewDocument(docType)" 
+                        class="w-8 h-8 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-colors"
+                        [matTooltip]="'Preview ' + getDocumentName(docType)">
+                  <mat-icon class="text-blue-600 text-sm">visibility</mat-icon>
                 </button>
-                <button mat-icon-button 
-                        (click)="downloadDocument(docType)" 
-                        matTooltip="Download {{getDocumentName(docType)}}">
-                  <mat-icon>download</mat-icon>
+                <button (click)="downloadDocument(docType)" 
+                        class="w-8 h-8 rounded-lg bg-green-100 hover:bg-green-200 flex items-center justify-center transition-colors"
+                        [matTooltip]="'Download ' + getDocumentName(docType)">
+                  <mat-icon class="text-green-600 text-sm">download</mat-icon>
                 </button>
-                <button mat-icon-button 
+                <button *ngIf="hasDocument(docType)"
                         (click)="openInNewTab(docType)" 
-                        matTooltip="Open {{getDocumentName(docType)}} in new tab"
-                        *ngIf="hasDocument(docType)">
-                  <mat-icon>open_in_new</mat-icon>
+                        class="w-8 h-8 rounded-lg bg-purple-100 hover:bg-purple-200 flex items-center justify-center transition-colors"
+                        [matTooltip]="'Open ' + getDocumentName(docType) + ' in new tab'">
+                  <mat-icon class="text-purple-600 text-sm">open_in_new</mat-icon>
                 </button>
               </div>
             </div>
           </div>
-        </mat-card-content>
-      </mat-card>
+        </div>
+      </div>
 
       <!-- No Documents Message -->
-      <mat-card class="info-section" *ngIf="!hasDocuments()">
-        <mat-card-content class="no-documents">
-          <mat-icon>folder_off</mat-icon>
-          <p>No documents have been uploaded for this client</p>
-        </mat-card-content>
-      </mat-card>
+      <div *ngIf="!hasDocuments()" class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
+        <div class="p-8 text-center">
+          <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <mat-icon class="text-gray-400 text-2xl">folder_off</mat-icon>
+          </div>
+          <p class="text-text-muted">No documents have been uploaded for this client</p>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div mat-dialog-actions class="dialog-actions">
-    <button mat-raised-button color="primary" (click)="onClose()">Close</button>
+  <!-- Dialog Actions -->
+  <div mat-dialog-actions class="flex justify-end p-6 border-t border-gray-200 bg-gray-50">
+    <button (click)="onClose()" 
+            class="btn btn-primary px-6 py-2 flex items-center gap-2">
+      <mat-icon class="text-sm">close</mat-icon>
+      Close
+    </button>
   </div>
 </div>

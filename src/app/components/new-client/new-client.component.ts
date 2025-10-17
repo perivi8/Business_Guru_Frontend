@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ClientService } from '../../services/client.service';
@@ -37,6 +37,13 @@ export class NewClientComponent implements OnInit {
   bankStatements: { file: File | null }[] = [{ file: null }];
   businessPanDetails: any = {};
   hasNewCurrentAccount = false;
+  
+  // Custom dropdown properties
+  isStateDropdownOpen = false;
+  isDistrictDropdownOpen = false;
+  isBankAccountTypeDropdownOpen = false;
+  isTransactionMonthsDropdownOpen = false;
+  isStaffDropdownOpen = false;
   
   // Indian States and Districts mapping
   stateDistrictMapping: { [key: string]: string[] } = {
@@ -869,5 +876,118 @@ export class NewClientComponent implements OnInit {
     
     // Force validation update
     this.step1Form.updateValueAndValidity();
+  }
+
+  // Custom dropdown methods
+  toggleStateDropdown(): void {
+    this.isStateDropdownOpen = !this.isStateDropdownOpen;
+    if (this.isStateDropdownOpen) {
+      this.isDistrictDropdownOpen = false;
+    }
+  }
+
+  toggleDistrictDropdown(): void {
+    if (this.selectedState) {
+      this.isDistrictDropdownOpen = !this.isDistrictDropdownOpen;
+      if (this.isDistrictDropdownOpen) {
+        this.isStateDropdownOpen = false;
+      }
+    }
+  }
+
+  selectState(state: string): void {
+    this.step1Form.patchValue({ state: state });
+    this.onStateChange(state);
+    this.isStateDropdownOpen = false;
+  }
+
+  selectDistrict(district: string): void {
+    this.step1Form.patchValue({ district: district });
+    this.isDistrictDropdownOpen = false;
+  }
+
+  getStateLabel(value: string): string {
+    if (!value) return 'Select State';
+    return value;
+  }
+
+  getDistrictLabel(value: string): string {
+    if (!value) return 'Select District';
+    if (!this.selectedState) return 'Select State First';
+    return value;
+  }
+
+  // Bank Account Type dropdown methods
+  toggleBankAccountTypeDropdown(): void {
+    this.isBankAccountTypeDropdownOpen = !this.isBankAccountTypeDropdownOpen;
+    if (this.isBankAccountTypeDropdownOpen) {
+      this.isStateDropdownOpen = false;
+      this.isDistrictDropdownOpen = false;
+    }
+  }
+
+  selectBankAccountType(type: string): void {
+    this.step3Form.patchValue({ bank_type: type });
+    this.isBankAccountTypeDropdownOpen = false;
+  }
+
+  getBankAccountTypeLabel(value: string): string {
+    if (!value) return 'Select Account Type';
+    return value;
+  }
+
+  // Transaction Months dropdown methods
+  toggleTransactionMonthsDropdown(): void {
+    this.isTransactionMonthsDropdownOpen = !this.isTransactionMonthsDropdownOpen;
+    if (this.isTransactionMonthsDropdownOpen) {
+      this.isStateDropdownOpen = false;
+      this.isDistrictDropdownOpen = false;
+      this.isBankAccountTypeDropdownOpen = false;
+    }
+  }
+
+  selectTransactionMonths(months: number): void {
+    this.step3Form.patchValue({ transaction_months: months });
+    this.isTransactionMonthsDropdownOpen = false;
+  }
+
+  getTransactionMonthsLabel(value: number): string {
+    if (!value) return 'Select Transaction Months';
+    return `${value} Months`;
+  }
+
+  // Staff dropdown methods
+  toggleStaffDropdown(): void {
+    this.isStaffDropdownOpen = !this.isStaffDropdownOpen;
+    if (this.isStaffDropdownOpen) {
+      this.isStateDropdownOpen = false;
+      this.isDistrictDropdownOpen = false;
+      this.isBankAccountTypeDropdownOpen = false;
+      this.isTransactionMonthsDropdownOpen = false;
+    }
+  }
+
+  selectStaff(staffId: string): void {
+    this.step4Form.patchValue({ staff_id: staffId });
+    this.isStaffDropdownOpen = false;
+  }
+
+  getStaffLabel(staffId: string): string {
+    if (!staffId) return 'Select Staff Member';
+    const staff = this.staffMembers.find(s => s._id === staffId);
+    return staff ? `${staff.username} (${staff.email})` : 'Select Staff Member';
+  }
+
+  // Close dropdowns when clicking outside
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.relative')) {
+      this.isStateDropdownOpen = false;
+      this.isDistrictDropdownOpen = false;
+      this.isBankAccountTypeDropdownOpen = false;
+      this.isTransactionMonthsDropdownOpen = false;
+      this.isStaffDropdownOpen = false;
+    }
   }
 }

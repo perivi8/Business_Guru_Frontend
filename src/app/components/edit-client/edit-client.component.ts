@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, HostListener } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -25,6 +25,13 @@ export class EditClientComponent implements OnInit {
   filteredNewBankNames: string[] = [];
   hasNewCurrentAccount = false;
   selectedPaymentGateways: string[] = [];
+  
+  // Custom dropdown properties
+  isConstitutionDropdownOpen = false;
+  isBusinessPanDropdownOpen = false;
+  isBankTypeDropdownOpen = false;
+  isNewCurrentAccountDropdownOpen = false;
+  isNewBusinessAccountDropdownOpen = false;
   
   // Step management properties
   currentStep = 0;
@@ -1279,5 +1286,109 @@ export class EditClientComponent implements OnInit {
             (hasBusinessPan === 'yes' || 
              this.hasExistingDocument('owner_aadhar') || 
              this.hasExistingDocument('owner_pan')));
+  }
+
+  // Custom dropdown methods
+  toggleConstitutionDropdown(): void {
+    this.isConstitutionDropdownOpen = !this.isConstitutionDropdownOpen;
+    if (this.isConstitutionDropdownOpen) {
+      this.isBusinessPanDropdownOpen = false;
+    }
+  }
+
+  toggleBusinessPanDropdown(): void {
+    this.isBusinessPanDropdownOpen = !this.isBusinessPanDropdownOpen;
+    if (this.isBusinessPanDropdownOpen) {
+      this.isConstitutionDropdownOpen = false;
+    }
+  }
+
+  selectConstitution(value: string): void {
+    this.clientForm.patchValue({ constitution_type: value });
+    this.isConstitutionDropdownOpen = false;
+  }
+
+  selectBusinessPan(value: string): void {
+    this.clientForm.patchValue({ has_business_pan: value });
+    this.isBusinessPanDropdownOpen = false;
+  }
+
+  getConstitutionLabel(value: string): string {
+    if (!value) return 'Select Constitution Type';
+    return value;
+  }
+
+  getBusinessPanLabel(value: string): string {
+    if (!value) return 'Select Option';
+    return value === 'yes' ? 'Yes' : 'No';
+  }
+
+  // Bank dropdown methods
+  toggleBankTypeDropdown(): void {
+    this.isBankTypeDropdownOpen = !this.isBankTypeDropdownOpen;
+    if (this.isBankTypeDropdownOpen) {
+      this.isNewCurrentAccountDropdownOpen = false;
+      this.isNewBusinessAccountDropdownOpen = false;
+    }
+  }
+
+  toggleNewCurrentAccountDropdown(): void {
+    this.isNewCurrentAccountDropdownOpen = !this.isNewCurrentAccountDropdownOpen;
+    if (this.isNewCurrentAccountDropdownOpen) {
+      this.isBankTypeDropdownOpen = false;
+      this.isNewBusinessAccountDropdownOpen = false;
+    }
+  }
+
+  toggleNewBusinessAccountDropdown(): void {
+    this.isNewBusinessAccountDropdownOpen = !this.isNewBusinessAccountDropdownOpen;
+    if (this.isNewBusinessAccountDropdownOpen) {
+      this.isBankTypeDropdownOpen = false;
+      this.isNewCurrentAccountDropdownOpen = false;
+    }
+  }
+
+  selectBankType(value: string): void {
+    this.clientForm.patchValue({ bank_type: value });
+    this.isBankTypeDropdownOpen = false;
+  }
+
+  selectNewCurrentAccount(value: string): void {
+    this.clientForm.patchValue({ new_current_account: value });
+    this.isNewCurrentAccountDropdownOpen = false;
+    this.onNewCurrentAccountChange(value);
+  }
+
+  selectNewBusinessAccount(value: string): void {
+    this.clientForm.patchValue({ new_business_account: value });
+    this.isNewBusinessAccountDropdownOpen = false;
+  }
+
+  getBankTypeLabel(value: string): string {
+    if (!value) return 'Select Account Type';
+    return value;
+  }
+
+  getNewCurrentAccountLabel(value: string): string {
+    if (!value) return 'Select Option';
+    return value === 'yes' ? 'Yes' : 'No';
+  }
+
+  getNewBusinessAccountLabel(value: string): string {
+    if (!value) return 'Select';
+    return value === 'yes' ? 'Yes' : 'No';
+  }
+
+  // Close dropdowns when clicking outside
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.relative')) {
+      this.isConstitutionDropdownOpen = false;
+      this.isBusinessPanDropdownOpen = false;
+      this.isBankTypeDropdownOpen = false;
+      this.isNewCurrentAccountDropdownOpen = false;
+      this.isNewBusinessAccountDropdownOpen = false;
+    }
   }
 }
