@@ -44,121 +44,170 @@
             <span class="hidden lg:block">Transaction</span>
           </a>
           
-          <!-- AI Chatbot Button -->
-          <button (click)="openChatbot()" 
-                  class="p-2 rounded-lg text-white hover:bg-white/10 transition-colors duration-200 flex items-center justify-center"
-                  matTooltip="Gemini AI Assistant">
-            <mat-icon class="text-lg">auto_awesome</mat-icon>
-          </button>
-          
           <!-- Notifications Section for Admin -->
-          <div class="relative">
-            <button (click)="toggleNotifications()" (dblclick)="navigateToNotifications()" 
+          <div class="relative notifications-wrapper">
+            <button (click)="toggleNotifications()" 
                     class="relative p-2 rounded-lg text-white hover:bg-white/10 transition-colors duration-200 flex items-center justify-center"
                     [class.animate-pulse]="hasUnreadNotifications" 
-                    matTooltip="Notifications (Double-click to view all)">
-              <mat-icon class="text-lg" [class.animate-bounce]="hasUnreadNotifications">notifications_active</mat-icon>
+                    title="Notifications">
+              <!-- Notification Bell Icon -->
+              <svg class="w-5 h-5" [class.animate-bounce]="hasUnreadNotifications" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 2C7.79086 2 6 3.79086 6 6V8C6 9.10457 5.10457 10 4 10H3C2.44772 10 2 10.4477 2 11C2 11.5523 2.44772 12 3 12H17C17.5523 12 18 11.5523 18 11C18 10.4477 17.5523 10 17 10H16C14.8954 10 14 9.10457 14 8V6C14 3.79086 12.2091 2 10 2Z"/>
+                <path d="M8.5 14C8.5 15.3807 9.11929 16 10 16C10.8807 16 11.5 15.3807 11.5 14H8.5Z"/>
+              </svg>
               <span *ngIf="getNotificationCount() > 0" 
                     class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">{{ getNotificationCount() }}</span>
             </button>
             
+            
             <!-- Notification Dropdown Panel -->
-            <div *ngIf="showNotifications" #notificationPanel
-                 class="absolute right-0 mt-2 w-96 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 max-h-96 overflow-hidden">
-              <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
-                <h3 class="text-lg font-semibold text-gray-800">Notifications</h3>
-                <div class="flex items-center space-x-2">
+            <div *ngIf="showNotifications" 
+                 class="notification-panel"
+                 (click)="$event.stopPropagation()">
+              <div class="notification-header">
+                <h3>Notifications</h3>
+                <div class="notification-actions">
                   <button (click)="clearAllNotifications()" 
-                          class="p-1 rounded-lg text-gray-600 hover:bg-gray-200 transition-colors duration-200"
-                          matTooltip="Clear all">
-                    <mat-icon class="text-lg">clear_all</mat-icon>
-                  </button>
-                  <button (click)="closeNotifications()" 
-                          class="p-1 rounded-lg text-gray-600 hover:bg-gray-200 transition-colors duration-200"
-                          matTooltip="Close">
-                    <mat-icon class="text-lg">close</mat-icon>
+                          class="clear-all-btn"
+                          title="Clear all notifications">
+                    <mat-icon>clear_all</mat-icon>
+                    <span>Clear All</span>
                   </button>
                 </div>
               </div>
               
-              <div class="max-h-80 overflow-y-auto">
-                <!-- No notifications state -->
-                <div *ngIf="getNotificationCount() === 0" class="flex flex-col items-center justify-center py-8 text-gray-500">
-                  <mat-icon class="text-4xl mb-2 text-gray-400">notifications_none</mat-icon>
-                  <p class="text-sm">No new notifications</p>
-                </div>
-                
-                <!-- System Notifications -->
-                <div *ngIf="notifications.length > 0" class="p-2">
-                  <h4 class="text-sm font-semibold text-gray-700 px-2 py-1">System Notifications</h4>
-                  <div *ngFor="let notification of notifications.slice(0, 5)" 
-                       class="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors duration-200"
-                       [class.bg-blue-50]="!notification.read" 
-                       (click)="onNotificationClick(notification)">
-                    <mat-icon [ngClass]="getNotificationClass(notification.type)" class="text-lg mt-0.5">{{ getNotificationIcon(notification.type) }}</mat-icon>
-                    <div class="flex-1 min-w-0">
-                      <div class="text-sm font-medium text-gray-900 truncate">{{ notification.title }}</div>
-                      <div class="text-sm text-gray-600 truncate">{{ notification.message }}</div>
-                      <div *ngIf="notification.data?.loanStatus" class="mt-1">
-                        <span class="inline-block px-2 py-1 text-xs font-medium rounded-full text-white"
-                              [style.background-color]="notification.data.loanStatusColor">
-                          Loan: {{ notification.data.loanStatus.toUpperCase() }}
-                        </span>
+              <div class="notification-content">
+                <!-- Admin: Show only Pending User Approvals -->
+                <ng-container *ngIf="isAdmin()">
+                  <!-- No pending approvals state for admin -->
+                  <div *ngIf="pendingUsersCount === 0" class="no-notifications">
+                    <mat-icon>notifications_none</mat-icon>
+                    <p>No pending user approvals</p>
+                  </div>
+                  
+                  <!-- Pending User Approvals (Admin Only) -->
+                  <div *ngIf="pendingUsersCount > 0" class="notification-section">
+                    <h4>Pending User Approvals</h4>
+                    <div *ngFor="let user of getPendingUsers()" 
+                         class="notification-item approval-request">
+                      <div class="notification-icon urgent">
+                        <mat-icon class="approval-request">person_add_alt</mat-icon>
                       </div>
-                      <div class="text-xs text-gray-500 mt-1">{{ formatTimeAgo(notification.timestamp) }}</div>
+                      <div class="notification-text">
+                        <div class="notification-title">{{ user.username }}</div>
+                        <div class="notification-subtitle">{{ user.email }}</div>
+                        <div class="notification-time">{{ getRegistrationTimeAgo(user.created_at) }}</div>
+                      </div>
+                      <div class="notification-actions">
+                        <button class="approve-btn" 
+                                (click)="approveUser(user, $event)"
+                                title="Approve User"
+                                matTooltip="Approve">
+                          <mat-icon>check_circle</mat-icon>
+                        </button>
+                        <button class="reject-btn" 
+                                (click)="rejectUser(user, $event)"
+                                title="Reject User"
+                                matTooltip="Reject">
+                          <mat-icon>cancel</mat-icon>
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </ng-container>
                 
-                <!-- New Clients -->
-                <div *ngIf="getNewClients().length > 0" class="p-2 border-t border-gray-100">
-                  <h4 class="text-sm font-semibold text-gray-700 px-2 py-1">New Clients ({{ getNewClients().length }})</h4>
-                  <div *ngFor="let client of getNewClients().slice(0, 3)" 
-                       class="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors duration-200">
-                    <mat-icon class="text-lg mt-0.5 text-green-600">person_add</mat-icon>
-                    <div class="flex-1 min-w-0">
-                      <div class="text-sm font-medium text-gray-900 truncate">{{ client.legal_name || client.user_name }}</div>
-                      <div class="text-sm text-gray-600">New client added</div>
-                      <div class="text-xs text-gray-500 mt-1">{{ getTimeAgo(client.created_at) }}</div>
+                <!-- Non-Admin: Show regular notifications -->
+                <ng-container *ngIf="!isAdmin()">
+                  <!-- No notifications state -->
+                  <div *ngIf="getNotificationCount() === 0" class="no-notifications">
+                    <mat-icon>notifications_none</mat-icon>
+                    <p>No new notifications</p>
+                  </div>
+                  
+                  <!-- Client Status Updates (Staff Members) -->
+                  <div *ngIf="getClientStatusNotifications().length > 0" class="notification-section">
+                    <h4>Client Status Updates</h4>
+                    <div *ngFor="let notification of getClientStatusNotifications()" 
+                         class="notification-item status-update"
+                         [class.unread]="!notification.read" 
+                         (click)="onNotificationClick(notification)">
+                      <div class="notification-icon status-update">
+                        <mat-icon class="status-change">swap_horiz</mat-icon>
+                      </div>
+                      <div class="notification-text">
+                        <div class="notification-title">{{ notification.data?.clientName }}</div>
+                        <div class="notification-subtitle">Status updated by {{ notification.data?.changedBy }}</div>
+                        <div class="notification-time">{{ formatTimeAgo(notification.timestamp) }}</div>
+                      </div>
+                      <div class="status-badge" 
+                           [ngClass]="getStatusBadgeClass(notification.data?.status)"
+                           [style.background-color]="getStatusColor(notification)">
+                        {{ notification.data?.status?.toUpperCase() }}
+                      </div>
                     </div>
                   </div>
-                </div>
-                
-                <!-- Updated Clients -->
-                <div *ngIf="getUpdatedClients().length > 0" class="p-2 border-t border-gray-100">
-                  <h4 class="text-sm font-semibold text-gray-700 px-2 py-1">Client Updates ({{ getUpdatedClients().length }})</h4>
-                  <div *ngFor="let client of getUpdatedClients().slice(0, 3)" 
-                       class="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors duration-200">
-                    <mat-icon class="text-lg mt-0.5 text-blue-600">edit</mat-icon>
-                    <div class="flex-1 min-w-0">
-                      <div class="text-sm font-medium text-gray-900 truncate">{{ client.legal_name || client.user_name }}</div>
-                      <div class="text-sm text-gray-600">Client updated</div>
-                      <div class="text-xs text-gray-500 mt-1">{{ getTimeAgo(client.updated_at) }}</div>
+                  
+                  <!-- New Clients -->
+                  <div *ngIf="getNewClients().length > 0" class="notification-section">
+                    <h4>New Clients</h4>
+                    <div *ngFor="let client of getNewClients().slice(0, 3)" 
+                         class="notification-item">
+                      <div class="notification-icon">
+                        <mat-icon class="new-client">person_add</mat-icon>
+                      </div>
+                      <div class="notification-text">
+                        <div class="notification-title">{{ client.legal_name || client.user_name }}</div>
+                        <div class="notification-time">{{ getTimeAgo(client.created_at) }}</div>
+                      </div>
+                      <button class="remove-notification-btn" 
+                              (click)="removeClientNotification(client, 'new', $event)"
+                              title="Remove notification">
+                        <mat-icon>close</mat-icon>
+                      </button>
                     </div>
                   </div>
-                </div>
-                
-                <!-- Admin Status Changes -->
-                <div *ngIf="getAdminStatusChanges().length > 0" class="p-2 border-t border-gray-100">
-                  <h4 class="text-sm font-semibold text-gray-700 px-2 py-1">Admin Actions ({{ getAdminStatusChanges().length }})</h4>
-                  <div *ngFor="let client of getAdminStatusChanges().slice(0, 3)" 
-                       class="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors duration-200">
-                    <mat-icon class="text-lg mt-0.5 text-purple-600">gavel</mat-icon>
-                    <div class="flex-1 min-w-0">
-                      <div class="text-sm font-medium text-gray-900 truncate">{{ client.legal_name || client.user_name }}</div>
-                      <div class="text-sm text-gray-600">Status changed to {{ client.status }}</div>
-                      <div class="text-xs text-gray-500 mt-1">{{ getTimeAgo(client.updated_at) }}</div>
+                  
+                  <!-- Updated Clients -->
+                  <div *ngIf="getUpdatedClients().length > 0" class="notification-section">
+                    <h4>Client Updates</h4>
+                    <div *ngFor="let client of getUpdatedClients().slice(0, 3)" 
+                         class="notification-item">
+                      <div class="notification-icon">
+                        <mat-icon class="update">edit</mat-icon>
+                      </div>
+                      <div class="notification-text">
+                        <div class="notification-title">{{ client.legal_name || client.user_name }}</div>
+                        <div class="notification-time">{{ getTimeAgo(client.updated_at) }}</div>
+                      </div>
+                      <button class="remove-notification-btn" 
+                              (click)="removeClientNotification(client, 'updated', $event)"
+                              title="Remove notification">
+                        <mat-icon>close</mat-icon>
+                      </button>
                     </div>
                   </div>
-                </div>
+                  
+                  <!-- Admin Status Changes -->
+                  <div *ngIf="getAdminStatusChanges().length > 0" class="notification-section">
+                    <h4>Admin Actions</h4>
+                    <div *ngFor="let client of getAdminStatusChanges().slice(0, 3)" 
+                         class="notification-item">
+                      <div class="notification-icon">
+                        <mat-icon class="admin-action">gavel</mat-icon>
+                      </div>
+                      <div class="notification-text">
+                        <div class="notification-title">{{ client.legal_name || client.user_name }}</div>
+                        <div class="notification-time">{{ getTimeAgo(client.updated_at) }}</div>
+                      </div>
+                      <button class="remove-notification-btn" 
+                              (click)="removeClientNotification(client, 'admin', $event)"
+                              title="Remove notification">
+                        <mat-icon>close</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                </ng-container>
                 
-                <!-- View All Link -->
-                <div *ngIf="getNotificationCount() > 0" class="p-4 border-t border-gray-200 bg-gray-50">
-                  <button (click)="router.navigate(['/notifications']); closeNotifications()"
-                          class="w-full px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors duration-200 text-sm font-medium">
-                    View All Notifications
-                  </button>
-                </div>
               </div>
             </div>
           </div>
@@ -186,122 +235,6 @@
             <mat-icon class="text-lg">person_add</mat-icon>
             <span class="hidden lg:block">New Client</span>
           </a>
-          
-          <!-- AI Chatbot Button -->
-          <button (click)="openChatbot()" 
-                  class="p-2 rounded-lg text-white hover:bg-white/10 transition-colors duration-200 flex items-center justify-center"
-                  matTooltip="Gemini AI Assistant">
-            <mat-icon class="text-lg">auto_awesome</mat-icon>
-          </button>
-          
-          <!-- Notifications Section for Users (same as admin) -->
-          <div class="relative">
-            <button (click)="toggleNotifications()" (dblclick)="navigateToNotifications()" 
-                    class="relative p-2 rounded-lg text-white hover:bg-white/10 transition-colors duration-200 flex items-center justify-center"
-                    [class.animate-pulse]="hasUnreadNotifications" 
-                    matTooltip="Notifications (Double-click to view all)">
-              <mat-icon class="text-lg" [class.animate-bounce]="hasUnreadNotifications">notifications_active</mat-icon>
-              <span *ngIf="getNotificationCount() > 0" 
-                    class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">{{ getNotificationCount() }}</span>
-            </button>
-            
-            <!-- Same notification panel as admin -->
-            <div *ngIf="showNotifications" #notificationPanel
-                 class="absolute right-0 mt-2 w-96 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 max-h-96 overflow-hidden">
-              <!-- Same content as admin notifications -->
-              <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
-                <h3 class="text-lg font-semibold text-gray-800">Notifications</h3>
-                <div class="flex items-center space-x-2">
-                  <button (click)="clearAllNotifications()" 
-                          class="p-1 rounded-lg text-gray-600 hover:bg-gray-200 transition-colors duration-200"
-                          matTooltip="Clear all">
-                    <mat-icon class="text-lg">clear_all</mat-icon>
-                  </button>
-                  <button (click)="closeNotifications()" 
-                          class="p-1 rounded-lg text-gray-600 hover:bg-gray-200 transition-colors duration-200"
-                          matTooltip="Close">
-                    <mat-icon class="text-lg">close</mat-icon>
-                  </button>
-                </div>
-              </div>
-              
-              <div class="max-h-80 overflow-y-auto">
-                <!-- Same notification content as admin -->
-                <div *ngIf="getNotificationCount() === 0" class="flex flex-col items-center justify-center py-8 text-gray-500">
-                  <mat-icon class="text-4xl mb-2 text-gray-400">notifications_none</mat-icon>
-                  <p class="text-sm">No new notifications</p>
-                </div>
-                
-                <!-- All notification sections same as admin -->
-                <div *ngIf="notifications.length > 0" class="p-2">
-                  <h4 class="text-sm font-semibold text-gray-700 px-2 py-1">System Notifications</h4>
-                  <div *ngFor="let notification of notifications.slice(0, 5)" 
-                       class="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors duration-200"
-                       [class.bg-blue-50]="!notification.read" 
-                       (click)="onNotificationClick(notification)">
-                    <mat-icon [ngClass]="getNotificationClass(notification.type)" class="text-lg mt-0.5">{{ getNotificationIcon(notification.type) }}</mat-icon>
-                    <div class="flex-1 min-w-0">
-                      <div class="text-sm font-medium text-gray-900 truncate">{{ notification.title }}</div>
-                      <div class="text-sm text-gray-600 truncate">{{ notification.message }}</div>
-                      <div *ngIf="notification.data?.loanStatus" class="mt-1">
-                        <span class="inline-block px-2 py-1 text-xs font-medium rounded-full text-white"
-                              [style.background-color]="notification.data.loanStatusColor">
-                          Loan: {{ notification.data.loanStatus.toUpperCase() }}
-                        </span>
-                      </div>
-                      <div class="text-xs text-gray-500 mt-1">{{ formatTimeAgo(notification.timestamp) }}</div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div *ngIf="getNewClients().length > 0" class="p-2 border-t border-gray-100">
-                  <h4 class="text-sm font-semibold text-gray-700 px-2 py-1">New Clients ({{ getNewClients().length }})</h4>
-                  <div *ngFor="let client of getNewClients().slice(0, 3)" 
-                       class="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors duration-200">
-                    <mat-icon class="text-lg mt-0.5 text-green-600">person_add</mat-icon>
-                    <div class="flex-1 min-w-0">
-                      <div class="text-sm font-medium text-gray-900 truncate">{{ client.legal_name || client.user_name }}</div>
-                      <div class="text-sm text-gray-600">New client added</div>
-                      <div class="text-xs text-gray-500 mt-1">{{ getTimeAgo(client.created_at) }}</div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div *ngIf="getUpdatedClients().length > 0" class="p-2 border-t border-gray-100">
-                  <h4 class="text-sm font-semibold text-gray-700 px-2 py-1">Client Updates ({{ getUpdatedClients().length }})</h4>
-                  <div *ngFor="let client of getUpdatedClients().slice(0, 3)" 
-                       class="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors duration-200">
-                    <mat-icon class="text-lg mt-0.5 text-blue-600">edit</mat-icon>
-                    <div class="flex-1 min-w-0">
-                      <div class="text-sm font-medium text-gray-900 truncate">{{ client.legal_name || client.user_name }}</div>
-                      <div class="text-sm text-gray-600">Client updated</div>
-                      <div class="text-xs text-gray-500 mt-1">{{ getTimeAgo(client.updated_at) }}</div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div *ngIf="getAdminStatusChanges().length > 0" class="p-2 border-t border-gray-100">
-                  <h4 class="text-sm font-semibold text-gray-700 px-2 py-1">Admin Actions ({{ getAdminStatusChanges().length }})</h4>
-                  <div *ngFor="let client of getAdminStatusChanges().slice(0, 3)" 
-                       class="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors duration-200">
-                    <mat-icon class="text-lg mt-0.5 text-purple-600">gavel</mat-icon>
-                    <div class="flex-1 min-w-0">
-                      <div class="text-sm font-medium text-gray-900 truncate">{{ client.legal_name || client.user_name }}</div>
-                      <div class="text-sm text-gray-600">Status changed to {{ client.status }}</div>
-                      <div class="text-xs text-gray-500 mt-1">{{ getTimeAgo(client.updated_at) }}</div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div *ngIf="getNotificationCount() > 0" class="p-4 border-t border-gray-200 bg-gray-50">
-                  <button (click)="router.navigate(['/notifications']); closeNotifications()"
-                          class="w-full px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors duration-200 text-sm font-medium">
-                    View All Notifications
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
         </ng-container>
 
         <!-- User Menu -->

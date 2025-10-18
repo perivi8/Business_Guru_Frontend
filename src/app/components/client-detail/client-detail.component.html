@@ -353,7 +353,27 @@
                   </mat-icon>
                 </div>
                 <div class="flex-1 min-w-0">
-                  <h4 class="text-sm font-semibold text-text-primary mb-1">{{ formatDocumentName(docType) }}</h4>
+                  <div class="flex items-center gap-2 mb-1">
+                    <h4 class="text-sm font-semibold text-text-primary">{{ formatDocumentName(docType) }}</h4>
+                    <!-- Verification Status Badge -->
+                    <div class="flex items-center">
+                      <span *ngIf="getVerificationStatus(docType) === 'verified'" 
+                            class="flex items-center gap-1 px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">
+                        <mat-icon class="text-xs">check_circle</mat-icon>
+                        Verified
+                      </span>
+                      <span *ngIf="getVerificationStatus(docType) === 'rejected'" 
+                            class="flex items-center gap-1 px-2 py-0.5 text-xs bg-red-100 text-red-700 rounded-full">
+                        <mat-icon class="text-xs">cancel</mat-icon>
+                        Rejected
+                      </span>
+                      <span *ngIf="getVerificationStatus(docType) === 'pending' || !getVerificationStatus(docType)" 
+                            class="flex items-center gap-1 px-2 py-0.5 text-xs bg-yellow-100 text-yellow-700 rounded-full">
+                        <mat-icon class="text-xs">schedule</mat-icon>
+                        Pending
+                      </span>
+                    </div>
+                  </div>
                   <p class="text-xs text-text-muted truncate mb-1">{{ client.processed_documents![docType].file_name }}</p>
                   <p class="text-xs text-text-secondary">{{ formatFileSize(client.processed_documents![docType].file_size) }}</p>
                 </div>
@@ -366,12 +386,24 @@
                   <mat-icon class="text-sm">visibility</mat-icon>
                   Preview
                 </button>
-                <button (click)="downloadDocument(docType)" 
-                        class="flex items-center gap-1 px-3 py-1.5 text-xs bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
-                        [matTooltip]="'Download ' + formatDocumentName(docType)">
-                  <mat-icon class="text-sm">download</mat-icon>
-                  Download
-                </button>
+                
+                <!-- Verification Buttons -->
+                <div class="flex items-center gap-1 ml-auto">
+                  <button *ngIf="shouldShowVerifyButton(docType)"
+                          (click)="verifyDocument(docType, 'verified')" 
+                          class="flex items-center gap-1 px-2 py-1 text-xs bg-green-50 text-green-600 rounded hover:bg-green-100 transition-colors border border-green-200"
+                          [matTooltip]="'Mark as Verified'">
+                    <mat-icon class="text-sm">check_circle</mat-icon>
+                    Verify
+                  </button>
+                  <button *ngIf="shouldShowRejectButton(docType)"
+                          (click)="verifyDocument(docType, 'rejected')" 
+                          class="flex items-center gap-1 px-2 py-1 text-xs bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors border border-red-200"
+                          [matTooltip]="'Mark as Rejected'">
+                    <mat-icon class="text-sm">cancel</mat-icon>
+                    Reject
+                  </button>
+                </div>
               </div>
             </div>
           </div>

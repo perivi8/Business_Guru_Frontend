@@ -342,10 +342,7 @@ export class ClientService implements OnDestroy {
           const currentUserName = this.currentUser?.username || 'Admin';
           const loanStatus = response.client.loan_status || 'soon';
           
-          // If admin is updating status, send specific notification with loan status
-          if (this.authService.isAdmin()) {
-            this.notificationService.notifyStatusChange(clientName, clientId, status, currentUserName, loanStatus);
-          }
+          // Don't send notifications to admin for their own status updates
         }
       })
     );
@@ -443,13 +440,7 @@ export class ClientService implements OnDestroy {
           const clientName = response.client?.legal_name || response.client?.user_name || 'Unknown Client';
           const currentUserName = this.currentUser?.username || 'Admin';
           
-          // Notify about client update
-          this.notificationService.notifyClientUpdate(clientName, clientId, 'updated');
-          
-          // If admin is updating, notify users about admin action
-          if (this.authService.isAdmin()) {
-            this.notificationService.notifyAdminAction('Updated', clientName, clientId, currentUserName);
-          }
+          // Don't send notifications to admin for their own updates
         }
       })
     );
@@ -465,10 +456,16 @@ export class ClientService implements OnDestroy {
           const clientName = response.client.legal_name || response.client.user_name || 'Unknown Client';
           const currentUserName = this.currentUser?.username || 'Admin';
           const loanStatus = response.client.loan_status || 'soon';
+          const staffId = response.client.staff_id;
           
-          // If admin is updating status, send specific notification with loan status
+          // If admin is updating status, send notifications
           if (this.authService.isAdmin() && data.status) {
-            this.notificationService.notifyStatusChange(clientName, clientId, data.status, currentUserName, loanStatus);
+            // Don't send general notification to admin themselves (removed notifyStatusChange)
+            
+            // Send specific notification to staff member who created the client
+            if (staffId && staffId !== this.currentUser?.id) {
+              this.notificationService.notifyClientStatusUpdate(clientName, clientId, data.status, currentUserName, staffId);
+            }
           }
           
           // If admin is updating loan status, send loan status notification
@@ -648,6 +645,36 @@ export class ClientService implements OnDestroy {
     );
   }
 
+  // Document verification methods
+  verifyDocument(clientId: string, documentType: string, status: 'verified' | 'rejected', notes?: string): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/clients/${clientId}/verify-document`, {
+      documentType,
+      status,
+      notes
+    }, {
+      headers: this.getHeaders(),
+      withCredentials: true
+    }).pipe(
+      catchError(error => {
+        console.error('Error verifying document:', error);
+        return throwError(() => new Error(error.error?.error || 'Failed to verify document'));
+      })
+    );
+  }
+
+  // Debug method to check document structure
+  debugClientDocuments(clientId: string): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/clients/${clientId}/debug-documents`, {
+      headers: this.getHeaders(),
+      withCredentials: true
+    }).pipe(
+      catchError(error => {
+        console.error('❌ Error debugging documents:', error);
+        return throwError(() => new Error(error.error?.error || 'Failed to debug documents'));
+      })
+    );
+  }
+
   deleteClient(clientId: string): Observable<any> {
     return this.http.delete<any>(`${environment.apiUrl}/clients/${clientId}`, {
       headers: this.getHeaders(),
@@ -658,10 +685,7 @@ export class ClientService implements OnDestroy {
           const clientName = response.client.legal_name || response.client.user_name || 'Unknown Client';
           const currentUserName = this.currentUser?.username || 'Admin';
           
-          // Notify about client deletion
-          if (this.authService.isAdmin()) {
-            this.notificationService.notifyAdminAction('Deleted', clientName, clientId, currentUserName);
-          }
+          // Don't send notifications to admin for their own actions
         }
       })
     );

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -8,7 +8,7 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.scss']
 })
-export class ForgotPasswordComponent implements OnInit {
+export class ForgotPasswordComponent implements OnInit, OnDestroy {
   forgotPasswordForm!: FormGroup;
   verifyCodeForm!: FormGroup;
   resetPasswordForm!: FormGroup;
@@ -27,6 +27,8 @@ export class ForgotPasswordComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    // Add body class to remove padding-top
+    document.body.classList.add('forgot-password-page');
     this.forgotPasswordForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]]
     });
@@ -161,5 +163,10 @@ export class ForgotPasswordComponent implements OnInit {
           this.loading = false;
         }
       });
+  }
+
+  ngOnDestroy(): void {
+    // Remove body class when component is destroyed
+    document.body.classList.remove('forgot-password-page');
   }
 }

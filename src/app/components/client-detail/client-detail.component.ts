@@ -1131,4 +1131,84 @@ export class ClientDetailComponent implements OnInit {
     }
   }
 
+  // Document verification methods
+  getVerificationStatus(docType: string): string {
+    if (!this.client || !this.client.processed_documents || !this.client.processed_documents[docType]) {
+      return 'pending';
+    }
+    const doc = this.client.processed_documents[docType] as any;
+    return doc.verification_status || 'pending';
+  }
+
+  // Role-based button visibility methods
+  shouldShowVerifyButton(docType: string): boolean {
+    const currentStatus = this.getVerificationStatus(docType);
+    
+    // Admin can see verify button when document is not verified (can reverse decisions)
+    if (this.isAdmin()) {
+      return currentStatus !== 'verified';
+    }
+    
+    // Non-admin users: only show verify button if status is pending (hide once any decision is made)
+    return currentStatus === 'pending';
+  }
+
+  shouldShowRejectButton(docType: string): boolean {
+    const currentStatus = this.getVerificationStatus(docType);
+    
+    // Admin can see reject button when document is not rejected (can reverse decisions)
+    if (this.isAdmin()) {
+      return currentStatus !== 'rejected';
+    }
+    
+    // Non-admin users: only show reject button if status is pending (hide once any decision is made)
+    return currentStatus === 'pending';
+  }
+
+  verifyDocument(docType: string, status: 'verified' | 'rejected'): void {
+    if (!this.client || !this.client._id) {
+      this.snackBar.open('Client information not available', 'Close', { duration: 3000 });
+      return;
+    }
+
+    const action = status === 'verified' ? 'verify' : 'reject';
+    const loadingMessage = `${action === 'verify' ? 'Verifying' : 'Rejecting'} document...`;
+    
+    const loadingSnackBar = this.snackBar.open(loadingMessage, 'Cancel', { duration: 10000 });
+
+    console.log(`🔍 Verifying document: ${docType} with status: ${status} for client: ${this.client._id}`);
+    
+    this.clientService.verifyDocument(this.client._id, docType, status).subscribe({
+      next: (response) => {
+        loadingSnackBar.dismiss();
+        
+        // Update the local client data
+        if (this.client && this.client.processed_documents && this.client.processed_documents[docType]) {
+          const doc = this.client.processed_documents[docType] as any;
+          doc.verification_status = status;
+          doc.verified_at = new Date().toISOString();
+        }
+
+        const successMessage = status === 'verified' 
+          ? `Document "${this.formatDocumentName(docType)}" has been verified successfully!`
+          : `Document "${this.formatDocumentName(docType)}" has been rejected.`;
+        
+        this.snackBar.open(successMessage, 'Close', { 
+          duration: 4000,
+          panelClass: status === 'verified' ? ['success-snackbar'] : ['error-snackbar']
+        });
+      },
+      error: (error) => {
+        loadingSnackBar.dismiss();
+        console.error('Error verifying document:', error);
+        
+        const errorMessage = error.message || `Failed to ${action} document. Please try again.`;
+        this.snackBar.open(errorMessage, 'Close', { 
+          duration: 5000,
+          panelClass: ['error-snackbar']
+        });
+      }
+    });
+  }
+
 }

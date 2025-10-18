@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { ClientService, Client } from '../../services/client.service';
-import { MatDialog } from '@angular/material/dialog';
-import { TransactionDialogComponent } from './transaction-dialog.component';
 
 export interface Transaction {
   id: string;
@@ -19,23 +18,22 @@ export interface Transaction {
 })
 export class TransactionComponent implements OnInit {
   approvedClients: Client[] = [];
-  selectedClient: Client | null = null;
-  clientTransactions: Transaction[] = [];
+  totalTransactions = 0;
+  totalAmount = 0;
   loading = false;
-  error: string | null = null;
 
   constructor(
-    private clientService: ClientService,
-    private dialog: MatDialog
+    private router: Router,
+    private clientService: ClientService
   ) {}
 
   ngOnInit(): void {
-    this.loadApprovedClients();
+    this.loadApprovedClientsData();
   }
 
-  loadApprovedClients(): void {
+  // Load approved clients and calculate totals
+  loadApprovedClientsData(): void {
     this.loading = true;
-    this.error = null;
     
     this.clientService.getClients().subscribe({
       next: (response) => {
@@ -43,36 +41,31 @@ export class TransactionComponent implements OnInit {
         this.approvedClients = response.clients.filter(client => 
           client.loan_status && client.loan_status.toLowerCase() === 'approved'
         );
+        
+        // Calculate totals
+        this.calculateTotals();
         this.loading = false;
       },
       error: (error) => {
-        this.error = 'Failed to load clients. Please try again later.';
-        this.loading = false;
         console.error('Error loading clients:', error);
+        this.loading = false;
       }
     });
   }
 
-  // Select a client to view their transactions (toggle if same client)
-  selectClient(client: Client): void {
-    if (this.selectedClient && this.selectedClient._id === client._id) {
-      // If clicking the same client, close the details
-      this.clearSelection();
-    } else {
-      // If clicking a different client or no client selected, show details
-      this.selectedClient = client;
-      this.loadClientTransactions(client._id);
-    }
-  }
+  // Calculate total transactions and amount for all approved clients
+  calculateTotals(): void {
+    let totalTxns = 0;
+    let totalAmt = 0;
 
-  // Load transactions for a specific client
-  loadClientTransactions(clientId: string): void {
-    const storedTransactions = localStorage.getItem(`transactions_${clientId}`);
-    if (storedTransactions) {
-      this.clientTransactions = JSON.parse(storedTransactions);
-    } else {
-      this.clientTransactions = [];
-    }
+    this.approvedClients.forEach(client => {
+      const clientTransactions = this.getClientTransactions(client._id);
+      totalTxns += clientTransactions.length;
+      totalAmt += clientTransactions.reduce((sum, txn) => sum + txn.amount, 0);
+    });
+
+    this.totalTransactions = totalTxns;
+    this.totalAmount = totalAmt;
   }
 
   // Get transactions for a specific client from localStorage
@@ -96,29 +89,6 @@ export class TransactionComponent implements OnInit {
     return transactions.length;
   }
 
-  // Add a new transaction for the selected client
-  addTransaction(): void {
-    if (this.selectedClient) {
-      const dialogRef = this.dialog.open(TransactionDialogComponent, {
-        width: '600px',
-        data: { client: this.selectedClient }
-      });
-
-      dialogRef.afterClosed().subscribe(result => {
-        if (result) {
-          // Refresh transactions after adding new one
-          this.loadClientTransactions(this.selectedClient!._id);
-        }
-      });
-    }
-  }
-
-  // Clear the selected client
-  clearSelection(): void {
-    this.selectedClient = null;
-    this.clientTransactions = [];
-  }
-
   // Get the first letter of client name for profile icon
   getClientInitial(client: Client): string {
     const name = client.legal_name || client.user_name || client.trade_name || client.business_name || 'N';
@@ -133,5 +103,10 @@ export class TransactionComponent implements OnInit {
   // Get client business name
   getClientBusinessName(client: Client): string {
     return client.trade_name || client.business_name || 'No business name';
+  }
+
+  // Navigate to approved clients page
+  navigateToApprovedClients(): void {
+    this.router.navigate(['/approved-clients']);
   }
 }

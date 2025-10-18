@@ -52,6 +52,7 @@ import { EnquiryComponent } from './components/enquiry/enquiry.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { AdminApprovalPopupComponent } from './components/admin-approval-popup/admin-approval-popup.component';
 import { ChatbotComponent } from './components/chatbot/chatbot.component';
+import { ChatbotFabComponent } from './components/chatbot-fab/chatbot-fab.component';
 import { WhatsappLinkComponent } from './components/whatsapp-link/whatsapp-link.component';
 import { WhatsappPublicComponent } from './components/whatsapp-public/whatsapp-public.component';
 import { WhatsappTestComponent } from './components/whatsapp-test/whatsapp-test.component';
@@ -60,6 +61,7 @@ import { PublicEnquiryComponent } from './components/public-enquiry/public-enqui
 // Transaction Components
 import { TransactionComponent } from './components/transaction/transaction.component';
 import { TransactionDialogComponent } from './components/transaction/transaction-dialog.component';
+import { ApprovedClientsComponent } from './components/approved-clients/approved-clients.component';
 
 // Interceptors
 import { AuthInterceptor } from './interceptors/auth.interceptor';
@@ -88,12 +90,14 @@ import { SocketService } from './services/socket.service';
     ForgotPasswordComponent,
     AdminApprovalPopupComponent,
     ChatbotComponent,
+    ChatbotFabComponent,
     WhatsappLinkComponent,
     WhatsappPublicComponent,
     WhatsappTestComponent,
     PublicEnquiryComponent,
     TransactionComponent,
-    TransactionDialogComponent
+    TransactionDialogComponent,
+    ApprovedClientsComponent
   ],
   imports: [
     BrowserModule,

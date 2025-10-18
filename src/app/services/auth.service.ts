@@ -54,6 +54,15 @@ export class AuthService {
   public get currentUserValue(): User | null {
     return this.currentUserSubject.value;
   }
+
+  // Helper method to get authentication headers
+  private getHeaders() {
+    const token = localStorage.getItem('token');
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': token ? `Bearer ${token}` : ''
+    };
+  }
   register(username: string, email: string, password: string, confirmPassword: string): Observable<any> {
     return this.http.post<any>(`${environment.apiUrl}/register`, {
       username,
@@ -204,19 +213,27 @@ export class AuthService {
 
   // Get pending registrations (admin only)
   getPendingRegistrations(): Observable<any> {
-    return this.http.get<any>(`${environment.apiUrl}/pending-registrations`);
+    return this.http.get<any>(`${environment.apiUrl}/pending-users`, {
+      headers: this.getHeaders(),
+      withCredentials: true
+    });
   }
 
   // Approve registration (admin only)
   approveRegistration(userId: string): Observable<any> {
-    return this.http.post<any>(`${environment.apiUrl}/approve-registration`, { userId });
+    return this.http.post<any>(`${environment.apiUrl}/approve-user/${userId}`, {}, {
+      headers: this.getHeaders(),
+      withCredentials: true
+    });
   }
 
   // Reject registration (admin only)
   rejectRegistration(userId: string, reason?: string): Observable<any> {
-    return this.http.post<any>(`${environment.apiUrl}/reject-registration`, { 
-      userId, 
+    return this.http.post<any>(`${environment.apiUrl}/reject-user/${userId}`, { 
       reason: reason || 'Registration rejected by admin' 
+    }, {
+      headers: this.getHeaders(),
+      withCredentials: true
     });
   }
 

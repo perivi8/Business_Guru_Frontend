@@ -1,21 +1,32 @@
 <!-- Modern AI Chatbot -->
-<div class="fixed bottom-4 right-4 z-50 w-96 max-w-[calc(100vw-2rem)] transition-all duration-300 ease-in-out" 
+<div class="fixed z-50 transition-all duration-300 ease-in-out" 
      [ngClass]="{
-       'h-16': isMinimized,
-       'h-[500px]': !isMinimized
+       'bottom-4 right-4 w-96 max-w-[calc(100vw-2rem)] h-16': isMinimized,
+       'bottom-4 right-4 w-96 max-w-[calc(100vw-2rem)] h-[600px]': !isMinimized && !isFullscreen,
+       'inset-0 w-full h-full': isFullscreen
      }" 
      *ngIf="isVisible">
   
   <!-- Chatbot Container -->
-  <div class="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden h-full flex flex-col">
+  <div class="bg-white shadow-2xl border border-gray-200 overflow-hidden h-full flex flex-col"
+       [ngClass]="{
+         'rounded-2xl': !isFullscreen,
+         'rounded-none': isFullscreen
+       }">
     
     <!-- Chatbot Header -->
     <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-3 cursor-pointer select-none" 
+         [ngClass]="{
+           'py-3': !isFullscreen,
+           'py-4': isFullscreen
+         }"
          (click)="toggleMinimize()">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center animate-pulse">
-            <mat-icon class="text-white text-lg">auto_awesome</mat-icon>
+            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
           </div>
           <div>
             <h3 class="text-white font-semibold text-sm">TMIS AI Assistant</h3>
@@ -27,23 +38,32 @@
         </div>
         
         <div class="flex items-center gap-1">
-          <button mat-icon-button 
-                  (click)="clearChat(); $event.stopPropagation()" 
-                  class="text-white/80 hover:text-white hover:bg-white/10 transition-colors duration-200 w-8 h-8"
-                  matTooltip="Clear Chat">
-            <mat-icon class="text-lg">refresh</mat-icon>
+          <button 
+            (click)="clearChat(); $event.stopPropagation()" 
+            class="text-white/80 hover:text-white hover:bg-white/10 transition-colors duration-200 w-8 h-8 rounded-lg flex items-center justify-center"
+            title="Clear Chat">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"></path>
+            </svg>
           </button>
-          <button mat-icon-button 
-                  (click)="closeChatbot(); $event.stopPropagation()" 
-                  class="text-white/80 hover:text-white hover:bg-white/10 transition-colors duration-200 w-8 h-8"
-                  matTooltip="Close">
-            <mat-icon class="text-lg">close</mat-icon>
+          <button 
+            (click)="toggleFullscreen(); $event.stopPropagation()" 
+            class="text-white/80 hover:text-white hover:bg-white/10 transition-colors duration-200 w-8 h-8 rounded-lg flex items-center justify-center"
+            [title]="isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'">
+            <svg *ngIf="!isFullscreen" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h4a1 1 0 010 2H6.414l2.293 2.293a1 1 0 11-1.414 1.414L5 6.414V8a1 1 0 01-2 0V4zm9 1a1 1 0 010-2h4a1 1 0 011 1v4a1 1 0 01-2 0V6.414l-2.293 2.293a1 1 0 11-1.414-1.414L13.586 5H12zm-9 7a1 1 0 012 0v1.586l2.293-2.293a1 1 0 111.414 1.414L6.414 15H8a1 1 0 010 2H4a1 1 0 01-1-1v-4zm13-1a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 010-2h1.586l-2.293-2.293a1 1 0 111.414-1.414L15 13.586V12a1 1 0 011-1z" clip-rule="evenodd"></path>
+            </svg>
+            <svg *ngIf="isFullscreen" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M8 2a1 1 0 011 1v4a1 1 0 01-1 1H4a1 1 0 010-2h1.586L3.293 3.707a1 1 0 011.414-1.414L7 4.586V3a1 1 0 011-1zm4 0a1 1 0 011 1v1.586l2.293-2.293a1 1 0 111.414 1.414L14.414 6H16a1 1 0 010 2h-4a1 1 0 01-1-1V3a1 1 0 011-1zM2 12a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H3a1 1 0 01-1-1v-1.586l-2.293 2.293a1 1 0 01-1.414-1.414L1.586 13H3v-1zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-1.586l2.293 2.293a1 1 0 01-1.414 1.414L13.586 17H12a1 1 0 01-1-1v-4z" clip-rule="evenodd"></path>
+            </svg>
           </button>
-          <button mat-icon-button 
-                  class="text-white/80 hover:text-white hover:bg-white/10 transition-colors duration-200 w-8 h-8"
-                  matTooltip="Minimize/Maximize">
-            <mat-icon class="text-lg transition-transform duration-200" 
-                      [ngClass]="{'rotate-180': isMinimized}">expand_less</mat-icon>
+          <button 
+            (click)="closeChatbot(); $event.stopPropagation()" 
+            class="text-white/80 hover:text-white hover:bg-white/10 transition-colors duration-200 w-8 h-8 rounded-lg flex items-center justify-center"
+            title="Close">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+            </svg>
           </button>
         </div>
       </div>
@@ -51,31 +71,15 @@
 
     <!-- Chatbot Body -->
     <div class="flex-1 flex flex-col" *ngIf="!isMinimized">
-      <!-- Quick Actions -->
-      <div class="p-3 border-b border-gray-100 bg-gray-50">
-        <div class="flex gap-2">
-          <button mat-stroked-button 
-                  (click)="askAboutEnquiries()" 
-                  [disabled]="isLoading"
-                  class="flex-1 border-indigo-200 text-indigo-600 hover:bg-indigo-50 disabled:opacity-50 text-xs py-2 px-3 rounded-lg transition-all duration-200">
-            <mat-icon class="text-sm mr-1">assignment</mat-icon>
-            Enquiry Stats
-          </button>
-          <button mat-stroked-button 
-                  (click)="askAboutClients()" 
-                  [disabled]="isLoading"
-                  class="flex-1 border-purple-200 text-purple-600 hover:bg-purple-50 disabled:opacity-50 text-xs py-2 px-3 rounded-lg transition-all duration-200">
-            <mat-icon class="text-sm mr-1">people</mat-icon>
-            Client Stats
-          </button>
-        </div>
-      </div>
 
       <!-- Messages Container -->
-      <div class="flex-1 overflow-y-auto p-3 space-y-3 bg-gradient-to-b from-gray-50 to-white relative min-h-0 scrollbar-thin scrollbar-thumb-indigo-300 scrollbar-track-gray-100" 
+      <div class="overflow-y-auto p-3 space-y-3 bg-gradient-to-b from-gray-50 to-white relative chatbot-messages" 
+           [ngClass]="{
+             'flex-1 min-h-0 max-h-[350px]': !isFullscreen,
+             'h-[calc(100vh-360px)] min-h-[250px]': isFullscreen
+           }"
            #messagesContainer 
-           (scroll)="onScroll()"
-           style="scrollbar-width: thin; scrollbar-color: #a5b4fc #f3f4f6;">
+           (scroll)="onScroll()">
         
         <div *ngFor="let message of messages" 
              class="flex gap-3 animate-fadeIn"
@@ -141,63 +145,87 @@
         <button *ngIf="showScrollButton" 
                 (click)="scrollToBottom()" 
                 class="absolute bottom-2 right-2 w-8 h-8 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 transform hover:scale-110 z-10"
-                matTooltip="Scroll to bottom">
-          <mat-icon class="text-sm">keyboard_arrow_down</mat-icon>
+                title="Scroll to bottom">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+          </svg>
         </button>
       </div>
 
       <!-- Enhanced Input Area -->
-      <div class="border-t border-gray-200 bg-gradient-to-r from-white to-gray-50 p-3 flex-shrink-0">
-        <div class="flex gap-2 items-end">
-          <div class="flex-1">
-            <mat-form-field appearance="outline" class="w-full">
-              <mat-label>Type your message...</mat-label>
-              <textarea matInput 
-                        [(ngModel)]="currentMessage" 
-                        (keydown)="onKeyPress($event)"
-                        [disabled]="isLoading" 
-                        rows="1" 
-                        maxlength="1000"
-                        class="resize-none text-sm"
-                        placeholder="Ask about enquiries, clients, or search by GST/mobile..."
-                        style="min-height: 40px;">
-              </textarea>
-              <mat-hint align="end" class="text-xs text-gray-500">
-                <span [ngClass]="{'text-orange-500': currentMessage.length > 800, 'text-red-500': currentMessage.length > 950}">
-                  {{ currentMessage.length }}/1000
-                </span>
-              </mat-hint>
-              <mat-icon matSuffix class="text-gray-400 cursor-pointer" 
-                        *ngIf="currentMessage.length > 0 && !isLoading"
-                        (click)="currentMessage = ''"
-                        matTooltip="Clear message">clear</mat-icon>
-            </mat-form-field>
+      <div class="border-t border-gray-200 bg-gradient-to-r from-white to-gray-50 flex-shrink-0"
+           [ngClass]="{
+             'p-2': !isFullscreen,
+             'p-3 pb-4': isFullscreen
+           }">
+        <div class="flex gap-2 items-start">
+          <!-- Input Container -->
+          <div class="flex-1 relative">
+            <div class="relative">
+              <textarea 
+                [(ngModel)]="currentMessage" 
+                (keydown)="onKeyPress($event)"
+                [disabled]="isLoading" 
+                rows="2" 
+                maxlength="1000"
+                class="w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-xl resize-none text-sm placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200 disabled:bg-gray-100 disabled:cursor-not-allowed transition-all duration-200"
+                placeholder="Ask about enquiries, clients, or search by GST/mobile..."
+                style="min-height: 48px; max-height: 96px;"></textarea>
+              
+              <!-- Clear Button -->
+              <button 
+                *ngIf="currentMessage.length > 0 && !isLoading"
+                (click)="currentMessage = ''"
+                class="absolute right-3 top-3 text-gray-400 hover:text-gray-600 transition-colors duration-200 p-1 rounded-full hover:bg-gray-100"
+                title="Clear message">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                </svg>
+              </button>
+            </div>
+            
+            <!-- Character Count -->
+            <div class="flex justify-between items-center mt-1 px-1">
+              <div class="text-xs text-gray-400">Press Enter to send, Shift+Enter for new line</div>
+              <div class="text-xs" [ngClass]="{
+                'text-gray-400': currentMessage.length <= 800,
+                'text-orange-500': currentMessage.length > 800 && currentMessage.length <= 950,
+                'text-red-500': currentMessage.length > 950
+              }">
+                {{ currentMessage.length }}/1000
+              </div>
+            </div>
           </div>
           
           <!-- Send Button -->
-          <button mat-fab 
-                  (click)="sendMessage()" 
-                  [disabled]="!currentMessage.trim() || isLoading"
-                  class="bg-gradient-to-br from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 disabled:transform-none w-10 h-10 flex-shrink-0"
-                  matTooltip="Send message (Enter)">
-            <mat-icon *ngIf="!isLoading" class="text-white text-lg">send</mat-icon>
-            <mat-spinner *ngIf="isLoading" diameter="20" class="text-white"></mat-spinner>
+          <button 
+            (click)="sendMessage()" 
+            [disabled]="!currentMessage.trim() || isLoading"
+            class="bg-gradient-to-br from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 disabled:transform-none flex items-center justify-center w-12 h-12 flex-shrink-0 mt-0"
+            title="Send message (Enter)">
+            <svg *ngIf="!isLoading" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+            </svg>
+            <div *ngIf="isLoading" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
           </button>
         </div>
         
         <!-- Quick Suggestions -->
-        <div class="flex flex-wrap gap-1 mt-2" *ngIf="!isLoading && currentMessage.length === 0">
-          <button class="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded-full hover:bg-indigo-100 transition-colors duration-200"
-                  (click)="currentMessage = 'How many enquiries do we have?'">
-            📊 Enquiry Count
+        <div class="flex flex-wrap gap-2 mt-3" *ngIf="!isLoading && currentMessage.length === 0">
+          <button 
+            class="text-xs bg-indigo-50 text-indigo-600 px-3 py-2 rounded-full hover:bg-indigo-100 border border-indigo-200 hover:border-indigo-300 transition-all duration-200 flex items-center gap-1"
+            (click)="currentMessage = 'How many enquiries do we have?'">
+            <span>📊</span> Enquiry Count
           </button>
-          <button class="text-xs bg-purple-50 text-purple-600 px-2 py-1 rounded-full hover:bg-purple-100 transition-colors duration-200"
-                  (click)="currentMessage = 'Show client statistics'">
-            👥 Client Stats
+          <button 
+            class="text-xs bg-purple-50 text-purple-600 px-3 py-2 rounded-full hover:bg-purple-100 border border-purple-200 hover:border-purple-300 transition-all duration-200 flex items-center gap-1"
+            (click)="currentMessage = 'Show client statistics'">
+            <span>👥</span> Client Stats
           </button>
-          <button class="text-xs bg-green-50 text-green-600 px-2 py-1 rounded-full hover:bg-green-100 transition-colors duration-200"
-                  (click)="currentMessage = 'GST: '">
-            🔍 Search GST
+          <button 
+            class="text-xs bg-green-50 text-green-600 px-3 py-2 rounded-full hover:bg-green-100 border border-green-200 hover:border-green-300 transition-all duration-200 flex items-center gap-1"
+            (click)="currentMessage = 'GST: '">
+            <span>🔍</span> Search GST
           </button>
         </div>
       </div>
@@ -205,7 +233,11 @@
   </div>
 </div>
 
+<!-- Fullscreen Backdrop -->
+<div class="fixed inset-0 bg-black/30 backdrop-blur-sm z-40" 
+     *ngIf="isFullscreen && isVisible"></div>
+
 <!-- Mobile Backdrop -->
 <div class="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 md:hidden" 
-     *ngIf="!isMinimized && isVisible" 
+     *ngIf="!isMinimized && !isFullscreen && isVisible" 
      (click)="toggleMinimize()"></div>

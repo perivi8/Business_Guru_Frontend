@@ -186,7 +186,7 @@ export class NewClientComponent implements OnInit {
       account_name: [''],
       bank_account_number: [''],
       ifsc_code: [''],
-      bank_type: ['', Validators.required],
+      bank_type: ['Current', Validators.required], // Default to Current account type
       transaction_months: [6, Validators.required],
       total_credit_amount: ['', Validators.required],
       new_current_account: ['', Validators.required],

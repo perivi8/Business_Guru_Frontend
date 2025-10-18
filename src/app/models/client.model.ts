@@ -84,6 +84,10 @@ export interface Client {
       file_name: string;
       file_size: number;
       url?: string;
+      verification_status?: 'pending' | 'verified' | 'rejected';
+      verification_notes?: string;
+      verified_by?: string;
+      verified_at?: string;
     };
   };
   

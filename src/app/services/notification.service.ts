@@ -4,14 +4,16 @@ import { map } from 'rxjs/operators';
 
 export interface Notification {
   id: string;
-  type: 'new_client' | 'update' | 'system' | 'client_updated' | 'status_changed';
+  type: 'new_client' | 'update' | 'system' | 'client_updated' | 'status_changed' | 'approval_request' | 'user_registration' | 'loan_application' | 'document_upload' | 'payment_received' | 'meeting_scheduled';
   title: string;
   message: string;
   timestamp: Date;
   read: boolean;
+  priority?: 'low' | 'medium' | 'high' | 'urgent';
   clientId?: string;
   clientName?: string;
   changedBy?: string;
+  actionRequired?: boolean;
   changes?: {
     field: string;
     oldValue: any;
@@ -95,18 +97,49 @@ export class NotificationService {
     const saved = localStorage.getItem('notifications');
     if (saved) {
       try {
-        this.notifications = JSON.parse(saved);
-        // Convert string dates back to Date objects
-        this.notifications = this.notifications.map(n => ({
-          ...n,
-          timestamp: new Date(n.timestamp)
-        }));
+        const allNotifications = JSON.parse(saved);
+        // Convert string dates back to Date objects and filter for current user
+        this.notifications = allNotifications
+          .map((n: any) => ({
+            ...n,
+            timestamp: new Date(n.timestamp)
+          }))
+          .filter((n: any) => {
+            // Show notification if:
+            // 1. It has no target user (general notification)
+            // 2. It's targeted to current user
+            // 3. It's a client status update for current user
+            const currentUserId = this.getCurrentUserId();
+            return !n.data?.targetUserId || 
+                   n.data?.targetUserId === currentUserId ||
+                   (n.data?.isClientStatusUpdate && this.isNotificationForCurrentUser(n));
+          });
         this.notificationsSubject.next([...this.notifications]);
       } catch (e) {
         console.error('Error loading notifications', e);
         this.notifications = [];
       }
     }
+  }
+
+  // Helper method to get current user ID
+  private getCurrentUserId(): string | null {
+    const currentUser = localStorage.getItem('currentUser');
+    if (currentUser) {
+      try {
+        const user = JSON.parse(currentUser);
+        return user.id;
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  // Helper method to check if notification is for current user
+  private isNotificationForCurrentUser(notification: any): boolean {
+    const currentUserId = this.getCurrentUserId();
+    return notification.data?.targetUserId === currentUserId;
   }
 
   // Clear notifications for current user only
@@ -242,6 +275,126 @@ export class NotificationService {
       message: `${adminName} ${actionType.toLowerCase()} client "${clientName}"${details ? ': ' + details : ''}`,
       data: { clientId, actionType, adminName }
     });
+  }
+
+  // New notification methods for approval requests and other types
+  notifyApprovalRequest(clientName: string, clientId: string, requestType: string, submittedBy: string) {
+    this.addNotification({
+      type: 'approval_request',
+      title: 'Approval Request',
+      message: `${requestType} approval requested for client "${clientName}" by ${submittedBy}`,
+      priority: 'high',
+      actionRequired: true,
+      data: { clientId, requestType, submittedBy }
+    });
+  }
+
+  // Notify admin about new user registration
+  notifyUserRegistration(username: string, email: string, userId: string) {
+    this.addNotification({
+      type: 'user_registration',
+      title: 'New User Registration',
+      message: `User "${username}" (${email}) has registered and is waiting for approval`,
+      priority: 'high',
+      actionRequired: true,
+      data: { userId, username, email }
+    });
+  }
+
+  // Notify staff member about client status update by admin
+  notifyClientStatusUpdate(clientName: string, clientId: string, newStatus: string, adminName: string, staffId?: string) {
+    // Create notification with target user information
+    this.addNotification({
+      type: 'status_changed',
+      title: 'Client Status Updated',
+      message: `Your client "${clientName}" status has been updated to ${newStatus.toUpperCase()} by ${adminName}`,
+      priority: 'high',
+      data: { 
+        clientId, 
+        clientName,
+        status: newStatus, 
+        changedBy: adminName,
+        targetUserId: staffId, // The user who should see this notification
+        statusColor: this.getStatusColor(newStatus),
+        isClientStatusUpdate: true // Flag to identify this type of notification
+      }
+    });
+  }
+
+  // Get status color for display
+  private getStatusColor(status: string): string {
+    switch (status.toLowerCase()) {
+      case 'approved':
+      case 'active':
+      case 'completed':
+        return '#10b981'; // Green
+      case 'rejected':
+      case 'cancelled':
+      case 'inactive':
+        return '#ef4444'; // Red
+      case 'pending':
+      case 'pending_review':
+      case 'pending_documents':
+        return '#f59e0b'; // Orange
+      case 'under_review':
+      case 'in_progress':
+        return '#3b82f6'; // Blue
+      case 'on_hold':
+        return '#8b5cf6'; // Purple
+      default:
+        return '#6b7280'; // Gray
+    }
+  }
+
+  notifyLoanApplication(clientName: string, clientId: string, loanAmount: number, submittedBy: string) {
+    this.addNotification({
+      type: 'loan_application',
+      title: 'New Loan Application',
+      message: `Loan application for ₹${loanAmount.toLocaleString()} submitted by "${clientName}"`,
+      priority: 'high',
+      actionRequired: true,
+      data: { clientId, loanAmount, submittedBy }
+    });
+  }
+
+  notifyDocumentUpload(clientName: string, clientId: string, documentType: string) {
+    this.addNotification({
+      type: 'document_upload',
+      title: 'Document Uploaded',
+      message: `${documentType} uploaded by client "${clientName}"`,
+      priority: 'medium',
+      data: { clientId, documentType }
+    });
+  }
+
+  notifyPaymentReceived(clientName: string, clientId: string, amount: number, paymentType: string) {
+    this.addNotification({
+      type: 'payment_received',
+      title: 'Payment Received',
+      message: `${paymentType} payment of ₹${amount.toLocaleString()} received from "${clientName}"`,
+      priority: 'medium',
+      data: { clientId, amount, paymentType }
+    });
+  }
+
+  notifyMeetingScheduled(clientName: string, clientId: string, meetingDate: string, scheduledBy: string) {
+    this.addNotification({
+      type: 'meeting_scheduled',
+      title: 'Meeting Scheduled',
+      message: `Meeting scheduled with "${clientName}" on ${meetingDate} by ${scheduledBy}`,
+      priority: 'medium',
+      data: { clientId, meetingDate, scheduledBy }
+    });
+  }
+
+  // Get notifications by priority for admins
+  getHighPriorityNotifications(): Notification[] {
+    return this.notifications.filter(n => n.priority === 'high' || n.priority === 'urgent');
+  }
+
+  // Get action required notifications for admins
+  getActionRequiredNotifications(): Notification[] {
+    return this.notifications.filter(n => n.actionRequired && !n.read);
   }
 
   // Clear individual notification

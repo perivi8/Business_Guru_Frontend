@@ -23,9 +23,48 @@
   body {
     @apply font-sans bg-gradient-body bg-fixed text-text-primary leading-relaxed font-normal antialiased;
     @apply overflow-x-hidden w-screen max-w-full relative scroll-smooth;
-    @apply pt-16; // Add padding-top to account for fixed navbar height (64px/4rem)
     touch-action: pan-y !important;
     overscroll-behavior-x: none !important;
+    
+    // Add padding-top to account for fixed navbar height (64px/4rem)
+    // Exclude full-screen pages that don't need navbar padding on ALL screen sizes
+    &:not(.login-page):not(.register-page):not(.forgot-password-page):not(.new-enquiry-page) {
+      @apply pt-16;
+      
+      // Ensure padding-top is applied on all screen sizes
+      @media (max-width: 768px) {
+        @apply pt-16; // Mobile
+      }
+      
+      @media (min-width: 769px) and (max-width: 1024px) {
+        @apply pt-16; // Tablet
+      }
+      
+      @media (min-width: 1025px) {
+        @apply pt-16; // Desktop
+      }
+    }
+    
+    // Explicitly ensure NO padding-top for full-screen pages on ALL screen sizes
+    &.login-page,
+    &.register-page,
+    &.forgot-password-page,
+    &.new-enquiry-page {
+      padding-top: 0 !important;
+      
+      // Explicitly remove padding on all screen sizes
+      @media (max-width: 768px) {
+        padding-top: 0 !important; // Mobile - force override
+      }
+      
+      @media (min-width: 769px) and (max-width: 1024px) {
+        padding-top: 0 !important; // Tablet - force override
+      }
+      
+      @media (min-width: 1025px) {
+        padding-top: 0 !important; // Desktop - force override
+      }
+    }
   }
 
   h1, h2, h3, h4, h5, h6 {

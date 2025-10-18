@@ -35,6 +35,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
+    // Add body class to remove padding-top
+    document.body.classList.add('register-page');
     this.registerForm = this.formBuilder.group({
       username: ['', Validators.required],
       email: ['', [Validators.required, Validators.email, this.tmisEmailValidator]],
@@ -228,6 +230,9 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   // Stop approval checking when component is destroyed
   ngOnDestroy(): void {
+    // Remove body class when component is destroyed
+    document.body.classList.remove('register-page');
+    
     this.checkingApprovalStatus = false;
     if (this.registrationSubscription) {
       this.registrationSubscription.unsubscribe();

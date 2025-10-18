@@ -32,10 +32,13 @@ export class NavbarComponent implements OnInit, OnDestroy {
   showNotifications = false;
   notifications: Notification[] = [];
   clients: Client[] = [];
+  pendingRegistrations: any[] = [];
+  pendingUsers: any[] = [];
   lastVisit: Date | null = null;
   private notificationSubscription: Subscription | null = null;
   private clientSubscription: Subscription | null = null;
   private unreadCountSubscription: Subscription | null = null;
+  private registrationSubscription: Subscription | null = null;
   hasUnreadNotifications = false;
   lastNotificationCount = 0;
   isLoadingNotifications = false;
@@ -76,8 +79,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
       console.log('Is admin check:', this.authService.isAdmin());
       
       if (user && this.authService.isAdmin()) {
-        console.log('Admin user detected, loading clients...');
+        console.log('Admin user detected, loading clients and pending registrations...');
         this.loadClients();
+        this.loadPendingRegistrations();
+        this.loadPendingUsers();
         this.setupAutoRefresh();
       } else {
         console.log('Not admin or no user, skipping client load');
@@ -99,6 +104,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.loadNotifications();
     this.initializeLastVisit();
     this.subscribeToUnreadCount();
+    
+    // Clear error notifications on component load
+    setTimeout(() => {
+      this.clearErrorNotifications();
+    }, 1000);
   }
 
   ngOnDestroy(): void {
@@ -110,6 +120,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
     }
     if (this.unreadCountSubscription) {
       this.unreadCountSubscription.unsubscribe();
+    }
+    if (this.registrationSubscription) {
+      this.registrationSubscription.unsubscribe();
     }
   }
 
@@ -146,38 +159,80 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.notificationService.markAllAsRead();
   }
 
-  clearAllNotifications(): void {
-    const now = new Date().toISOString();
-    const userRole = this.isAdmin() ? 'admin' : 'user';
-    const userId = this.currentUser?.id || 'default';
-    const lastVisitKey = `lastVisit_${userRole}_${userId}`;
+  removeNotification(notification: Notification): void {
+    // Remove individual notification
+    this.notificationService.clearNotification(notification.id);
     
-    // Update lastVisit timestamp to clear client-based notifications
-    localStorage.setItem(lastVisitKey, now);
-    this.lastVisit = new Date(now);
-    
-    // Also store a separate timestamp for client-related notifications
-    const clientNotificationsKey = `lastClientNotificationsClear_${userRole}_${userId}`;
-    localStorage.setItem(clientNotificationsKey, now);
-    
-    // Clear system notifications from service
-    this.notificationService.clearAll();
-    
-    // Reload clients to refresh the counts
-    if (this.currentUser && this.authService.isAdmin()) {
-      this.loadClients();
-    }
-    
-    this.snackBar.open('All notifications cleared', 'Close', {
+    // Show confirmation
+    this.snackBar.open('Notification removed', 'Close', {
       duration: 2000,
       horizontalPosition: 'right',
       verticalPosition: 'top'
     });
     
+    // Reload notifications to update the display
+    this.loadNotifications();
+  }
+
+  clearAllNotifications(): void {
+    const now = new Date().toISOString();
+    const userRole = this.isAdmin() ? 'admin' : 'user';
+    const userId = this.currentUser?.id || 'default';
+    
+    if (this.isAdmin()) {
+      // For admin: Clear pending user approvals (no action needed as they handle individually)
+      this.snackBar.open('Pending user approvals cannot be cleared - handle them individually', 'Close', {
+        duration: 3000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top'
+      });
+    } else {
+      // For non-admin: Clear all notifications as before
+      const lastVisitKey = `lastVisit_${userRole}_${userId}`;
+      
+      // Update lastVisit timestamp to clear client-based notifications
+      localStorage.setItem(lastVisitKey, now);
+      this.lastVisit = new Date(now);
+      
+      // Also store a separate timestamp for client-related notifications
+      const clientNotificationsKey = `lastClientNotificationsClear_${userRole}_${userId}`;
+      localStorage.setItem(clientNotificationsKey, now);
+      
+      // Clear system notifications from service
+      this.notificationService.clearAll();
+      
+      // Reload clients to refresh the counts
+      this.loadClients();
+      
+      this.snackBar.open('All notifications cleared', 'Close', {
+        duration: 2000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top'
+      });
+    }
+    
     this.closeNotifications();
   }
 
   getNotificationCount(): number {
+    // If dropdown is open, always return 0 (hide badge)
+    if (this.showNotifications) {
+      return 0;
+    }
+    
+    // For admin users: only count pending user approvals
+    if (this.isAdmin()) {
+      const pendingUsersCount = this.pendingUsers.length;
+      
+      console.log('Admin notification count breakdown:', {
+        pendingUsers: pendingUsersCount,
+        total: pendingUsersCount
+      });
+      
+      return pendingUsersCount;
+    }
+    
+    // For non-admin users: keep all existing notification types
     // Ensure clients array is initialized
     if (!this.clients) {
       this.clients = [];
@@ -188,14 +243,18 @@ export class NavbarComponent implements OnInit, OnDestroy {
     const updatedClientsCount = this.getUpdatedClients().length;
     const adminChangesCount = this.getAdminStatusChanges().length;
     
-    // Total count includes system notifications + client notifications
-    const totalCount = this.unreadNotificationCount + newClientsCount + updatedClientsCount + adminChangesCount;
+    // Get client status notifications count for staff members
+    const clientStatusNotificationsCount = this.getClientStatusNotifications().length;
     
-    console.log('Notification count breakdown:', {
+    // Total count includes system notifications + client notifications + status notifications
+    const totalCount = this.unreadNotificationCount + newClientsCount + updatedClientsCount + adminChangesCount + clientStatusNotificationsCount;
+    
+    console.log('Non-admin notification count breakdown:', {
       unreadSystemNotifications: this.unreadNotificationCount,
       newClients: newClientsCount,
       updatedClients: updatedClientsCount,
       adminChanges: adminChangesCount,
+      clientStatusNotifications: clientStatusNotificationsCount,
       total: totalCount,
       clientsLoaded: this.clients.length
     });
@@ -208,9 +267,24 @@ export class NavbarComponent implements OnInit, OnDestroy {
       case 'new_client':
         return 'person_add';
       case 'update':
-        return 'update';
+      case 'client_updated':
+        return 'edit';
       case 'system':
         return 'notifications';
+      case 'status_changed':
+        return 'swap_horiz';
+      case 'approval_request':
+        return 'approval';
+      case 'user_registration':
+        return 'person_add_alt';
+      case 'loan_application':
+        return 'account_balance';
+      case 'document_upload':
+        return 'upload_file';
+      case 'payment_received':
+        return 'payment';
+      case 'meeting_scheduled':
+        return 'event';
       default:
         return 'notifications_none';
     }
@@ -221,9 +295,24 @@ export class NavbarComponent implements OnInit, OnDestroy {
       case 'new_client':
         return 'new-client';
       case 'update':
+      case 'client_updated':
         return 'update';
       case 'system':
         return 'system';
+      case 'status_changed':
+        return 'status-change';
+      case 'approval_request':
+        return 'approval-request';
+      case 'user_registration':
+        return 'user-registration';
+      case 'loan_application':
+        return 'loan-application';
+      case 'document_upload':
+        return 'document-upload';
+      case 'payment_received':
+        return 'payment-received';
+      case 'meeting_scheduled':
+        return 'meeting-scheduled';
       default:
         return '';
     }
@@ -261,6 +350,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
           this.lastNotificationCount = newCount - previousCount;
         }
       });
+      // Also refresh pending registrations and users for admin
+      if (this.isAdmin()) {
+        this.loadPendingRegistrations();
+        this.loadPendingUsers();
+      }
     });
   }
 
@@ -348,6 +442,15 @@ export class NavbarComponent implements OnInit, OnDestroy {
     
     return this.clients.filter(client => {
       if (!client.created_at) return false;
+      
+      // Check if this specific client notification was hidden
+      const clientId = (client as any)._id || (client as any).id;
+      const notificationKey = `hiddenClient_new_${clientId}_${userRole}_${userId}`;
+      const hiddenTime = localStorage.getItem(notificationKey);
+      if (hiddenTime) {
+        return false; // Hide this specific notification
+      }
+      
       const createdAt = new Date(client.created_at);
       return createdAt > filterTime;
     }).sort((a, b) => {
@@ -379,6 +482,14 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
     return this.clients.filter(client => {
       if (!client.updated_at) return false;
+      
+      // Check if this specific client notification was hidden
+      const clientId = (client as any)._id || (client as any).id;
+      const notificationKey = `hiddenClient_updated_${clientId}_${userRole}_${userId}`;
+      const hiddenTime = localStorage.getItem(notificationKey);
+      if (hiddenTime) {
+        return false; // Hide this specific notification
+      }
       
       const updatedAt = new Date(client.updated_at);
       const createdAt = client.created_at ? new Date(client.created_at) : null;
@@ -434,6 +545,14 @@ export class NavbarComponent implements OnInit, OnDestroy {
         return false;
       }
       
+      // Check if this specific client notification was hidden
+      const clientId = (client as any)._id || (client as any).id;
+      const notificationKey = `hiddenClient_admin_${clientId}_${userRole}_${userId}`;
+      const hiddenTime = localStorage.getItem(notificationKey);
+      if (hiddenTime) {
+        return false; // Hide this specific notification
+      }
+      
       const updatedAt = new Date(client.updated_at);
       
       // Filter by clear timestamp first
@@ -472,17 +591,75 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   toggleNotifications(): void {
-    console.log('Toggle notifications clicked. Current state:', this.showNotifications);
+    const wasOpen = this.showNotifications;
     this.showNotifications = !this.showNotifications;
-    console.log('New notification state:', this.showNotifications);
     
     if (this.showNotifications) {
-      // Load fresh notifications when opening dropdown
+      // Opening dropdown - reset counts and mark as read
       this.loadNotifications();
-      // Mark system notifications as read when opening dropdown
-      this.notificationService.markAllAsRead();
-      console.log('Notifications loaded and marked as read');
+      this.resetNotificationCounts();
+      this.markAllAsRead();
+    } else {
+      // Closing dropdown - start fresh counting from this point
+      this.startFreshCounting();
     }
+  }
+
+  // Start fresh counting when dropdown is closed
+  startFreshCounting(): void {
+    const now = new Date().toISOString();
+    const userRole = this.isAdmin() ? 'admin' : 'user';
+    const userId = this.currentUser?.id || 'default';
+    
+    // Update last visit timestamp to current time (this becomes the new baseline)
+    const lastVisitKey = `lastVisit_${userRole}_${userId}`;
+    localStorage.setItem(lastVisitKey, now);
+    this.lastVisit = new Date(now);
+    
+    // Update client notifications clear timestamp
+    const clientNotificationsKey = `lastClientNotificationsClear_${userRole}_${userId}`;
+    localStorage.setItem(clientNotificationsKey, now);
+    
+    // Reset counters to start fresh
+    this.unreadNotificationCount = 0;
+    this.hasUnreadNotifications = false;
+  }
+
+  // Reset all notification counts and timestamps
+  resetNotificationCounts(): void {
+    const now = new Date().toISOString();
+    const userRole = this.isAdmin() ? 'admin' : 'user';
+    const userId = this.currentUser?.id || 'default';
+    
+    // Update last visit timestamp to current time
+    const lastVisitKey = `lastVisit_${userRole}_${userId}`;
+    localStorage.setItem(lastVisitKey, now);
+    this.lastVisit = new Date(now);
+    
+    // Update client notifications clear timestamp
+    const clientNotificationsKey = `lastClientNotificationsClear_${userRole}_${userId}`;
+    localStorage.setItem(clientNotificationsKey, now);
+    
+    // Reset unread notification count
+    this.unreadNotificationCount = 0;
+    this.hasUnreadNotifications = false;
+  }
+
+  // Remove individual client notification
+  removeClientNotification(client: any, type: 'new' | 'updated' | 'admin', event: Event): void {
+    event.stopPropagation();
+    
+    const now = new Date().toISOString();
+    const userRole = this.isAdmin() ? 'admin' : 'user';
+    const userId = this.currentUser?.id || 'default';
+    
+    // Create a unique key for this specific client notification
+    const clientId = client._id || client.id;
+    const notificationKey = `hiddenClient_${type}_${clientId}_${userRole}_${userId}`;
+    localStorage.setItem(notificationKey, now);
+    
+    // Reload clients to refresh the notification lists
+    this.loadClients();
   }
 
   private updateLastVisit(): void {
@@ -547,18 +724,356 @@ export class NavbarComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Navigate to notifications page on double-click
-  navigateToNotifications(): void {
-    console.log('Double-click detected - navigating to notifications page');
-    // Close the dropdown if it's open
-    this.showNotifications = false;
-    // Navigate to notifications page
-    this.router.navigate(['/notifications']);
+
+  // Get approval requests for admin
+  getApprovalRequests(): Notification[] {
+    if (!this.isAdmin()) return [];
+    return this.notifications.filter(n => n.type === 'approval_request' && !n.read).slice(0, 3);
   }
+
+  // Get high priority notifications
+  getHighPriorityNotifications(): Notification[] {
+    return this.notifications.filter(n => 
+      (n.priority === 'high' || n.priority === 'urgent') && !n.read
+    ).slice(0, 3);
+  }
+
+  // Get filtered notifications (excluding error messages)
+  getFilteredNotifications(): Notification[] {
+    return this.notifications.filter(n => 
+      !n.title.toLowerCase().includes('error') && 
+      !n.message.toLowerCase().includes('cannot connect to server') &&
+      !n.message.toLowerCase().includes('error')
+    ).slice(0, 3);
+  }
+
+  // Clear all error notifications
+  clearErrorNotifications(): void {
+    const errorNotifications = this.notifications.filter(n => 
+      n.title.toLowerCase().includes('error') || 
+      n.message.toLowerCase().includes('cannot connect to server') ||
+      n.message.toLowerCase().includes('error')
+    );
+    
+    errorNotifications.forEach(notification => {
+      this.notificationService.clearNotification(notification.id);
+    });
+    
+    // Reload notifications
+    this.loadNotifications();
+  }
+
+  // Get action required notifications for admin
+  getActionRequiredNotifications(): Notification[] {
+    if (!this.isAdmin()) return [];
+    return this.notifications.filter(n => n.actionRequired && !n.read).slice(0, 3);
+  }
+
+  // Get client status update notifications for staff members
+  getClientStatusNotifications(): Notification[] {
+    if (this.isAdmin()) {
+      return []; // Admins don't see client status notifications
+    }
+    
+    return this.notifications.filter(n => 
+      n.type === 'status_changed' && 
+      n.data?.isClientStatusUpdate === true && 
+      n.data?.targetUserId === this.currentUser?.id && 
+      !n.read
+    ).slice(0, 3);
+  }
+
+  // Get status color from notification data
+  getStatusColor(notification: Notification): string {
+    return notification.data?.statusColor || '#6b7280';
+  }
+
+  // Get status badge class based on status
+  getStatusBadgeClass(status: string): string {
+    switch (status?.toLowerCase()) {
+      case 'approved':
+      case 'active':
+      case 'completed':
+        return 'status-approved';
+      case 'rejected':
+      case 'cancelled':
+      case 'inactive':
+        return 'status-rejected';
+      case 'pending':
+      case 'pending_review':
+      case 'pending_documents':
+        return 'status-pending';
+      case 'under_review':
+      case 'in_progress':
+        return 'status-in-progress';
+      case 'on_hold':
+        return 'status-on-hold';
+      default:
+        return 'status-default';
+    }
+  }
+
+  // Test methods to demonstrate different notification types
+  testApprovalRequest(): void {
+    this.notificationService.notifyApprovalRequest(
+      'John Doe', 
+      'client123', 
+      'Loan Application', 
+      'Jane Smith'
+    );
+  }
+
+  testLoanApplication(): void {
+    this.notificationService.notifyLoanApplication(
+      'Alice Johnson', 
+      'client456', 
+      500000, 
+      'Alice Johnson'
+    );
+  }
+
+  testDocumentUpload(): void {
+    this.notificationService.notifyDocumentUpload(
+      'Bob Wilson', 
+      'client789', 
+      'Income Certificate'
+    );
+  }
+
+  testPaymentReceived(): void {
+    this.notificationService.notifyPaymentReceived(
+      'Carol Brown', 
+      'client101', 
+      25000, 
+      'EMI'
+    );
+  }
+
+  testMeetingScheduled(): void {
+    this.notificationService.notifyMeetingScheduled(
+      'David Lee', 
+      'client202', 
+      '2024-10-20 10:00 AM', 
+      'Admin User'
+    );
+  }
+
 
   // Open chatbot dialog
   openChatbot(): void {
     console.log('Opening AI chatbot...');
     this.chatbotService.openChatbot();
+  }
+
+  // Load pending registrations for admin
+  loadPendingRegistrations(): void {
+    if (!this.isAdmin()) {
+      return;
+    }
+
+    this.registrationSubscription = this.authService.getPendingRegistrations().subscribe({
+      next: (response) => {
+        this.pendingRegistrations = response.users || [];
+        console.log('Pending registrations loaded:', this.pendingRegistrations.length);
+      },
+      error: (error) => {
+        console.error('Error loading pending registrations:', error);
+        this.pendingRegistrations = [];
+      }
+    });
+  }
+
+  // Get pending registrations for display
+  getPendingRegistrations(): any[] {
+    if (!this.isAdmin()) {
+      return [];
+    }
+    return this.pendingRegistrations.slice(0, 5); // Show max 5 in dropdown
+  }
+
+  // Load pending users (same as notifications page)
+  loadPendingUsers(): void {
+    if (!this.isAdmin()) {
+      return;
+    }
+
+    this.authService.getPendingUsers().subscribe({
+      next: (response) => {
+        this.pendingUsers = response.pending_users || [];
+        console.log('Pending users loaded in navbar:', this.pendingUsers.length);
+      },
+      error: (error) => {
+        console.error('Error loading pending users in navbar:', error);
+        this.pendingUsers = [];
+      }
+    });
+  }
+
+  // Get pending users for display
+  getPendingUsers(): any[] {
+    if (!this.isAdmin()) {
+      return [];
+    }
+    return this.pendingUsers.slice(0, 5); // Show max 5 in dropdown
+  }
+
+  // Approve user registration
+  approveRegistration(user: any, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+
+    this.authService.approveRegistration(user.id).subscribe({
+      next: (response) => {
+        // Remove from pending list
+        this.pendingRegistrations = this.pendingRegistrations.filter(u => u.id !== user.id);
+        
+        // Show success notification
+        this.notificationService.addNotification({
+          type: 'system',
+          title: 'Registration Approved',
+          message: `User "${user.username}" has been approved and can now login`,
+          priority: 'medium'
+        });
+        
+        console.log('User approved successfully:', user.username);
+      },
+      error: (error) => {
+        console.error('Error approving user:', error);
+        this.notificationService.showError(
+          'Failed to approve user registration. Please try again.',
+          'Approval Error'
+        );
+      }
+    });
+  }
+
+  // Reject user registration
+  rejectRegistration(user: any, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+
+    const reason = 'Registration rejected by admin';
+    this.authService.rejectRegistration(user.id, reason).subscribe({
+      next: (response) => {
+        // Remove from pending list
+        this.pendingRegistrations = this.pendingRegistrations.filter(u => u.id !== user.id);
+        
+        // Show success notification
+        this.notificationService.addNotification({
+          type: 'system',
+          title: 'Registration Rejected',
+          message: `User "${user.username}" registration has been rejected`,
+          priority: 'medium'
+        });
+        
+        console.log('User rejected successfully:', user.username);
+      },
+      error: (error) => {
+        console.error('Error rejecting user:', error);
+        this.notificationService.showError(
+          'Failed to reject user registration. Please try again.',
+          'Rejection Error'
+        );
+      }
+    });
+  }
+
+  // Approve user (same as notifications page)
+  approveUser(user: any, event?: Event): void {
+    if (!this.isAdmin()) {
+      return;
+    }
+
+    if (event) {
+      event.stopPropagation();
+    }
+
+    this.authService.approveUser(user._id).subscribe({
+      next: (response) => {
+        // Remove from pending list
+        this.pendingUsers = this.pendingUsers.filter(u => u._id !== user._id);
+        
+        // Show success notification
+        this.notificationService.addNotification({
+          type: 'system',
+          title: 'User Approved',
+          message: `User "${user.username}" has been approved and can now login`,
+          priority: 'medium'
+        });
+        
+        console.log('User approved successfully:', user.username);
+      },
+      error: (error) => {
+        console.error('Error approving user:', error);
+        this.notificationService.showError(
+          'Failed to approve user. Please try again.',
+          'Approval Error'
+        );
+      }
+    });
+  }
+
+  // Reject user (same as notifications page)
+  rejectUser(user: any, event?: Event): void {
+    if (!this.isAdmin()) {
+      return;
+    }
+
+    if (event) {
+      event.stopPropagation();
+    }
+
+    const reason = 'Registration rejected by admin';
+    
+    this.authService.rejectUser(user._id, reason).subscribe({
+      next: (response) => {
+        // Remove from pending list
+        this.pendingUsers = this.pendingUsers.filter(u => u._id !== user._id);
+        
+        // Show success notification
+        this.notificationService.addNotification({
+          type: 'system',
+          title: 'User Rejected',
+          message: `User "${user.username}" registration has been rejected`,
+          priority: 'medium'
+        });
+        
+        console.log('User rejected successfully:', user.username);
+      },
+      error: (error) => {
+        console.error('Error rejecting user:', error);
+        this.notificationService.showError(
+          'Failed to reject user. Please try again.',
+          'Rejection Error'
+        );
+      }
+    });
+  }
+
+  // Get time ago for pending registrations
+  getRegistrationTimeAgo(dateString: string): string {
+    if (!dateString) return 'Unknown time';
+    
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+    
+    if (diffInMinutes < 1) return 'Just now';
+    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+    
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) return `${diffInHours}h ago`;
+    
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) return `${diffInDays}d ago`;
+    
+    return date.toLocaleDateString();
+  }
+
+  // Get pending users count
+  get pendingUsersCount(): number {
+    return this.pendingUsers.length;
   }
 }

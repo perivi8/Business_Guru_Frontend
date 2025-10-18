@@ -28,6 +28,8 @@ export class LoginComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
+    // Add body class to remove padding-top
+    document.body.classList.add('login-page');
     // Check for approval message from registration
     this.route.queryParams.subscribe(params => {
       if (params['message']) {
@@ -160,6 +162,9 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    // Remove body class when component is destroyed
+    document.body.classList.remove('login-page');
+    
     // Clean up timeout to prevent memory leaks
     if (this.emailCheckTimeout) {
       clearTimeout(this.emailCheckTimeout);

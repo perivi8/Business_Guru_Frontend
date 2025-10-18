@@ -22,6 +22,7 @@ import { AdminGuard } from './guards/admin.guard';
 
 // Import the new Transaction component
 import { TransactionComponent } from './components/transaction/transaction.component';
+import { ApprovedClientsComponent } from './components/approved-clients/approved-clients.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -94,6 +95,12 @@ const routes: Routes = [
   { 
     path: 'transaction', 
     component: TransactionComponent, 
+    canActivate: [AuthGuard, AdminGuard] 
+  },
+  // Add the approved clients route for admin users
+  { 
+    path: 'approved-clients', 
+    component: ApprovedClientsComponent, 
     canActivate: [AuthGuard, AdminGuard] 
   },
   { path: '**', redirectTo: '/login' }

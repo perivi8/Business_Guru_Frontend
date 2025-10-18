@@ -34,6 +34,7 @@ export class ChatbotComponent implements OnInit, OnDestroy, AfterViewChecked {
   isLoading = false;
   isMinimized = false;
   isVisible = false;
+  isFullscreen = false;
   showScrollButton = false;
   
   private apiUrl = environment.apiUrl || 'http://localhost:5000/api';
@@ -221,11 +222,13 @@ What would you like to know?`,
     try {
       if (this.messagesContainer) {
         const element = this.messagesContainer.nativeElement;
-        // Smooth scroll to bottom
-        element.scrollTo({
-          top: element.scrollHeight,
-          behavior: 'smooth'
-        });
+        // Use setTimeout to ensure DOM is updated
+        setTimeout(() => {
+          element.scrollTo({
+            top: element.scrollHeight,
+            behavior: 'smooth'
+          });
+        }, 100);
       }
     } catch (err) {
       console.error('Error scrolling to bottom:', err);
@@ -291,10 +294,23 @@ What would you like to know?`,
     this.showScrollButton = !this.isAtBottom();
   }
 
-  toggleMinimize(): void {
-    this.isMinimized = !this.isMinimized;
-    if (!this.isMinimized) {
+  toggleFullscreen(): void {
+    this.isFullscreen = !this.isFullscreen;
+    // Always ensure we're not minimized when toggling fullscreen
+    this.isMinimized = false;
+    // Scroll to bottom when entering fullscreen
+    if (this.isFullscreen) {
       this.shouldScrollToBottom = true;
+    }
+  }
+
+  toggleMinimize(): void {
+    // Only allow minimize if not in fullscreen mode
+    if (!this.isFullscreen) {
+      this.isMinimized = !this.isMinimized;
+      if (!this.isMinimized) {
+        this.shouldScrollToBottom = true;
+      }
     }
   }
 
@@ -318,13 +334,130 @@ What would you like to know?`,
     this.sendMessage();
   }
 
-  // Format message for display (handle markdown-like formatting)
+  // Format message for display (handle markdown-like formatting and tables)
   formatMessage(message: string): string {
-    return message
+    let formattedMessage = message;
+    
+    // First handle basic markdown formatting
+    formattedMessage = formattedMessage
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/\n/g, '<br>')
       .replace(/•/g, '&bull;');
+    
+    // Detect and format tabular data (pipe-separated)
+    const lines = formattedMessage.split('\n');
+    let inTable = false;
+    let tableRows: string[] = [];
+    let result: string[] = [];
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      
+      // Check if line contains pipe-separated data (at least 2 pipes)
+      if (line.includes('|') && (line.match(/\|/g) || []).length >= 2) {
+        if (!inTable) {
+          inTable = true;
+          tableRows = [];
+        }
+        tableRows.push(line);
+      } else {
+        // If we were in a table, close it
+        if (inTable) {
+          result.push(this.createHtmlTable(tableRows));
+          tableRows = [];
+          inTable = false;
+        }
+        // Add non-table line
+        if (line) {
+          result.push(line);
+        }
+      }
+    }
+    
+    // Handle case where message ends with a table
+    if (inTable && tableRows.length > 0) {
+      result.push(this.createHtmlTable(tableRows));
+    }
+    
+    return result.join('<br>');
+  }
+  
+  // Create HTML table from pipe-separated rows
+  private createHtmlTable(rows: string[]): string {
+    if (rows.length === 0) return '';
+    
+    let html = '<div class="overflow-x-auto my-3"><table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-sm">';
+    
+    rows.forEach((row, index) => {
+      const cells = row.split('|').map(cell => cell.trim()).filter(cell => cell !== '');
+      
+      if (cells.length === 0) return;
+      
+      // First row is header if it contains non-numeric data or specific keywords
+      const isHeader = index === 0 || this.isHeaderRow(cells);
+      const tag = isHeader ? 'th' : 'td';
+      const headerClass = isHeader ? 'bg-gray-50 font-semibold text-gray-900 border-b-2 border-gray-200' : 'border-b border-gray-100';
+      const cellClass = isHeader ? 'px-4 py-3 text-left text-sm' : 'px-4 py-2 text-sm text-gray-700';
+      
+      html += '<tr>';
+      cells.forEach(cell => {
+        // Handle empty cells or separator rows
+        if (cell === '---' || cell === '--' || cell === '-') {
+          return; // Skip separator rows
+        }
+        
+        html += `<${tag} class="${headerClass} ${cellClass}">${this.formatCellContent(cell)}</${tag}>`;
+      });
+      html += '</tr>';
+    });
+    
+    html += '</table></div>';
+    return html;
+  }
+  
+  // Check if a row should be treated as header
+  private isHeaderRow(cells: string[]): boolean {
+    const headerKeywords = ['metric', 'count', 'status', 'name', 'type', 'percentage', 'total', 'client', 'enquiry'];
+    return cells.some(cell => 
+      headerKeywords.some(keyword => 
+        cell.toLowerCase().includes(keyword)
+      )
+    );
+  }
+  
+  // Format individual cell content
+  private formatCellContent(cell: string): string {
+    // Handle numbers with formatting
+    if (/^\d+$/.test(cell)) {
+      return `<span class="font-medium text-indigo-600">${cell}</span>`;
+    }
+    
+    // Handle percentages
+    if (cell.includes('%')) {
+      return `<span class="font-medium text-green-600">${cell}</span>`;
+    }
+    
+    // Handle status-like words
+    const statusWords = ['active', 'inactive', 'pending', 'approved', 'rejected', 'completed'];
+    const lowerCell = cell.toLowerCase();
+    if (statusWords.some(status => lowerCell.includes(status))) {
+      const colorClass = this.getStatusColor(lowerCell);
+      return `<span class="px-2 py-1 text-xs font-medium rounded-full ${colorClass}">${cell}</span>`;
+    }
+    
+    return cell;
+  }
+  
+  // Get color class for status
+  private getStatusColor(status: string): string {
+    if (status.includes('active') || status.includes('approved') || status.includes('completed')) {
+      return 'bg-green-100 text-green-800';
+    } else if (status.includes('pending')) {
+      return 'bg-yellow-100 text-yellow-800';
+    } else if (status.includes('inactive') || status.includes('rejected')) {
+      return 'bg-red-100 text-red-800';
+    }
+    return 'bg-gray-100 text-gray-800';
   }
 
   // Track by function for better performance (optional)
