@@ -142,8 +142,73 @@ export class ClientDetailComponent implements OnInit {
   }
 
   getDocumentKeys(): string[] {
-    if (!this.client || !this.client.processed_documents) return [];
-    return Object.keys(this.client.processed_documents);
+    const keys: string[] = [];
+    
+    // Get keys from processed_documents (legacy format)
+    if (this.client && this.client.processed_documents) {
+      keys.push(...Object.keys(this.client.processed_documents));
+    }
+    
+    // Get keys from documents (new format from client creation)
+    if (this.client && this.client.documents) {
+      const documentKeys = Object.keys(this.client.documents).filter(key => 
+        this.client!.documents![key] && 
+        typeof this.client!.documents![key] === 'object' &&
+        this.client!.documents![key].url
+      );
+      keys.push(...documentKeys);
+    }
+    
+    // Remove duplicates and return
+    return [...new Set(keys)];
+  }
+
+  getDocumentFileName(docType: string): string {
+    // Check processed_documents first (legacy format)
+    if (this.client?.processed_documents?.[docType]) {
+      return this.client.processed_documents[docType].file_name;
+    }
+    
+    // Check documents (new format from client creation)
+    if (this.client?.documents?.[docType]) {
+      const doc = this.client.documents[docType];
+      if (typeof doc === 'object' && doc.original_filename) {
+        return doc.original_filename;
+      }
+      // Fallback to document type name
+      return `${docType}.pdf`;
+    }
+    
+    return 'Unknown';
+  }
+
+  getDocumentFileSize(docType: string): number {
+    // Check processed_documents first (legacy format)
+    if (this.client?.processed_documents?.[docType]) {
+      return this.client.processed_documents[docType].file_size;
+    }
+    
+    // Check documents (new format from client creation)
+    if (this.client?.documents?.[docType]) {
+      const doc = this.client.documents[docType];
+      if (typeof doc === 'object' && doc.bytes) {
+        return doc.bytes;
+      }
+    }
+    
+    return 0;
+  }
+
+  isDocumentFromEnquiry(docType: string): boolean {
+    // Check if document has the copied_from_enquiry flag
+    if (this.client?.documents?.[docType]) {
+      const doc = this.client.documents[docType];
+      if (typeof doc === 'object' && doc.copied_from_enquiry) {
+        return true;
+      }
+    }
+    
+    return false;
   }
 
   formatDocumentName(docType: string): string {
@@ -200,7 +265,17 @@ export class ClientDetailComponent implements OnInit {
     
     console.log(`👁️ Previewing document: ${docType} for client: ${this.client._id}`);
     
-    // Show loading message
+    // Check if document has direct URL (new format)
+    if (this.client.documents?.[docType]) {
+      const doc = this.client.documents[docType];
+      if (typeof doc === 'object' && doc.url) {
+        console.log(`📄 Opening document directly from URL: ${doc.url}`);
+        window.open(doc.url, '_blank');
+        return;
+      }
+    }
+    
+    // Fallback to service-based preview (legacy format)
     const loadingSnackBar = this.snackBar.open('Loading preview...', 'Cancel', { duration: 10000 });
     
     this.clientService.previewDocument(this.client._id, docType).subscribe({
