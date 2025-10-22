@@ -28,6 +28,7 @@ export class NewClientComponent implements OnInit {
   
   // Enquiry data from session storage
   enquiryData: any = null;
+  originalEnquiryData: any = null; // Store original enquiry data for sync back
   businessDocumentFromEnquiry: string | null = null;
   
   // Dynamic form data
@@ -272,57 +273,110 @@ export class NewClientComponent implements OnInit {
       return;
     }
 
+    console.log('Pre-filling forms with enquiry data:', this.enquiryData);
+
     // Pre-fill Step 1 form (Basic Info & GST)
     if (this.step1Form) {
-      // Set trade name from business name
+      const step1Updates: any = {};
+      
+      // Map business name to trade name
       if (this.enquiryData.business_name) {
-        this.step1Form.patchValue({
-          trade_name: this.enquiryData.business_name
-        });
+        step1Updates.trade_name = this.enquiryData.business_name;
+        step1Updates.legal_name = this.enquiryData.business_name; // Also set legal name
       }
       
-      // Set user email from enquiry email
+      // Map email address
       if (this.enquiryData.email_address) {
-        this.step1Form.patchValue({
-          user_email: this.enquiryData.email_address
-        });
+        step1Updates.user_email = this.enquiryData.email_address;
       }
       
-      // Set mobile number
+      // Map mobile number
       if (this.enquiryData.mobile_number) {
-        this.step1Form.patchValue({
-          mobile_number: this.enquiryData.mobile_number
-        });
+        step1Updates.mobile_number = this.enquiryData.mobile_number;
       }
+      
+      // Map GST information if available
+      if (this.enquiryData.gst) {
+        if (this.enquiryData.gst === 'Yes') {
+          step1Updates.gst_status = 'Active';
+          if (this.enquiryData.gst_status) {
+            step1Updates.gst_status = this.enquiryData.gst_status;
+          }
+        }
+      }
+      
+      // Map annual revenue if available
+      if (this.enquiryData.annual_revenue) {
+        step1Updates.annual_revenue = this.enquiryData.annual_revenue;
+      }
+      
+      this.step1Form.patchValue(step1Updates);
+      console.log('Step 1 form updated with:', step1Updates);
     }
 
-    // Pre-fill Step 2 form (Owner name)
-    if (this.step2Form && this.enquiryData.owner_name) {
-      this.step2Form.patchValue({
-        owner_name: this.enquiryData.owner_name
-      });
+    // Pre-fill Step 2 form (Owner name and business details)
+    if (this.step2Form) {
+      const step2Updates: any = {};
+      
+      if (this.enquiryData.owner_name) {
+        step2Updates.owner_name = this.enquiryData.owner_name;
+      }
+      
+      // Map business type if available
+      if (this.enquiryData.business_type) {
+        // Map enquiry business type to constitution type
+        const businessTypeMapping: { [key: string]: string } = {
+          'Private Limited': 'Private Limited Company',
+          'Proprietorship': 'Proprietorship',
+          'Partnership': 'Partnership'
+        };
+        
+        if (businessTypeMapping[this.enquiryData.business_type]) {
+          this.constitutionType = businessTypeMapping[this.enquiryData.business_type];
+          step2Updates.constitution_type = this.constitutionType;
+        }
+      }
+      
+      this.step2Form.patchValue(step2Updates);
+      console.log('Step 2 form updated with:', step2Updates);
     }
 
     // Pre-fill Step 4 form (Loan details)
     if (this.step4Form) {
+      const step4Updates: any = {};
+      
       if (this.enquiryData.loan_amount) {
-        this.step4Form.patchValue({
-          required_loan_amount: this.enquiryData.loan_amount
-        });
+        // Parse loan amount if it's a string with currency symbols
+        let loanAmount = this.enquiryData.loan_amount;
+        if (typeof loanAmount === 'string') {
+          // Remove currency symbols and convert to number if possible
+          const numericAmount = loanAmount.replace(/[₹,\s]/g, '');
+          if (!isNaN(Number(numericAmount))) {
+            step4Updates.required_loan_amount = Number(numericAmount);
+          } else {
+            step4Updates.required_loan_amount = loanAmount; // Keep as string if can't parse
+          }
+        } else {
+          step4Updates.required_loan_amount = loanAmount;
+        }
       }
       
       if (this.enquiryData.loan_purpose) {
-        this.step4Form.patchValue({
-          loan_purpose: this.enquiryData.loan_purpose
-        });
+        step4Updates.loan_purpose = this.enquiryData.loan_purpose;
       }
+      
+      this.step4Form.patchValue(step4Updates);
+      console.log('Step 4 form updated with:', step4Updates);
     }
 
     // Handle business document if available
     if (this.enquiryData.business_document_url) {
-      // Store the business document URL for later use
       this.businessDocumentFromEnquiry = this.enquiryData.business_document_url;
+      console.log('Business document from enquiry:', this.businessDocumentFromEnquiry);
     }
+    
+    // Store original enquiry data for sync back functionality
+    this.originalEnquiryData = { ...this.enquiryData };
   }
 
   onFileSelected(event: any, fieldName: string): void {
@@ -588,9 +642,9 @@ export class NewClientComponent implements OnInit {
       next: (response) => {
         this.success = 'Client created successfully!';
         
-        // Update enquiry status to submitted if this came from an enquiry
+        // Sync data back to enquiry if this came from an enquiry
         if (this.enquiryData?.enquiry_id) {
-          this.updateEnquiryAsSubmitted(this.enquiryData.enquiry_id);
+          this.syncClientDataBackToEnquiry(response.client, this.enquiryData.enquiry_id);
         }
         
         setTimeout(() => {
@@ -1168,5 +1222,192 @@ export class NewClientComponent implements OnInit {
         // Don't show error to user as client creation was successful
       }
     });
+  }
+
+  // Business Document Methods
+  showBusinessDocumentUpload = false;
+
+  shouldShowBusinessDocumentField(): boolean {
+    // Show if there's an enquiry with business document OR if user is creating a new client without enquiry
+    return this.enquiryData?.business_document_url || !this.enquiryData || this.showBusinessDocumentUpload;
+  }
+
+  previewEnquiryDocument(): void {
+    if (this.enquiryData?.business_document_url) {
+      window.open(this.enquiryData.business_document_url, '_blank');
+    }
+  }
+
+  replaceEnquiryDocument(): void {
+    this.showBusinessDocumentUpload = true;
+  }
+
+  // Comprehensive sync method to update enquiry with client data
+  syncClientDataBackToEnquiry(clientData: any, enquiryId: string): void {
+    console.log('Syncing client data back to enquiry:', clientData);
+    
+    // Prepare updated enquiry data based on client information
+    const enquiryUpdates: any = {
+      client_submitted: true, // Mark as client created
+      client_id: clientData._id, // Link to created client
+      updated_at: new Date().toISOString()
+    };
+
+    // Sync basic information
+    if (clientData.trade_name && clientData.trade_name !== this.originalEnquiryData?.business_name) {
+      enquiryUpdates.business_name = clientData.trade_name;
+    }
+
+    if (clientData.user_email && clientData.user_email !== this.originalEnquiryData?.email_address) {
+      enquiryUpdates.email_address = clientData.user_email;
+    }
+
+    if (clientData.mobile_number && clientData.mobile_number !== this.originalEnquiryData?.mobile_number) {
+      enquiryUpdates.mobile_number = clientData.mobile_number;
+    }
+
+    // Sync business information
+    if (clientData.owner_name && clientData.owner_name !== this.originalEnquiryData?.owner_name) {
+      enquiryUpdates.owner_name = clientData.owner_name;
+    }
+
+    // Map constitution type back to business type
+    if (clientData.constitution_type) {
+      const constitutionToBusinessTypeMapping: { [key: string]: string } = {
+        'Private Limited Company': 'Private Limited',
+        'Proprietorship': 'Proprietorship',
+        'Partnership': 'Partnership'
+      };
+      
+      const mappedBusinessType = constitutionToBusinessTypeMapping[clientData.constitution_type];
+      if (mappedBusinessType && mappedBusinessType !== this.originalEnquiryData?.business_type) {
+        enquiryUpdates.business_type = mappedBusinessType;
+      }
+    }
+
+    // Sync loan information
+    if (clientData.required_loan_amount && clientData.required_loan_amount !== this.originalEnquiryData?.loan_amount) {
+      // Format loan amount for enquiry (convert number to string with currency if needed)
+      if (typeof clientData.required_loan_amount === 'number') {
+        enquiryUpdates.loan_amount = `₹${clientData.required_loan_amount.toLocaleString('en-IN')}`;
+      } else {
+        enquiryUpdates.loan_amount = clientData.required_loan_amount;
+      }
+    }
+
+    if (clientData.loan_purpose && clientData.loan_purpose !== this.originalEnquiryData?.loan_purpose) {
+      enquiryUpdates.loan_purpose = clientData.loan_purpose;
+    }
+
+    // Sync GST information
+    if (clientData.gst_status) {
+      if (clientData.gst_status === 'Active' && this.originalEnquiryData?.gst !== 'Yes') {
+        enquiryUpdates.gst = 'Yes';
+        enquiryUpdates.gst_status = 'Active';
+      } else if (clientData.gst_status !== this.originalEnquiryData?.gst_status) {
+        enquiryUpdates.gst_status = clientData.gst_status;
+      }
+    }
+
+    // Sync business document if uploaded in client form
+    if (this.uploadedFiles['business_document'] || clientData.business_document_url) {
+      const newDocumentUrl = clientData.business_document_url || clientData.documents?.business_document?.url;
+      if (newDocumentUrl && newDocumentUrl !== this.originalEnquiryData?.business_document_url) {
+        enquiryUpdates.business_document_url = newDocumentUrl;
+      }
+    }
+
+    // Only sync if there are actual changes
+    const hasChanges = Object.keys(enquiryUpdates).length > 3; // More than just client_submitted, client_id, updated_at
+    
+    if (hasChanges) {
+      console.log('Syncing enquiry updates:', enquiryUpdates);
+      
+      this.enquiryService.updateEnquiry(enquiryId, enquiryUpdates).subscribe({
+        next: (response) => {
+          console.log('Enquiry updated successfully with client data:', response);
+          this.success += ' Enquiry data synchronized!';
+        },
+        error: (error) => {
+          console.error('Error syncing data back to enquiry:', error);
+          // Don't show error to user as client creation was successful
+          console.warn('Client created successfully but enquiry sync failed');
+        }
+      });
+    } else {
+      // Just mark as submitted
+      this.updateEnquiryAsSubmitted(enquiryId);
+    }
+  }
+
+  // Enhanced method to detect changes between forms and original enquiry data
+  getFormChangesForSync(): any {
+    if (!this.originalEnquiryData) return {};
+    
+    const changes: any = {};
+    
+    // Check Step 1 changes
+    if (this.step1Form) {
+      const step1Values = this.step1Form.value;
+      
+      if (step1Values.trade_name !== this.originalEnquiryData.business_name) {
+        changes.business_name = step1Values.trade_name;
+      }
+      
+      if (step1Values.user_email !== this.originalEnquiryData.email_address) {
+        changes.email_address = step1Values.user_email;
+      }
+      
+      if (step1Values.mobile_number !== this.originalEnquiryData.mobile_number) {
+        changes.mobile_number = step1Values.mobile_number;
+      }
+    }
+    
+    // Check Step 2 changes
+    if (this.step2Form) {
+      const step2Values = this.step2Form.value;
+      
+      if (step2Values.owner_name !== this.originalEnquiryData.owner_name) {
+        changes.owner_name = step2Values.owner_name;
+      }
+    }
+    
+    // Check Step 4 changes
+    if (this.step4Form) {
+      const step4Values = this.step4Form.value;
+      
+      if (step4Values.required_loan_amount !== this.originalEnquiryData.loan_amount) {
+        changes.loan_amount = step4Values.required_loan_amount;
+      }
+      
+      if (step4Values.loan_purpose !== this.originalEnquiryData.loan_purpose) {
+        changes.loan_purpose = step4Values.loan_purpose;
+      }
+    }
+    
+    return changes;
+  }
+
+  // Method to sync form changes back to enquiry in real-time (optional)
+  syncFormChangesToEnquiry(): void {
+    if (!this.enquiryData?.enquiry_id) return;
+    
+    const changes = this.getFormChangesForSync();
+    
+    if (Object.keys(changes).length > 0) {
+      console.log('Syncing form changes to enquiry:', changes);
+      
+      this.enquiryService.updateEnquiry(this.enquiryData.enquiry_id, {
+        ...changes,
+        updated_at: new Date().toISOString()
+      }).subscribe({
+        next: (response) => {
+          console.log('Enquiry updated with form changes:', response);
+        },
+        error: (error) => {
+          console.error('Error syncing form changes to enquiry:', error);
+        }
+      });
+    }
   }
 }

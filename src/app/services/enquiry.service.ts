@@ -173,4 +173,33 @@ export class EnquiryService {
     const templatesUrl = `${environment.apiUrl}/whatsapp/templates`;
     return this.http.get<any>(templatesUrl, { headers: this.getHeaders() });
   }
+
+  // Business Document Upload Methods
+  uploadBusinessDocument(enquiryId: string, formData: FormData): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+      // Don't set Content-Type for FormData, let browser set it with boundary
+    });
+    
+    return this.http.post<any>(`${this.apiUrl}/${enquiryId}/business-document`, formData, { 
+      headers: headers 
+    }).pipe(
+      catchError((error: any) => {
+        console.error('Error uploading business document:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  removeBusinessDocument(enquiryId: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${enquiryId}/business-document`, { 
+      headers: this.getHeaders() 
+    }).pipe(
+      catchError((error: any) => {
+        console.error('Error removing business document:', error);
+        return throwError(() => error);
+      })
+    );
+  }
 }

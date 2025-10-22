@@ -1772,6 +1772,122 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Business document upload properties
+  businessDocumentUploading = false;
+
+  // Handle business document file selection
+  onBusinessDocumentSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      // Validate file size (10MB limit)
+      if (file.size > 10 * 1024 * 1024) {
+        this.snackBar.open('File size must be less than 10MB', 'Close', { duration: 3000 });
+        return;
+      }
+
+      // Validate file type
+      const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      if (!allowedTypes.includes(file.type)) {
+        this.snackBar.open('Please select a valid file type (PDF, JPG, PNG, DOC, DOCX)', 'Close', { duration: 3000 });
+        return;
+      }
+
+      this.uploadBusinessDocument(file);
+    }
+  }
+
+  // Upload business document
+  uploadBusinessDocument(file: File): void {
+    this.businessDocumentUploading = true;
+    
+    // Create FormData for file upload
+    const formData = new FormData();
+    formData.append('business_document', file);
+    
+    // Get current enquiry ID
+    const enquiryId = this.editingEnquiryId;
+    if (!enquiryId) {
+      this.businessDocumentUploading = false;
+      this.snackBar.open('Error: No enquiry selected for document upload', 'Close', { duration: 3000 });
+      return;
+    }
+
+    // Upload document using enquiry service
+    this.enquiryService.uploadBusinessDocument(enquiryId, formData)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: any) => {
+          this.businessDocumentUploading = false;
+          
+          // Update the form with the new document URL
+          this.registrationForm.patchValue({
+            business_document_url: response.business_document_url
+          });
+          
+          // Update the local enquiry data
+          const enquiryIndex = this.enquiries.findIndex(e => e._id === enquiryId);
+          if (enquiryIndex !== -1) {
+            this.enquiries[enquiryIndex].business_document_url = response.business_document_url;
+            this.applyFilters();
+          }
+          
+          this.snackBar.open('Business document uploaded successfully!', 'Close', { 
+            duration: 3000,
+            panelClass: ['success-snackbar']
+          });
+        },
+        error: (error: any) => {
+          this.businessDocumentUploading = false;
+          console.error('Error uploading business document:', error);
+          this.snackBar.open('Error uploading document. Please try again.', 'Close', { 
+            duration: 3000,
+            panelClass: ['error-snackbar']
+          });
+        }
+      });
+  }
+
+  // Remove business document
+  removeBusinessDocument(): void {
+    const enquiryId = this.editingEnquiryId;
+    if (!enquiryId) {
+      this.snackBar.open('Error: No enquiry selected', 'Close', { duration: 3000 });
+      return;
+    }
+
+    if (confirm('Are you sure you want to remove this business document?')) {
+      this.enquiryService.removeBusinessDocument(enquiryId)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            // Update the form
+            this.registrationForm.patchValue({
+              business_document_url: ''
+            });
+            
+            // Update the local enquiry data
+            const enquiryIndex = this.enquiries.findIndex(e => e._id === enquiryId);
+            if (enquiryIndex !== -1) {
+              this.enquiries[enquiryIndex].business_document_url = '';
+              this.applyFilters();
+            }
+            
+            this.snackBar.open('Business document removed successfully!', 'Close', { 
+              duration: 3000,
+              panelClass: ['success-snackbar']
+            });
+          },
+          error: (error: any) => {
+            console.error('Error removing business document:', error);
+            this.snackBar.open('Error removing document. Please try again.', 'Close', { 
+              duration: 3000,
+              panelClass: ['error-snackbar']
+            });
+          }
+        });
+    }
+  }
+
   // Close dropdown when clicking outside
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event): void {
@@ -1834,5 +1950,12 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.router.navigate(['/new-client']);
     }, 1500);
+  }
+
+  // Navigate to view client details
+  viewClient(clientId: string): void {
+    if (clientId) {
+      this.router.navigate(['/client-detail', clientId]);
+    }
   }
 }

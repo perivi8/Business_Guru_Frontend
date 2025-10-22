@@ -39,6 +39,7 @@ export interface Enquiry {
   enquiry_age_days?: number;
   // Client submission tracking
   client_submitted?: boolean; // Track if client has been created from this enquiry
+  client_id?: string; // ID of the client created from this enquiry
 }
 
 export interface StaffLockStatus {

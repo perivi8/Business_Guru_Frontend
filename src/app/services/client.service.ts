@@ -690,4 +690,19 @@ export class ClientService implements OnDestroy {
       })
     );
   }
+
+  // Business Document Sync Methods
+  syncBusinessDocumentToEnquiry(enquiryId: string, businessDocumentUrl: string): Observable<any> {
+    return this.http.put<any>(`${environment.apiUrl}/enquiries/${enquiryId}`, {
+      business_document_url: businessDocumentUrl
+    }, {
+      headers: this.getHeaders(),
+      withCredentials: true
+    }).pipe(
+      catchError(error => {
+        console.error('Error syncing business document to enquiry:', error);
+        return throwError(() => new Error(error.error?.error || 'Failed to sync business document'));
+      })
+    );
+  }
 }
