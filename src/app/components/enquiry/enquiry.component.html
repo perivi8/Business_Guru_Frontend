@@ -466,24 +466,24 @@
                 </td>
               </ng-container>
 
-              <!-- Name Column -->
-              <ng-container matColumnDef="wati_name">
-                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Name</th>
+              <!-- Owner Name Column -->
+              <ng-container matColumnDef="owner_name">
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Owner Name</th>
                 <td mat-cell *matCellDef="let enquiry" class="px-4 py-3">
                   <div class="font-medium text-text-primary text-sm">
-                    {{ enquiry.wati_name }}
+                    {{ enquiry.owner_name || enquiry.wati_name }}
                   </div>
-                  <div *ngIf="enquiry.user_name" class="text-xs text-text-muted">
-                    {{ enquiry.user_name }}
+                  <div class="text-xs text-text-muted mt-1" *ngIf="enquiry.user_name">
+                    User: {{ enquiry.user_name }}
                   </div>
                 </td>
               </ng-container>
 
-              <!-- Mobile Number Column -->
-              <ng-container matColumnDef="mobile_number">
-                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Mobile</th>
+              <!-- Phone Number Column -->
+              <ng-container matColumnDef="phone_number">
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Phone Number</th>
                 <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-sm text-text-secondary">
-                  {{ enquiry.mobile_number }}
+                  {{ enquiry.phone_number || enquiry.mobile_number }}
                 </td>
               </ng-container>
 
@@ -502,11 +502,53 @@
                 </td>
               </ng-container>
 
-              <!-- Business Type Column -->
-              <ng-container matColumnDef="business_type">
-                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Business Type</th>
+              <!-- Business Name Column -->
+              <ng-container matColumnDef="business_name">
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Business Name</th>
                 <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-sm text-text-secondary">
-                  {{ enquiry.business_type || '-' }}
+                  {{ enquiry.business_name || '-' }}
+                </td>
+              </ng-container>
+
+              <!-- Loan Amount Column -->
+              <ng-container matColumnDef="loan_amount">
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Loan Amount</th>
+                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-sm text-text-secondary">
+                  {{ enquiry.loan_amount || '-' }}
+                </td>
+              </ng-container>
+
+              <!-- Loan Purpose Column -->
+              <ng-container matColumnDef="loan_purpose">
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Loan Purpose</th>
+                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-sm text-text-secondary">
+                  {{ enquiry.loan_purpose || '-' }}
+                </td>
+              </ng-container>
+
+              <!-- Email Address Column -->
+              <ng-container matColumnDef="email_address">
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Email Address</th>
+                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-sm text-text-secondary">
+                  {{ enquiry.email_address || '-' }}
+                </td>
+              </ng-container>
+
+              <!-- Business Document Column -->
+              <ng-container matColumnDef="business_document">
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Business Document</th>
+                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-sm text-center">
+                  <div *ngIf="enquiry.business_document_url; else noDocument">
+                    <button (click)="previewDocument(enquiry.business_document_url)" 
+                            class="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded text-xs font-medium transition-colors"
+                            matTooltip="Preview Document">
+                      <mat-icon class="text-sm">visibility</mat-icon>
+                      Preview
+                    </button>
+                  </div>
+                  <ng-template #noDocument>
+                    <span class="text-gray-400 text-xs">N/A</span>
+                  </ng-template>
                 </td>
               </ng-container>
 
@@ -528,6 +570,40 @@
                         [title]="enquiry.comments || 'No Comment'">
                     {{ enquiry.comments || 'No Comment' }}
                   </span>
+                </td>
+              </ng-container>
+
+              <!-- Shortlist Column -->
+              <ng-container matColumnDef="shortlist">
+                <th mat-header-cell *matHeaderCellDef class="text-center font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Shortlist</th>
+                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-center">
+                  <div class="flex items-center justify-center">
+                    <!-- Shortlist Button (Red) - Show when verified but not submitted -->
+                    <button *ngIf="canShowShortlistButton(enquiry)" 
+                            (click)="shortlistEnquiry(enquiry)"
+                            class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:scale-105 shadow-md hover:shadow-lg flex items-center gap-2"
+                            matTooltip="Shortlist this enquiry for client creation"
+                            matTooltipPosition="above">
+                      <mat-icon class="text-sm">playlist_add</mat-icon>
+                      Shortlist
+                    </button>
+                    
+                    <!-- Submitted Button (Green) - Show when already submitted -->
+                    <button *ngIf="isEnquirySubmitted(enquiry)"
+                            disabled
+                            class="px-4 py-2 bg-green-500 text-white text-sm font-medium rounded-lg opacity-75 cursor-not-allowed flex items-center gap-2 shadow-md"
+                            matTooltip="Client already created from this enquiry"
+                            matTooltipPosition="above">
+                      <mat-icon class="text-sm">check_circle</mat-icon>
+                      Submitted
+                    </button>
+                    
+                    <!-- Empty state for non-verified enquiries -->
+                    <span *ngIf="!canShowShortlistButton(enquiry) && !isEnquirySubmitted(enquiry)" 
+                          class="text-gray-400 text-sm">
+                      -
+                    </span>
+                  </div>
                 </td>
               </ng-container>
 
@@ -676,14 +752,14 @@
                   </div>
                 </div>
 
-                <!-- Business Nature (if available) -->
-                <div *ngIf="enquiry.business_nature" class="flex items-start gap-3">
+                <!-- Business Name (if available) -->
+                <div *ngIf="enquiry.business_name" class="flex items-start gap-3">
                   <div class="w-8 h-8 bg-orange-50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <mat-icon class="text-orange-600 text-lg">category</mat-icon>
+                    <mat-icon class="text-orange-600 text-lg">business</mat-icon>
                   </div>
                   <div class="flex-1 min-w-0">
-                    <p class="text-xs font-medium text-text-muted uppercase tracking-wide mb-1">Business Nature</p>
-                    <p class="text-sm text-text-primary">{{ enquiry.business_nature }}</p>
+                    <p class="text-xs font-medium text-text-muted uppercase tracking-wide mb-1">Business Name</p>
+                    <p class="text-sm text-text-primary">{{ enquiry.business_name }}</p>
                   </div>
                 </div>
               </div>
@@ -783,6 +859,33 @@
               <input type="text" 
                      formControlName="user_name"
                      placeholder="Enter user name"
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors">
+            </div>
+
+            <!-- Owner Name -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Owner Name (Optional)</label>
+              <input type="text" 
+                     formControlName="owner_name"
+                     placeholder="Enter owner name"
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors">
+            </div>
+
+            <!-- Phone Number -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number (Optional)</label>
+              <input type="tel" 
+                     formControlName="phone_number"
+                     placeholder="Enter phone number"
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors">
+            </div>
+
+            <!-- Email Address -->
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Email Address (Optional)</label>
+              <input type="email" 
+                     formControlName="email_address"
+                     placeholder="Enter email address"
                      class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors">
             </div>
 
@@ -912,10 +1015,10 @@
 
               <!-- Business Nature -->
               <div class="w-full">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Business Nature (Optional)</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Business Name (Optional)</label>
                 <input type="text" 
-                       formControlName="business_nature" 
-                       placeholder="e.g., Electronics, Clothing"
+                       formControlName="business_name" 
+                       placeholder="e.g., ABC Electronics Pvt Ltd"
                        class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors">
               </div>
 
@@ -1010,6 +1113,45 @@
                     </button>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Loan Information Section -->
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <div class="flex items-center gap-3 mb-6">
+              <div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
+                <mat-icon class="text-yellow-600 text-lg">account_balance</mat-icon>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-900">Loan Information</h3>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <!-- Loan Amount -->
+              <div class="w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Loan Amount (Optional)</label>
+                <input type="text" 
+                       formControlName="loan_amount" 
+                       placeholder="e.g., ₹5-10 Lakh"
+                       class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors">
+              </div>
+
+              <!-- Loan Purpose -->
+              <div class="w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Loan Purpose (Optional)</label>
+                <input type="text" 
+                       formControlName="loan_purpose" 
+                       placeholder="e.g., Business Expansion"
+                       class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors">
+              </div>
+
+              <!-- Annual Revenue -->
+              <div class="w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Annual Revenue (Optional)</label>
+                <input type="text" 
+                       formControlName="annual_revenue" 
+                       placeholder="e.g., ₹1-5 Crore"
+                       class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors">
               </div>
             </div>
           </div>

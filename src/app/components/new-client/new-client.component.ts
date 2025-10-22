@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ClientService } from '../../services/client.service';
 import { UserService, User } from '../../services/user.service';
+import { EnquiryService } from '../../services/enquiry.service';
 
 @Component({
   selector: 'app-new-client',
@@ -24,6 +25,10 @@ export class NewClientComponent implements OnInit {
   
   staffMembers: User[] = [];
   uploadedFiles: { [key: string]: File } = {};
+  
+  // Enquiry data from session storage
+  enquiryData: any = null;
+  businessDocumentFromEnquiry: string | null = null;
   
   // Dynamic form data
   constitutionType = '';
@@ -134,13 +139,15 @@ export class NewClientComponent implements OnInit {
     private formBuilder: FormBuilder,
     private router: Router,
     private clientService: ClientService,
-    private userService: UserService
+    private userService: UserService,
+    private enquiryService: EnquiryService
   ) { }
 
   ngOnInit(): void {
     this.initializeForms();
     this.loadStaffMembers();
     this.filteredBankNames = [];
+    this.loadEnquiryData();
   }
 
   initializeForms(): void {
@@ -206,6 +213,11 @@ export class NewClientComponent implements OnInit {
     
     // Set flag to indicate forms are initialized
     this.formsInitialized = true;
+    
+    // Pre-fill forms with enquiry data if available
+    if (this.enquiryData) {
+      this.prefillFormsWithEnquiryData();
+    }
   }
 
   loadStaffMembers(): void {
@@ -221,6 +233,96 @@ export class NewClientComponent implements OnInit {
         console.error('Error loading staff members:', error);
       }
     });
+  }
+
+  loadEnquiryData(): void {
+    // Check if there's enquiry data in session storage
+    const enquiryDataStr = sessionStorage.getItem('enquiry_data_for_client');
+    if (enquiryDataStr) {
+      try {
+        this.enquiryData = JSON.parse(enquiryDataStr);
+        console.log('Loaded enquiry data:', this.enquiryData);
+        
+        // Show success message about data loading
+        this.success = `Pre-filled with data from verified enquiry for ${this.enquiryData.owner_name}`;
+        
+        // Pre-fill the forms with enquiry data
+        this.prefillFormsWithEnquiryData();
+        
+        // Clear the session storage after loading
+        sessionStorage.removeItem('enquiry_data_for_client');
+        
+        // Clear success message after 5 seconds
+        setTimeout(() => {
+          this.success = '';
+        }, 5000);
+      } catch (error) {
+        console.error('Error parsing enquiry data:', error);
+        sessionStorage.removeItem('enquiry_data_for_client');
+        this.error = 'Failed to load enquiry data. Please fill the form manually.';
+        setTimeout(() => {
+          this.error = '';
+        }, 5000);
+      }
+    }
+  }
+
+  prefillFormsWithEnquiryData(): void {
+    if (!this.enquiryData || !this.formsInitialized) {
+      return;
+    }
+
+    // Pre-fill Step 1 form (Basic Info & GST)
+    if (this.step1Form) {
+      // Set trade name from business name
+      if (this.enquiryData.business_name) {
+        this.step1Form.patchValue({
+          trade_name: this.enquiryData.business_name
+        });
+      }
+      
+      // Set user email from enquiry email
+      if (this.enquiryData.email_address) {
+        this.step1Form.patchValue({
+          user_email: this.enquiryData.email_address
+        });
+      }
+      
+      // Set mobile number
+      if (this.enquiryData.mobile_number) {
+        this.step1Form.patchValue({
+          mobile_number: this.enquiryData.mobile_number
+        });
+      }
+    }
+
+    // Pre-fill Step 2 form (Owner name)
+    if (this.step2Form && this.enquiryData.owner_name) {
+      this.step2Form.patchValue({
+        owner_name: this.enquiryData.owner_name
+      });
+    }
+
+    // Pre-fill Step 4 form (Loan details)
+    if (this.step4Form) {
+      if (this.enquiryData.loan_amount) {
+        this.step4Form.patchValue({
+          required_loan_amount: this.enquiryData.loan_amount
+        });
+      }
+      
+      if (this.enquiryData.loan_purpose) {
+        this.step4Form.patchValue({
+          loan_purpose: this.enquiryData.loan_purpose
+        });
+      }
+    }
+
+    // Handle business document if available
+    if (this.enquiryData.business_document_url) {
+      // Store the business document URL for later use
+      this.businessDocumentFromEnquiry = this.enquiryData.business_document_url;
+    }
   }
 
   onFileSelected(event: any, fieldName: string): void {
@@ -455,7 +557,9 @@ export class NewClientComponent implements OnInit {
       ...this.step4Form.value,
       constitution_type: this.constitutionType,
       number_of_partners: this.numberOfPartners,
-      has_business_pan: this.hasBusinessPan
+      has_business_pan: this.hasBusinessPan,
+      // Include enquiry_id if this client was created from an enquiry
+      ...(this.enquiryData?.enquiry_id && { enquiry_id: this.enquiryData.enquiry_id })
     };
     
     // Add form fields
@@ -468,6 +572,11 @@ export class NewClientComponent implements OnInit {
       formData.append(key, this.uploadedFiles[key]);
     });
 
+    // Add business document URL from enquiry if available
+    if (this.businessDocumentFromEnquiry) {
+      formData.append('business_document_from_enquiry', this.businessDocumentFromEnquiry);
+    }
+
     // Add bank statement files
     this.bankStatements.forEach((statement, index) => {
       if (statement.file) {
@@ -478,6 +587,12 @@ export class NewClientComponent implements OnInit {
     this.clientService.createClient(formData).subscribe({
       next: (response) => {
         this.success = 'Client created successfully!';
+        
+        // Update enquiry status to submitted if this came from an enquiry
+        if (this.enquiryData?.enquiry_id) {
+          this.updateEnquiryAsSubmitted(this.enquiryData.enquiry_id);
+        }
+        
         setTimeout(() => {
           this.router.navigate(['/clients']);
         }, 2000);
@@ -989,5 +1104,69 @@ export class NewClientComponent implements OnInit {
       this.isTransactionMonthsDropdownOpen = false;
       this.isStaffDropdownOpen = false;
     }
+  }
+
+  getBusinessDocumentStatus(): string {
+    // Check if there's a business document from enquiry
+    if (this.businessDocumentFromEnquiry) {
+      return 'Yes (From Enquiry)';
+    }
+    
+    // Check if there's an uploaded business document
+    if (this.uploadedFiles['business_document']) {
+      return 'Yes (Uploaded)';
+    }
+    
+    return 'No';
+  }
+
+  viewBusinessDocument(): void {
+    if (this.businessDocumentFromEnquiry) {
+      // Open the business document URL in a new tab
+      window.open(this.businessDocumentFromEnquiry, '_blank');
+    }
+  }
+
+  isFieldPreFilled(fieldName: string): boolean {
+    if (!this.enquiryData) return false;
+    
+    const fieldMappings: { [key: string]: string } = {
+      'trade_name': 'business_name',
+      'user_email': 'email_address',
+      'mobile_number': 'mobile_number',
+      'owner_name': 'owner_name',
+      'required_loan_amount': 'loan_amount',
+      'loan_purpose': 'loan_purpose'
+    };
+    
+    const enquiryField = fieldMappings[fieldName];
+    return enquiryField && this.enquiryData[enquiryField] && this.enquiryData[enquiryField].toString().trim() !== '';
+  }
+
+  getPreFilledFieldClass(fieldName: string): string {
+    return this.isFieldPreFilled(fieldName) ? 'border-green-300 bg-green-50' : '';
+  }
+
+  formatMobileNumber(mobile: string): string {
+    if (!mobile) return '';
+    // Format as XXX-XXX-XXXX
+    const cleaned = mobile.replace(/\D/g, '');
+    if (cleaned.length === 10) {
+      return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
+    }
+    return mobile;
+  }
+
+  updateEnquiryAsSubmitted(enquiryId: string): void {
+    // Update the enquiry to mark it as client_submitted = true
+    this.enquiryService.updateEnquiry(enquiryId, { client_submitted: true }).subscribe({
+      next: (response) => {
+        console.log('Enquiry marked as submitted:', response);
+      },
+      error: (error) => {
+        console.error('Error updating enquiry status:', error);
+        // Don't show error to user as client creation was successful
+      }
+    });
   }
 }

@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
 import { EnquiryService } from '../../services/enquiry.service';
 import { UserService, User } from '../../services/user.service';
 import { Enquiry, COMMENT_OPTIONS } from '../../models/enquiry.interface';
@@ -17,9 +18,9 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   enquiries: Enquiry[] = [];
   filteredEnquiries: Enquiry[] = [];
   displayedColumns: string[] = [
-    'sno', 'date', 'wati_name', 'mobile_number', 
-    'gst', 'business_type', 'staff', 
-    'comments', 'actions'
+    'sno', 'date', 'owner_name', 'phone_number', 
+    'gst', 'business_name', 'loan_amount', 'loan_purpose', 
+    'email_address', 'business_document', 'staff', 'comments', 'shortlist', 'actions'
   ];
   
   staffMembers: User[] = [];
@@ -142,7 +143,8 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     private enquiryService: EnquiryService,
     private userService: UserService,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private router: Router
   ) {
     this.registrationForm = this.createRegistrationForm();
   }
@@ -157,10 +159,10 @@ export class EnquiryComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$),
       switchMap(({enquiry, value}) => {
         // Update the local value immediately for UI feedback
-        enquiry.business_nature = value;
+        enquiry.business_name = value;
         // Call the service to update the enquiry in the backend
         if (enquiry._id) {
-          return this.enquiryService.updateEnquiry(enquiry._id, { business_nature: value });
+          return this.enquiryService.updateEnquiry(enquiry._id, { business_name: value });
         }
         return [];
       })
@@ -230,28 +232,35 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     const form = this.fb.group({
       date: [new Date(), Validators.required],
       wati_name: ['', Validators.required],
+      owner_name: [''],
       user_name: [''],
       country_code: ['+91', Validators.required], // Default to India
       mobile_number: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
+      phone_number: [''],
+      email_address: ['', [Validators.email]],
       secondary_mobile_number: [''],
       gst: [''], // Optional - user can leave this unselected
       gst_status: [''],
       business_type: [''],
-      business_nature: [''],
+      business_name: [''],
+      loan_amount: [''],
+      loan_purpose: [''],
+      annual_revenue: [''],
+      business_document_url: [''],
       staff: ['', Validators.required],
       comments: [''], // Made optional - removed Validators.required
       additional_comments: ['']
     });
     
-    // Add value change listener for comments to dynamically validate business_nature
+    // Add value change listener for comments to dynamically validate business_name
     form.get('comments')?.valueChanges.subscribe(value => {
-      const businessNatureControl = form.get('business_nature');
+      const businessNameControl = form.get('business_name');
       if (this.isEditMode && value === 'Not Eligible') {
-        businessNatureControl?.setValidators([Validators.required]);
+        businessNameControl?.setValidators([Validators.required]);
       } else {
-        businessNatureControl?.clearValidators();
+        businessNameControl?.clearValidators();
       }
-      businessNatureControl?.updateValueAndValidity();
+      businessNameControl?.updateValueAndValidity();
     });
     
     return form;
@@ -646,7 +655,70 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   // Update comments for an enquiry
   updateComments(enquiry: Enquiry, comments: string): void {
     enquiry.comments = comments;
-    // Call the service to update the enquiry in the backend
+    
+    // Check if the comment is "Verified(Shortlisted)" and redirect to new client page
+    if (comments === 'Verified(Shortlisted)') {
+      // Validate required data before proceeding
+      const ownerName = enquiry.owner_name || enquiry.wati_name;
+      const mobileNumber = enquiry.mobile_number || enquiry.phone_number;
+      
+      if (!ownerName || !mobileNumber) {
+        this.snackBar.open('Missing required data (Owner name or mobile number). Please complete the enquiry first.', 'Close', { 
+          duration: 5000,
+          panelClass: ['error-snackbar']
+        });
+        return;
+      }
+      
+      // Store enquiry data in session storage for the new client form
+      const enquiryData = {
+        owner_name: ownerName,
+        business_name: enquiry.business_name || '',
+        email_address: enquiry.email_address || '',
+        mobile_number: mobileNumber,
+        loan_amount: enquiry.loan_amount || '',
+        loan_purpose: enquiry.loan_purpose || '',
+        business_document_url: enquiry.business_document_url || null,
+        enquiry_id: enquiry._id,
+        verified_date: new Date().toISOString()
+      };
+      
+      sessionStorage.setItem('enquiry_data_for_client', JSON.stringify(enquiryData));
+      
+      // Update the comment first, then redirect
+      if (enquiry._id) {
+        this.enquiryService.updateEnquiry(enquiry._id, { comments: comments })
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: (updatedEnquiry: any) => {
+              // Update the local enquiry with the response from the server
+              const index = this.enquiries.findIndex(e => e._id === enquiry._id);
+              if (index !== -1) {
+                this.enquiries[index] = { ...this.enquiries[index], ...updatedEnquiry };
+                this.applyFilters();
+              }
+              
+              // Show success message and redirect
+              this.snackBar.open('Enquiry verified! Redirecting to new client form...', 'Close', { 
+                duration: 3000,
+                panelClass: ['success-snackbar']
+              });
+              
+              // Redirect to new client page after a short delay
+              setTimeout(() => {
+                this.router.navigate(['/new-client']);
+              }, 1500);
+            },
+            error: (error) => {
+              console.error('Error updating enquiry comments:', error);
+              this.snackBar.open('Error updating comment', 'Close', { duration: 3000 });
+            }
+          });
+      }
+      return;
+    }
+    
+    // Regular comment update for non-verified comments
     if (enquiry._id) {
       this.enquiryService.updateEnquiry(enquiry._id, { comments: comments })
         .pipe(takeUntil(this.destroy$))
@@ -1141,14 +1213,21 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     this.registrationForm.patchValue({
       date: new Date(enquiry.date),
       wati_name: enquiry.wati_name || '',
+      owner_name: enquiry.owner_name || '',
       user_name: enquiry.user_name || '',
       country_code: countryCode,
       mobile_number: number,
+      phone_number: enquiry.phone_number || '',
+      email_address: enquiry.email_address || '',
       secondary_mobile_number: enquiry.secondary_mobile_number || '',
       gst: enquiry.gst || '',
       gst_status: enquiry.gst_status || '',
       business_type: enquiry.business_type || '',
-      business_nature: enquiry.business_nature || '',
+      business_name: enquiry.business_name || '',
+      loan_amount: enquiry.loan_amount || '',
+      loan_purpose: enquiry.loan_purpose || '',
+      annual_revenue: enquiry.annual_revenue || '',
+      business_document_url: enquiry.business_document_url || '',
       staff: enquiry.staff || '',
       comments: enquiry.comments || '',
       additional_comments: enquiry.additional_comments || ''
@@ -1686,6 +1765,13 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     this.closeDropdown();
   }
 
+  // Preview business document
+  previewDocument(documentUrl: string): void {
+    if (documentUrl) {
+      window.open(documentUrl, '_blank');
+    }
+  }
+
   // Close dropdown when clicking outside
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event): void {
@@ -1694,5 +1780,59 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     if (!target.closest('.relative')) {
       this.closeDropdown();
     }
+  }
+
+  // Shortlist button logic methods
+  canShowShortlistButton(enquiry: Enquiry): boolean {
+    // Show red shortlist button only when:
+    // 1. Comment is "Verified(Shortlisted)"
+    // 2. Enquiry is not yet submitted (no client created)
+    return enquiry.comments === 'Verified(Shortlisted)' && !enquiry.client_submitted;
+  }
+
+  isEnquirySubmitted(enquiry: Enquiry): boolean {
+    // Show green submitted button when client has been created from this enquiry
+    return enquiry.client_submitted === true;
+  }
+
+  shortlistEnquiry(enquiry: Enquiry): void {
+    // Validate required data before proceeding
+    const ownerName = enquiry.owner_name || enquiry.wati_name;
+    const mobileNumber = enquiry.mobile_number || enquiry.phone_number;
+    
+    if (!ownerName || !mobileNumber) {
+      this.snackBar.open('Missing required data (Owner name or mobile number). Please complete the enquiry first.', 'Close', { 
+        duration: 5000,
+        panelClass: ['error-snackbar']
+      });
+      return;
+    }
+    
+    // Store enquiry data in session storage for the new client form
+    const enquiryData = {
+      owner_name: ownerName,
+      business_name: enquiry.business_name || '',
+      email_address: enquiry.email_address || '',
+      mobile_number: mobileNumber,
+      loan_amount: enquiry.loan_amount || '',
+      loan_purpose: enquiry.loan_purpose || '',
+      business_document_url: enquiry.business_document_url || null,
+      enquiry_id: enquiry._id,
+      verified_date: new Date().toISOString(),
+      shortlisted_via_button: true // Flag to indicate this came from shortlist button
+    };
+    
+    sessionStorage.setItem('enquiry_data_for_client', JSON.stringify(enquiryData));
+    
+    // Show success message and redirect
+    this.snackBar.open('Enquiry shortlisted! Redirecting to new client form...', 'Close', { 
+      duration: 3000,
+      panelClass: ['success-snackbar']
+    });
+    
+    // Redirect to new client page after a short delay
+    setTimeout(() => {
+      this.router.navigate(['/new-client']);
+    }, 1500);
   }
 }

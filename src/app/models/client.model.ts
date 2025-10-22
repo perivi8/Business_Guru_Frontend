@@ -55,6 +55,9 @@ export interface Client {
   required_loan_amount?: number;
   loan_purpose?: string;
   
+  // Enquiry tracking
+  enquiry_id?: string; // Reference to the original enquiry
+  
   // Business information
   constitution_type?: string;
   gst_status?: string;

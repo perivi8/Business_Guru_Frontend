@@ -2,7 +2,15 @@
 <div class="max-w-4xl mx-auto">
   <!-- Dialog Header -->
   <div mat-dialog-title class="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-primary/5 to-secondary/5">
-    <h2 class="text-xl font-bold text-text-primary">Client Details</h2>
+    <div class="flex flex-col">
+      <h2 class="text-xl font-bold text-text-primary">Client Details</h2>
+      <div *ngIf="client.enquiry_id" class="flex items-center gap-2 mt-1">
+        <span class="text-sm text-gray-600">From Enquiry:</span>
+        <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
+          ID: {{ client.enquiry_id }}
+        </span>
+      </div>
+    </div>
     <button (click)="onClose()" 
             class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
             matTooltip="Close">

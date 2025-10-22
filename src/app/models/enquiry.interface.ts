@@ -3,13 +3,20 @@ export interface Enquiry {
   sno?: number;
   date: Date;
   wati_name: string;
+  owner_name?: string; // New field for owner name
   user_name?: string;
   mobile_number: string;
+  phone_number?: string; // New field for phone number
   secondary_mobile_number?: string;
+  email_address?: string; // New field for email address
   gst: 'Yes' | 'No' | 'Not Selected' | '';
   gst_status?: 'Active' | 'Cancel';
   business_type?: string;
-  business_nature?: string;
+  business_name?: string; // New field for business name
+  loan_amount?: string; // New field for loan amount
+  loan_purpose?: string; // New field for loan purpose
+  annual_revenue?: string; // New field for annual revenue
+  business_document_url?: string; // New field for business document URL
   staff: string;
   staff_locked?: boolean; // Add this property to track if staff assignment is locked
   comments: string;
@@ -30,6 +37,8 @@ export interface Enquiry {
   staff_dropdown_ui_state?: 'enabled' | 'enabled_priority' | 'disabled_locked' | 'disabled_error';
   is_old_enquiry?: boolean;
   enquiry_age_days?: number;
+  // Client submission tracking
+  client_submitted?: boolean; // Track if client has been created from this enquiry
 }
 
 export interface StaffLockStatus {

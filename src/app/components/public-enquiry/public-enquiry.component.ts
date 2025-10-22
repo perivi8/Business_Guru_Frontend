@@ -17,6 +17,10 @@ export class PublicEnquiryComponent implements OnInit, OnDestroy {
   whatsappNumber = '8106811285';
   whatsappSent = false;
   whatsappError = '';
+  showOtherLoanPurpose = false;
+  selectedFile: File | null = null;
+  fileUploading = false;
+  businessDocumentUrl = '';
 
   constructor(
     private fb: FormBuilder,
@@ -32,9 +36,14 @@ export class PublicEnquiryComponent implements OnInit, OnDestroy {
 
   createForm(): FormGroup {
     return this.fb.group({
-      wati_name: ['', [Validators.required, this.nameValidator]],
-      mobile_number: ['', [Validators.required, this.mobileValidator]],
-      business_nature: ['']
+      business_name: ['', [Validators.required]],
+      owner_name: ['', [Validators.required]],
+      email_address: ['', [Validators.required, Validators.email]],
+      phone_number: ['', [Validators.required]],
+      loan_amount: ['', [Validators.required]],
+      loan_purpose: ['', [Validators.required]],
+      loan_purpose_other: [''],
+      annual_revenue: ['', [Validators.required]]
     });
   }
 
@@ -84,6 +93,25 @@ export class PublicEnquiryComponent implements OnInit, OnDestroy {
     return null;
   }
 
+  // Handle loan purpose change to show/hide custom input
+  onLoanPurposeChange(event: any): void {
+    const selectedValue = event.target.value;
+    this.showOtherLoanPurpose = selectedValue === 'Other';
+    
+    const loanPurposeOtherControl = this.enquiryForm.get('loan_purpose_other');
+    
+    if (this.showOtherLoanPurpose) {
+      // Make custom input required when "Other" is selected
+      loanPurposeOtherControl?.setValidators([Validators.required]);
+    } else {
+      // Clear validators and value when not "Other"
+      loanPurposeOtherControl?.clearValidators();
+      this.enquiryForm.patchValue({ loan_purpose_other: '' });
+    }
+    
+    loanPurposeOtherControl?.updateValueAndValidity();
+  }
+
   // Allow only letters and spaces for name input
   onNameKeyPress(event: KeyboardEvent): void {
     const char = String.fromCharCode(event.which);
@@ -112,63 +140,140 @@ export class PublicEnquiryComponent implements OnInit, OnDestroy {
     }
   }
 
-  onSubmit(): void {
+  // Handle file selection
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      // Validate file size (5MB max)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File size must be less than 5MB');
+        return;
+      }
+      
+      // Validate file type
+      const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png', 
+                           'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      if (!allowedTypes.includes(file.type)) {
+        alert('Only PDF, JPG, PNG, DOC, and DOCX files are allowed');
+        return;
+      }
+      
+      this.selectedFile = file;
+      console.log('File selected:', file.name);
+    }
+  }
+
+  // Remove selected file
+  removeFile(event: Event): void {
+    event.stopPropagation();
+    this.selectedFile = null;
+    this.businessDocumentUrl = '';
+  }
+
+  // Upload file to backend
+  async uploadFileToBackend(file: File): Promise<string> {
+    this.fileUploading = true;
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+      const response = await this.http.post<any>(
+        `${environment.apiUrl}/upload-document`,
+        formData
+      ).toPromise();
+      
+      this.fileUploading = false;
+      return response.file_url;
+    } catch (error) {
+      this.fileUploading = false;
+      console.error('File upload failed:', error);
+      throw error;
+    }
+  }
+
+  async onSubmit(): Promise<void> {
     if (this.enquiryForm.valid && !this.submitting) {
       this.submitting = true;
       const formData = this.enquiryForm.value;
       
-      // Prepare data for backend
-      const enquiryData = {
-        wati_name: formData.wati_name,
-        mobile_number: formData.mobile_number,
-        business_nature: formData.business_nature || '',
-        staff: 'Public Enquiry',
-        comments: 'New Public Enquiry',
+      try {
+        // Upload file to backend if selected
+        let businessDocumentUrl = '';
+        if (this.selectedFile) {
+          businessDocumentUrl = await this.uploadFileToBackend(this.selectedFile);
+        }
+        
+        // Prepare data for backend
+        const finalLoanPurpose = formData.loan_purpose === 'Other' ? formData.loan_purpose_other : formData.loan_purpose;
+        
+        const enquiryData = {
+          business_name: formData.business_name,
+          owner_name: formData.owner_name,
+          wati_name: formData.owner_name, // Use owner_name as wati_name for compatibility
+          email_address: formData.email_address,
+          phone_number: formData.phone_number,
+          mobile_number: formData.phone_number, // Use phone_number as mobile_number for compatibility
+          loan_amount: formData.loan_amount,
+          loan_purpose: finalLoanPurpose,
+          annual_revenue: formData.annual_revenue,
+          business_document_url: businessDocumentUrl,
+          staff: 'Public Enquiry',
+          comments: 'New Public Enquiry - FinGrowth Form',
         gst: '',
         secondary_mobile_number: null
       };
 
-      // Send to backend
-      this.http.post(`${environment.apiUrl}/enquiries/public`, enquiryData)
-        .subscribe({
-          next: (response: any) => {
-            console.log('Enquiry submitted successfully:', response);
-            this.submitted = true;
-            this.success = true;
-            this.submitting = false;
-            
-            // Show WhatsApp status message
-            if (response.whatsapp_sent === true) {
-              console.log('WhatsApp message sent successfully');
-            } else if (response.whatsapp_error) {
-              console.log('WhatsApp message failed:', response.whatsapp_error);
-            }
-          },
-          error: (error) => {
-            console.error('Error submitting enquiry:', error);
-            this.submitting = false;
-            
-            // Check if mobile number already exists
-            if (error.status === 409 && error.error?.error === 'mobile_exists') {
-              this.mobileExists = true;
+      // Debug logging
+      console.log('Form Data:', formData);
+      console.log('Enquiry Data being sent:', enquiryData);
+
+        // Send to backend
+        this.http.post(`${environment.apiUrl}/enquiries/public`, enquiryData)
+          .subscribe({
+            next: (response: any) => {
+              console.log('Enquiry submitted successfully:', response);
               this.submitted = true;
-              this.success = false;
+              this.success = true;
+              this.submitting = false;
               
-              // Check WhatsApp sending status
-              this.whatsappSent = error.error?.whatsapp_sent || false;
-              this.whatsappError = error.error?.whatsapp_error || '';
-              
-              if (this.whatsappSent) {
-                console.log('WhatsApp message sent automatically to existing user');
-              } else if (this.whatsappError) {
-                console.log('WhatsApp message failed:', this.whatsappError);
+              // Show WhatsApp status message
+              if (response.whatsapp_sent === true) {
+                console.log('WhatsApp message sent successfully');
+              } else if (response.whatsapp_error) {
+                console.log('WhatsApp message failed:', response.whatsapp_error);
               }
-            } else {
-              this.submitted = true;
-              this.success = false;
+            },
+            error: (error) => {
+              console.error('Error submitting enquiry:', error);
+              this.submitting = false;
+              
+              // Check if mobile number already exists
+              if (error.status === 409 && error.error?.error === 'mobile_exists') {
+                this.mobileExists = true;
+                this.submitted = true;
+                this.success = false;
+                
+                // Check WhatsApp sending status
+                this.whatsappSent = error.error?.whatsapp_sent || false;
+                this.whatsappError = error.error?.whatsapp_error || '';
+                
+                if (this.whatsappSent) {
+                  console.log('WhatsApp message sent automatically to existing user');
+                } else if (this.whatsappError) {
+                  console.log('WhatsApp message failed:', this.whatsappError);
+                }
+              } else {
+                this.submitted = true;
+                this.success = false;
+              }
             }
-          }
-        });
+          });
+      } catch (error) {
+        console.error('Error during form submission:', error);
+        this.submitting = false;
+        alert('An error occurred while submitting the form. Please try again.');
+      }
     }
   }
 
