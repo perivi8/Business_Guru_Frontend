@@ -538,12 +538,19 @@
               <ng-container matColumnDef="business_document">
                 <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Business Document</th>
                 <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-sm text-center">
-                  <div *ngIf="enquiry.business_document_url; else noDocument">
+                  <div *ngIf="enquiry.business_document_url; else noDocument" class="flex items-center justify-center gap-2">
+                    <!-- Preview Button -->
                     <button (click)="previewDocument(enquiry.business_document_url)" 
-                            class="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded text-xs font-medium transition-colors"
+                            class="inline-flex items-center justify-center w-8 h-8 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full transition-colors"
                             matTooltip="Preview Document">
                       <mat-icon class="text-sm">visibility</mat-icon>
-                      Preview
+                    </button>
+                    
+                    <!-- Download Button -->
+                    <button (click)="downloadDocument(enquiry.business_document_url, enquiry._id)" 
+                            class="inline-flex items-center justify-center w-8 h-8 bg-green-100 hover:bg-green-200 text-green-700 rounded-full transition-colors"
+                            matTooltip="Download Document">
+                      <mat-icon class="text-sm">download</mat-icon>
                     </button>
                   </div>
                   <ng-template #noDocument>
@@ -1191,9 +1198,15 @@
                     <div class="flex items-center gap-2">
                       <button type="button" 
                               (click)="previewDocument(registrationForm.get('business_document_url')?.value)"
-                              class="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-xs rounded-md transition-colors">
+                              class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-md transition-colors">
                         <mat-icon class="text-sm mr-1">visibility</mat-icon>
-                        View
+                        Preview
+                      </button>
+                      <button type="button" 
+                              (click)="downloadDocument(registrationForm.get('business_document_url')?.value, editingEnquiryId || undefined)"
+                              class="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-xs rounded-md transition-colors">
+                        <mat-icon class="text-sm mr-1">download</mat-icon>
+                        Download
                       </button>
                       <button type="button" 
                               (click)="removeBusinessDocument()"

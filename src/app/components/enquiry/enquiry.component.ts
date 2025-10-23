@@ -1767,8 +1767,433 @@ export class EnquiryComponent implements OnInit, OnDestroy {
 
   // Preview business document
   previewDocument(documentUrl: string): void {
-    if (documentUrl) {
+    if (!documentUrl) {
+      this.snackBar.open('Document URL not available', 'Close', { duration: 3000 });
+      return;
+    }
+
+    console.log('📄 Previewing document:', documentUrl);
+
+    // Check if it's a PDF by URL extension or file format
+    // For Cloudinary raw uploads, PDFs might not have .pdf in URL, so we check multiple indicators
+    const isPdf = documentUrl.toLowerCase().includes('.pdf') || 
+                  documentUrl.includes('pdf') ||
+                  documentUrl.includes('resource_type/raw') || // Cloudinary raw uploads are typically PDFs
+                  documentUrl.includes('/raw/') || // Alternative Cloudinary raw format
+                  // Assume business documents are PDFs unless clearly an image format
+                  (!documentUrl.toLowerCase().includes('.jpg') && 
+                   !documentUrl.toLowerCase().includes('.jpeg') && 
+                   !documentUrl.toLowerCase().includes('.png') && 
+                   !documentUrl.toLowerCase().includes('.gif') &&
+                   !documentUrl.toLowerCase().includes('.webp'));
+    
+    if (isPdf) {
+      // Create a more robust PDF preview
+      this.previewPdfDocument(documentUrl);
+    } else {
+      // For images and other documents, use direct opening
+      this.previewImageDocument(documentUrl);
+    }
+  }
+
+  // Preview PDF documents with better handling
+  private previewPdfDocument(documentUrl: string): void {
+    try {
+      // Optimize Cloudinary URL for PDF viewing
+      const optimizedUrl = this.optimizeCloudinaryPdfUrl(documentUrl);
+      console.log('Original URL:', documentUrl);
+      console.log('Optimized URL:', optimizedUrl);
+
+      // Try to open PDF in a new window with multiple fallback methods
+      const newWindow = window.open('', '_blank');
+      if (newWindow) {
+        newWindow.document.write(`
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <title>PDF Preview - Business Document</title>
+              <style>
+                body, html { 
+                  margin: 0; 
+                  padding: 0; 
+                  height: 100%; 
+                  overflow: hidden; 
+                  background: #525659;
+                  font-family: Arial, sans-serif;
+                }
+                .pdf-container {
+                  width: 100%;
+                  height: 100vh;
+                  display: flex;
+                  flex-direction: column;
+                }
+                .pdf-header {
+                  background: #323639;
+                  color: white;
+                  padding: 10px 20px;
+                  font-size: 14px;
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                }
+                .pdf-viewer {
+                  flex: 1;
+                  width: 100%;
+                  border: none;
+                }
+                .error-message {
+                  display: flex;
+                  flex-direction: column;
+                  justify-content: center;
+                  align-items: center;
+                  height: 100vh;
+                  background: #f5f5f5;
+                  color: #333;
+                  text-align: center;
+                  padding: 20px;
+                }
+                .retry-btn {
+                  background: #2563eb;
+                  color: white;
+                  border: none;
+                  padding: 10px 20px;
+                  border-radius: 5px;
+                  cursor: pointer;
+                  margin: 5px;
+                  min-width: 120px;
+                }
+                .retry-btn:hover {
+                  background: #1d4ed8;
+                }
+                .loading-message {
+                  display: flex;
+                  flex-direction: column;
+                  justify-content: center;
+                  align-items: center;
+                  height: 100vh;
+                  background: #f5f5f5;
+                  color: #333;
+                  text-align: center;
+                }
+              </style>
+            </head>
+            <body>
+              <div class="pdf-container">
+                <div class="pdf-header">
+                  <span>📄 Business Document Preview</span>
+                  <div>
+                    <a href="${optimizedUrl}" target="_blank" style="color: #60a5fa; text-decoration: none; margin-right: 15px;">
+                      ⬇ Download
+                    </a>
+                    <button onclick="tryAlternativeViewer()" style="background: #10b981; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">
+                      Alternative View
+                    </button>
+                  </div>
+                </div>
+                
+                <!-- Loading message -->
+                <div id="loadingDiv" class="loading-message">
+                  <h3>📄 Loading PDF...</h3>
+                  <p>Please wait while the document loads.</p>
+                </div>
+
+                <!-- Primary PDF viewer (embed) -->
+                <embed id="pdfEmbed" 
+                       class="pdf-viewer" 
+                       src="${optimizedUrl}" 
+                       type="application/pdf"
+                       style="display: none;"
+                       onload="onPdfLoad()"
+                       onerror="tryIframeMethod()">
+
+                <!-- Fallback PDF viewer (iframe) -->
+                <iframe id="pdfIframe" 
+                        class="pdf-viewer" 
+                        src="${optimizedUrl}"
+                        style="display: none;"
+                        onload="onPdfLoad()"
+                        onerror="tryObjectMethod()">
+                </iframe>
+
+                <!-- Second fallback (object) -->
+                <object id="pdfObject" 
+                        class="pdf-viewer" 
+                        data="${optimizedUrl}" 
+                        type="application/pdf"
+                        style="display: none;"
+                        onload="onPdfLoad()">
+                  <p>Your browser doesn't support PDF viewing.</p>
+                </object>
+
+                <!-- Error message -->
+                <div id="errorDiv" class="error-message" style="display: none;">
+                  <h3>⚠️ Unable to preview PDF</h3>
+                  <p>The PDF viewer couldn't load this document.</p>
+                  <p><strong>Possible causes:</strong></p>
+                  <ul style="text-align: left; max-width: 400px;">
+                    <li>Browser security settings blocking the PDF</li>
+                    <li>Cloudinary CORS configuration</li>
+                    <li>PDF file format issues</li>
+                    <li>Network connectivity problems</li>
+                  </ul>
+                  <div style="margin-top: 20px;">
+                    <button class="retry-btn" onclick="window.open('${optimizedUrl}', '_blank')">
+                      📱 Open in New Tab
+                    </button>
+                    <button class="retry-btn" onclick="downloadPdf()">
+                      💾 Download PDF
+                    </button>
+                    <button class="retry-btn" onclick="location.reload()">
+                      🔄 Retry Preview
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <script>
+                let currentMethod = 0;
+                const methods = ['pdfEmbed', 'pdfIframe', 'pdfObject'];
+                let loadTimeout;
+
+                function onPdfLoad() {
+                  clearTimeout(loadTimeout);
+                  document.getElementById('loadingDiv').style.display = 'none';
+                  console.log('PDF loaded successfully with method:', methods[currentMethod]);
+                }
+
+                function tryNextMethod() {
+                  if (currentMethod < methods.length - 1) {
+                    // Hide current method
+                    document.getElementById(methods[currentMethod]).style.display = 'none';
+                    currentMethod++;
+                    
+                    // Show next method
+                    const nextElement = document.getElementById(methods[currentMethod]);
+                    nextElement.style.display = 'block';
+                    
+                    console.log('Trying method:', methods[currentMethod]);
+                    
+                    // Set timeout for next method
+                    loadTimeout = setTimeout(() => {
+                      if (currentMethod < methods.length - 1) {
+                        tryNextMethod();
+                      } else {
+                        showError();
+                      }
+                    }, 4000);
+                  } else {
+                    showError();
+                  }
+                }
+
+                function tryIframeMethod() {
+                  console.log('Embed method failed, trying iframe...');
+                  tryNextMethod();
+                }
+
+                function tryObjectMethod() {
+                  console.log('Iframe method failed, trying object...');
+                  tryNextMethod();
+                }
+
+                function showError() {
+                  clearTimeout(loadTimeout);
+                  document.getElementById('loadingDiv').style.display = 'none';
+                  methods.forEach(method => {
+                    document.getElementById(method).style.display = 'none';
+                  });
+                  document.getElementById('errorDiv').style.display = 'flex';
+                  console.log('All PDF viewing methods failed');
+                }
+
+                function tryAlternativeViewer() {
+                  // Try Google Docs viewer as alternative
+                  const googleViewerUrl = 'https://docs.google.com/viewer?url=' + encodeURIComponent('${optimizedUrl}') + '&embedded=true';
+                  window.open(googleViewerUrl, '_blank');
+                }
+
+                function downloadPdf() {
+                  const link = document.createElement('a');
+                  link.href = '${optimizedUrl}';
+                  link.download = 'business-document.pdf';
+                  link.target = '_blank';
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }
+
+                // Start with first method
+                document.getElementById(methods[0]).style.display = 'block';
+                
+                // Set initial timeout
+                loadTimeout = setTimeout(() => {
+                  tryNextMethod();
+                }, 4000);
+
+                // Hide loading after 10 seconds regardless
+                setTimeout(() => {
+                  if (document.getElementById('loadingDiv').style.display !== 'none') {
+                    document.getElementById('loadingDiv').style.display = 'none';
+                  }
+                }, 10000);
+              </script>
+            </body>
+          </html>
+        `);
+        newWindow.document.close();
+      } else {
+        // Fallback if popup blocked
+        this.fallbackPreview(documentUrl);
+      }
+    } catch (error) {
+      console.error('Error opening PDF preview:', error);
+      this.fallbackPreview(documentUrl);
+    }
+  }
+
+  // Optimize Cloudinary URL for better PDF viewing
+  private optimizeCloudinaryPdfUrl(url: string): string {
+    try {
+      // Check if it's a Cloudinary URL
+      if (url.includes('cloudinary.com')) {
+        // For PDFs, we want to preserve the raw format without any transformations
+        // that might convert it to an image. Just return the original URL.
+        // This ensures PDFs are displayed as actual PDFs, not converted to images.
+        return url;
+      }
+      
+      // If not Cloudinary, return original URL
+      return url;
+    } catch (error) {
+      console.error('Error processing Cloudinary URL:', error);
+      return url;
+    }
+  }
+
+  // Preview image documents
+  private previewImageDocument(documentUrl: string): void {
+    try {
+      const newWindow = window.open('', '_blank');
+      if (newWindow) {
+        newWindow.document.write(`
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <title>Image Preview - Business Document</title>
+              <style>
+                body { 
+                  margin: 0; 
+                  padding: 20px; 
+                  display: flex; 
+                  justify-content: center; 
+                  align-items: center; 
+                  min-height: 100vh; 
+                  background: #f5f5f5; 
+                  font-family: Arial, sans-serif;
+                }
+                img { 
+                  max-width: 90%; 
+                  max-height: 90vh; 
+                  object-fit: contain; 
+                  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                  border-radius: 8px;
+                }
+                .error-message {
+                  text-align: center;
+                  color: #666;
+                }
+              </style>
+            </head>
+            <body>
+              <img src="${documentUrl}" 
+                   onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+              <div class="error-message" style="display: none;">
+                <h3>⚠️ Unable to load image</h3>
+                <p>The image could not be displayed.</p>
+                <a href="${documentUrl}" target="_blank">View Original</a>
+              </div>
+            </body>
+          </html>
+        `);
+        newWindow.document.close();
+      } else {
+        this.fallbackPreview(documentUrl);
+      }
+    } catch (error) {
+      console.error('Error opening image preview:', error);
+      this.fallbackPreview(documentUrl);
+    }
+  }
+
+  // Fallback preview method
+  private fallbackPreview(documentUrl: string): void {
+    this.snackBar.open('Opening document in new tab...', 'Close', { duration: 2000 });
+    
+    // Try direct URL opening as last resort
+    try {
       window.open(documentUrl, '_blank');
+    } catch (error) {
+      console.error('All preview methods failed:', error);
+      this.snackBar.open('Unable to preview document. Please check the document URL.', 'Close', { duration: 5000 });
+    }
+  }
+
+  // Download business document
+  downloadDocument(documentUrl: string, enquiryId?: string): void {
+    if (!documentUrl) {
+      this.snackBar.open('Document URL not available', 'Close', { duration: 3000 });
+      return;
+    }
+
+    console.log('📥 Downloading document:', documentUrl);
+
+    try {
+      // Create a temporary anchor element for download
+      const link = document.createElement('a');
+      link.href = documentUrl;
+      
+      // Generate a meaningful filename
+      const timestamp = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+      const enquiryPrefix = enquiryId ? `enquiry-${enquiryId}-` : 'business-document-';
+      
+      // Determine file extension from URL or default to pdf
+      let fileExtension = 'pdf';
+      if (documentUrl.toLowerCase().includes('.jpg') || documentUrl.toLowerCase().includes('.jpeg')) {
+        fileExtension = 'jpg';
+      } else if (documentUrl.toLowerCase().includes('.png')) {
+        fileExtension = 'png';
+      } else if (documentUrl.toLowerCase().includes('.doc')) {
+        fileExtension = 'doc';
+      } else if (documentUrl.toLowerCase().includes('.docx')) {
+        fileExtension = 'docx';
+      }
+      
+      link.download = `${enquiryPrefix}${timestamp}.${fileExtension}`;
+      link.target = '_blank';
+      
+      // Append to body, click, and remove
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      this.snackBar.open('Document download started', 'Close', { 
+        duration: 2000,
+        panelClass: ['success-snackbar']
+      });
+    } catch (error) {
+      console.error('Error downloading document:', error);
+      
+      // Fallback: open in new tab
+      try {
+        window.open(documentUrl, '_blank');
+        this.snackBar.open('Opening document in new tab for download', 'Close', { duration: 3000 });
+      } catch (fallbackError) {
+        console.error('Fallback download method failed:', fallbackError);
+        this.snackBar.open('Unable to download document. Please try again.', 'Close', { 
+          duration: 5000,
+          panelClass: ['error-snackbar']
+        });
+      }
     }
   }
 
