@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { EnquiryService } from '../../services/enquiry.service';
+import { ClientService } from '../../services/client.service';
 import { UserService, User } from '../../services/user.service';
 import { Enquiry, COMMENT_OPTIONS } from '../../models/enquiry.interface';
 import { Subject, timer } from 'rxjs';
@@ -44,6 +45,9 @@ export class EnquiryComponent implements OnInit, OnDestroy {
 
   // Cleanup subject for subscriptions
   private destroy$ = new Subject<void>();
+
+  // Track existing clients by mobile number for shortlist functionality
+  private existingClientsByMobile = new Map<string, any>();
 
   // Add debounce subjects for business nature and additional comments
   private businessNatureDebounce = new Subject<{enquiry: Enquiry, value: string}>();
@@ -141,6 +145,7 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private enquiryService: EnquiryService,
+    private clientService: ClientService,
     private userService: UserService,
     private snackBar: MatSnackBar,
     private dialog: MatDialog,
@@ -152,6 +157,12 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadEnquiries();
     this.loadStaffMembers();
+    this.checkExistingClients();
+    
+    // Listen for window focus to refresh client data
+    window.addEventListener('focus', () => {
+      this.checkExistingClients();
+    });
     
     // Set up debouncing for business nature updates (3 seconds delay)
     this.businessNatureDebounce.pipe(
@@ -2207,20 +2218,84 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Check for existing clients by mobile number
+  checkExistingClients(): void {
+    this.clientService.getClients().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (response) => {
+        const clients = response.clients || [];
+        this.existingClientsByMobile.clear();
+        
+        clients.forEach(client => {
+          if (client.mobile_number) {
+            const cleanedMobile = this.cleanMobileNumber(client.mobile_number);
+            if (cleanedMobile) {
+              this.existingClientsByMobile.set(cleanedMobile, client);
+            }
+          }
+        });
+        
+        console.log('Existing clients loaded for shortlist check:', this.existingClientsByMobile.size);
+      },
+      error: (error) => {
+        console.error('Error loading clients for shortlist check:', error);
+      }
+    });
+  }
+
+  // Helper method to clean mobile number to 10 digits
+  private cleanMobileNumber(mobile: string): string {
+    if (!mobile) return '';
+    
+    // Remove all non-digit characters
+    const cleaned = mobile.replace(/\D/g, '');
+    
+    // Extract last 10 digits if more than 10
+    if (cleaned.length >= 10) {
+      return cleaned.substring(cleaned.length - 10);
+    }
+    
+    return cleaned;
+  }
+
+  // Check if enquiry mobile matches existing client
+  hasExistingClient(enquiry: Enquiry): boolean {
+    const mobileNumber = enquiry.mobile_number || enquiry.phone_number;
+    if (!mobileNumber) return false;
+    
+    const cleanedMobile = this.cleanMobileNumber(mobileNumber);
+    return this.existingClientsByMobile.has(cleanedMobile);
+  }
+
   // Shortlist button logic methods
   canShowShortlistButton(enquiry: Enquiry): boolean {
     // Show red shortlist button only when:
     // 1. Comment is "Verified(Shortlisted)"
     // 2. Enquiry is not yet submitted (no client created)
-    return enquiry.comments === 'Verified(Shortlisted)' && !enquiry.client_submitted;
+    // 3. No existing client with same mobile number
+    return enquiry.comments === 'Verified(Shortlisted)' && 
+           !enquiry.client_submitted && 
+           !this.hasExistingClient(enquiry);
   }
 
   isEnquirySubmitted(enquiry: Enquiry): boolean {
-    // Show green submitted button when client has been created from this enquiry
-    return enquiry.client_submitted === true;
+    // Show green submitted button when:
+    // 1. Client has been created from this enquiry, OR
+    // 2. Existing client with same mobile number exists
+    return enquiry.client_submitted === true || this.hasExistingClient(enquiry);
   }
 
   shortlistEnquiry(enquiry: Enquiry): void {
+    // Check if client already exists with this mobile number
+    if (this.hasExistingClient(enquiry)) {
+      this.snackBar.open('Client already exists with this mobile number. Cannot create duplicate client.', 'Close', { 
+        duration: 5000,
+        panelClass: ['error-snackbar']
+      });
+      return;
+    }
+
     // Validate required data before proceeding
     const ownerName = enquiry.owner_name || enquiry.wati_name;
     const mobileNumber = enquiry.mobile_number || enquiry.phone_number;
@@ -2260,6 +2335,28 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.router.navigate(['/new-client']);
     }, 1500);
+  }
+
+  // Helper methods for green button display
+  getShortlistedText(enquiry: Enquiry): string {
+    if (this.hasExistingClient(enquiry)) {
+      return 'Already Shortlisted';
+    }
+    return enquiry.client_id ? 'Synced' : 'Shortlisted';
+  }
+
+  getShortlistedIcon(enquiry: Enquiry): string {
+    if (this.hasExistingClient(enquiry)) {
+      return 'person_check';
+    }
+    return enquiry.client_id ? 'sync' : 'check_circle';
+  }
+
+  getShortlistedTooltip(enquiry: Enquiry): string {
+    if (this.hasExistingClient(enquiry)) {
+      return 'Client already exists with this mobile number';
+    }
+    return enquiry.client_id ? 'Client created and data synchronized' : 'Client already created from this enquiry';
   }
 
   // Navigate to view client details

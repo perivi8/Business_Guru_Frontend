@@ -603,14 +603,14 @@
                       Shortlist
                     </button>
                     
-                    <!-- Submitted Button (Green) - Show when already submitted -->
+                    <!-- Submitted Button (Green) - Show when already submitted or client exists -->
                     <button *ngIf="isEnquirySubmitted(enquiry)"
                             disabled
                             class="px-4 py-2 bg-green-500 text-white text-sm font-medium rounded-lg opacity-75 cursor-not-allowed flex items-center gap-2 shadow-md"
-                            [matTooltip]="enquiry.client_id ? 'Client created and data synchronized' : 'Client already created from this enquiry'"
+                            [matTooltip]="getShortlistedTooltip(enquiry)"
                             matTooltipPosition="above">
-                      <mat-icon class="text-sm">{{ enquiry.client_id ? 'sync' : 'check_circle' }}</mat-icon>
-                      {{ enquiry.client_id ? 'Synced' : 'Submitted' }}
+                      <mat-icon class="text-sm">{{ getShortlistedIcon(enquiry) }}</mat-icon>
+                      {{ getShortlistedText(enquiry) }}
                     </button>
                     
                     <!-- Empty state for non-verified enquiries -->

@@ -144,7 +144,7 @@ export class ClientService implements OnDestroy {
     private authService: AuthService,
     private notificationService: NotificationService
   ) { 
-    this.userSubscription = this.authService.currentUser.subscribe(user => {
+    this.userSubscription = this.authService.currentUser.subscribe((user: User | null) => {
       this.currentUser = user;
     });
   }
@@ -196,7 +196,7 @@ export class ClientService implements OnDestroy {
       withCredentials: true
     }).pipe(
       tap({
-        next: (response) => {
+        next: (response: { clients: Client[] }) => {
           console.log('=== SUCCESS RESPONSE ===');
           console.log('Clients received:', response);
           console.log('Response type:', typeof response);
@@ -207,7 +207,7 @@ export class ClientService implements OnDestroy {
             this.clientsSubject.next(response.clients);
           }
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error('=== ERROR RESPONSE ===');
           console.error('Error in getClients:', {
             error: error,
@@ -220,7 +220,7 @@ export class ClientService implements OnDestroy {
           });
         }
       }),
-      catchError(error => {
+      catchError((error: any) => {
         console.error('=== CATCH ERROR ===');
         console.error('Error fetching clients:', {
           error: error,
@@ -270,7 +270,7 @@ export class ClientService implements OnDestroy {
       withCredentials: true
     }).pipe(
       tap({
-        next: (response) => {
+        next: (response: { clients: Client[] }) => {
           console.log('=== SUCCESS RESPONSE ===');
           console.log('My clients received:', response);
           console.log('Response type:', typeof response);
@@ -281,7 +281,7 @@ export class ClientService implements OnDestroy {
             // We don't update the subject here since this is for dashboard only
           }
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error('=== ERROR RESPONSE ===');
           console.error('Error in getMyClients:', {
             error: error,
@@ -294,7 +294,7 @@ export class ClientService implements OnDestroy {
           });
         }
       }),
-      catchError(error => {
+      catchError((error: any) => {
         console.error('=== CATCH ERROR ===');
         console.error('Error fetching my clients:', {
           error: error,
@@ -343,7 +343,7 @@ export class ClientService implements OnDestroy {
           withCredentials: true
         });
       }),
-      tap(response => {
+      tap((response: any) => {
         if (response && response.client) {
           const clientName = response.client.legal_name || response.client.user_name || 'Unknown Client';
           const currentUserName = this.currentUser?.username || 'Admin';
@@ -402,7 +402,7 @@ export class ClientService implements OnDestroy {
           ...error.error
         });
       }),
-      tap(response => {
+      tap((response: { success: boolean, status_code: number, message: string, error?: any }) => {
         console.log('✅ Update response received:', response);
         
         // Notify other components about client update if successful
@@ -438,7 +438,7 @@ export class ClientService implements OnDestroy {
       headers: this.getHeaders(),
       withCredentials: true
     }).pipe(
-      tap(response => {
+      tap((response: any) => {
         // Notify other components about client update
         this.clientUpdatedSubject.next(clientId);
         
@@ -458,7 +458,7 @@ export class ClientService implements OnDestroy {
       headers: this.getHeaders(),
       withCredentials: true
     }).pipe(
-      tap(response => {
+      tap((response: any) => {
         if (response && response.client) {
           const clientName = response.client.legal_name || response.client.user_name || 'Unknown Client';
           const currentUserName = this.currentUser?.username || 'Admin';
@@ -498,10 +498,10 @@ export class ClientService implements OnDestroy {
       responseType: 'blob',
       withCredentials: true
     }).pipe(
-      tap(blob => {
+      tap((blob: Blob) => {
         console.log(`✅ Download successful: ${documentType} (${blob.size} bytes)`);
       }),
-      catchError(error => {
+      catchError((error: any) => {
         console.error(`❌ Download failed for ${documentType}:`, error);
         let errorMessage = 'Download failed';
         if (error.status === 404) {
@@ -525,10 +525,10 @@ export class ClientService implements OnDestroy {
       responseType: 'blob',
       withCredentials: true
     }).pipe(
-      tap(blob => {
+      tap((blob: Blob) => {
         console.log(`✅ Direct download successful: ${documentType} (${blob.size} bytes)`);
       }),
-      catchError(error => {
+      catchError((error: any) => {
         console.error(`❌ Direct download failed for ${documentType}:`, error);
         return throwError(() => error);
       })
@@ -542,10 +542,10 @@ export class ClientService implements OnDestroy {
       responseType: 'blob',
       withCredentials: true
     }).pipe(
-      tap(blob => {
+      tap((blob: Blob) => {
         console.log(`✅ Raw download successful: ${documentType} (${blob.size} bytes)`);
       }),
-      catchError(error => {
+      catchError((error: any) => {
         console.error(`❌ Raw download failed for ${documentType}:`, error);
         return throwError(() => error);
       })
@@ -559,10 +559,10 @@ export class ClientService implements OnDestroy {
       responseType: 'blob',
       withCredentials: false  // Disable credentials to avoid CORS issues with Cloudinary redirects
     }).pipe(
-      tap(blob => {
+      tap((blob: Blob) => {
         console.log(`✅ Preview successful: ${documentType} (${blob.size} bytes, type: ${blob.type})`);
       }),
-      catchError(error => {
+      catchError((error: any) => {
         console.error(`❌ Preview failed for ${documentType}:`, error);
         let errorMessage = 'Preview failed';
         if (error.status === 404) {
@@ -582,15 +582,15 @@ export class ClientService implements OnDestroy {
   // Method to get direct document URL from Cloudinary (bypasses backend)
   getDirectDocumentUrl(clientId: string, documentType: string): Observable<string> {
     return this.getClientDetails(clientId).pipe(
-      tap(response => {
+      tap((response: { client: Client }) => {
         console.log(`📋 Getting direct URL for ${documentType} from client data`);
       }),
-      catchError(error => {
+      catchError((error: any) => {
         console.error(`❌ Failed to get client details for direct URL:`, error);
         return throwError(() => new Error('Failed to get document URL'));
       })
     ).pipe(
-      tap(response => {
+      tap((response: { client: Client }) => {
         const client = response.client;
         if (client.documents && client.documents[documentType]) {
           const docInfo = client.documents[documentType];
@@ -625,7 +625,7 @@ export class ClientService implements OnDestroy {
       headers: this.getHeaders(),
       withCredentials: true
     }).pipe(
-      catchError(error => {
+      catchError((error: any) => {
         console.error('Error extracting GST data:', error);
         return throwError(() => new Error(error.error?.error || 'Failed to extract GST data'));
       })
@@ -637,7 +637,7 @@ export class ClientService implements OnDestroy {
       headers: this.getFormHeaders(),
       withCredentials: true
     }).pipe(
-      catchError(error => {
+      catchError((error: any) => {
         console.error('Error extracting GST data directly:', error);
         
         // Handle network errors specifically
@@ -662,7 +662,7 @@ export class ClientService implements OnDestroy {
       headers: this.getHeaders(),
       withCredentials: true
     }).pipe(
-      catchError(error => {
+      catchError((error: any) => {
         console.error('Error verifying document:', error);
         return throwError(() => new Error(error.error?.error || 'Failed to verify document'));
       })
@@ -675,7 +675,7 @@ export class ClientService implements OnDestroy {
       headers: this.getHeaders(),
       withCredentials: true
     }).pipe(
-      catchError(error => {
+      catchError((error: any) => {
         console.error('❌ Error debugging documents:', error);
         return throwError(() => new Error(error.error?.error || 'Failed to debug documents'));
       })
@@ -687,7 +687,7 @@ export class ClientService implements OnDestroy {
       headers: this.getHeaders(),
       withCredentials: true
     }).pipe(
-      tap(response => {
+      tap((response: any) => {
         if (response && response.client) {
           const clientName = response.client.legal_name || response.client.user_name || 'Unknown Client';
           const currentUserName = this.currentUser?.username || 'Admin';
@@ -706,10 +706,50 @@ export class ClientService implements OnDestroy {
       headers: this.getHeaders(),
       withCredentials: true
     }).pipe(
-      catchError(error => {
+      catchError((error: any) => {
         console.error('Error syncing business document to enquiry:', error);
         return throwError(() => new Error(error.error?.error || 'Failed to sync business document'));
       })
     );
+  }
+
+  // Check if client exists by mobile number
+  checkClientByMobile(mobileNumber: string): Observable<{ exists: boolean, client?: Client }> {
+    // Clean mobile number to 10 digits for comparison
+    const cleanedMobile = this.cleanMobileNumber(mobileNumber);
+    
+    return this.getClients().pipe(
+      map((response: { clients: Client[] }) => {
+        const clients = response.clients || [];
+        const existingClient = clients.find((client: Client) => {
+          const clientMobile = this.cleanMobileNumber(client.mobile_number || '');
+          return clientMobile === cleanedMobile;
+        });
+        
+        return {
+          exists: !!existingClient,
+          client: existingClient
+        };
+      }),
+      catchError((error: any) => {
+        console.error('Error checking client by mobile:', error);
+        return of({ exists: false });
+      })
+    );
+  }
+
+  // Helper method to clean mobile number to 10 digits
+  private cleanMobileNumber(mobile: string): string {
+    if (!mobile) return '';
+    
+    // Remove all non-digit characters
+    const cleaned = mobile.replace(/\D/g, '');
+    
+    // Extract last 10 digits if more than 10
+    if (cleaned.length >= 10) {
+      return cleaned.substring(cleaned.length - 10);
+    }
+    
+    return cleaned;
   }
 }
