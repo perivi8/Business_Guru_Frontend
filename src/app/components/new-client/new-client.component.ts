@@ -51,6 +51,7 @@ export class NewClientComponent implements OnInit {
   isBankAccountTypeDropdownOpen = false;
   isTransactionMonthsDropdownOpen = false;
   isStaffDropdownOpen = false;
+  isPartnersDropdownOpen = false;
   
   // Indian States and Districts mapping
   stateDistrictMapping: { [key: string]: string[] } = {
@@ -167,7 +168,8 @@ export class NewClientComponent implements OnInit {
       company_email: ['', [Validators.email]], // New optional field
       mobile_number: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
       optional_mobile_number: ['', [Validators.pattern(/^\d{10}$/)]], // Optional mobile number
-      gst_status: ['', Validators.required],
+      annual_revenue: [''], // Annual revenue field from enquiry
+      gst_status: ['Active', Validators.required], // Default to Active
       constitution_type: ['', Validators.required]
     });
 
@@ -181,6 +183,8 @@ export class NewClientComponent implements OnInit {
       owner_aadhar: [''],
       owner_pan: [''],
       has_business_pan: ['no'],
+      number_of_partners: ['', Validators.required], // Number of partners for Partnership
+      partnership_deed_document: [''], // Partnership deed document
       website: ['', Validators.pattern('https?://.+')]
     });
     
@@ -468,6 +472,25 @@ export class NewClientComponent implements OnInit {
     }
   }
 
+  // Partners dropdown methods
+  togglePartnersDropdown(): void {
+    this.isPartnersDropdownOpen = !this.isPartnersDropdownOpen;
+  }
+
+  selectPartnerNumber(num: number): void {
+    const numValue = Number(num);
+    this.step2Form.get('number_of_partners')?.setValue(numValue);
+    this.onPartnerNumberChange(numValue);
+    this.isPartnersDropdownOpen = false;
+  }
+
+  getPartnersLabel(value: any): string {
+    if (!value) {
+      return 'Select number of partners';
+    }
+    return `${value} Partners`;
+  }
+
   onStateChange(selectedState: string): void {
     this.selectedState = selectedState;
     this.filteredDistricts = this.stateDistrictMapping[selectedState] || [];
@@ -534,7 +557,7 @@ export class NewClientComponent implements OnInit {
       return ownerDocsValid;
     }
     
-    // For Partnership: Partner documents required
+    // For Partnership: Partner documents + Partnership Deed required
     if (this.constitutionType === 'Partnership') {
       let partnerDocsValid = true;
       for (let i = 0; i < this.numberOfPartners; i++) {
@@ -547,16 +570,21 @@ export class NewClientComponent implements OnInit {
           break;
         }
       }
+      
+      // Partnership Deed is always required for Partnership
+      const hasPartnershipDeed = !!this.uploadedFiles['partnership_deed_document'];
+      console.log('Partnership Deed valid:', hasPartnershipDeed);
       console.log('Partner docs valid:', partnerDocsValid);
       
       // If Business PAN is Yes, also need Business PAN document
       if (this.hasBusinessPan) {
-        const isValid = partnerDocsValid && !!this.uploadedFiles['business_pan_document'];
+        const isValid = partnerDocsValid && hasPartnershipDeed && !!this.uploadedFiles['business_pan_document'];
         console.log('Partnership with Business PAN validation:', isValid);
         return isValid;
       }
-      console.log('Partnership without Business PAN validation:', partnerDocsValid);
-      return partnerDocsValid;
+      const isValid = partnerDocsValid && hasPartnershipDeed;
+      console.log('Partnership without Business PAN validation:', isValid);
+      return isValid;
     }
     
     console.log('Default validation: true');

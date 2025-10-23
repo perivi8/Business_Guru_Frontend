@@ -19,7 +19,7 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   filteredEnquiries: Enquiry[] = [];
   displayedColumns: string[] = [
     'sno', 'date', 'owner_name', 'phone_number', 
-    'gst', 'business_name', 'loan_amount', 'loan_purpose', 
+    'gst', 'business_name', 'loan_amount', 'loan_purpose', 'annual_revenue',
     'email_address', 'business_document', 'staff', 'comments', 'shortlist', 'actions'
   ];
   
@@ -2241,6 +2241,7 @@ export class EnquiryComponent implements OnInit, OnDestroy {
       mobile_number: mobileNumber,
       loan_amount: enquiry.loan_amount || '',
       loan_purpose: enquiry.loan_purpose || '',
+      annual_revenue: enquiry.annual_revenue || '',
       business_document_url: enquiry.business_document_url || null,
       enquiry_id: enquiry._id,
       verified_date: new Date().toISOString(),
