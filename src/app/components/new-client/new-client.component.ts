@@ -491,6 +491,20 @@ export class NewClientComponent implements OnInit {
     return `${value} Partners`;
   }
 
+  // Stepper styling methods
+  getStepClasses(stepIndex: number): string {
+    if (this.currentStep > stepIndex) {
+      // Completed step
+      return 'bg-green-600 text-white shadow-lg';
+    } else if (this.currentStep === stepIndex) {
+      // Current step
+      return 'bg-blue-600 text-white shadow-lg ring-4 ring-blue-200';
+    } else {
+      // Future step
+      return 'bg-gray-300 text-gray-600';
+    }
+  }
+
   onStateChange(selectedState: string): void {
     this.selectedState = selectedState;
     this.filteredDistricts = this.stateDistrictMapping[selectedState] || [];

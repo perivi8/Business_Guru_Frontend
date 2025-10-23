@@ -24,9 +24,85 @@
     
     <!-- Stepper Container -->
     <div *ngIf="formsInitialized" class="bg-white rounded-xl shadow-lg border border-border-light overflow-hidden">
-      <mat-horizontal-stepper #stepper [selectedIndex]="currentStep" [linear]="true" class="modern-stepper">
+      <!-- Custom Tailwind CSS Stepper Header -->
+      <div class="bg-gradient-to-r from-blue-50 to-purple-50 border-b border-gray-200 px-8 py-6">
+        <div class="flex items-center justify-between">
+          <!-- Step 1 -->
+          <div class="flex items-center" [class.opacity-50]="currentStep < 0">
+            <div class="flex items-center">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-200"
+                   [class]="getStepClasses(0)">
+                <span *ngIf="currentStep > 0" class="text-white">✓</span>
+                <span *ngIf="currentStep <= 0" class="text-white">1</span>
+              </div>
+              <div class="ml-3 hidden sm:block">
+                <p class="text-sm font-medium" [class.text-blue-600]="currentStep === 0" [class.text-gray-900]="currentStep > 0" [class.text-gray-500]="currentStep < 0">Basic Info & GST</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Connector Line 1 -->
+          <div class="flex-1 mx-4 h-0.5 bg-gray-200 hidden sm:block">
+            <div class="h-full bg-blue-600 transition-all duration-300" [style.width]="currentStep > 0 ? '100%' : '0%'"></div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="flex items-center" [class.opacity-50]="currentStep < 1">
+            <div class="flex items-center">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-200"
+                   [class]="getStepClasses(1)">
+                <span *ngIf="currentStep > 1" class="text-white">✓</span>
+                <span *ngIf="currentStep <= 1" class="text-white">2</span>
+              </div>
+              <div class="ml-3 hidden sm:block">
+                <p class="text-sm font-medium" [class.text-blue-600]="currentStep === 1" [class.text-gray-900]="currentStep > 1" [class.text-gray-500]="currentStep < 1">Upload Documents</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Connector Line 2 -->
+          <div class="flex-1 mx-4 h-0.5 bg-gray-200 hidden sm:block">
+            <div class="h-full bg-blue-600 transition-all duration-300" [style.width]="currentStep > 1 ? '100%' : '0%'"></div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="flex items-center" [class.opacity-50]="currentStep < 2">
+            <div class="flex items-center">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-200"
+                   [class]="getStepClasses(2)">
+                <span *ngIf="currentStep > 2" class="text-white">✓</span>
+                <span *ngIf="currentStep <= 2" class="text-white">3</span>
+              </div>
+              <div class="ml-3 hidden sm:block">
+                <p class="text-sm font-medium" [class.text-blue-600]="currentStep === 2" [class.text-gray-900]="currentStep > 2" [class.text-gray-500]="currentStep < 2">Bank Details</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Connector Line 3 -->
+          <div class="flex-1 mx-4 h-0.5 bg-gray-200 hidden sm:block">
+            <div class="h-full bg-blue-600 transition-all duration-300" [style.width]="currentStep > 2 ? '100%' : '0%'"></div>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="flex items-center" [class.opacity-50]="currentStep < 3">
+            <div class="flex items-center">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-200"
+                   [class]="getStepClasses(3)">
+                <span *ngIf="currentStep > 3" class="text-white">✓</span>
+                <span *ngIf="currentStep <= 3" class="text-white">4</span>
+              </div>
+              <div class="ml-3 hidden sm:block">
+                <p class="text-sm font-medium" [class.text-blue-600]="currentStep === 3" [class.text-gray-900]="currentStep > 3" [class.text-gray-500]="currentStep < 3">Review & Submit</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step Content -->
       <!-- Step 1: Basic Info & GST -->
-      <mat-step [stepControl]="step1Form" label="Basic Info & GST">
+      <div *ngIf="currentStep === 0">
         <form [formGroup]="step1Form">
           <div class="p-8 space-y-8">
             <!-- Owner Name Display (if from enquiry) -->
@@ -618,10 +694,10 @@
             </div>
           </div>
         </form>
-      </mat-step>
+      </div>
 
       <!-- Step 2: Upload Documents -->
-      <mat-step [stepControl]="step2Form" label="Upload Documents">
+      <div *ngIf="currentStep === 1">
         <form [formGroup]="step2Form">
           <div class="p-8 space-y-8">
             <div class="text-center mb-8">
@@ -1150,10 +1226,10 @@
             </div>
           </div>
         </form>
-      </mat-step>
+      </div>
 
       <!-- Step 3: Bank Details -->
-      <mat-step [stepControl]="step3Form" label="Bank Details">
+      <div *ngIf="currentStep === 2">
         <form [formGroup]="step3Form">
           <div class="p-8 space-y-8">
             <div class="text-center mb-8">
@@ -1476,10 +1552,10 @@
             </div>
           </div>
         </form>
-      </mat-step>
+      </div>
 
       <!-- Step 4: Review & Submit -->
-      <mat-step [stepControl]="step4Form" label="Review & Submit">
+      <div *ngIf="currentStep === 3">
         <form [formGroup]="step4Form">
           <div class="p-8 space-y-8">
             <div class="text-center mb-8">
@@ -1773,8 +1849,7 @@
             </div>
           </div>
         </form>
-      </mat-step>
-      </mat-horizontal-stepper>
+      </div>
     </div>
   </div>
 </div>
