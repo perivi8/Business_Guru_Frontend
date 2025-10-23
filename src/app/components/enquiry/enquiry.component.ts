@@ -1775,17 +1775,17 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     console.log('📄 Previewing document:', documentUrl);
 
     // Check if it's a PDF by URL extension or file format
-    // For Cloudinary raw uploads, PDFs might not have .pdf in URL, so we check multiple indicators
+    // Enhanced PDF detection for Cloudinary uploads
     const isPdf = documentUrl.toLowerCase().includes('.pdf') || 
                   documentUrl.includes('pdf') ||
-                  documentUrl.includes('resource_type/raw') || // Cloudinary raw uploads are typically PDFs
-                  documentUrl.includes('/raw/') || // Alternative Cloudinary raw format
                   // Assume business documents are PDFs unless clearly an image format
                   (!documentUrl.toLowerCase().includes('.jpg') && 
                    !documentUrl.toLowerCase().includes('.jpeg') && 
                    !documentUrl.toLowerCase().includes('.png') && 
                    !documentUrl.toLowerCase().includes('.gif') &&
-                   !documentUrl.toLowerCase().includes('.webp'));
+                   !documentUrl.toLowerCase().includes('.webp') &&
+                   !documentUrl.toLowerCase().includes('.doc') &&
+                   !documentUrl.toLowerCase().includes('.docx'));
     
     if (isPdf) {
       // Create a more robust PDF preview

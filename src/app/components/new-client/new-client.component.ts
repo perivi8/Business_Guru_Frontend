@@ -1243,8 +1243,18 @@ export class NewClientComponent implements OnInit {
 
     console.log('📄 Previewing enquiry document:', documentUrl);
 
-    // Check if it's a PDF by URL extension or assume it's PDF for business documents
-    const isPdf = documentUrl.toLowerCase().includes('.pdf') || documentUrl.includes('pdf');
+    // Check if it's a PDF by URL extension or file format
+    // Enhanced PDF detection for Cloudinary uploads
+    const isPdf = documentUrl.toLowerCase().includes('.pdf') || 
+                  documentUrl.includes('pdf') ||
+                  // Assume business documents are PDFs unless clearly an image format
+                  (!documentUrl.toLowerCase().includes('.jpg') && 
+                   !documentUrl.toLowerCase().includes('.jpeg') && 
+                   !documentUrl.toLowerCase().includes('.png') && 
+                   !documentUrl.toLowerCase().includes('.gif') &&
+                   !documentUrl.toLowerCase().includes('.webp') &&
+                   !documentUrl.toLowerCase().includes('.doc') &&
+                   !documentUrl.toLowerCase().includes('.docx'));
     
     if (isPdf) {
       // Create a more robust PDF preview
