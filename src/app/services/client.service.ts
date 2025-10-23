@@ -119,6 +119,9 @@ export interface Client {
   
   // Payment Gateway Information
   payment_gateways?: string[];
+  
+  // Business Document
+  business_document_url?: string;
 }
 
 @Injectable({

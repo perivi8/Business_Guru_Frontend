@@ -343,13 +343,15 @@
                 <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
                      [ngClass]="{
                        'bg-blue-100': isImageFile(getDocumentFileName(docType)),
-                       'bg-red-100': !isImageFile(getDocumentFileName(docType))
+                       'bg-purple-100': docType === 'business_document',
+                       'bg-red-100': !isImageFile(getDocumentFileName(docType)) && docType !== 'business_document'
                      }">
                   <mat-icon [ngClass]="{
                               'text-blue-600': isImageFile(getDocumentFileName(docType)),
-                              'text-red-600': !isImageFile(getDocumentFileName(docType))
+                              'text-purple-600': docType === 'business_document',
+                              'text-red-600': !isImageFile(getDocumentFileName(docType)) && docType !== 'business_document'
                             }">
-                    {{ isImageFile(getDocumentFileName(docType)) ? 'image' : 'description' }}
+                    {{ docType === 'business_document' ? 'business_center' : (isImageFile(getDocumentFileName(docType)) ? 'image' : 'description') }}
                   </mat-icon>
                 </div>
                 <div class="flex-1 min-w-0">
@@ -385,7 +387,7 @@
                 </div>
               </div>
               <div class="flex items-center gap-2 mt-3 pt-3 border-t border-gray-200">
-                <button *ngIf="canPreviewDocument(getDocumentFileName(docType))"
+                <button *ngIf="canPreviewDocumentByType(docType)"
                         (click)="previewDocument(docType)" 
                         class="flex items-center gap-1 px-3 py-1.5 text-xs bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
                         [matTooltip]="'Preview ' + formatDocumentName(docType)">

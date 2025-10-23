@@ -159,11 +159,25 @@ export class ClientDetailComponent implements OnInit {
       keys.push(...documentKeys);
     }
     
+    // Add business document if it exists
+    if (this.client && this.client.business_document_url) {
+      keys.push('business_document');
+    }
+    
     // Remove duplicates and return
     return [...new Set(keys)];
   }
 
   getDocumentFileName(docType: string): string {
+    // Handle business document
+    if (docType === 'business_document' && this.client?.business_document_url) {
+      // Extract filename from URL or use default
+      const url = this.client.business_document_url;
+      const urlParts = url.split('/');
+      const filename = urlParts[urlParts.length - 1];
+      return filename.includes('.') ? filename : 'business_document.pdf';
+    }
+    
     // Check processed_documents first (legacy format)
     if (this.client?.processed_documents?.[docType]) {
       return this.client.processed_documents[docType].file_name;
@@ -183,6 +197,11 @@ export class ClientDetailComponent implements OnInit {
   }
 
   getDocumentFileSize(docType: string): number {
+    // Handle business document - return 0 as we don't have size info from URL
+    if (docType === 'business_document' && this.client?.business_document_url) {
+      return 0;
+    }
+    
     // Check processed_documents first (legacy format)
     if (this.client?.processed_documents?.[docType]) {
       return this.client.processed_documents[docType].file_size;
@@ -243,6 +262,17 @@ export class ClientDetailComponent implements OnInit {
     return previewableExtensions.some(ext => fileName.toLowerCase().endsWith(ext));
   }
 
+  canPreviewDocumentByType(docType: string): boolean {
+    // Always allow preview for known PDF document types
+    if (this.isPdfDocumentType(docType)) {
+      return true;
+    }
+    
+    // For other document types, check by filename
+    const fileName = this.getDocumentFileName(docType);
+    return this.canPreviewDocument(fileName);
+  }
+
   isPdfDocumentType(docType: string): boolean {
     const pdfDocumentTypes = [
       'gst_document',
@@ -252,7 +282,8 @@ export class ClientDetailComponent implements OnInit {
       'msme_certificate',
       'incorporation_certificate',
       'registration_certificate',
-      'license_document'
+      'license_document',
+      'business_document'
     ];
     return pdfDocumentTypes.includes(docType);
   }
@@ -264,6 +295,13 @@ export class ClientDetailComponent implements OnInit {
     }
     
     console.log(`👁️ Previewing document: ${docType} for client: ${this.client._id}`);
+    
+    // Handle business document preview
+    if (docType === 'business_document' && this.client.business_document_url) {
+      console.log(`📄 Opening business document directly from URL: ${this.client.business_document_url}`);
+      window.open(this.client.business_document_url, '_blank');
+      return;
+    }
     
     // Check if document has direct URL (new format)
     if (this.client.documents?.[docType]) {
