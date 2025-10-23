@@ -48,6 +48,30 @@ export class ClientDetailComponent implements OnInit {
         this.loading = false;
       }
     });
+    
+    // Subscribe to client updates to refresh data when client is updated
+    this.clientService.clientUpdated$.subscribe(clientId => {
+      if (clientId && this.client && this.client._id === clientId) {
+        // Reload client details when this specific client is updated
+        this.loadClientDetails(clientId);
+      }
+    });
+    
+    // Check for reload query parameter
+    this.route.queryParams.subscribe(params => {
+      if (params['reload'] && this.client) {
+        // Reload client details when coming back from edit page
+        this.loadClientDetails(this.client._id);
+      } else if (params['reload']) {
+        // If we don't have client yet but reload param is present, 
+        // wait a bit and try to reload (in case of timing issues)
+        setTimeout(() => {
+          if (this.client && this.client._id) {
+            this.loadClientDetails(this.client._id);
+          }
+        }, 500);
+      }
+    });
   }
 
   loadClientDetails(clientId: string): void {
@@ -59,13 +83,55 @@ export class ClientDetailComponent implements OnInit {
         // Ensure UI is updated after data reload
         console.log('Client details reloaded:', {
           payment_gateways_status: (this.client as any).payment_gateways_status,
-          loan_status: (this.client as any).loan_status
+          loan_status: (this.client as any).loan_status,
+          business_document: this.client?.business_document_url,
+          documents: this.client?.documents
         });
+        
+        // Force change detection to ensure UI updates
+        setTimeout(() => {
+          // This helps ensure the UI reflects the latest data
+        }, 100);
       },
       error: (error) => {
         this.error = 'Failed to load client details';
         this.loading = false;
         console.error('Error loading client details:', error);
+      }
+    });
+  }
+  
+  // Method to refresh client data and then preview document
+  refreshAndPreviewDocument(docType: string): void {
+    if (!this.client || !this.client._id) {
+      this.snackBar.open('Client information not available', 'Close', { duration: 3000 });
+      return;
+    }
+    
+    // Show loading message
+    const loadingSnackBar = this.snackBar.open('Refreshing document data...', 'Cancel', { duration: 10000 });
+    
+    // Reload client data to get latest document URLs
+    this.clientService.getClientDetails(this.client._id).subscribe({
+      next: (response) => {
+        loadingSnackBar.dismiss();
+        
+        // Update client data with fresh information
+        this.client = response.client;
+        
+        // Force change detection
+        setTimeout(() => {
+          // Now preview the document with updated data
+          this.previewDocumentWithUpdatedData(docType);
+        }, 100);
+      },
+      error: (error) => {
+        loadingSnackBar.dismiss();
+        console.error('Error refreshing client data:', error);
+        this.snackBar.open('Error refreshing document data', 'Close', { duration: 3000 });
+        
+        // Still try to preview with existing data
+        this.previewDocumentWithUpdatedData(docType);
       }
     });
   }
@@ -153,15 +219,19 @@ export class ClientDetailComponent implements OnInit {
     if (this.client && this.client.documents) {
       const documentKeys = Object.keys(this.client.documents).filter(key => 
         this.client!.documents![key] && 
-        typeof this.client!.documents![key] === 'object' &&
-        this.client!.documents![key].url
+        (typeof this.client!.documents![key] === 'object' || typeof this.client!.documents![key] === 'string')
       );
       keys.push(...documentKeys);
     }
     
-    // Add business document if it exists
-    if (this.client && this.client.business_document_url) {
-      keys.push('business_document');
+    // Add business document if it exists in any format
+    if (this.client && (this.client.business_document_url || 
+                        (this.client.documents && this.client.documents['business_document']) || 
+                        (this.client.processed_documents && this.client.processed_documents['business_document']))) {
+      // Only add if not already added
+      if (!keys.includes('business_document')) {
+        keys.push('business_document');
+      }
     }
     
     // Remove duplicates and return
@@ -170,12 +240,33 @@ export class ClientDetailComponent implements OnInit {
 
   getDocumentFileName(docType: string): string {
     // Handle business document
-    if (docType === 'business_document' && this.client?.business_document_url) {
-      // Extract filename from URL or use default
-      const url = this.client.business_document_url;
-      const urlParts = url.split('/');
-      const filename = urlParts[urlParts.length - 1];
-      return filename.includes('.') ? filename : 'business_document.pdf';
+    if (docType === 'business_document') {
+      // Check documents (new format from client creation) first
+      if (this.client?.documents && this.client.documents[docType]) {
+        const doc = this.client.documents[docType];
+        if (typeof doc === 'object' && doc.original_filename) {
+          return doc.original_filename;
+        } else if (typeof doc === 'string') {
+          // Extract filename from URL
+          const urlParts = doc.split('/');
+          const filename = urlParts[urlParts.length - 1].split('?')[0];
+          return filename || `${docType}.pdf`;
+        }
+        // Fallback to document type name
+        return `${docType}.pdf`;
+      }
+      // Check processed_documents (legacy format)
+      else if (this.client?.processed_documents?.[docType]) {
+        return this.client.processed_documents[docType].file_name;
+      }
+      // Fallback to old business_document_url
+      else if (this.client?.business_document_url) {
+        // Extract filename from URL or use default
+        const url = this.client.business_document_url;
+        const urlParts = url.split('/');
+        const filename = urlParts[urlParts.length - 1].split('?')[0];
+        return filename.includes('.') ? filename : 'business_document.pdf';
+      }
     }
     
     // Check processed_documents first (legacy format)
@@ -188,6 +279,11 @@ export class ClientDetailComponent implements OnInit {
       const doc = this.client.documents[docType];
       if (typeof doc === 'object' && doc.original_filename) {
         return doc.original_filename;
+      } else if (typeof doc === 'string') {
+        // Extract filename from URL
+        const urlParts = doc.split('/');
+        const filename = urlParts[urlParts.length - 1].split('?')[0];
+        return filename || `${docType}.pdf`;
       }
       // Fallback to document type name
       return `${docType}.pdf`;
@@ -197,9 +293,23 @@ export class ClientDetailComponent implements OnInit {
   }
 
   getDocumentFileSize(docType: string): number {
-    // Handle business document - return 0 as we don't have size info from URL
-    if (docType === 'business_document' && this.client?.business_document_url) {
-      return 0;
+    // Handle business document
+    if (docType === 'business_document') {
+      // Check documents (new format from client creation) first
+      if (this.client?.documents?.[docType]) {
+        const doc = this.client.documents[docType];
+        if (typeof doc === 'object' && doc.bytes) {
+          return doc.bytes;
+        }
+      }
+      // Check processed_documents (legacy format)
+      else if (this.client?.processed_documents?.[docType]) {
+        return this.client.processed_documents[docType].file_size;
+      }
+      // Fallback to old business_document_url - return 0 as we don't have size info from URL
+      else if (this.client?.business_document_url) {
+        return 0;
+      }
     }
     
     // Check processed_documents first (legacy format)
@@ -263,6 +373,17 @@ export class ClientDetailComponent implements OnInit {
   }
 
   canPreviewDocumentByType(docType: string): boolean {
+    // Handle business document specifically
+    if (docType === 'business_document') {
+      // Check if we have a business document in any of the possible locations
+      if (this.client?.documents?.[docType] || 
+          this.client?.processed_documents?.[docType] || 
+          this.client?.business_document_url) {
+        return true;
+      }
+      return false;
+    }
+    
     // Always allow preview for known PDF document types
     if (this.isPdfDocumentType(docType)) {
       return true;
@@ -296,11 +417,107 @@ export class ClientDetailComponent implements OnInit {
     
     console.log(`👁️ Previewing document: ${docType} for client: ${this.client._id}`);
     
-    // Handle business document preview
-    if (docType === 'business_document' && this.client.business_document_url) {
-      console.log(`📄 Opening business document directly from URL: ${this.client.business_document_url}`);
-      window.open(this.client.business_document_url, '_blank');
+    // Refresh client data and then preview document to ensure we have the latest document URLs
+    this.refreshAndPreviewDocument(docType);
+  }
+  
+  private previewDocumentWithUpdatedData(docType: string): void {
+    if (!this.client || !this.client._id) {
+      this.snackBar.open('Client information not available', 'Close', { duration: 3000 });
       return;
+    }
+    
+    // Handle business document preview with priority logic
+    if (docType === 'business_document') {
+      // Check documents_original (preserved full format from backend) - THIS IS THE MOST RECENT FORMAT
+      if (this.client.documents_original && this.client.documents_original['business_document']) {
+        const doc = this.client.documents_original['business_document'];
+        if (typeof doc === 'object' && doc.url) {
+          console.log(`📄 Opening business document directly from URL (preserved full format): ${doc.url}`);
+          // Force refresh by adding a timestamp to bypass cache
+          const urlWithTimestamp = `${doc.url}?t=${new Date().getTime()}`;
+          window.open(urlWithTimestamp, '_blank');
+          return;
+        }
+      }
+      // Check documents (new format from client creation) - THIS IS THE MOST RECENT FORMAT
+      else if (this.client.documents?.['business_document']) {
+        const doc = this.client.documents['business_document'];
+        if (typeof doc === 'object' && doc.url) {
+          console.log(`📄 Opening business document directly from URL (new format): ${doc.url}`);
+          // Force refresh by adding a timestamp to bypass cache
+          const urlWithTimestamp = `${doc.url}?t=${new Date().getTime()}`;
+          window.open(urlWithTimestamp, '_blank');
+          return;
+        } else if (typeof doc === 'string' && doc.startsWith('http')) {
+          console.log(`📄 Opening business document directly from URL (string format): ${doc}`);
+          // Force refresh by adding a timestamp to bypass cache
+          const urlWithTimestamp = `${doc}?t=${new Date().getTime()}`;
+          window.open(urlWithTimestamp, '_blank');
+          return;
+        }
+      }
+      // Check processed_documents (legacy format)
+      else if (this.client.processed_documents?.['business_document']) {
+        console.log(`📄 Previewing processed business document via service (legacy format)`);
+        // Use service-based preview for processed documents - this will handle the correct updated document
+        const businessDocLoadingSnackBar = this.snackBar.open('Loading business document preview...', 'Cancel', { duration: 10000 });
+        
+        this.clientService.previewDocument(this.client._id, 'business_document').subscribe({
+          next: (blob: Blob) => {
+            businessDocLoadingSnackBar.dismiss();
+            
+            if (blob.size > 0) {
+              const url = window.URL.createObjectURL(blob);
+              const mimeType = blob.type || 'application/pdf';
+              
+              if (mimeType === 'application/pdf' || this.isPdfDocumentType('business_document')) {
+                // Open PDF in new tab
+                const newWindow = window.open('', '_blank');
+                if (newWindow) {
+                  newWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                      <head>
+                        <title>PDF Preview - Business Document</title>
+                        <style>
+                          body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+                          embed { width: 100%; height: 100vh; border: none; }
+                        </style>
+                      </head>
+                      <body>
+                        <embed src="${url}" type="application/pdf" onload="setTimeout(() => URL.revokeObjectURL('${url}'), 1000)" />
+                      </body>
+                    </html>
+                  `);
+                  newWindow.document.close();
+                }
+              } else {
+                // For other types, just open the blob URL
+                window.open(url, '_blank');
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+              }
+            } else {
+              console.warn('Preview blob is empty for business document');
+              this.snackBar.open('Unable to preview business document', 'Close', { duration: 3000 });
+            }
+          },
+          error: (error) => {
+            businessDocLoadingSnackBar.dismiss();
+            console.error('Error previewing business document:', error);
+            this.snackBar.open('Error previewing business document', 'Close', { duration: 3000 });
+          }
+        });
+        return;
+      }
+      // Fallback to old business document (from enquiry)
+      else if (this.client.business_document_url) {
+        console.log(`📄 Opening old business document directly from URL: ${this.client.business_document_url}`);
+        // Force refresh by adding a timestamp to bypass cache
+        const urlWithTimestamp = `${this.client.business_document_url}?t=${new Date().getTime()}`;
+        window.open(urlWithTimestamp, '_blank');
+        return;
+      }
     }
     
     // Check if document has direct URL (new format)
@@ -308,7 +525,15 @@ export class ClientDetailComponent implements OnInit {
       const doc = this.client.documents[docType];
       if (typeof doc === 'object' && doc.url) {
         console.log(`📄 Opening document directly from URL: ${doc.url}`);
-        window.open(doc.url, '_blank');
+        // Force refresh by adding a timestamp to bypass cache
+        const urlWithTimestamp = `${doc.url}?t=${new Date().getTime()}`;
+        window.open(urlWithTimestamp, '_blank');
+        return;
+      } else if (typeof doc === 'string' && doc.startsWith('http')) {
+        console.log(`📄 Opening document directly from URL (string format): ${doc}`);
+        // Force refresh by adding a timestamp to bypass cache
+        const urlWithTimestamp = `${doc}?t=${new Date().getTime()}`;
+        window.open(urlWithTimestamp, '_blank');
         return;
       }
     }
@@ -900,6 +1125,9 @@ export class ClientDetailComponent implements OnInit {
         
         // Reload client details to ensure we have the latest data
         this.loadClientDetails(this.client!._id);
+        
+        // The service will automatically notify other components about the update
+        // through the clientUpdated$ observable, so we don't need to do anything here
       },
       error: (error: any) => {
         console.error('Error updating client:', error);

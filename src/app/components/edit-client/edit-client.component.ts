@@ -695,16 +695,6 @@ export class EditClientComponent implements OnInit {
     }
   }
 
-  onFileSelected(event: Event, documentType: string): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      this.documents[documentType] = input.files[0];
-    }
-  }
-
-  removeDocument(documentType: string): void {
-    delete this.documents[documentType];
-  }
 
   removeExistingDocument(documentType: string): void {
     console.log('removeExistingDocument called with documentType:', documentType);
@@ -738,24 +728,6 @@ export class EditClientComponent implements OnInit {
       });
     } else {
       console.log('User cancelled deletion');
-    }
-  }
-
-  downloadDocument(documentType: string): void {
-    if (this.existingDocuments[documentType]) {
-      this.clientService.downloadDocument(this.clientId, documentType).subscribe({
-        next: (blob) => {
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = this.existingDocuments[documentType].file_name;
-          a.click();
-          window.URL.revokeObjectURL(url);
-        },
-        error: (error) => {
-          this.snackBar.open('Error downloading document', 'Close', { duration: 3000 });
-        }
-      });
     }
   }
 
@@ -827,6 +799,13 @@ export class EditClientComponent implements OnInit {
       }
     });
 
+    // Add deleted documents
+    if (this.deletedDocuments && this.deletedDocuments.length > 0) {
+      this.deletedDocuments.forEach(docType => {
+        formData.append(`delete_${docType}`, 'true');
+      });
+    }
+
     console.log('Calling updateClientDetails with clientId:', this.clientId);
     console.log('=== END SAVE CLIENT DEBUGGING ===');
 
@@ -859,7 +838,10 @@ export class EditClientComponent implements OnInit {
           }
         }
         
-        this.router.navigate(['/client-detail', this.clientId]);
+        // Navigate back to client detail page with reload flag
+        this.router.navigate(['/client-detail', this.clientId], { 
+          queryParams: { reload: true } 
+        });
       },
       error: (error) => {
         console.error('Error updating client:', error);
@@ -1377,6 +1359,69 @@ export class EditClientComponent implements OnInit {
   getNewBusinessAccountLabel(value: string): string {
     if (!value) return 'Select';
     return value === 'yes' ? 'Yes' : 'No';
+  }
+
+  // Document handling methods
+  onFileSelected(event: any, documentType: string): void {
+    const file = event.target.files[0];
+    if (file) {
+      // Validate file type
+      const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+      if (!allowedTypes.includes(file.type)) {
+        this.snackBar.open('Please select a valid file type (PDF, JPG, PNG)', 'Close', { duration: 3000 });
+        return;
+      }
+
+      // Validate file size (5MB limit)
+      const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+      if (file.size > maxSize) {
+        this.snackBar.open('File size must be less than 5MB', 'Close', { duration: 3000 });
+        return;
+      }
+
+      this.documents[documentType] = file;
+      console.log(`File selected for ${documentType}:`, file.name);
+    }
+  }
+
+  removeDocument(documentType: string): void {
+    delete this.documents[documentType];
+    // Reset the file input
+    const fileInput = document.getElementById(documentType) as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
+    console.log(`Document removed: ${documentType}`);
+  }
+
+  downloadDocument(documentType: string): void {
+    if (!this.client?._id) {
+      this.snackBar.open('Client information not available', 'Close', { duration: 3000 });
+      return;
+    }
+
+    if (!this.hasExistingDocument(documentType)) {
+      this.snackBar.open('Document not found', 'Close', { duration: 3000 });
+      return;
+    }
+
+    this.clientService.downloadDocument(this.client._id, documentType).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = this.existingDocuments[documentType].file_name || `${documentType}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        this.snackBar.open('Document downloaded successfully', 'Close', { duration: 3000 });
+      },
+      error: (error) => {
+        console.error('Download error:', error);
+        this.snackBar.open('Failed to download document', 'Close', { duration: 3000 });
+      }
+    });
   }
 
   // Close dropdowns when clicking outside

@@ -959,13 +959,20 @@
               </div>
             </div>
 
-            <!-- Business Document Upload (Conditional) -->
-            <div class="space-y-6" *ngIf="shouldShowBusinessDocumentField()">
+            <!-- Business Document Upload (Always Available) -->
+            <div class="space-y-6">
+              <div class="flex items-center gap-3 mb-6">
+                <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
+                  <mat-icon class="text-indigo-600 text-lg">description</mat-icon>
+                </div>
+                <h4 class="text-lg font-semibold text-text-primary">Business Document</h4>
+                <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Optional</span>
+              </div>
+              
               <div class="space-y-3">
-                <label class="text-sm font-medium text-text-secondary flex items-center gap-2">
-                  <span>📄 Business Document</span>
+                <label class="text-sm font-medium text-text-primary flex items-center gap-2">
+                  <span>📄 Upload Business Document</span>
                   <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded" *ngIf="enquiryData?.business_document_url">✓ From Enquiry</span>
-                  <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded" *ngIf="!enquiryData?.business_document_url">Optional</span>
                 </label>
                 
                 <!-- Show existing document from enquiry if available -->

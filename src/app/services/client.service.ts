@@ -98,6 +98,10 @@ export interface Client {
     bank_statement?: string;
     [key: string]: any;
   };
+  // Preserved original documents with full metadata (from backend)
+  documents_original?: {
+    [key: string]: any;
+  };
   processed_documents?: {
     [key: string]: {
       file_name: string;

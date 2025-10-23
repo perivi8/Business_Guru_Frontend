@@ -56,6 +56,8 @@ export class ClientDetailsDialogComponent implements OnInit {
   ) {
     if (data?.client) {
       this.client = data.client;
+      console.log('Client Details Dialog - Full client data:', this.client);
+      console.log('Client Documents specifically:', this.client.documents);
       this.initializeClientSections();
     }
   }
@@ -103,6 +105,8 @@ export class ClientDetailsDialogComponent implements OnInit {
         return 'badge';
       case 'partnership_deed_document':
         return 'description';
+      case 'business_document':
+        return 'business_center';
       default:
         return 'insert_drive_file';
     }
@@ -233,9 +237,14 @@ export class ClientDetailsDialogComponent implements OnInit {
   }
 
   hasDocuments(): boolean {
-    return !!(this.client.documents && 
-             (this.client.documents.gst_document || this.client.documents.bank_statement || 
-              (Object.keys(this.client.documents).filter(k => !['gst_document', 'bank_statement'].includes(k)).length > 0)));
+    const hasGst = !!this.client.documents?.gst_document;
+    const hasBankStatement = !!this.client.documents?.bank_statement;
+    const otherDocs = this.client.documents ? Object.keys(this.client.documents).filter(k => !['gst_document', 'bank_statement'].includes(k)) : [];
+    const hasOtherDocs = otherDocs.length > 0;
+    
+    console.log('Document check - GST:', hasGst, 'Bank Statement:', hasBankStatement, 'Other docs:', otherDocs, 'Has other docs:', hasOtherDocs);
+    
+    return !!(this.client.documents && (hasGst || hasBankStatement || hasOtherDocs));
   }
 
   getAdditionalDocuments(): DocumentInfo[] {
@@ -580,6 +589,26 @@ export class ClientDetailsDialogComponent implements OnInit {
 
   private getDocumentUrl(type: string): string | undefined {
     if (!this.client.documents) return undefined;
+    
+    // Special handling for business_document
+    if (type === 'business_document') {
+      // First check if there's a new business document
+      if (this.client.documents['business_document']) {
+        return this.client.documents['business_document'] as string;
+      }
+      // If no new business document, check for old business document sources
+      else if (this.client.documents['business_document_from_enquiry']) {
+        return this.client.documents['business_document_from_enquiry'] as string;
+      }
+      else if (this.client.documents['business_document_url']) {
+        return this.client.documents['business_document_url'] as string;
+      }
+      // Check client root level business_document_url
+      else if (this.client['business_document_url']) {
+        return this.client['business_document_url'] as string;
+      }
+    }
+    
     return this.client.documents[type as keyof typeof this.client.documents] as string;
   }
 
@@ -779,11 +808,68 @@ export class ClientDetailsDialogComponent implements OnInit {
   }
 
   hasDocument(type: string): boolean {
-    return !!this.client.documents?.[type as keyof typeof this.client.documents];
+    if (!this.client.documents) return false;
+    
+    // Special handling for business_document
+    if (type === 'business_document') {
+      return !!(this.client.documents['business_document'] || 
+                this.client.documents['business_document_from_enquiry'] || 
+                this.client.documents['business_document_url'] || 
+                this.client['business_document_url']);
+    }
+    
+    return !!this.client.documents[type as keyof typeof this.client.documents];
   }
 
   getDocumentTypes(): string[] {
-    return this.client.documents ? Object.keys(this.client.documents) : [];
+    if (!this.client.documents) {
+      console.log('No documents found in client data');
+      return [];
+    }
+
+    let documentTypes = Object.keys(this.client.documents);
+    console.log('Client documents:', this.client.documents);
+    console.log('All document types found:', documentTypes);
+
+    // Filter business document logic: Show only new uploaded business document, not old ones
+    const hasNewBusinessDocument = documentTypes.includes('business_document');
+    const hasOldBusinessDocument = documentTypes.includes('business_document_from_enquiry') || 
+                                   documentTypes.includes('business_document_url') ||
+                                   this.client['business_document_url'];
+
+    console.log('Business document analysis:', {
+      hasNewBusinessDocument,
+      hasOldBusinessDocument,
+      business_document_url: this.client['business_document_url']
+    });
+
+    // If there's a new business document, exclude old business document fields
+    if (hasNewBusinessDocument) {
+      documentTypes = documentTypes.filter(type => 
+        type !== 'business_document_from_enquiry' && 
+        type !== 'business_document_url'
+      );
+      console.log('Filtered document types (prioritizing new business document):', documentTypes);
+    }
+    // If there's only old business document, show it as 'business_document' for consistency
+    else if (hasOldBusinessDocument && !hasNewBusinessDocument) {
+      // Check if we have business_document_from_enquiry or business_document_url in documents
+      if (documentTypes.includes('business_document_from_enquiry')) {
+        documentTypes = documentTypes.filter(type => type !== 'business_document_from_enquiry');
+        documentTypes.push('business_document'); // Rename for consistent display
+      } else if (documentTypes.includes('business_document_url')) {
+        documentTypes = documentTypes.filter(type => type !== 'business_document_url');
+        documentTypes.push('business_document'); // Rename for consistent display
+      }
+      // If business_document_url is in client root but not in documents, add it
+      else if (this.client['business_document_url'] && !documentTypes.includes('business_document')) {
+        documentTypes.push('business_document');
+      }
+      console.log('Showing old business document as business_document:', documentTypes);
+    }
+
+    console.log('Final document types to display:', documentTypes);
+    return documentTypes;
   }
 
   getDocumentName(type: string): string {
@@ -794,6 +880,7 @@ export class ClientDetailsDialogComponent implements OnInit {
       case 'partnership_deed_document': return 'Partnership Deed';
       case 'owner_pan_document': return 'Owner PAN Document';
       case 'owner_aadhaar_document': return 'Owner Aadhaar Document';
+      case 'business_document': return 'Business Document';
       default: return type.split('_')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');

@@ -292,9 +292,12 @@ export class NewClientComponent implements OnInit {
         step1Updates.user_email = this.enquiryData.email_address;
       }
       
-      // Map mobile number
+      // Map mobile number (remove country code if present)
       if (this.enquiryData.mobile_number) {
-        step1Updates.mobile_number = this.enquiryData.mobile_number;
+        const originalMobile = this.enquiryData.mobile_number;
+        const extractedMobile = this.extractTenDigitMobile(originalMobile);
+        console.log(`Mobile number processing: "${originalMobile}" -> "${extractedMobile}"`);
+        step1Updates.mobile_number = extractedMobile;
       }
       
       // Map GST information if available
@@ -1213,6 +1216,34 @@ export class NewClientComponent implements OnInit {
     return mobile;
   }
 
+  extractTenDigitMobile(mobile: string): string {
+    if (!mobile) return '';
+    
+    // Remove all non-digit characters
+    const cleaned = mobile.replace(/\D/g, '');
+    
+    // Handle different mobile number formats
+    if (cleaned.length === 10) {
+      // Already 10 digits, return as is
+      return cleaned;
+    } else if (cleaned.length === 12 && cleaned.startsWith('91')) {
+      // Remove +91 country code (91xxxxxxxxxx)
+      return cleaned.substring(2);
+    } else if (cleaned.length === 13 && cleaned.startsWith('091')) {
+      // Remove 091 country code (091xxxxxxxxxx)
+      return cleaned.substring(3);
+    } else if (cleaned.length === 11 && cleaned.startsWith('0')) {
+      // Remove leading 0 (0xxxxxxxxxx)
+      return cleaned.substring(1);
+    } else if (cleaned.length > 10) {
+      // Take the last 10 digits (handles various country code formats)
+      return cleaned.substring(cleaned.length - 10);
+    }
+    
+    // If less than 10 digits or other format, return as is
+    return cleaned;
+  }
+
   updateEnquiryAsSubmitted(enquiryId: string): void {
     // Update the enquiry to mark it as client_submitted = true
     this.enquiryService.updateEnquiry(enquiryId, { client_submitted: true }).subscribe({
@@ -1230,8 +1261,9 @@ export class NewClientComponent implements OnInit {
   showBusinessDocumentUpload = false;
 
   shouldShowBusinessDocumentField(): boolean {
-    // Show if there's an enquiry with business document OR if user is creating a new client without enquiry
-    return this.enquiryData?.business_document_url || !this.enquiryData || this.showBusinessDocumentUpload;
+    // Always show business document field in step 2 (optional upload)
+    // This allows users to upload business documents even if not uploaded during enquiry
+    return true;
   }
 
   previewEnquiryDocument(): void {
