@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -24,6 +24,8 @@ export class ClientsComponent implements OnInit, OnDestroy {
   statusFilter = 'all';
   staffFilter = 'all';
   sortBy = 'newest';
+  commentsFilter = 'all';
+  loanStatusFilter = 'all';
   applyNewClientsFilter: Date | null = null;
   applyUpdatedClientsFilter: Date | null = null;
   updatingClientId: string | null = null;
@@ -34,18 +36,17 @@ export class ClientsComponent implements OnInit, OnDestroy {
   currentDropdownClient: Client | null = null;
   private scrollListener?: () => void;
   commentOptions = [
-    { value: '', label: 'Select Comment' },
-    { value: 'Not Interested', label: 'Not Interested' },
-    { value: 'Will call back', label: 'Will call back' },
-    { value: '1st call completed', label: '1st call completed' },
-    { value: '2nd call completed', label: '2nd call completed' },
-    { value: '3rd call completed', label: '3rd call completed' },
-    { value: '4th call completed', label: '4th call completed' },
-    { value: '5th call completed', label: '5th call completed' },
-    { value: 'rejected', label: 'rejected' },
-    { value: 'cash free login completed', label: 'cash free login completed' },
-    { value: 'share product images', label: 'share product images' },
-    { value: 'share signature', label: 'share signature' }
+    { value: 'Not Interested', label: 'Not Interested', icon: 'cancel' },
+    { value: 'Will call back', label: 'Will call back', icon: 'phone_callback' },
+    { value: '1st call completed', label: '1st call completed', icon: 'call_end' },
+    { value: '2nd call completed', label: '2nd call completed', icon: 'call_end' },
+    { value: '3rd call completed', label: '3rd call completed', icon: 'call_end' },
+    { value: '4th call completed', label: '4th call completed', icon: 'call_end' },
+    { value: '5th call completed', label: '5th call completed', icon: 'call_end' },
+    { value: 'rejected', label: 'rejected', icon: 'block' },
+    { value: 'cash free login completed', label: 'cash free login completed', icon: 'check_circle' },
+    { value: 'share product images', label: 'share product images', icon: 'image' },
+    { value: 'share signature', label: 'share signature', icon: 'draw' }
   ];
 
   displayedColumns: string[] = ['serial', 'name', 'business', 'staff', 'status', 'loan_status', 'created', 'comments', 'actions'];
@@ -63,6 +64,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
+    this.checkMobileView();
     this.handleQueryParams();
     this.loadClients();
     this.loadUsers();
@@ -74,6 +76,13 @@ export class ClientsComponent implements OnInit, OnDestroy {
         this.refreshClientData(clientId);
       }
     });
+  }
+
+  checkMobileView(): void {
+    // Check if device is mobile (screen width < 768px)
+    if (window.innerWidth < 768) {
+      this.viewMode = 'card';
+    }
   }
 
   handleQueryParams(): void {
@@ -252,7 +261,11 @@ export class ClientsComponent implements OnInit, OnDestroy {
       
       const matchesStaff = this.staffFilter === 'all' || client.staff_email === this.staffFilter;
       
-      return matchesSearch && matchesStatus && matchesStaff;
+      const matchesComments = this.commentsFilter === 'all' || client.comments === this.commentsFilter;
+      
+      const matchesLoanStatus = this.loanStatusFilter === 'all' || this.getLoanStatus(client) === this.loanStatusFilter;
+      
+      return matchesSearch && matchesStatus && matchesStaff && matchesComments && matchesLoanStatus;
     });
     
     this.applySorting();
@@ -297,6 +310,230 @@ export class ClientsComponent implements OnInit, OnDestroy {
 
   onStaffFilterChange(): void {
     this.applyFilters();
+  }
+
+  // Custom dropdown state variables
+  isStatusDropdownOpen = false;
+  isStaffDropdownOpen = false;
+  isSortDropdownOpen = false;
+  isCommentsDropdownOpen = false;
+  isLoanStatusDropdownOpen = false;
+  statusUpdateDropdownClientId: string | null = null;
+  statusUpdateDropdownPosition = { top: 0, left: 0 };
+  commentsDropdownClientId: string | null = null;
+  commentsDropdownPosition = { top: 0, left: 0 };
+
+  // Toggle dropdown methods
+  toggleStatusDropdown(): void {
+    this.isStatusDropdownOpen = !this.isStatusDropdownOpen;
+    this.isStaffDropdownOpen = false;
+    this.isSortDropdownOpen = false;
+    this.isCommentsDropdownOpen = false;
+    this.isLoanStatusDropdownOpen = false;
+  }
+
+  toggleStaffDropdown(): void {
+    this.isStaffDropdownOpen = !this.isStaffDropdownOpen;
+    this.isStatusDropdownOpen = false;
+    this.isSortDropdownOpen = false;
+    this.isCommentsDropdownOpen = false;
+    this.isLoanStatusDropdownOpen = false;
+  }
+
+  toggleSortDropdown(): void {
+    this.isSortDropdownOpen = !this.isSortDropdownOpen;
+    this.isStatusDropdownOpen = false;
+    this.isStaffDropdownOpen = false;
+    this.isCommentsDropdownOpen = false;
+    this.isLoanStatusDropdownOpen = false;
+  }
+
+  toggleCommentsDropdown(): void {
+    this.isCommentsDropdownOpen = !this.isCommentsDropdownOpen;
+    this.isStatusDropdownOpen = false;
+    this.isStaffDropdownOpen = false;
+    this.isSortDropdownOpen = false;
+    this.isLoanStatusDropdownOpen = false;
+  }
+
+  toggleLoanStatusDropdown(): void {
+    this.isLoanStatusDropdownOpen = !this.isLoanStatusDropdownOpen;
+    this.isStatusDropdownOpen = false;
+    this.isStaffDropdownOpen = false;
+    this.isSortDropdownOpen = false;
+    this.isCommentsDropdownOpen = false;
+  }
+
+  // Select filter methods
+  selectStatusFilter(status: string): void {
+    this.statusFilter = status;
+    this.isStatusDropdownOpen = false;
+    this.onStatusFilterChange();
+  }
+
+  selectStaffFilter(staffEmail: string): void {
+    this.staffFilter = staffEmail;
+    this.isStaffDropdownOpen = false;
+    this.onStaffFilterChange();
+  }
+
+  selectSortOption(sortOption: string): void {
+    this.sortBy = sortOption;
+    this.isSortDropdownOpen = false;
+    this.onSortChange();
+  }
+
+  selectCommentsFilter(comment: string): void {
+    this.commentsFilter = comment;
+    this.isCommentsDropdownOpen = false;
+    this.applyFilters();
+  }
+
+  selectLoanStatusFilter(loanStatus: string): void {
+    this.loanStatusFilter = loanStatus;
+    this.isLoanStatusDropdownOpen = false;
+    this.applyFilters();
+  }
+
+  // Status update dropdown methods
+  toggleStatusUpdateDropdown(clientId: string, event: MouseEvent): void {
+    if (this.statusUpdateDropdownClientId === clientId) {
+      this.statusUpdateDropdownClientId = null;
+    } else {
+      this.statusUpdateDropdownClientId = clientId;
+      
+      // Position dropdown after DOM update
+      setTimeout(() => {
+        this.positionStatusUpdateDropdown(clientId);
+      }, 0);
+    }
+  }
+
+  positionStatusUpdateDropdown(clientId: string): void {
+    const button = document.getElementById('status-btn-' + clientId);
+    
+    if (button) {
+      const rect = button.getBoundingClientRect();
+      const viewport = {
+        width: window.innerWidth,
+        height: window.innerHeight
+      };
+      
+      const dropdownWidth = 224; // 14rem = 224px (w-56)
+      const dropdownHeight = 280; // Approximate height of 5 items
+      
+      // Calculate initial position (below and to the left of button)
+      let top = rect.bottom + window.scrollY + 8;
+      let left = rect.left + window.scrollX;
+      
+      // Check if dropdown would go off-screen to the right
+      if (left + dropdownWidth > viewport.width) {
+        // Align to right edge of button instead
+        left = rect.right + window.scrollX - dropdownWidth;
+      }
+      
+      // Check if dropdown would go off-screen at the bottom
+      if (top + dropdownHeight > viewport.height + window.scrollY) {
+        // Position above the button instead
+        top = rect.top + window.scrollY - dropdownHeight - 8;
+      }
+      
+      // Ensure dropdown doesn't go off left edge
+      if (left < 10) {
+        left = 10;
+      }
+      
+      // Ensure dropdown doesn't go off right edge
+      if (left + dropdownWidth > viewport.width - 10) {
+        left = viewport.width - dropdownWidth - 10;
+      }
+      
+      this.statusUpdateDropdownPosition = { top, left };
+    }
+  }
+
+  isStatusUpdateDropdownOpen(clientId: string): boolean {
+    return this.statusUpdateDropdownClientId === clientId;
+  }
+
+  selectStatusUpdate(client: Client, status: string): void {
+    this.statusUpdateDropdownClientId = null;
+    this.updateClientStatus(client, status);
+  }
+
+  getClientById(clientId: string): Client {
+    return this.filteredClients.find(c => c._id === clientId) || this.clients.find(c => c._id === clientId) || {} as Client;
+  }
+
+  // Get label methods for dropdowns
+  getStatusFilterLabel(): string {
+    switch (this.statusFilter) {
+      case 'all': return `All Status (${this.getStatusCount('all')})`;
+      case 'pending': return `Pending (${this.getStatusCount('pending')})`;
+      case 'interested': return `Interested (${this.getStatusCount('interested')})`;
+      case 'not_interested': return `Not Interested (${this.getStatusCount('not_interested')})`;
+      case 'hold': return `On Hold (${this.getStatusCount('hold')})`;
+      case 'processing': return `Processing (${this.getStatusCount('processing')})`;
+      default: return 'Select Status';
+    }
+  }
+
+  getStaffFilterLabel(): string {
+    if (this.staffFilter === 'all') {
+      return `All Staff (${this.clients.length})`;
+    }
+    const staff = this.uniqueStaffMembers.find(s => s.email === this.staffFilter);
+    if (staff) {
+      return `${this.getStaffNameFromFilter(staff)} (${this.getStaffCount(staff.email)})`;
+    }
+    return 'Select Staff';
+  }
+
+  getSortOptionLabel(): string {
+    switch (this.sortBy) {
+      case 'newest': return 'Newest First';
+      case 'oldest': return 'Oldest First';
+      case 'name_asc': return 'Name A-Z';
+      case 'name_desc': return 'Name Z-A';
+      default: return 'Sort By';
+    }
+  }
+
+  getCommentsFilterLabel(): string {
+    if (this.commentsFilter === 'all') {
+      return `All Comments (${this.getCommentsCount('all')})`;
+    }
+    const option = this.commentOptions.find(o => o.value === this.commentsFilter);
+    if (option) {
+      return `${option.label} (${this.getCommentsCount(this.commentsFilter)})`;
+    }
+    return 'Select Comment';
+  }
+
+  getLoanStatusFilterLabel(): string {
+    const labels: { [key: string]: string } = {
+      'all': `All Loan Status (${this.getLoanStatusCount('all')})`,
+      'approved': `Approved (${this.getLoanStatusCount('approved')})`,
+      'rejected': `Rejected (${this.getLoanStatusCount('rejected')})`,
+      'hold': `Hold (${this.getLoanStatusCount('hold')})`,
+      'processing': `Processing (${this.getLoanStatusCount('processing')})`,
+      'soon': `Soon (${this.getLoanStatusCount('soon')})`
+    };
+    return labels[this.loanStatusFilter] || 'Select Loan Status';
+  }
+
+  getCommentsCount(comment: string): number {
+    if (comment === 'all') {
+      return this.clients.length;
+    }
+    return this.clients.filter(c => c.comments === comment).length;
+  }
+
+  getLoanStatusCount(loanStatus: string): number {
+    if (loanStatus === 'all') {
+      return this.clients.length;
+    }
+    return this.clients.filter(c => this.getLoanStatus(c) === loanStatus).length;
   }
 
   getStatusColor(status: string): string {
@@ -520,13 +757,16 @@ export class ClientsComponent implements OnInit, OnDestroy {
   }
 
   hasActiveFilters(): boolean {
-    return this.searchTerm !== '' || this.statusFilter !== 'all' || this.staffFilter !== 'all';
+    return this.searchTerm !== '' || this.statusFilter !== 'all' || this.staffFilter !== 'all' || 
+           this.commentsFilter !== 'all' || this.loanStatusFilter !== 'all';
   }
 
   clearAllFilters(): void {
     this.searchTerm = '';
     this.statusFilter = 'all';
     this.staffFilter = 'all';
+    this.commentsFilter = 'all';
+    this.loanStatusFilter = 'all';
     this.applyFilters();
   }
 
@@ -822,6 +1062,73 @@ export class ClientsComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     // Clean up scroll listeners when component is destroyed
     this.removeScrollListeners();
+  }
+
+  // Handle window resize to switch view mode on mobile
+  @HostListener('window:resize', ['$event'])
+  onResize(): void {
+    this.checkMobileView();
+  }
+
+  // Close all dropdowns when clicking outside
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    
+    // Check if click is inside the table comment dropdown or its button
+    const clickedInsideCommentDropdown = target.closest('[data-client-id]') !== null ||
+                                          target.closest('#dropdown-' + this.openDropdownId) !== null;
+    
+    // Check if click is inside status update dropdown or its button
+    const clickedInsideStatusDropdown = target.closest('#status-btn-' + this.statusUpdateDropdownClientId) !== null ||
+                                         (this.statusUpdateDropdownClientId && 
+                                          target.closest('.fixed.w-56') !== null);
+    
+    // Check if clicked on filter dropdown elements
+    const clickedOnStatusFilter = target.closest('button')?.textContent?.includes(this.getStatusFilterLabel()) ||
+                                   target.closest('.absolute.z-50.w-full') !== null;
+    const clickedOnStaffFilter = target.closest('button')?.textContent?.includes(this.getStaffFilterLabel()) ||
+                                  target.closest('.absolute.z-50.w-full') !== null;
+    const clickedOnSortFilter = target.closest('button')?.textContent?.includes(this.getSortOptionLabel()) ||
+                                 target.closest('.absolute.z-50.w-full') !== null;
+    const clickedOnCommentsFilter = target.closest('button')?.textContent?.includes(this.getCommentsFilterLabel()) ||
+                                     target.closest('.absolute.z-50.w-full') !== null;
+    const clickedOnLoanStatusFilter = target.closest('button')?.textContent?.includes(this.getLoanStatusFilterLabel()) ||
+                                       target.closest('.absolute.z-50.w-full') !== null;
+    
+    // Close table comment dropdown if clicking outside
+    if (this.openDropdownId && !clickedInsideCommentDropdown) {
+      this.closeDropdown();
+    }
+    
+    // Close status update dropdown if clicking outside
+    if (this.statusUpdateDropdownClientId && !clickedInsideStatusDropdown) {
+      this.statusUpdateDropdownClientId = null;
+    }
+    
+    // Close filter dropdowns if clicking outside their respective areas
+    const filterDropdownElement = target.closest('.absolute.z-50.w-full');
+    if (!filterDropdownElement) {
+      // Only close dropdowns if we didn't click on their trigger buttons
+      const clickedButton = target.closest('button');
+      const buttonText = clickedButton?.textContent || '';
+      
+      if (!buttonText.includes(this.getStatusFilterLabel())) {
+        this.isStatusDropdownOpen = false;
+      }
+      if (!buttonText.includes(this.getStaffFilterLabel())) {
+        this.isStaffDropdownOpen = false;
+      }
+      if (!buttonText.includes(this.getSortOptionLabel())) {
+        this.isSortDropdownOpen = false;
+      }
+      if (!buttonText.includes(this.getCommentsFilterLabel())) {
+        this.isCommentsDropdownOpen = false;
+      }
+      if (!buttonText.includes(this.getLoanStatusFilterLabel())) {
+        this.isLoanStatusDropdownOpen = false;
+      }
+    }
   }
 
 }

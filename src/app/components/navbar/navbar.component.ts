@@ -16,11 +16,11 @@ import { ChatbotService } from '../../services/chatbot.service';
   animations: [
     trigger('slideInOut', [
       transition(':enter', [
-        style({ transform: 'translateX(100%)', opacity: 0 }),
-        animate('300ms ease-in', style({ transform: 'translateX(0%)', opacity: 1 }))
+        style({ height: '0', opacity: 0, overflow: 'hidden' }),
+        animate('300ms ease-out', style({ height: '*', opacity: 1 }))
       ]),
       transition(':leave', [
-        animate('300ms ease-out', style({ transform: 'translateX(100%)', opacity: 0 }))
+        animate('200ms ease-in', style({ height: '0', opacity: 0, overflow: 'hidden' }))
       ])
     ])
   ]
@@ -45,6 +45,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   unreadNotificationCount = 0;
   showBackButton = false;
   currentRoute = '';
+  isMobileMenuOpen = false;
 
   // Routes that should show back button
   private backButtonRoutes = [
@@ -678,11 +679,26 @@ export class NavbarComponent implements OnInit, OnDestroy {
   onDocumentClick(event: Event): void {
     const target = event.target as HTMLElement;
     const notificationWrapper = target.closest('.notifications-wrapper');
+    const mobileMenuButton = target.closest('.mobile-menu-button');
+    const mobileMenu = target.closest('.mobile-menu');
     
     // Close dropdown if clicking outside of it
     if (!notificationWrapper && this.showNotifications) {
       this.showNotifications = false;
     }
+    
+    // Close mobile menu if clicking outside of it
+    if (!mobileMenuButton && !mobileMenu && this.isMobileMenuOpen) {
+      this.isMobileMenuOpen = false;
+    }
+  }
+
+  toggleMobileMenu(): void {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+  }
+
+  closeMobileMenu(): void {
+    this.isMobileMenuOpen = false;
   }
 
   logout(): void {

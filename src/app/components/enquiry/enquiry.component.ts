@@ -168,6 +168,7 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.checkMobileView();
     this.loadEnquiries();
     this.loadStaffMembers();
     this.checkExistingClients();
@@ -1205,6 +1206,19 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   }
 
   viewMode: 'table' | 'card' = 'table';
+
+  checkMobileView(): void {
+    // Check if device is mobile (screen width < 768px)
+    if (window.innerWidth < 768) {
+      this.viewMode = 'card';
+    }
+  }
+
+  // Handle window resize to switch view mode on mobile
+  @HostListener('window:resize', ['$event'])
+  onResize(): void {
+    this.checkMobileView();
+  }
 
   toggleView(): void {
     this.viewMode = this.viewMode === 'table' ? 'card' : 'table';
@@ -2511,7 +2525,7 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   // Helper methods for green button display
   getShortlistedText(enquiry: Enquiry): string {
     if (this.hasExistingClient(enquiry)) {
-      return 'Already Shortlisted';
+      return 'Shortlisted';
     }
     return enquiry.client_id ? 'Synced' : 'Shortlisted';
   }

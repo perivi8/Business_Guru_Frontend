@@ -1,338 +1,419 @@
 <!-- Main Container with Gradient Background -->
-<div class="min-h-screen bg-gradient-body" style="position: relative;">
+<div class="min-h-screen bg-gradient-body">
 
   <!-- Main Content Layout -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-    <div class="flex flex-col lg:flex-row gap-6">
-      
-      <!-- Left Sidebar - Flipkart Style Filters -->
-      <div class="w-full lg:w-80 order-1">
-        <div class="bg-white rounded-xl shadow-sm border border-border-light sticky top-24">
-          <!-- Filters Header -->
-          <div class="p-4 border-b border-border-light">
-            <div class="flex items-center justify-between">
-              <h3 class="text-lg font-semibold text-text-primary flex items-center gap-2">
-                <mat-icon class="text-primary">filter_list</mat-icon>
-                Filters
-              </h3>
-              <button 
-                *ngIf="hasActiveFilters()" 
-                (click)="clearAllFilters()"
-                class="text-primary hover:text-primary-dark text-sm font-medium">
-                Clear All
+  <div class="max-w-7xl mx-auto py-6">
+    
+    <!-- Horizontal Filters Section -->
+    <div class="bg-white rounded-xl shadow-sm border border-border-light p-6 mb-6">
+      <!-- Filters Header -->
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-lg font-semibold text-text-primary flex items-center gap-2">
+          <mat-icon class="text-primary">filter_list</mat-icon>
+          Filters
+        </h3>
+        <div class="flex items-center gap-3">
+          <!-- View Toggle - Hidden on mobile -->
+          <div class="hidden md:flex items-center gap-2">
+            <button 
+              (click)="viewMode = 'table'" 
+              [class]="viewMode === 'table' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+              class="flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200"
+              matTooltip="Table View">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 6h18m-9 8h9m-9 4h9m-9-8H3m0 4h6"></path>
+              </svg>
+            </button>
+            <button 
+              (click)="viewMode = 'card'" 
+              [class]="viewMode === 'card' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+              class="flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200"
+              matTooltip="Card View">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14-7H5a2 2 0 00-2 2v12a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2z"></path>
+              </svg>
+            </button>
+          </div>
+          <button 
+            *ngIf="hasActiveFilters()" 
+            (click)="clearAllFilters()"
+            class="px-4 py-2 text-sm font-medium text-primary hover:text-primary-dark border border-primary rounded-lg hover:bg-primary/5 transition-colors">
+            Clear All Filters
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter Grid - First Row -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
+        
+        <!-- Search Filter -->
+        <div class="lg:col-span-2">
+          <label class="block text-sm font-medium text-text-primary mb-2">Search Clients</label>
+          <div class="relative">
+            <input 
+              type="text" 
+              [(ngModel)]="searchTerm" 
+              (input)="onSearchChange()"
+              placeholder="Name, business, mobile..."
+              class="w-full pl-10 pr-4 py-2 border border-border-light rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
+            <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-muted text-lg">search</mat-icon>
+          </div>
+        </div>
+
+        <!-- Status Filter -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+            <mat-icon class="text-blue-600 text-lg">info</mat-icon>
+            Client Status
+          </label>
+          <div class="relative">
+            <button type="button"
+                    (click)="toggleStatusDropdown()"
+                    class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white hover:border-gray-400 transition-colors text-left flex items-center justify-between">
+              <span class="truncate">{{ getStatusFilterLabel() }}</span>
+              <mat-icon class="text-gray-400 text-lg transition-transform" [class.rotate-180]="isStatusDropdownOpen">expand_more</mat-icon>
+            </button>
+            <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg pointer-events-none">badge</mat-icon>
+            
+            <!-- Custom Dropdown -->
+            <div *ngIf="isStatusDropdownOpen" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+              <button type="button"
+                      (click)="selectStatusFilter('all')"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-blue-50 transition-colors flex items-center gap-3 border-b border-gray-100"
+                      [class.bg-blue-100]="statusFilter === 'all'"
+                      [class.text-blue-700]="statusFilter === 'all'"
+                      [class.font-semibold]="statusFilter === 'all'">
+                <mat-icon class="text-lg" [class.text-blue-600]="statusFilter === 'all'">list</mat-icon>
+                <span>All Status ({{ getStatusCount('all') }})</span>
+              </button>
+              <button type="button"
+                      (click)="selectStatusFilter('pending')"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-blue-50 transition-colors flex items-center gap-3 border-b border-gray-100"
+                      [class.bg-blue-100]="statusFilter === 'pending'"
+                      [class.text-blue-700]="statusFilter === 'pending'"
+                      [class.font-semibold]="statusFilter === 'pending'">
+                <mat-icon class="text-lg" [class.text-blue-600]="statusFilter === 'pending'">schedule</mat-icon>
+                <span>Pending ({{ getStatusCount('pending') }})</span>
+              </button>
+              <button type="button"
+                      (click)="selectStatusFilter('interested')"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-blue-50 transition-colors flex items-center gap-3 border-b border-gray-100"
+                      [class.bg-blue-100]="statusFilter === 'interested'"
+                      [class.text-blue-700]="statusFilter === 'interested'"
+                      [class.font-semibold]="statusFilter === 'interested'">
+                <mat-icon class="text-lg" [class.text-blue-600]="statusFilter === 'interested'">check_circle</mat-icon>
+                <span>Interested ({{ getStatusCount('interested') }})</span>
+              </button>
+              <button type="button"
+                      (click)="selectStatusFilter('not_interested')"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-blue-50 transition-colors flex items-center gap-3 border-b border-gray-100"
+                      [class.bg-blue-100]="statusFilter === 'not_interested'"
+                      [class.text-blue-700]="statusFilter === 'not_interested'"
+                      [class.font-semibold]="statusFilter === 'not_interested'">
+                <mat-icon class="text-lg" [class.text-blue-600]="statusFilter === 'not_interested'">cancel</mat-icon>
+                <span>Not Interested ({{ getStatusCount('not_interested') }})</span>
+              </button>
+              <button type="button"
+                      (click)="selectStatusFilter('hold')"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-blue-50 transition-colors flex items-center gap-3 border-b border-gray-100"
+                      [class.bg-blue-100]="statusFilter === 'hold'"
+                      [class.text-blue-700]="statusFilter === 'hold'"
+                      [class.font-semibold]="statusFilter === 'hold'">
+                <mat-icon class="text-lg" [class.text-blue-600]="statusFilter === 'hold'">pause</mat-icon>
+                <span>On Hold ({{ getStatusCount('hold') }})</span>
+              </button>
+              <button type="button"
+                      (click)="selectStatusFilter('processing')"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-blue-50 transition-colors flex items-center gap-3 last:border-b-0"
+                      [class.bg-blue-100]="statusFilter === 'processing'"
+                      [class.text-blue-700]="statusFilter === 'processing'"
+                      [class.font-semibold]="statusFilter === 'processing'">
+                <mat-icon class="text-lg" [class.text-blue-600]="statusFilter === 'processing'">autorenew</mat-icon>
+                <span>Processing ({{ getStatusCount('processing') }})</span>
               </button>
             </div>
           </div>
+        </div>
 
-          <!-- View Toggle Section -->
-          <div class="p-4 border-b border-border-light">
-            <label class="block text-sm font-medium text-text-primary mb-3">View Mode</label>
-            <div class="flex items-center gap-2">
-              <button 
-                (click)="viewMode = 'table'" 
-                [class]="viewMode === 'table' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
-                class="flex items-center justify-center w-12 h-10 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                matTooltip="Table View">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 6h18m-9 8h9m-9 4h9m-9-8H3m0 4h6"></path>
-                </svg>
+        <!-- Staff Filter -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+            <mat-icon class="text-purple-600 text-lg">person</mat-icon>
+            Assigned Staff
+          </label>
+          <div class="relative">
+            <button type="button"
+                    (click)="toggleStaffDropdown()"
+                    class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm bg-white hover:border-gray-400 transition-colors text-left flex items-center justify-between">
+              <span class="truncate">{{ getStaffFilterLabel() }}</span>
+              <mat-icon class="text-gray-400 text-lg transition-transform" [class.rotate-180]="isStaffDropdownOpen">expand_more</mat-icon>
+            </button>
+            <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg pointer-events-none">support_agent</mat-icon>
+            
+            <!-- Custom Dropdown -->
+            <div *ngIf="isStaffDropdownOpen" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+              <button type="button"
+                      (click)="selectStaffFilter('all')"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-purple-50 transition-colors flex items-center gap-3 border-b border-gray-100"
+                      [class.bg-purple-100]="staffFilter === 'all'"
+                      [class.text-purple-700]="staffFilter === 'all'"
+                      [class.font-semibold]="staffFilter === 'all'">
+                <mat-icon class="text-lg" [class.text-purple-600]="staffFilter === 'all'">groups</mat-icon>
+                <span>All Staff ({{ clients.length }})</span>
               </button>
-              <button 
-                (click)="viewMode = 'card'" 
-                [class]="viewMode === 'card' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
-                class="flex items-center justify-center w-12 h-10 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                matTooltip="Card View">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14-7H5a2 2 0 00-2 2v12a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2z"></path>
-                </svg>
+              <button type="button"
+                      *ngFor="let staff of uniqueStaffMembers"
+                      (click)="selectStaffFilter(staff.email)"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-purple-50 transition-colors flex items-center gap-3 border-b border-gray-100 last:border-b-0"
+                      [class.bg-purple-100]="staffFilter === staff.email"
+                      [class.text-purple-700]="staffFilter === staff.email"
+                      [class.font-semibold]="staffFilter === staff.email">
+                <mat-icon class="text-lg" [class.text-purple-600]="staffFilter === staff.email">person</mat-icon>
+                <span>{{ getStaffNameFromFilter(staff) }} ({{ getStaffCount(staff.email) }})</span>
               </button>
             </div>
           </div>
+        </div>
 
-          <!-- Search Filter (Desktop) -->
-          <div class="hidden sm:block p-4 border-b border-border-light">
-            <label class="block text-sm font-medium text-text-primary mb-2">Search Clients</label>
-            <div class="relative">
-              <input 
-                type="text" 
-                [(ngModel)]="searchTerm" 
-                (input)="onSearchChange()"
-                placeholder="Name, business, mobile..."
-                class="w-full pl-10 pr-4 py-2 border border-border-light rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
-              <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-muted text-lg">search</mat-icon>
-            </div>
-          </div>
-
-          <!-- Status Filter -->
-          <div class="p-4 border-b border-border-light">
-            <label class="block text-sm font-medium text-text-primary mb-3">Client Status</label>
-            <div class="space-y-2">
-              <label class="flex items-center cursor-pointer group">
-                <input 
-                  type="radio" 
-                  name="status" 
-                  value="all" 
-                  [(ngModel)]="statusFilter" 
-                  (change)="onStatusFilterChange()"
-                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
-                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary">
-                  All Status
-                  <span class="text-text-muted">({{ getStatusCount('all') }})</span>
-                </span>
-              </label>
-              <label class="flex items-center cursor-pointer group">
-                <input 
-                  type="radio" 
-                  name="status" 
-                  value="pending" 
-                  [(ngModel)]="statusFilter" 
-                  (change)="onStatusFilterChange()"
-                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
-                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
-                  <span class="w-2 h-2 bg-yellow-500 rounded-full"></span>
-                  Pending
-                  <span class="text-text-muted">({{ getStatusCount('pending') }})</span>
-                </span>
-              </label>
-              <label class="flex items-center cursor-pointer group">
-                <input 
-                  type="radio" 
-                  name="status" 
-                  value="interested" 
-                  [(ngModel)]="statusFilter" 
-                  (change)="onStatusFilterChange()"
-                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
-                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
-                  <span class="w-2 h-2 bg-green-500 rounded-full"></span>
-                  Interested
-                  <span class="text-text-muted">({{ getStatusCount('interested') }})</span>
-                </span>
-              </label>
-              <label class="flex items-center cursor-pointer group">
-                <input 
-                  type="radio" 
-                  name="status" 
-                  value="not_interested" 
-                  [(ngModel)]="statusFilter" 
-                  (change)="onStatusFilterChange()"
-                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
-                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
-                  <span class="w-2 h-2 bg-red-500 rounded-full"></span>
-                  Not Interested
-                  <span class="text-text-muted">({{ getStatusCount('not_interested') }})</span>
-                </span>
-              </label>
-              <label class="flex items-center cursor-pointer group">
-                <input 
-                  type="radio" 
-                  name="status" 
-                  value="hold" 
-                  [(ngModel)]="statusFilter" 
-                  (change)="onStatusFilterChange()"
-                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
-                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
-                  <span class="w-2 h-2 bg-orange-500 rounded-full"></span>
-                  On Hold
-                  <span class="text-text-muted">({{ getStatusCount('hold') }})</span>
-                </span>
-              </label>
-              <label class="flex items-center cursor-pointer group">
-                <input 
-                  type="radio" 
-                  name="status" 
-                  value="processing" 
-                  [(ngModel)]="statusFilter" 
-                  (change)="onStatusFilterChange()"
-                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
-                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
-                  <span class="w-2 h-2 bg-purple-500 rounded-full"></span>
-                  Processing
-                  <span class="text-text-muted">({{ getStatusCount('processing') }})</span>
-                </span>
-              </label>
-            </div>
-          </div>
-
-          <!-- Staff Filter -->
-          <div class="p-4 border-b border-border-light">
-            <label class="block text-sm font-medium text-text-primary mb-3">Assigned Staff</label>
-            <div class="space-y-2 max-h-48 overflow-y-auto">
-              <label class="flex items-center cursor-pointer group">
-                <input 
-                  type="radio" 
-                  name="staff" 
-                  value="all" 
-                  [(ngModel)]="staffFilter" 
-                  (change)="onStaffFilterChange()"
-                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
-                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary">
-                  All Staff
-                  <span class="text-text-muted">({{ clients.length }})</span>
-                </span>
-              </label>
-              <label *ngFor="let staff of uniqueStaffMembers" class="flex items-center cursor-pointer group">
-                <input 
-                  type="radio" 
-                  name="staff" 
-                  [value]="staff.email" 
-                  [(ngModel)]="staffFilter" 
-                  (change)="onStaffFilterChange()"
-                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
-                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
-                  <mat-icon class="text-lg text-text-muted">person</mat-icon>
-                  {{ getStaffNameFromFilter(staff) }}
-                  <span class="text-text-muted">({{ getStaffCount(staff.email) }})</span>
-                </span>
-              </label>
-            </div>
-          </div>
-
-          <!-- Sort Options -->
-          <div class="p-4">
-            <label class="block text-sm font-medium text-text-primary mb-3">Sort By</label>
-            <div class="space-y-2">
-              <label class="flex items-center cursor-pointer group">
-                <input 
-                  type="radio" 
-                  name="sort" 
-                  value="newest" 
-                  [(ngModel)]="sortBy" 
-                  (change)="onSortChange()"
-                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
-                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
-                  <mat-icon class="text-lg text-text-muted">schedule</mat-icon>
-                  Newest First
-                </span>
-              </label>
-              <label class="flex items-center cursor-pointer group">
-                <input 
-                  type="radio" 
-                  name="sort" 
-                  value="oldest" 
-                  [(ngModel)]="sortBy" 
-                  (change)="onSortChange()"
-                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
-                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
-                  <mat-icon class="text-lg text-text-muted">history</mat-icon>
-                  Oldest First
-                </span>
-              </label>
-              <label class="flex items-center cursor-pointer group">
-                <input 
-                  type="radio" 
-                  name="sort" 
-                  value="name_asc" 
-                  [(ngModel)]="sortBy" 
-                  (change)="onSortChange()"
-                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
-                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
-                  <mat-icon class="text-lg text-text-muted">sort_by_alpha</mat-icon>
-                  Name A-Z
-                </span>
-              </label>
-              <label class="flex items-center cursor-pointer group">
-                <input 
-                  type="radio" 
-                  name="sort" 
-                  value="name_desc" 
-                  [(ngModel)]="sortBy" 
-                  (change)="onSortChange()"
-                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
-                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
-                  <mat-icon class="text-lg text-text-muted">sort_by_alpha</mat-icon>
-                  Name Z-A
-                </span>
-              </label>
+        <!-- Sort By Filter -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+            <mat-icon class="text-orange-600 text-lg">sort</mat-icon>
+            Sort By
+          </label>
+          <div class="relative">
+            <button type="button"
+                    (click)="toggleSortDropdown()"
+                    class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm bg-white hover:border-gray-400 transition-colors text-left flex items-center justify-between">
+              <span class="truncate">{{ getSortOptionLabel() }}</span>
+              <mat-icon class="text-gray-400 text-lg transition-transform" [class.rotate-180]="isSortDropdownOpen">expand_more</mat-icon>
+            </button>
+            <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg pointer-events-none">swap_vert</mat-icon>
+            
+            <!-- Custom Dropdown -->
+            <div *ngIf="isSortDropdownOpen" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+              <button type="button" (click)="selectSortOption('newest')" class="w-full text-left px-4 py-3 text-sm hover:bg-orange-50 transition-colors flex items-center gap-3 border-b border-gray-100" [class.bg-orange-100]="sortBy === 'newest'" [class.text-orange-700]="sortBy === 'newest'" [class.font-semibold]="sortBy === 'newest'">
+                <mat-icon class="text-lg" [class.text-orange-600]="sortBy === 'newest'">arrow_downward</mat-icon>
+                <span>Newest First</span>
+              </button>
+              <button type="button" (click)="selectSortOption('oldest')" class="w-full text-left px-4 py-3 text-sm hover:bg-orange-50 transition-colors flex items-center gap-3 border-b border-gray-100" [class.bg-orange-100]="sortBy === 'oldest'" [class.text-orange-700]="sortBy === 'oldest'" [class.font-semibold]="sortBy === 'oldest'">
+                <mat-icon class="text-lg" [class.text-orange-600]="sortBy === 'oldest'">arrow_upward</mat-icon>
+                <span>Oldest First</span>
+              </button>
+              <button type="button" (click)="selectSortOption('name_asc')" class="w-full text-left px-4 py-3 text-sm hover:bg-orange-50 transition-colors flex items-center gap-3 border-b border-gray-100" [class.bg-orange-100]="sortBy === 'name_asc'" [class.text-orange-700]="sortBy === 'name_asc'" [class.font-semibold]="sortBy === 'name_asc'">
+                <mat-icon class="text-lg" [class.text-orange-600]="sortBy === 'name_asc'">sort_by_alpha</mat-icon>
+                <span>Name A-Z</span>
+              </button>
+              <button type="button" (click)="selectSortOption('name_desc')" class="w-full text-left px-4 py-3 text-sm hover:bg-orange-50 transition-colors flex items-center gap-3 last:border-b-0" [class.bg-orange-100]="sortBy === 'name_desc'" [class.text-orange-700]="sortBy === 'name_desc'" [class.font-semibold]="sortBy === 'name_desc'">
+                <mat-icon class="text-lg" [class.text-orange-600]="sortBy === 'name_desc'">sort_by_alpha</mat-icon>
+                <span>Name Z-A</span>
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Main Content Area -->
-      <div class="flex-1 order-2">
-        <!-- Results Header -->
-        <div class="bg-white rounded-xl shadow-sm border border-border-light p-4 mb-6">
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div class="flex items-center gap-4">
-              <h2 class="text-lg font-semibold text-text-primary">
-                Clients ({{ filteredClients.length }})
-              </h2>
-              
-              <!-- Active Filters Display -->
-              <div *ngIf="hasActiveFilters()" class="flex flex-wrap gap-2">
-                <span *ngIf="searchTerm" class="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                  Search: "{{ searchTerm }}"
-                  <button (click)="searchTerm = ''; onSearchChange()" class="hover:bg-blue-200 rounded-full p-0.5">
-                    <mat-icon class="text-xs">close</mat-icon>
-                  </button>
-                </span>
-                <span *ngIf="statusFilter !== 'all'" class="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-                  Status: {{ statusFilter | titlecase }}
-                  <button (click)="statusFilter = 'all'; onStatusFilterChange()" class="hover:bg-green-200 rounded-full p-0.5">
-                    <mat-icon class="text-xs">close</mat-icon>
-                  </button>
-                </span>
-                <span *ngIf="staffFilter !== 'all'" class="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
-                  Staff: {{ getStaffNameFromFilter(getSelectedStaff()) }}
-                  <button (click)="staffFilter = 'all'; onStaffFilterChange()" class="hover:bg-purple-200 rounded-full p-0.5">
-                    <mat-icon class="text-xs">close</mat-icon>
-                  </button>
-                </span>
-              </div>
-            </div>
-            
-            <!-- Clear All Filters -->
-            <button 
-              *ngIf="hasActiveFilters()" 
-              (click)="clearAllFilters()"
-              class="btn btn-outline text-status-error border-status-error hover:bg-status-error hover:text-white flex items-center gap-2 px-3 py-1.5 text-sm">
-              <mat-icon class="text-sm">clear_all</mat-icon>
-              Clear All
+      <!-- Filter Grid - Second Row (Comments and Loan Status) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <!-- Comments Filter -->
+        <div class="lg:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+            <mat-icon class="text-teal-600 text-lg">comment</mat-icon>
+            Comments
+          </label>
+          <div class="relative">
+            <button type="button"
+                    (click)="toggleCommentsDropdown()"
+                    class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm bg-white hover:border-gray-400 transition-colors text-left flex items-center justify-between">
+              <span class="truncate">{{ getCommentsFilterLabel() }}</span>
+              <mat-icon class="text-gray-400 text-lg transition-transform" [class.rotate-180]="isCommentsDropdownOpen">expand_more</mat-icon>
             </button>
+            <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg pointer-events-none">chat_bubble</mat-icon>
+            
+            <!-- Custom Dropdown -->
+            <div *ngIf="isCommentsDropdownOpen" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+              <button type="button"
+                      (click)="selectCommentsFilter('all')"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-teal-50 transition-colors flex items-center gap-3 border-b border-gray-100"
+                      [class.bg-teal-100]="commentsFilter === 'all'"
+                      [class.text-teal-700]="commentsFilter === 'all'"
+                      [class.font-semibold]="commentsFilter === 'all'">
+                <mat-icon class="text-lg" [class.text-teal-600]="commentsFilter === 'all'">list</mat-icon>
+                <span>All Comments ({{ getCommentsCount('all') }})</span>
+              </button>
+              <button type="button"
+                      *ngFor="let option of commentOptions"
+                      (click)="selectCommentsFilter(option.value)"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-teal-50 transition-colors flex items-center gap-3 border-b border-gray-100 last:border-b-0"
+                      [class.bg-teal-100]="commentsFilter === option.value"
+                      [class.text-teal-700]="commentsFilter === option.value"
+                      [class.font-semibold]="commentsFilter === option.value">
+                <mat-icon class="text-lg" [class.text-teal-600]="commentsFilter === option.value">{{ option.icon }}</mat-icon>
+                <span>{{ option.label }} ({{ getCommentsCount(option.value) }})</span>
+              </button>
+            </div>
           </div>
         </div>
 
-        <!-- Loading State -->
-        <div *ngIf="loading" class="flex flex-col items-center justify-center py-16">
-          <mat-spinner diameter="40" class="mb-4"></mat-spinner>
-          <p class="text-text-secondary">Loading clients...</p>
-        </div>
-
-        <!-- Error State -->
-        <div *ngIf="error" class="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-          <mat-icon class="text-red-500 text-4xl mb-2">error_outline</mat-icon>
-          <h3 class="text-lg font-semibold text-red-800 mb-2">Error Loading Clients</h3>
-          <p class="text-red-600 mb-4">{{ error }}</p>
-          <button (click)="loadClients()" class="btn btn-primary">
-            <mat-icon class="mr-2">refresh</mat-icon>
-            Try Again
-          </button>
-        </div>
-
-        <!-- Empty State -->
-        <div *ngIf="!loading && !error && filteredClients.length === 0" class="text-center py-16">
-          <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <mat-icon class="text-gray-400 text-3xl">people_outline</mat-icon>
+        <!-- Loan Status Filter -->
+        <div class="lg:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+            <mat-icon class="text-indigo-600 text-lg">account_balance</mat-icon>
+            Loan Status
+          </label>
+          <div class="relative">
+            <button type="button"
+                    (click)="toggleLoanStatusDropdown()"
+                    class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-white hover:border-gray-400 transition-colors text-left flex items-center justify-between">
+              <span class="truncate">{{ getLoanStatusFilterLabel() }}</span>
+              <mat-icon class="text-gray-400 text-lg transition-transform" [class.rotate-180]="isLoanStatusDropdownOpen">expand_more</mat-icon>
+            </button>
+            <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg pointer-events-none">account_balance_wallet</mat-icon>
+            
+            <!-- Custom Dropdown -->
+            <div *ngIf="isLoanStatusDropdownOpen" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+              <button type="button"
+                      (click)="selectLoanStatusFilter('all')"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-indigo-50 transition-colors flex items-center gap-3 border-b border-gray-100"
+                      [class.bg-indigo-100]="loanStatusFilter === 'all'"
+                      [class.text-indigo-700]="loanStatusFilter === 'all'"
+                      [class.font-semibold]="loanStatusFilter === 'all'">
+                <mat-icon class="text-lg" [class.text-indigo-600]="loanStatusFilter === 'all'">list</mat-icon>
+                <span>All Loan Status ({{ getLoanStatusCount('all') }})</span>
+              </button>
+              <button type="button"
+                      (click)="selectLoanStatusFilter('approved')"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-indigo-50 transition-colors flex items-center gap-3 border-b border-gray-100"
+                      [class.bg-indigo-100]="loanStatusFilter === 'approved'"
+                      [class.text-indigo-700]="loanStatusFilter === 'approved'"
+                      [class.font-semibold]="loanStatusFilter === 'approved'">
+                <mat-icon class="text-lg" [class.text-indigo-600]="loanStatusFilter === 'approved'">check_circle</mat-icon>
+                <span>Approved ({{ getLoanStatusCount('approved') }})</span>
+              </button>
+              <button type="button"
+                      (click)="selectLoanStatusFilter('rejected')"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-indigo-50 transition-colors flex items-center gap-3 border-b border-gray-100"
+                      [class.bg-indigo-100]="loanStatusFilter === 'rejected'"
+                      [class.text-indigo-700]="loanStatusFilter === 'rejected'"
+                      [class.font-semibold]="loanStatusFilter === 'rejected'">
+                <mat-icon class="text-lg" [class.text-indigo-600]="loanStatusFilter === 'rejected'">cancel</mat-icon>
+                <span>Rejected ({{ getLoanStatusCount('rejected') }})</span>
+              </button>
+              <button type="button"
+                      (click)="selectLoanStatusFilter('hold')"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-indigo-50 transition-colors flex items-center gap-3 border-b border-gray-100"
+                      [class.bg-indigo-100]="loanStatusFilter === 'hold'"
+                      [class.text-indigo-700]="loanStatusFilter === 'hold'"
+                      [class.font-semibold]="loanStatusFilter === 'hold'">
+                <mat-icon class="text-lg" [class.text-indigo-600]="loanStatusFilter === 'hold'">pause</mat-icon>
+                <span>Hold ({{ getLoanStatusCount('hold') }})</span>
+              </button>
+              <button type="button"
+                      (click)="selectLoanStatusFilter('processing')"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-indigo-50 transition-colors flex items-center gap-3 border-b border-gray-100"
+                      [class.bg-indigo-100]="loanStatusFilter === 'processing'"
+                      [class.text-indigo-700]="loanStatusFilter === 'processing'"
+                      [class.font-semibold]="loanStatusFilter === 'processing'">
+                <mat-icon class="text-lg" [class.text-indigo-600]="loanStatusFilter === 'processing'">autorenew</mat-icon>
+                <span>Processing ({{ getLoanStatusCount('processing') }})</span>
+              </button>
+              <button type="button"
+                      (click)="selectLoanStatusFilter('soon')"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-indigo-50 transition-colors flex items-center gap-3 last:border-b-0"
+                      [class.bg-indigo-100]="loanStatusFilter === 'soon'"
+                      [class.text-indigo-700]="loanStatusFilter === 'soon'"
+                      [class.font-semibold]="loanStatusFilter === 'soon'">
+                <mat-icon class="text-lg" [class.text-indigo-600]="loanStatusFilter === 'soon'">schedule</mat-icon>
+                <span>Soon ({{ getLoanStatusCount('soon') }})</span>
+              </button>
+            </div>
           </div>
-          <h3 class="text-xl font-semibold text-text-primary mb-2">No clients found</h3>
-          <p class="text-text-secondary mb-6 max-w-md mx-auto">
-            <span *ngIf="searchTerm || statusFilter !== 'all' || staffFilter !== 'all'">
-              Try adjusting your search criteria or filters to find what you're looking for.
-            </span>
-            <span *ngIf="!searchTerm && statusFilter === 'all' && staffFilter === 'all'">
-              Start building your client base by adding your first client to the system.
-            </span>
-          </p>
-          <button routerLink="/new-client" class="btn btn-primary">
-            <mat-icon class="mr-2">person_add</mat-icon>
-            Add New Client
-          </button>
         </div>
+      </div>
+    </div>
+    <!-- Results Header -->
+    <div class="bg-white rounded-xl shadow-sm border border-border-light p-4 mb-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <h2 class="text-lg font-semibold text-text-primary">
+            Clients ({{ filteredClients.length }})
+          </h2>
+          
+          <!-- Active Filters Display -->
+          <div *ngIf="hasActiveFilters()" class="flex flex-wrap gap-2">
+            <span *ngIf="searchTerm" class="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+              Search: "{{ searchTerm }}"
+              <button (click)="searchTerm = ''; onSearchChange()" class="hover:bg-blue-200 rounded-full p-0.5">
+                <mat-icon class="text-xs">close</mat-icon>
+              </button>
+            </span>
+            <span *ngIf="statusFilter !== 'all'" class="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+              Status: {{ statusFilter | titlecase }}
+              <button (click)="statusFilter = 'all'; onStatusFilterChange()" class="hover:bg-green-200 rounded-full p-0.5">
+                <mat-icon class="text-xs">close</mat-icon>
+              </button>
+            </span>
+            <span *ngIf="staffFilter !== 'all'" class="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
+              Staff: {{ getStaffNameFromFilter(getSelectedStaff()) }}
+              <button (click)="staffFilter = 'all'; onStaffFilterChange()" class="hover:bg-purple-200 rounded-full p-0.5">
+                <mat-icon class="text-xs">close</mat-icon>
+              </button>
+            </span>
+          </div>
+        </div>
+        
+        <!-- Clear All Filters -->
+        <button 
+          *ngIf="hasActiveFilters()" 
+          (click)="clearAllFilters()"
+          class="btn btn-outline text-status-error border-status-error hover:bg-status-error hover:text-white flex items-center gap-2 px-3 py-1.5 text-sm">
+          <mat-icon class="text-sm">clear_all</mat-icon>
+          Clear All
+        </button>
+      </div>
+    </div>
 
-        <!-- Table View -->
-        <div *ngIf="!loading && !error && filteredClients.length > 0 && viewMode === 'table'" class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
-          <div class="overflow-x-auto overflow-y-visible" style="overflow-y: visible !important;">
-            <table mat-table [dataSource]="filteredClients" class="w-full rounded-xl">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex flex-col items-center justify-center py-16">
+      <mat-spinner diameter="40" class="mb-4"></mat-spinner>
+      <p class="text-text-secondary">Loading clients...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error" class="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+      <mat-icon class="text-red-500 text-4xl mb-2">error_outline</mat-icon>
+      <h3 class="text-lg font-semibold text-red-800 mb-2">Error Loading Clients</h3>
+      <p class="text-red-600 mb-4">{{ error }}</p>
+      <button (click)="loadClients()" class="btn btn-primary">
+        <mat-icon class="mr-2">refresh</mat-icon>
+        Try Again
+      </button>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && !error && filteredClients.length === 0" class="text-center py-16">
+      <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <mat-icon class="text-gray-400 text-3xl">people_outline</mat-icon>
+      </div>
+      <h3 class="text-xl font-semibold text-text-primary mb-2">No clients found</h3>
+      <p class="text-text-secondary mb-6 max-w-md mx-auto">
+        <span *ngIf="searchTerm || statusFilter !== 'all' || staffFilter !== 'all'">
+          Try adjusting your search criteria or filters to find what you're looking for.
+        </span>
+        <span *ngIf="!searchTerm && statusFilter === 'all' && staffFilter === 'all'">
+          Start building your client base by adding your first client to the system.
+        </span>
+      </p>
+      <button routerLink="/new-client" class="btn btn-primary">
+        <mat-icon class="mr-2">person_add</mat-icon>
+        Add New Client
+      </button>
+    </div>
+
+    <!-- Table View -->
+    <div *ngIf="!loading && !error && filteredClients.length > 0 && viewMode === 'table'" class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
+      <div class="overflow-x-auto overflow-y-visible" style="overflow-y: visible !important;">
+        <table mat-table [dataSource]="filteredClients" class="w-full text-xs">
               <!-- Serial Number Column -->
               <ng-container matColumnDef="serial">
                 <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">S.No</th>
@@ -459,91 +540,43 @@
               <!-- Actions Column -->
               <ng-container matColumnDef="actions">
                 <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Actions</th>
-                <td mat-cell *matCellDef="let client" class="px-4 py-3">
-                  <!-- User Actions -->
-                  <div *ngIf="!isAdmin()" class="flex items-center">
-                    <button mat-icon-button [matMenuTriggerFor]="userActionMenu" 
-                            class="w-8 h-8 text-text-secondary hover:text-text-primary hover:bg-surface-alt" 
-                            (click)="$event.stopPropagation()"
-                            matTooltip="Actions">
-                      <mat-icon class="text-lg">more_horiz</mat-icon>
+                <td mat-cell *matCellDef="let client" class="px-4 py-3 relative" (click)="$event.stopPropagation()" style="overflow: visible;">
+                  <div class="flex items-center gap-2">
+                    <!-- Edit Action -->
+                    <button (click)="editClient(client)" 
+                            class="w-9 h-9 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-200 hover:scale-110 group"
+                            matTooltip="Edit Client"
+                            matTooltipPosition="above">
+                      <mat-icon class="text-blue-600 group-hover:text-blue-700 text-xl">edit_note</mat-icon>
                     </button>
-                    <mat-menu #userActionMenu="matMenu" class="user-action-menu">
-                      <div class="flex items-center gap-1 px-3 py-2">
-                        <button mat-icon-button 
-                                (click)="editClient(client)" 
-                                class="text-primary hover:bg-primary/10 w-8 h-8"
-                                matTooltip="Edit Client">
-                          <mat-icon class="text-lg">edit</mat-icon>
-                        </button>
-                        <button mat-icon-button 
-                                (click)="openWhatsApp(client)" 
-                                class="text-green-600 hover:bg-green-50 w-8 h-8"
-                                matTooltip="WhatsApp">
-                          <mat-icon svgIcon="whatsapp" class="text-lg"></mat-icon>
-                        </button>
-                        <button mat-icon-button 
-                                (click)="deleteClient(client)" 
-                                class="text-status-error hover:bg-red-50 w-8 h-8"
-                                matTooltip="Delete Client">
-                          <mat-icon class="text-lg">delete</mat-icon>
-                        </button>
-                      </div>
-                    </mat-menu>
-                  </div>
-                  
-                  <!-- Admin Actions -->
-                  <div *ngIf="isAdmin()" class="flex items-center">
-                    <button mat-icon-button [matMenuTriggerFor]="actionMenu" 
-                            class="w-8 h-8" 
-                            (click)="$event.stopPropagation()" 
-                            [disabled]="isClientUpdating(client._id)">
-                      <mat-spinner *ngIf="isClientUpdating(client._id)" diameter="16"></mat-spinner>
-                      <mat-icon *ngIf="!isClientUpdating(client._id)" class="text-lg">more_vert</mat-icon>
+                    
+                    <!-- WhatsApp Action -->
+                    <button (click)="openWhatsApp(client)" 
+                            class="w-9 h-9 rounded-lg bg-green-100 hover:bg-green-200 flex items-center justify-center transition-all duration-200 hover:scale-110 group"
+                            matTooltip="Open WhatsApp"
+                            matTooltipPosition="above">
+                      <svg class="w-5 h-5 text-green-600 group-hover:text-green-700" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                      </svg>
                     </button>
-                    <mat-menu #actionMenu="matMenu">
-                      <button mat-menu-item (click)="viewClientDetails(client)" [disabled]="isClientUpdating(client._id)">
-                        <mat-icon>visibility</mat-icon>
-                        View Details
-                      </button>
-                      
-                      <ng-container *ngIf="isAdmin()">
-                        <mat-divider></mat-divider>
-                        
-                        <button mat-menu-item (click)="updateClientStatus(client, 'interested')" 
-                                [disabled]="client.status === 'interested' || isClientUpdating(client._id)">
-                          <mat-icon style="color: #4caf50;">check_circle</mat-icon>
-                          Mark Interested
-                        </button>
-                        <button mat-menu-item (click)="updateClientStatus(client, 'not_interested')"
-                                [disabled]="client.status === 'not_interested' || isClientUpdating(client._id)">
-                          <mat-icon style="color: #f44336;">cancel</mat-icon>
-                          Mark Not Interested
-                        </button>
-                        <button mat-menu-item (click)="updateClientStatus(client, 'hold')"
-                                [disabled]="client.status === 'hold' || isClientUpdating(client._id)">
-                          <mat-icon style="color: #ff9800;">pause</mat-icon>
-                          Mark Hold
-                        </button>
-                        <button mat-menu-item (click)="updateClientStatus(client, 'pending')"
-                                [disabled]="client.status === 'pending' || isClientUpdating(client._id)">
-                          <mat-icon style="color: #9c27b0;">schedule</mat-icon>
-                          Mark Pending
-                        </button>
-                        <button mat-menu-item (click)="updateClientStatus(client, 'processing')"
-                                [disabled]="client.status === 'processing' || isClientUpdating(client._id)">
-                          <mat-icon style="color: #2196f3;">autorenew</mat-icon>
-                          Mark Processing
-                        </button>
-                        
-                        <mat-divider></mat-divider>
-                        
-                        <button mat-menu-item (click)="deleteClient(client)" class="text-status-error" [disabled]="isClientUpdating(client._id)">
-                          <mat-icon>delete</mat-icon>
-                          Delete Client
-                        </button>
-                      </ng-container>
-                    </mat-menu>
+                    
+                    <!-- Delete Action -->
+                    <button (click)="deleteClient(client)" 
+                            class="w-9 h-9 rounded-lg bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-200 hover:scale-110 group"
+                            matTooltip="Delete Client"
+                            matTooltipPosition="above">
+                      <mat-icon class="text-red-600 group-hover:text-red-700 text-xl">delete_forever</mat-icon>
+                    </button>
+                    
+                    <!-- Admin Status Update Action -->
+                    <button *ngIf="isAdmin()" 
+                            [id]="'status-btn-' + client._id"
+                            (click)="toggleStatusUpdateDropdown(client._id, $event); $event.stopPropagation()"
+                            class="w-9 h-9 rounded-lg bg-purple-100 hover:bg-purple-200 flex items-center justify-center transition-all duration-200 hover:scale-110 group"
+                            matTooltip="Update Status"
+                            matTooltipPosition="above">
+                      <mat-icon class="text-purple-600 group-hover:text-purple-700 text-xl">more_vert</mat-icon>
+                    </button>
                   </div>
                 </td>
               </ng-container>
@@ -560,8 +593,8 @@
           </div>
         </div>
 
-        <!-- Card View - 2 Column Grid -->
-        <div *ngIf="!loading && !error && filteredClients.length > 0 && viewMode === 'card'" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Card View - 3 Column Grid -->
+        <div *ngIf="!loading && !error && filteredClients.length > 0 && viewMode === 'card'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div *ngFor="let client of filteredClients; let i = index" 
                class="bg-white rounded-2xl shadow-lg border border-border-light overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer group">
             
@@ -696,24 +729,39 @@
                 
                 <!-- Admin Actions -->
                 <div *ngIf="isAdmin()" class="flex flex-col gap-3 w-full">
-                  <!-- Comment Selector -->
-                  <mat-form-field appearance="outline" class="w-full">
-                    <mat-label>Add Comment</mat-label>
-                    <mat-select [(value)]="client.comments" (selectionChange)="onCommentChange(client, $event.value)" [disabled]="isClientUpdating(client._id)">
-                      <mat-option value="">Select Comment</mat-option>
-                      <mat-option value="Not Interested">Not Interested</mat-option>
-                      <mat-option value="Will call back">Will call back</mat-option>
-                      <mat-option value="1st call completed">1st call completed</mat-option>
-                      <mat-option value="2nd call completed">2nd call completed</mat-option>
-                      <mat-option value="3rd call completed">3rd call completed</mat-option>
-                      <mat-option value="4th call completed">4th call completed</mat-option>
-                      <mat-option value="5th call completed">5th call completed</mat-option>
-                      <mat-option value="rejected">rejected</mat-option>
-                      <mat-option value="cash free login completed">cash free login completed</mat-option>
-                      <mat-option value="share product images">share product images</mat-option>
-                      <mat-option value="share signature">share signature</mat-option>
-                    </mat-select>
-                  </mat-form-field>
+                  <!-- Comment Selector - Tailwind CSS Dropdown -->
+                  <div class="relative w-full">
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Add Comment</label>
+                    <button 
+                      type="button"
+                      (click)="toggleDropdown('card-' + client._id)"
+                      [disabled]="isClientUpdating(client._id)"
+                      [attr.data-client-id]="'card-' + client._id"
+                      class="relative w-full bg-white border border-gray-300 rounded-lg px-3 py-2.5 text-left text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 hover:border-gray-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      [class.border-teal-500]="isDropdownOpen('card-' + client._id)"
+                      [class.ring-2]="isDropdownOpen('card-' + client._id)"
+                      [class.ring-teal-500]="isDropdownOpen('card-' + client._id)">
+                      
+                      <span class="block truncate text-gray-700">
+                        {{ getSelectedCommentLabel(client) }}
+                      </span>
+                      
+                      <!-- Dropdown Arrow -->
+                      <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                        <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                             [class.rotate-180]="isDropdownOpen('card-' + client._id)"
+                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                      </span>
+                    </button>
+
+                    <!-- Loading Spinner -->
+                    <div *ngIf="isClientUpdating(client._id)" 
+                         class="absolute top-9 right-8 transform">
+                      <div class="animate-spin rounded-full h-4 w-4 border-2 border-teal-500 border-t-transparent"></div>
+                    </div>
+                  </div>
                   
                   <!-- Action Buttons -->
                   <div class="flex items-center justify-between">
@@ -771,8 +819,6 @@
             </div>
           </div>
         </div>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -781,28 +827,61 @@
      [id]="'dropdown-' + openDropdownId"
      style="position: absolute; z-index: 30; width: 12rem; background: white; border: 1px solid #d1d5db; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); max-height: 15rem; overflow-y: auto;">
   
-  <!-- Backdrop to close dropdown when clicking outside -->
-  <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 29;" (click)="closeDropdown()"></div>
-  
   <!-- Options List -->
-  <div style="position: relative; z-index: 31;">
-    <button
-      *ngFor="let option of commentOptions"
-      type="button"
-      (click)="selectCommentFromGlobalDropdown(option.value)"
-      style="width: 100%; text-align: left; padding: 8px 12px; font-size: 14px; border: none; background: transparent; cursor: pointer; border-bottom: 1px solid #f3f4f6; position: relative;"
-      [style.background-color]="getCurrentClientComment() === option.value ? '#3b82f6' : 'transparent'"
-      [style.color]="getCurrentClientComment() === option.value ? 'white' : '#374151'"
-      (mouseenter)="onGlobalOptionHover($event, option, true)"
-      (mouseleave)="onGlobalOptionHover($event, option, false)">
-      
-      {{ option.label }}
-      
-      <!-- Selected indicator -->
-      <span *ngIf="getCurrentClientComment() === option.value" 
-            style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%);">
-        ✓
-      </span>
-    </button>
-  </div>
+  <button
+    *ngFor="let option of commentOptions"
+    type="button"
+    (click)="selectCommentFromGlobalDropdown(option.value)"
+    style="width: 100%; text-align: left; padding: 8px 12px; font-size: 14px; border: none; background: transparent; cursor: pointer; border-bottom: 1px solid #f3f4f6; position: relative;"
+    [style.background-color]="getCurrentClientComment() === option.value ? '#3b82f6' : 'transparent'"
+    [style.color]="getCurrentClientComment() === option.value ? 'white' : '#374151'"
+    (mouseenter)="onGlobalOptionHover($event, option, true)"
+    (mouseleave)="onGlobalOptionHover($event, option, false)">
+    
+    {{ option.label }}
+    
+    <!-- Selected indicator -->
+    <span *ngIf="getCurrentClientComment() === option.value" 
+          style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%);">
+      ✓
+    </span>
+  </button>
+</div>
+
+<!-- Status Update Dropdown (Portal-style, positioned absolutely) -->
+<div *ngIf="statusUpdateDropdownClientId" 
+     class="fixed w-56 bg-white border border-gray-200 rounded-lg shadow-xl overflow-hidden"
+     [style.top.px]="statusUpdateDropdownPosition.top"
+     [style.left.px]="statusUpdateDropdownPosition.left"
+     style="z-index: 10000;">
+  <button type="button"
+          (click)="selectStatusUpdate(getClientById(statusUpdateDropdownClientId), 'interested')"
+          class="w-full text-left px-4 py-3 text-sm hover:bg-green-50 transition-colors flex items-center gap-3 border-b border-gray-100">
+    <mat-icon class="text-lg text-green-600">check_circle</mat-icon>
+    <span class="text-gray-700">Mark Interested</span>
+  </button>
+  <button type="button"
+          (click)="selectStatusUpdate(getClientById(statusUpdateDropdownClientId), 'not_interested')"
+          class="w-full text-left px-4 py-3 text-sm hover:bg-red-50 transition-colors flex items-center gap-3 border-b border-gray-100">
+    <mat-icon class="text-lg text-red-600">cancel</mat-icon>
+    <span class="text-gray-700">Mark Not Interested</span>
+  </button>
+  <button type="button"
+          (click)="selectStatusUpdate(getClientById(statusUpdateDropdownClientId), 'hold')"
+          class="w-full text-left px-4 py-3 text-sm hover:bg-orange-50 transition-colors flex items-center gap-3 border-b border-gray-100">
+    <mat-icon class="text-lg text-orange-600">pause</mat-icon>
+    <span class="text-gray-700">Mark Hold</span>
+  </button>
+  <button type="button"
+          (click)="selectStatusUpdate(getClientById(statusUpdateDropdownClientId), 'pending')"
+          class="w-full text-left px-4 py-3 text-sm hover:bg-purple-50 transition-colors flex items-center gap-3 border-b border-gray-100">
+    <mat-icon class="text-lg text-purple-600">schedule</mat-icon>
+    <span class="text-gray-700">Mark Pending</span>
+  </button>
+  <button type="button"
+          (click)="selectStatusUpdate(getClientById(statusUpdateDropdownClientId), 'processing')"
+          class="w-full text-left px-4 py-3 text-sm hover:bg-blue-50 transition-colors flex items-center gap-3">
+    <mat-icon class="text-lg text-blue-600">autorenew</mat-icon>
+    <span class="text-gray-700">Mark Processing</span>
+  </button>
 </div>
