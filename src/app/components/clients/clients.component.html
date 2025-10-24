@@ -400,9 +400,6 @@
         <span *ngIf="searchTerm || statusFilter !== 'all' || staffFilter !== 'all'">
           Try adjusting your search criteria or filters to find what you're looking for.
         </span>
-        <span *ngIf="!searchTerm && statusFilter === 'all' && staffFilter === 'all'">
-          Start building your client base by adding your first client to the system.
-        </span>
       </p>
       <button routerLink="/new-client" class="btn btn-primary">
         <mat-icon class="mr-2">person_add</mat-icon>
