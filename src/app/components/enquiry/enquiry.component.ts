@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { EnquiryService } from '../../services/enquiry.service';
 import { ClientService } from '../../services/client.service';
 import { UserService, User } from '../../services/user.service';
@@ -19,9 +19,8 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   enquiries: Enquiry[] = [];
   filteredEnquiries: Enquiry[] = [];
   displayedColumns: string[] = [
-    'sno', 'date', 'owner_name', 'phone_number', 'secondary_mobile',
-    'gst', 'business_name', 'loan_amount', 'loan_purpose', 'annual_revenue',
-    'email_address', 'business_document', 'staff', 'comments', 'shortlist', 'actions'
+    'sno', 'date', 'owner_name', 'phone_number',
+    'gst', 'business_name', 'business_document', 'staff', 'comments', 'shortlist', 'actions'
   ];
   
   staffMembers: User[] = [];
@@ -36,12 +35,15 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   staffFilter = 'all';
   gstFilter = 'all';
   interestFilter = 'all'; // New interest level filter
+  shortlistFilter = 'all'; // New shortlist filter
   fromDate: Date | null = null;
   toDate: Date | null = null;
   
   // Edit mode tracking
   isEditMode = false;
   editingEnquiryId: string | null = null;
+  originalFormValues: any = null; // Store original values to detect changes
+  hasFormChanges = false; // Track if form has been modified
   
   // Duplicate mobile number message tracking
   showDuplicateMessage = false;
@@ -144,6 +146,13 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   // Custom dropdown properties
   openDropdownId: string | null = null;
   businessTypes = ['Retail', 'Wholesale', 'Manufacturing', 'Service', 'Trading', 'Other'];
+  
+  // Filter dropdown states
+  isStaffDropdownOpen = false;
+  isGstDropdownOpen = false;
+  isInterestDropdownOpen = false;
+  isShortlistDropdownOpen = false;
+  isSortDropdownOpen = false;
 
   constructor(
     private fb: FormBuilder,
@@ -152,7 +161,8 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private snackBar: MatSnackBar,
     private dialog: MatDialog,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     this.registrationForm = this.createRegistrationForm();
   }
@@ -161,6 +171,20 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     this.loadEnquiries();
     this.loadStaffMembers();
     this.checkExistingClients();
+    
+    // Check for edit query parameter
+    this.route.queryParams.subscribe(params => {
+      if (params['edit']) {
+        const enquiryId = params['edit'];
+        // Wait for enquiries to load, then trigger edit
+        setTimeout(() => {
+          const enquiry = this.enquiries.find(e => e._id === enquiryId);
+          if (enquiry) {
+            this.editEnquiry(enquiry);
+          }
+        }, 500);
+      }
+    });
     
     // Listen for window focus to refresh client data
     window.addEventListener('focus', () => {
@@ -354,7 +378,34 @@ export class EnquiryComponent implements OnInit, OnDestroy {
       }
     });
     
-    this.uniqueStaffMembers = Array.from(staffSet).sort();
+    // Convert to array and sort with priority order
+    const staffArray = Array.from(staffSet);
+    
+    // Define priority staff members (shown at top)
+    const priorityStaff = ['Public Form', 'Admin'];
+    
+    // Separate priority and regular staff
+    const priority: string[] = [];
+    const regular: string[] = [];
+    
+    staffArray.forEach(staff => {
+      if (priorityStaff.includes(staff)) {
+        priority.push(staff);
+      } else {
+        regular.push(staff);
+      }
+    });
+    
+    // Sort priority staff in defined order
+    priority.sort((a, b) => {
+      return priorityStaff.indexOf(a) - priorityStaff.indexOf(b);
+    });
+    
+    // Sort regular staff alphabetically
+    regular.sort();
+    
+    // Combine: priority first, then regular staff
+    this.uniqueStaffMembers = [...priority, ...regular];
   }
 
   /**
@@ -965,17 +1016,42 @@ export class EnquiryComponent implements OnInit, OnDestroy {
       }
     }
 
+    // Apply shortlist filter
+    if (this.shortlistFilter !== 'all') {
+      if (this.shortlistFilter === 'shortlist') {
+        // Show only enquiries that can be shortlisted (verified but not submitted)
+        filtered = filtered.filter(enquiry => this.canShowShortlistButton(enquiry));
+      } else if (this.shortlistFilter === 'shortlisted') {
+        // Show only enquiries that are already shortlisted/submitted
+        filtered = filtered.filter(enquiry => this.isEnquirySubmitted(enquiry));
+      } else if (this.shortlistFilter === 'not_shortlist') {
+        // Show only enquiries that cannot be shortlisted (not verified)
+        filtered = filtered.filter(enquiry => 
+          !this.canShowShortlistButton(enquiry) && !this.isEnquirySubmitted(enquiry)
+        );
+      }
+    }
+
     // Apply date range filter
     if (this.fromDate || this.toDate) {
       filtered = filtered.filter(enquiry => {
         const enquiryDate = new Date(enquiry.date);
+        enquiryDate.setHours(0, 0, 0, 0); // Reset time for accurate date comparison
         
         if (this.fromDate && this.toDate) {
-          return enquiryDate >= this.fromDate && enquiryDate <= this.toDate;
+          const fromDateObj = new Date(this.fromDate);
+          const toDateObj = new Date(this.toDate);
+          fromDateObj.setHours(0, 0, 0, 0);
+          toDateObj.setHours(23, 59, 59, 999);
+          return enquiryDate >= fromDateObj && enquiryDate <= toDateObj;
         } else if (this.fromDate) {
-          return enquiryDate >= this.fromDate;
+          const fromDateObj = new Date(this.fromDate);
+          fromDateObj.setHours(0, 0, 0, 0);
+          return enquiryDate >= fromDateObj;
         } else if (this.toDate) {
-          return enquiryDate <= this.toDate;
+          const toDateObj = new Date(this.toDate);
+          toDateObj.setHours(23, 59, 59, 999);
+          return enquiryDate <= toDateObj;
         }
         
         return true;
@@ -1045,10 +1121,30 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     this.applyFilters();
   }
 
+  clearShortlistFilter(): void {
+    this.shortlistFilter = 'all';
+    this.applyFilters();
+  }
+
   clearDateRange(): void {
     this.fromDate = null;
     this.toDate = null;
     this.applyFilters();
+  }
+
+  getShortlistCount(filter: string): number {
+    if (filter === 'all') {
+      return this.enquiries.length;
+    } else if (filter === 'shortlist') {
+      return this.enquiries.filter(e => this.canShowShortlistButton(e)).length;
+    } else if (filter === 'shortlisted') {
+      return this.enquiries.filter(e => this.isEnquirySubmitted(e)).length;
+    } else if (filter === 'not_shortlist') {
+      return this.enquiries.filter(e => 
+        !this.canShowShortlistButton(e) && !this.isEnquirySubmitted(e)
+      ).length;
+    }
+    return 0;
   }
 
   formatDateRange(): string {
@@ -1227,12 +1323,13 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     this.isEditMode = true;
     this.editingEnquiryId = enquiry._id || null;
     this.showRegistrationForm = true;
+    this.hasFormChanges = false;
     
     // Split mobile number into country code and number
     const { countryCode, number } = this.splitMobileNumber(enquiry.mobile_number);
     
     // Populate form with enquiry data
-    this.registrationForm.patchValue({
+    const formValues = {
       date: new Date(enquiry.date),
       wati_name: enquiry.wati_name || '',
       owner_name: enquiry.owner_name || '',
@@ -1253,7 +1350,33 @@ export class EnquiryComponent implements OnInit, OnDestroy {
       staff: enquiry.staff || '',
       comments: enquiry.comments || '',
       additional_comments: enquiry.additional_comments || ''
-    });
+    };
+    
+    this.registrationForm.patchValue(formValues);
+    
+    // Store original values for comparison
+    this.originalFormValues = { ...formValues };
+    
+    // Listen for form changes
+    this.registrationForm.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.checkFormChanges();
+      });
+    
+    // Scroll to top to show the form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  
+  // Check if form has changes compared to original values
+  checkFormChanges(): void {
+    if (!this.isEditMode || !this.originalFormValues) {
+      this.hasFormChanges = false;
+      return;
+    }
+    
+    const currentValues = this.registrationForm.value;
+    this.hasFormChanges = JSON.stringify(currentValues) !== JSON.stringify(this.originalFormValues);
   }
 
   // Delete enquiry method
@@ -1369,10 +1492,14 @@ export class EnquiryComponent implements OnInit, OnDestroy {
       console.log('📤 Form errors:', this.registrationForm.errors);
 
       if (this.isEditMode && this.editingEnquiryId) {
+        // Show loading indicator
+        this.loading = true;
+        
         this.enquiryService.updateEnquiry(this.editingEnquiryId, formData)
           .pipe(takeUntil(this.destroy$))
           .subscribe({
           next: (updatedEnquiry: any) => {
+            this.loading = false; // Hide loading indicator
             let message = 'Enquiry updated successfully!';
             let panelClass = ['success-snackbar'];
             
@@ -1405,10 +1532,19 @@ export class EnquiryComponent implements OnInit, OnDestroy {
               duration: 5000,
               panelClass: panelClass
             });
-            this.closeDuplicateMessage(); // This will reset form and keep it open for new enquiry
+            
+            // Close the edit form after successful update
+            this.showRegistrationForm = false;
+            this.isEditMode = false;
+            this.editingEnquiryId = null;
+            this.hasFormChanges = false;
+            this.originalFormValues = null;
+            this.registrationForm.reset();
+            
             this.loadEnquiries();
           },
           error: (error) => {
+            this.loading = false; // Hide loading indicator on error
             console.error('Error updating enquiry:', error);
             console.error('Error response body:', error.error);
             console.error('Error status:', error.status);
@@ -1491,7 +1627,7 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   }
 
 
-  formatDate(date: Date): string {
+  formatDate(date: string | Date): string {
     return new Date(date).toLocaleDateString('en-IN');
   }
 
@@ -2243,6 +2379,12 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     // Check if the click is outside any dropdown
     if (!target.closest('.relative')) {
       this.closeDropdown();
+      // Close filter dropdowns
+      this.isStaffDropdownOpen = false;
+      this.isGstDropdownOpen = false;
+      this.isInterestDropdownOpen = false;
+      this.isShortlistDropdownOpen = false;
+      this.isSortDropdownOpen = false;
     }
   }
 
@@ -2395,6 +2537,125 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Filter dropdown toggle methods
+  toggleStaffDropdown(): void {
+    this.isStaffDropdownOpen = !this.isStaffDropdownOpen;
+    this.isGstDropdownOpen = false;
+    this.isInterestDropdownOpen = false;
+    this.isSortDropdownOpen = false;
+  }
+
+  toggleGstDropdown(): void {
+    this.isGstDropdownOpen = !this.isGstDropdownOpen;
+    this.isStaffDropdownOpen = false;
+    this.isInterestDropdownOpen = false;
+    this.isSortDropdownOpen = false;
+  }
+
+  toggleInterestDropdown(): void {
+    this.isInterestDropdownOpen = !this.isInterestDropdownOpen;
+    this.isStaffDropdownOpen = false;
+    this.isGstDropdownOpen = false;
+    this.isShortlistDropdownOpen = false;
+    this.isSortDropdownOpen = false;
+  }
+
+  toggleShortlistDropdown(): void {
+    this.isShortlistDropdownOpen = !this.isShortlistDropdownOpen;
+    this.isStaffDropdownOpen = false;
+    this.isGstDropdownOpen = false;
+    this.isInterestDropdownOpen = false;
+    this.isSortDropdownOpen = false;
+  }
+
+  toggleSortDropdown(): void {
+    this.isSortDropdownOpen = !this.isSortDropdownOpen;
+    this.isStaffDropdownOpen = false;
+    this.isGstDropdownOpen = false;
+    this.isInterestDropdownOpen = false;
+    this.isShortlistDropdownOpen = false;
+  }
+
+  selectStaffFilter(value: string): void {
+    this.staffFilter = value;
+    this.isStaffDropdownOpen = false;
+    this.applyFilters();
+  }
+
+  selectGstFilter(value: string): void {
+    this.gstFilter = value;
+    this.isGstDropdownOpen = false;
+    this.applyFilters();
+  }
+
+  selectInterestFilter(value: string): void {
+    this.interestFilter = value;
+    this.isInterestDropdownOpen = false;
+    this.applyFilters();
+  }
+
+  selectShortlistFilter(value: string): void {
+    this.shortlistFilter = value;
+    this.isShortlistDropdownOpen = false;
+    this.applyFilters();
+  }
+
+  selectSortOption(value: string): void {
+    this.sortOption = value;
+    this.isSortDropdownOpen = false;
+    this.onSortChange();
+  }
+
+  getStaffFilterLabel(): string {
+    return this.staffFilter === 'all' ? `All Staff (${this.getStaffCount('all')})` : `${this.staffFilter} (${this.getStaffCount(this.staffFilter)})`;
+  }
+
+  getGstFilterLabel(): string {
+    if (this.gstFilter === 'all') return `All GST (${this.getGstCount('all')})`;
+    if (this.gstFilter === 'yes') return `GST Active (${this.getGstCount('yes')})`;
+    return `Not Selected (${this.getGstCount('not_selected')})`;
+  }
+
+  getInterestFilterLabel(): string {
+    const labels: { [key: string]: string } = {
+      'all': 'All Interest',
+      'interested': 'Interested',
+      'not_interested': 'Not Interested',
+      'no_gst': 'No GST',
+      'gst_cancelled': 'GST Cancelled',
+      'pending': 'Pending',
+      'unknown': 'Unknown'
+    };
+    return `${labels[this.interestFilter]} (${this.getInterestCount(this.interestFilter)})`;
+  }
+
+  getShortlistFilterLabel(): string {
+    const labels: { [key: string]: string } = {
+      'all': 'All',
+      'shortlist': 'Can Shortlist',
+      'shortlisted': 'Shortlisted',
+      'not_shortlist': 'Not Eligible'
+    };
+    return `${labels[this.shortlistFilter]} (${this.getShortlistCount(this.shortlistFilter)})`;
+  }
+
+  getSortOptionLabel(): string {
+    const labels: { [key: string]: string } = {
+      'date_new': 'Newest First',
+      'date_old': 'Oldest First',
+      'name_asc': 'Name A-Z',
+      'name_desc': 'Name Z-A'
+    };
+    return labels[this.sortOption];
+  }
+
+  // Navigate to enquiry details page
+  viewEnquiryDetails(enquiry: Enquiry): void {
+    if (enquiry._id) {
+      this.router.navigate(['/enquiry-details', enquiry._id]);
+    }
+  }
+
   // Helper method to extract last 10 digits from mobile number (remove country code)
   getDisplayMobileNumber(mobileNumber: string): string {
     if (!mobileNumber) {
@@ -2403,5 +2664,25 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     // Extract last 10 digits
     const cleanedNumber = mobileNumber.replace(/\D/g, ''); // Remove non-digits
     return cleanedNumber.length > 10 ? cleanedNumber.slice(-10) : cleanedNumber;
+  }
+
+  // Generate WhatsApp link from mobile number
+  getWhatsAppLink(mobileNumber: string): string {
+    if (!mobileNumber) {
+      return '#';
+    }
+    
+    // Clean the number - remove all non-digit characters
+    const cleanedNumber = mobileNumber.replace(/\D/g, '');
+    
+    // If number has country code (more than 10 digits), use as is
+    // If it's 10 digits, assume it's Indian number and add 91
+    let fullNumber = cleanedNumber;
+    if (cleanedNumber.length === 10) {
+      fullNumber = '91' + cleanedNumber;
+    }
+    
+    // Return WhatsApp link
+    return `https://wa.me/${fullNumber}`;
   }
 }

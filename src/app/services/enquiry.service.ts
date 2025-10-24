@@ -96,7 +96,26 @@ export class EnquiryService {
   }
 
   getEnquiryById(id: string): Observable<Enquiry> {
-    return this.http.get<Enquiry>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
+    return this.http.get<any>(`${this.apiUrl}/${id}`, { 
+      headers: this.getHeaders(),
+      withCredentials: true 
+    }).pipe(
+      map((response: any) => {
+        // Handle different response formats
+        if (response && response.enquiry) {
+          return response.enquiry;
+        } else if (response && response._id) {
+          return response;
+        } else {
+          console.warn('Unexpected enquiry response format:', response);
+          return response;
+        }
+      }),
+      catchError((error: any) => {
+        console.error('Error fetching enquiry by ID:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
   createEnquiry(enquiry: Enquiry): Observable<Enquiry> {

@@ -2,372 +2,329 @@
 <div class="min-h-screen bg-gradient-body">
 
   <!-- Main Content Layout -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-    <div class="flex flex-col lg:flex-row gap-6">
-      
-      <!-- Left Sidebar - Filters -->
-      <div class="w-full lg:w-80 order-1">
-        <div class="bg-white rounded-xl shadow-sm border border-border-light sticky top-24">
-          <!-- Filters Header -->
-          <div class="p-4 border-b border-border-light">
-            <div class="flex items-center justify-between">
-              <h3 class="text-lg font-semibold text-text-primary flex items-center gap-2">
-                <mat-icon class="text-primary">filter_list</mat-icon>
-                Filters
-              </h3>
-              <button 
-                *ngIf="hasActiveFilters()" 
-                (click)="clearAllFilters()"
-                class="text-primary hover:text-primary-dark text-sm font-medium">
-                Clear All
+  <div class="max-w-7xl mx-auto py-6">
+    
+    <!-- Horizontal Filters Section -->
+    <div class="bg-white rounded-xl shadow-sm border border-border-light p-6 mb-6">
+      <!-- Filters Header -->
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-lg font-semibold text-text-primary flex items-center gap-2">
+          <mat-icon class="text-primary">filter_list</mat-icon>
+          Filters
+        </h3>
+        <div class="flex items-center gap-3">
+          <!-- View Toggle -->
+          <div class="flex items-center gap-2">
+            <button 
+              (click)="viewMode = 'table'" 
+              [class]="viewMode === 'table' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+              class="flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200"
+              matTooltip="Table View">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 6h18m-9 8h9m-9 4h9m-9-8H3m0 4h6"></path>
+              </svg>
+            </button>
+            <button 
+              (click)="viewMode = 'card'" 
+              [class]="viewMode === 'card' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+              class="flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200"
+              matTooltip="Card View">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14-7H5a2 2 0 00-2 2v12a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2z"></path>
+              </svg>
+            </button>
+          </div>
+          <button 
+            *ngIf="hasActiveFilters()" 
+            (click)="clearAllFilters()"
+            class="px-4 py-2 text-sm font-medium text-primary hover:text-primary-dark border border-primary rounded-lg hover:bg-primary/5 transition-colors">
+            Clear All Filters
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter Grid - First Row -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-4">
+        
+        <!-- Search Filter -->
+        <div class="lg:col-span-2">
+          <label class="block text-sm font-medium text-text-primary mb-2">Search Enquiries</label>
+          <div class="relative">
+            <input 
+              type="text" 
+              [(ngModel)]="searchTerm" 
+              (input)="applyFilters()"
+              placeholder="Name, mobile, business..."
+              class="w-full pl-10 pr-4 py-2 border border-border-light rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
+            <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-muted text-lg">search</mat-icon>
+          </div>
+        </div>
+
+        <!-- Staff Filter -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+            <mat-icon class="text-blue-600 text-lg">person</mat-icon>
+            Assigned Staff
+          </label>
+          <div class="relative">
+            <button type="button"
+                    (click)="toggleStaffDropdown()"
+                    class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white hover:border-gray-400 transition-colors text-left flex items-center justify-between">
+              <span class="truncate">{{ getStaffFilterLabel() }}</span>
+              <mat-icon class="text-gray-400 text-lg transition-transform" [class.rotate-180]="isStaffDropdownOpen">expand_more</mat-icon>
+            </button>
+            <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg pointer-events-none">badge</mat-icon>
+            
+            <!-- Custom Dropdown -->
+            <div *ngIf="isStaffDropdownOpen" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+              <button type="button"
+                      (click)="selectStaffFilter('all')"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-blue-50 transition-colors flex items-center gap-3 border-b border-gray-100"
+                      [class.bg-blue-100]="staffFilter === 'all'"
+                      [class.text-blue-700]="staffFilter === 'all'"
+                      [class.font-semibold]="staffFilter === 'all'">
+                <mat-icon class="text-lg" [class.text-blue-600]="staffFilter === 'all'">groups</mat-icon>
+                <span>All Staff ({{ getStaffCount('all') }})</span>
+              </button>
+              <button type="button"
+                      *ngFor="let staff of uniqueStaffMembers"
+                      (click)="selectStaffFilter(staff)"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-blue-50 transition-colors flex items-center gap-3 border-b border-gray-100 last:border-b-0"
+                      [class.bg-blue-100]="staffFilter === staff"
+                      [class.text-blue-700]="staffFilter === staff"
+                      [class.font-semibold]="staffFilter === staff">
+                <mat-icon class="text-lg" [class.text-blue-600]="staffFilter === staff">
+                  {{ staff === 'Public Form' ? 'public' : (staff === 'Admin' ? 'admin_panel_settings' : 'person') }}
+                </mat-icon>
+                <span>{{ staff }} ({{ getStaffCount(staff) }})</span>
               </button>
             </div>
           </div>
+        </div>
 
-          <!-- View Toggle Section -->
-          <div class="p-4 border-b border-border-light">
-            <label class="block text-sm font-medium text-text-primary mb-3">View Mode</label>
-            <div class="flex items-center gap-2">
-              <button 
-                (click)="viewMode = 'table'" 
-                [class]="viewMode === 'table' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
-                class="flex items-center justify-center w-12 h-10 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                matTooltip="Table View">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 6h18m-9 8h9m-9 4h9m-9-8H3m0 4h6"></path>
-                </svg>
+        <!-- GST Filter -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+            <mat-icon class="text-green-600 text-lg">verified</mat-icon>
+            GST Status
+          </label>
+          <div class="relative">
+            <button type="button"
+                    (click)="toggleGstDropdown()"
+                    class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm bg-white hover:border-gray-400 transition-colors text-left flex items-center justify-between">
+              <span class="truncate">{{ getGstFilterLabel() }}</span>
+              <mat-icon class="text-gray-400 text-lg transition-transform" [class.rotate-180]="isGstDropdownOpen">expand_more</mat-icon>
+            </button>
+            <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg pointer-events-none">receipt_long</mat-icon>
+            
+            <!-- Custom Dropdown -->
+            <div *ngIf="isGstDropdownOpen" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+              <button type="button"
+                      (click)="selectGstFilter('all')"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-green-50 transition-colors flex items-center gap-3 border-b border-gray-100"
+                      [class.bg-green-100]="gstFilter === 'all'"
+                      [class.text-green-700]="gstFilter === 'all'"
+                      [class.font-semibold]="gstFilter === 'all'">
+                <mat-icon class="text-lg" [class.text-green-600]="gstFilter === 'all'">list</mat-icon>
+                <span>All GST ({{ getGstCount('all') }})</span>
               </button>
-              <button 
-                (click)="viewMode = 'card'" 
-                [class]="viewMode === 'card' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
-                class="flex items-center justify-center w-12 h-10 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                matTooltip="Card View">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14-7H5a2 2 0 00-2 2v12a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2z"></path>
-                </svg>
+              <button type="button"
+                      (click)="selectGstFilter('yes')"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-green-50 transition-colors flex items-center gap-3 border-b border-gray-100"
+                      [class.bg-green-100]="gstFilter === 'yes'"
+                      [class.text-green-700]="gstFilter === 'yes'"
+                      [class.font-semibold]="gstFilter === 'yes'">
+                <mat-icon class="text-lg" [class.text-green-600]="gstFilter === 'yes'">verified</mat-icon>
+                <span>GST Active ({{ getGstCount('yes') }})</span>
+              </button>
+              <button type="button"
+                      (click)="selectGstFilter('not_selected')"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-green-50 transition-colors flex items-center gap-3 last:border-b-0"
+                      [class.bg-green-100]="gstFilter === 'not_selected'"
+                      [class.text-green-700]="gstFilter === 'not_selected'"
+                      [class.font-semibold]="gstFilter === 'not_selected'">
+                <mat-icon class="text-lg" [class.text-green-600]="gstFilter === 'not_selected'">help_outline</mat-icon>
+                <span>Not Selected ({{ getGstCount('not_selected') }})</span>
               </button>
             </div>
           </div>
+        </div>
 
-          <!-- Search Filter (Desktop) -->
-          <div class="hidden sm:block p-4 border-b border-border-light">
-            <label class="block text-sm font-medium text-text-primary mb-2">Search Enquiries</label>
-            <div class="relative">
-              <input 
-                type="text" 
-                [(ngModel)]="searchTerm" 
-                (input)="applyFilters()"
-                placeholder="Name, mobile, business..."
-                class="w-full pl-10 pr-4 py-2 border border-border-light rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
-              <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-muted text-lg">search</mat-icon>
+        <!-- Interest Level Filter -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+            <mat-icon class="text-purple-600 text-lg">favorite</mat-icon>
+            Interest Level
+          </label>
+          <div class="relative">
+            <button type="button"
+                    (click)="toggleInterestDropdown()"
+                    class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm bg-white hover:border-gray-400 transition-colors text-left flex items-center justify-between">
+              <span class="truncate">{{ getInterestFilterLabel() }}</span>
+              <mat-icon class="text-gray-400 text-lg transition-transform" [class.rotate-180]="isInterestDropdownOpen">expand_more</mat-icon>
+            </button>
+            <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg pointer-events-none">star</mat-icon>
+            
+            <!-- Custom Dropdown -->
+            <div *ngIf="isInterestDropdownOpen" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+              <button type="button" (click)="selectInterestFilter('all')" class="w-full text-left px-4 py-3 text-sm hover:bg-purple-50 transition-colors flex items-center gap-3 border-b border-gray-100" [class.bg-purple-100]="interestFilter === 'all'" [class.text-purple-700]="interestFilter === 'all'" [class.font-semibold]="interestFilter === 'all'">
+                <mat-icon class="text-lg" [class.text-purple-600]="interestFilter === 'all'">list</mat-icon>
+                <span>All Interest ({{ getInterestCount('all') }})</span>
+              </button>
+              <button type="button" (click)="selectInterestFilter('interested')" class="w-full text-left px-4 py-3 text-sm hover:bg-purple-50 transition-colors flex items-center gap-3 border-b border-gray-100" [class.bg-purple-100]="interestFilter === 'interested'" [class.text-purple-700]="interestFilter === 'interested'" [class.font-semibold]="interestFilter === 'interested'">
+                <mat-icon class="text-lg" [class.text-purple-600]="interestFilter === 'interested'">thumb_up</mat-icon>
+                <span>Interested ({{ getInterestCount('interested') }})</span>
+              </button>
+              <button type="button" (click)="selectInterestFilter('not_interested')" class="w-full text-left px-4 py-3 text-sm hover:bg-purple-50 transition-colors flex items-center gap-3 border-b border-gray-100" [class.bg-purple-100]="interestFilter === 'not_interested'" [class.text-purple-700]="interestFilter === 'not_interested'" [class.font-semibold]="interestFilter === 'not_interested'">
+                <mat-icon class="text-lg" [class.text-purple-600]="interestFilter === 'not_interested'">thumb_down</mat-icon>
+                <span>Not Interested ({{ getInterestCount('not_interested') }})</span>
+              </button>
+              <button type="button" (click)="selectInterestFilter('no_gst')" class="w-full text-left px-4 py-3 text-sm hover:bg-purple-50 transition-colors flex items-center gap-3 border-b border-gray-100" [class.bg-purple-100]="interestFilter === 'no_gst'" [class.text-purple-700]="interestFilter === 'no_gst'" [class.font-semibold]="interestFilter === 'no_gst'">
+                <mat-icon class="text-lg" [class.text-purple-600]="interestFilter === 'no_gst'">cancel</mat-icon>
+                <span>No GST ({{ getInterestCount('no_gst') }})</span>
+              </button>
+              <button type="button" (click)="selectInterestFilter('gst_cancelled')" class="w-full text-left px-4 py-3 text-sm hover:bg-purple-50 transition-colors flex items-center gap-3 border-b border-gray-100" [class.bg-purple-100]="interestFilter === 'gst_cancelled'" [class.text-purple-700]="interestFilter === 'gst_cancelled'" [class.font-semibold]="interestFilter === 'gst_cancelled'">
+                <mat-icon class="text-lg" [class.text-purple-600]="interestFilter === 'gst_cancelled'">block</mat-icon>
+                <span>GST Cancelled ({{ getInterestCount('gst_cancelled') }})</span>
+              </button>
+              <button type="button" (click)="selectInterestFilter('pending')" class="w-full text-left px-4 py-3 text-sm hover:bg-purple-50 transition-colors flex items-center gap-3 border-b border-gray-100" [class.bg-purple-100]="interestFilter === 'pending'" [class.text-purple-700]="interestFilter === 'pending'" [class.font-semibold]="interestFilter === 'pending'">
+                <mat-icon class="text-lg" [class.text-purple-600]="interestFilter === 'pending'">schedule</mat-icon>
+                <span>Pending ({{ getInterestCount('pending') }})</span>
+              </button>
+              <button type="button" (click)="selectInterestFilter('unknown')" class="w-full text-left px-4 py-3 text-sm hover:bg-purple-50 transition-colors flex items-center gap-3 last:border-b-0" [class.bg-purple-100]="interestFilter === 'unknown'" [class.text-purple-700]="interestFilter === 'unknown'" [class.font-semibold]="interestFilter === 'unknown'">
+                <mat-icon class="text-lg" [class.text-purple-600]="interestFilter === 'unknown'">help</mat-icon>
+                <span>Unknown ({{ getInterestCount('unknown') }})</span>
+              </button>
             </div>
           </div>
+        </div>
 
-          <!-- Staff Filter -->
-          <div class="p-4 border-b border-border-light">
-            <label class="block text-sm font-medium text-text-primary mb-3">Assigned Staff</label>
-            <div class="space-y-2 max-h-48 overflow-y-auto">
-              <label class="flex items-center cursor-pointer group">
-                <input 
-                  type="radio" 
-                  name="staff" 
-                  value="all" 
-                  [(ngModel)]="staffFilter" 
-                  (change)="applyFilters()"
-                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
-                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary">
-                  All Staff
-                  <span class="text-text-muted">({{ getStaffCount('all') }})</span>
-                </span>
-              </label>
-              <label *ngFor="let staff of uniqueStaffMembers" class="flex items-center cursor-pointer group">
-                <input 
-                  type="radio" 
-                  name="staff" 
-                  [value]="staff" 
-                  [(ngModel)]="staffFilter" 
-                  (change)="applyFilters()"
-                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
-                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
-                  <mat-icon class="text-lg text-text-muted">person</mat-icon>
-                  {{ staff }}
-                  <span class="text-text-muted">({{ getStaffCount(staff) }})</span>
-                </span>
-              </label>
-            </div>
-          </div>
-
-          <!-- GST Filter -->
-          <div class="p-4 border-b border-border-light">
-            <label class="block text-sm font-medium text-text-primary mb-3">GST Status</label>
-            <div class="space-y-2">
-              <label class="flex items-center cursor-pointer group">
-                <input 
-                  type="radio" 
-                  name="gst" 
-                  value="all" 
-                  [(ngModel)]="gstFilter" 
-                  (change)="applyFilters()"
-                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
-                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary">
-                  All GST
-                  <span class="text-text-muted">({{ getGstCount('all') }})</span>
-                </span>
-              </label>
-              <label class="flex items-center cursor-pointer group">
-                <input 
-                  type="radio" 
-                  name="gst" 
-                  value="yes" 
-                  [(ngModel)]="gstFilter" 
-                  (change)="applyFilters()"
-                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
-                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
-                  <span class="w-2 h-2 bg-green-500 rounded-full"></span>
-                  GST Active
-                  <span class="text-text-muted">({{ getGstCount('yes') }})</span>
-                </span>
-              </label>
-              <label class="flex items-center cursor-pointer group">
-                <input 
-                  type="radio" 
-                  name="gst" 
-                  value="not_selected" 
-                  [(ngModel)]="gstFilter" 
-                  (change)="applyFilters()"
-                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
-                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
-                  <span class="w-2 h-2 bg-gray-500 rounded-full"></span>
-                  Not Selected
-                  <span class="text-text-muted">({{ getGstCount('not_selected') }})</span>
-                </span>
-              </label>
-            </div>
-          </div>
-
-          <!-- Interest Level Filter -->
-          <div class="p-4 border-b border-border-light">
-            <label class="block text-sm font-medium text-text-primary mb-3">Interest Level</label>
-            <div class="space-y-2">
-              <label class="flex items-center cursor-pointer group">
-                <input 
-                  type="radio" 
-                  name="interest" 
-                  value="all" 
-                  [(ngModel)]="interestFilter" 
-                  (change)="applyFilters()"
-                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
-                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary">
-                  All Interest
-                  <span class="text-text-muted">({{ getInterestCount('all') }})</span>
-                </span>
-              </label>
-              <label class="flex items-center cursor-pointer group">
-                <input 
-                  type="radio" 
-                  name="interest" 
-                  value="interested" 
-                  [(ngModel)]="interestFilter" 
-                  (change)="applyFilters()"
-                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
-                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
-                  <span class="w-2 h-2 bg-green-500 rounded-full"></span>
-                  Interested
-                  <span class="text-text-muted">({{ getInterestCount('interested') }})</span>
-                </span>
-              </label>
-              <label class="flex items-center cursor-pointer group">
-                <input 
-                  type="radio" 
-                  name="interest" 
-                  value="not_interested" 
-                  [(ngModel)]="interestFilter" 
-                  (change)="applyFilters()"
-                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
-                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
-                  <span class="w-2 h-2 bg-red-500 rounded-full"></span>
-                  Not Interested
-                  <span class="text-text-muted">({{ getInterestCount('not_interested') }})</span>
-                </span>
-              </label>
-              <label class="flex items-center cursor-pointer group">
-                <input 
-                  type="radio" 
-                  name="interest" 
-                  value="no_gst" 
-                  [(ngModel)]="interestFilter" 
-                  (change)="applyFilters()"
-                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
-                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
-                  <span class="w-2 h-2 bg-orange-500 rounded-full"></span>
-                  No GST
-                  <span class="text-text-muted">({{ getInterestCount('no_gst') }})</span>
-                </span>
-              </label>
-              <label class="flex items-center cursor-pointer group">
-                <input 
-                  type="radio" 
-                  name="interest" 
-                  value="gst_cancelled" 
-                  [(ngModel)]="interestFilter" 
-                  (change)="applyFilters()"
-                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
-                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
-                  <span class="w-2 h-2 bg-red-500 rounded-full"></span>
-                  GST Cancelled
-                  <span class="text-text-muted">({{ getInterestCount('gst_cancelled') }})</span>
-                </span>
-              </label>
-              <label class="flex items-center cursor-pointer group">
-                <input 
-                  type="radio" 
-                  name="interest" 
-                  value="pending" 
-                  [(ngModel)]="interestFilter" 
-                  (change)="applyFilters()"
-                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
-                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
-                  <span class="w-2 h-2 bg-yellow-500 rounded-full"></span>
-                  Pending
-                  <span class="text-text-muted">({{ getInterestCount('pending') }})</span>
-                </span>
-              </label>
-              <label class="flex items-center cursor-pointer group">
-                <input 
-                  type="radio" 
-                  name="interest" 
-                  value="unknown" 
-                  [(ngModel)]="interestFilter" 
-                  (change)="applyFilters()"
-                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
-                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
-                  <span class="w-2 h-2 bg-gray-500 rounded-full"></span>
-                  Unknown
-                  <span class="text-text-muted">({{ getInterestCount('unknown') }})</span>
-                </span>
-              </label>
-            </div>
-          </div>
-
-          <!-- Date Range Filter -->
-          <div class="p-4 border-b border-gray-200">
-            <div class="flex items-center gap-2 mb-4">
-              <div class="w-5 h-5 bg-blue-100 rounded flex items-center justify-center">
-                <svg class="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                </svg>
-              </div>
-              <label class="block text-sm font-semibold text-gray-800">Date Range</label>
-            </div>
-            <div class="space-y-4">
-              <!-- From Date -->
-              <div class="w-full">
-                <label class="block text-xs font-medium text-gray-600 mb-2 uppercase tracking-wide">From Date</label>
-                <div class="relative">
-                  <input type="date" 
-                         [(ngModel)]="fromDate" 
-                         (change)="applyFilters()"
-                         class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 shadow-sm">
-                  <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              <!-- To Date -->
-              <div class="w-full">
-                <label class="block text-xs font-medium text-gray-600 mb-2 uppercase tracking-wide">To Date</label>
-                <div class="relative">
-                  <input type="date" 
-                         [(ngModel)]="toDate" 
-                         (change)="applyFilters()"
-                         class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-all duration-200 shadow-sm">
-                  <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Clear Date Range Button -->
-              <div class="pt-2" *ngIf="fromDate || toDate">
-                <button (click)="clearDateRange()" 
-                        class="w-full px-3 py-2 text-xs font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 hover:border-red-300 transition-all duration-200 flex items-center justify-center gap-2">
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                  </svg>
-                  Clear Date Range
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Sort Options -->
-          <div class="p-4">
-            <label class="block text-sm font-medium text-text-primary mb-3">Sort By</label>
-            <div class="space-y-2">
-              <label class="flex items-center cursor-pointer group">
-                <input 
-                  type="radio" 
-                  name="sort" 
-                  value="date_new" 
-                  [(ngModel)]="sortOption" 
-                  (change)="onSortChange()"
-                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
-                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
-                  <mat-icon class="text-lg text-text-muted">schedule</mat-icon>
-                  Newest First
-                </span>
-              </label>
-              <label class="flex items-center cursor-pointer group">
-                <input 
-                  type="radio" 
-                  name="sort" 
-                  value="date_old" 
-                  [(ngModel)]="sortOption" 
-                  (change)="onSortChange()"
-                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
-                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
-                  <mat-icon class="text-lg text-text-muted">history</mat-icon>
-                  Oldest First
-                </span>
-              </label>
-              <label class="flex items-center cursor-pointer group">
-                <input 
-                  type="radio" 
-                  name="sort" 
-                  value="name_asc" 
-                  [(ngModel)]="sortOption" 
-                  (change)="onSortChange()"
-                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
-                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
-                  <mat-icon class="text-lg text-text-muted">sort_by_alpha</mat-icon>
-                  Name A-Z
-                </span>
-              </label>
-              <label class="flex items-center cursor-pointer group">
-                <input 
-                  type="radio" 
-                  name="sort" 
-                  value="name_desc" 
-                  [(ngModel)]="sortOption" 
-                  (change)="onSortChange()"
-                  class="w-4 h-4 text-primary border-border-light focus:ring-primary">
-                <span class="ml-3 text-sm text-text-secondary group-hover:text-text-primary flex items-center gap-2">
-                  <mat-icon class="text-lg text-text-muted">sort_by_alpha</mat-icon>
-                  Name Z-A
-                </span>
-              </label>
+        <!-- Shortlist Filter -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+            <mat-icon class="text-pink-600 text-lg">playlist_add_check</mat-icon>
+            Shortlist Status
+          </label>
+          <div class="relative">
+            <button type="button"
+                    (click)="toggleShortlistDropdown()"
+                    class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-sm bg-white hover:border-gray-400 transition-colors text-left flex items-center justify-between">
+              <span class="truncate">{{ getShortlistFilterLabel() }}</span>
+              <mat-icon class="text-gray-400 text-lg transition-transform" [class.rotate-180]="isShortlistDropdownOpen">expand_more</mat-icon>
+            </button>
+            <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg pointer-events-none">checklist</mat-icon>
+            
+            <!-- Custom Dropdown -->
+            <div *ngIf="isShortlistDropdownOpen" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+              <button type="button" (click)="selectShortlistFilter('all')" class="w-full text-left px-4 py-3 text-sm hover:bg-pink-50 transition-colors flex items-center gap-3 border-b border-gray-100" [class.bg-pink-100]="shortlistFilter === 'all'" [class.text-pink-700]="shortlistFilter === 'all'" [class.font-semibold]="shortlistFilter === 'all'">
+                <mat-icon class="text-lg" [class.text-pink-600]="shortlistFilter === 'all'">list</mat-icon>
+                <span>All ({{ getShortlistCount('all') }})</span>
+              </button>
+              <button type="button" (click)="selectShortlistFilter('shortlist')" class="w-full text-left px-4 py-3 text-sm hover:bg-pink-50 transition-colors flex items-center gap-3 border-b border-gray-100" [class.bg-pink-100]="shortlistFilter === 'shortlist'" [class.text-pink-700]="shortlistFilter === 'shortlist'" [class.font-semibold]="shortlistFilter === 'shortlist'">
+                <mat-icon class="text-lg" [class.text-pink-600]="shortlistFilter === 'shortlist'">playlist_add</mat-icon>
+                <span>Can Shortlist ({{ getShortlistCount('shortlist') }})</span>
+              </button>
+              <button type="button" (click)="selectShortlistFilter('shortlisted')" class="w-full text-left px-4 py-3 text-sm hover:bg-pink-50 transition-colors flex items-center gap-3 border-b border-gray-100" [class.bg-pink-100]="shortlistFilter === 'shortlisted'" [class.text-pink-700]="shortlistFilter === 'shortlisted'" [class.font-semibold]="shortlistFilter === 'shortlisted'">
+                <mat-icon class="text-lg" [class.text-pink-600]="shortlistFilter === 'shortlisted'">check_circle</mat-icon>
+                <span>Shortlisted ({{ getShortlistCount('shortlisted') }})</span>
+              </button>
+              <button type="button" (click)="selectShortlistFilter('not_shortlist')" class="w-full text-left px-4 py-3 text-sm hover:bg-pink-50 transition-colors flex items-center gap-3 last:border-b-0" [class.bg-pink-100]="shortlistFilter === 'not_shortlist'" [class.text-pink-700]="shortlistFilter === 'not_shortlist'" [class.font-semibold]="shortlistFilter === 'not_shortlist'">
+                <mat-icon class="text-lg" [class.text-pink-600]="shortlistFilter === 'not_shortlist'">cancel</mat-icon>
+                <span>Not Eligible ({{ getShortlistCount('not_shortlist') }})</span>
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Main Content Area -->
-      <div class="flex-1 order-2">
+      <!-- Filter Grid - Second Row (Date Range and Sort) -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+            <mat-icon class="text-indigo-600 text-lg">event</mat-icon>
+            From Date
+          </label>
+          <div class="relative custom-datepicker">
+            <input matInput 
+                   [matDatepicker]="fromDatePicker"
+                   [(ngModel)]="fromDate" 
+                   (dateChange)="applyFilters()"
+                   placeholder="Select from date"
+                   readonly
+                   class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-white hover:border-gray-400 transition-colors cursor-pointer">
+            <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg pointer-events-none z-10">calendar_today</mat-icon>
+            <mat-datepicker-toggle matSuffix [for]="fromDatePicker" class="absolute right-2 top-1/2 transform -translate-y-1/2">
+              <mat-icon matDatepickerToggleIcon class="text-indigo-600 text-lg">date_range</mat-icon>
+            </mat-datepicker-toggle>
+            <mat-datepicker #fromDatePicker></mat-datepicker>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+            <mat-icon class="text-indigo-600 text-lg">event</mat-icon>
+            To Date
+          </label>
+          <div class="relative custom-datepicker">
+            <input matInput 
+                   [matDatepicker]="toDatePicker"
+                   [(ngModel)]="toDate" 
+                   (dateChange)="applyFilters()"
+                   placeholder="Select to date"
+                   readonly
+                   class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-white hover:border-gray-400 transition-colors cursor-pointer">
+            <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg pointer-events-none z-10">calendar_today</mat-icon>
+            <mat-datepicker-toggle matSuffix [for]="toDatePicker" class="absolute right-2 top-1/2 transform -translate-y-1/2">
+              <mat-icon matDatepickerToggleIcon class="text-indigo-600 text-lg">date_range</mat-icon>
+            </mat-datepicker-toggle>
+            <mat-datepicker #toDatePicker></mat-datepicker>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+            <mat-icon class="text-orange-600 text-lg">sort</mat-icon>
+            Sort By
+          </label>
+          <div class="relative">
+            <button type="button"
+                    (click)="toggleSortDropdown()"
+                    class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm bg-white hover:border-gray-400 transition-colors text-left flex items-center justify-between">
+              <span class="truncate">{{ getSortOptionLabel() }}</span>
+              <mat-icon class="text-gray-400 text-lg transition-transform" [class.rotate-180]="isSortDropdownOpen">expand_more</mat-icon>
+            </button>
+            <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg pointer-events-none">swap_vert</mat-icon>
+            
+            <!-- Custom Dropdown -->
+            <div *ngIf="isSortDropdownOpen" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+              <button type="button" (click)="selectSortOption('date_new')" class="w-full text-left px-4 py-3 text-sm hover:bg-orange-50 transition-colors flex items-center gap-3 border-b border-gray-100" [class.bg-orange-100]="sortOption === 'date_new'" [class.text-orange-700]="sortOption === 'date_new'" [class.font-semibold]="sortOption === 'date_new'">
+                <mat-icon class="text-lg" [class.text-orange-600]="sortOption === 'date_new'">arrow_downward</mat-icon>
+                <span>Newest First</span>
+              </button>
+              <button type="button" (click)="selectSortOption('date_old')" class="w-full text-left px-4 py-3 text-sm hover:bg-orange-50 transition-colors flex items-center gap-3 border-b border-gray-100" [class.bg-orange-100]="sortOption === 'date_old'" [class.text-orange-700]="sortOption === 'date_old'" [class.font-semibold]="sortOption === 'date_old'">
+                <mat-icon class="text-lg" [class.text-orange-600]="sortOption === 'date_old'">arrow_upward</mat-icon>
+                <span>Oldest First</span>
+              </button>
+              <button type="button" (click)="selectSortOption('name_asc')" class="w-full text-left px-4 py-3 text-sm hover:bg-orange-50 transition-colors flex items-center gap-3 border-b border-gray-100" [class.bg-orange-100]="sortOption === 'name_asc'" [class.text-orange-700]="sortOption === 'name_asc'" [class.font-semibold]="sortOption === 'name_asc'">
+                <mat-icon class="text-lg" [class.text-orange-600]="sortOption === 'name_asc'">sort_by_alpha</mat-icon>
+                <span>Name A-Z</span>
+              </button>
+              <button type="button" (click)="selectSortOption('name_desc')" class="w-full text-left px-4 py-3 text-sm hover:bg-orange-50 transition-colors flex items-center gap-3 last:border-b-0" [class.bg-orange-100]="sortOption === 'name_desc'" [class.text-orange-700]="sortOption === 'name_desc'" [class.font-semibold]="sortOption === 'name_desc'">
+                <mat-icon class="text-lg" [class.text-orange-600]="sortOption === 'name_desc'">sort_by_alpha</mat-icon>
+                <span>Name Z-A</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-end">
+          <button 
+            *ngIf="fromDate || toDate"
+            (click)="clearDateRange()" 
+            class="w-full px-4 py-2 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 hover:border-red-300 transition-colors">
+            Clear Date Range
+          </button>
+        </div>
+      </div>
+    </div>
+        
         <!-- Results Header -->
         <div class="bg-white rounded-xl shadow-sm border border-border-light p-4 mb-6">
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -438,9 +395,6 @@
             <span *ngIf="hasActiveFilters()">
               Try adjusting your search criteria or filters to find what you're looking for.
             </span>
-            <span *ngIf="!hasActiveFilters()">
-              Start managing customer enquiries by adding your first enquiry to the system.
-            </span>
           </p>
           <button (click)="showAddForm()" class="btn btn-primary">
             <mat-icon class="mr-2">add</mat-icon>
@@ -451,7 +405,7 @@
         <!-- Table View -->
         <div *ngIf="!loading && filteredEnquiries.length > 0 && viewMode === 'table'" class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
           <div class="overflow-x-auto">
-            <table mat-table [dataSource]="filteredEnquiries" class="w-full">
+            <table mat-table [dataSource]="filteredEnquiries" class="w-full text-xs">
               <!-- Serial Number Column -->
               <ng-container matColumnDef="sno">
                 <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">S.No</th>
@@ -603,12 +557,12 @@
               <!-- Shortlist Column -->
               <ng-container matColumnDef="shortlist">
                 <th mat-header-cell *matHeaderCellDef class="text-center font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Shortlist</th>
-                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-center">
+                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-center" (click)="$event.stopPropagation()">
                   <div class="flex items-center justify-center">
                     <!-- Shortlist Button (Red) - Show when verified but not submitted -->
                     <button *ngIf="canShowShortlistButton(enquiry)" 
                             (click)="shortlistEnquiry(enquiry)"
-                            class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg transition-all duration-200 hover:scale-105 shadow-md hover:shadow-lg flex items-center gap-2"
+                            class="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-xs font-medium rounded-lg transition-all duration-200 hover:scale-105 shadow-md hover:shadow-lg flex items-center gap-1"
                             matTooltip="Shortlist this enquiry for client creation"
                             matTooltipPosition="above">
                       <mat-icon class="text-sm">playlist_add</mat-icon>
@@ -618,7 +572,7 @@
                     <!-- Submitted Button (Green) - Show when already submitted or client exists -->
                     <button *ngIf="isEnquirySubmitted(enquiry)"
                             disabled
-                            class="px-4 py-2 bg-green-500 text-white text-sm font-medium rounded-lg opacity-75 cursor-not-allowed flex items-center gap-2 shadow-md"
+                            class="px-3 py-1 bg-green-500 text-white text-xs font-medium rounded-lg opacity-75 cursor-not-allowed flex items-center gap-1 shadow-md"
                             [matTooltip]="getShortlistedTooltip(enquiry)"
                             matTooltipPosition="above">
                       <mat-icon class="text-sm">{{ getShortlistedIcon(enquiry) }}</mat-icon>
@@ -637,15 +591,26 @@
               <!-- Actions Column -->
               <ng-container matColumnDef="actions">
                 <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Actions</th>
-                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3">
+                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3" (click)="$event.stopPropagation()">
                   <div class="flex items-center gap-2">
+                    <!-- WhatsApp Action -->
+                    <a [href]="getWhatsAppLink(enquiry.phone_number || enquiry.mobile_number)" 
+                       target="_blank"
+                       class="w-9 h-9 rounded-lg bg-green-100 hover:bg-green-200 flex items-center justify-center transition-all duration-200 hover:scale-110 group"
+                       matTooltip="Open WhatsApp"
+                       matTooltipPosition="above">
+                      <svg class="w-5 h-5 text-green-600 group-hover:text-green-700" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                      </svg>
+                    </a>
+                    
                     <!-- View Client Action (if client created) -->
                     <button *ngIf="enquiry.client_id" 
                             (click)="viewClient(enquiry.client_id)" 
-                            class="w-9 h-9 rounded-lg bg-green-100 hover:bg-green-200 flex items-center justify-center transition-all duration-200 hover:scale-110 group"
+                            class="w-9 h-9 rounded-lg bg-purple-100 hover:bg-purple-200 flex items-center justify-center transition-all duration-200 hover:scale-110 group"
                             matTooltip="View Created Client"
                             matTooltipPosition="above">
-                      <mat-icon class="text-green-600 group-hover:text-green-700 text-xl">person</mat-icon>
+                      <mat-icon class="text-purple-600 group-hover:text-purple-700 text-xl">person</mat-icon>
                     </button>
                     
                     <!-- Edit Action -->
@@ -669,14 +634,15 @@
 
               <tr mat-header-row *matHeaderRowDef="displayedColumns" class="border-b border-border-light"></tr>
               <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
-                  class="border-b border-border-light hover:bg-surface-alt transition-colors"
+                  (click)="viewEnquiryDetails(row)"
+                  class="border-b border-border-light hover:bg-surface-alt transition-colors cursor-pointer"
                   [ngClass]="getRowColorClass(row)"></tr>
             </table>
           </div>
         </div>
 
-        <!-- Card View - 2 Column Grid -->
-        <div *ngIf="!loading && filteredEnquiries.length > 0 && viewMode === 'card'" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Card View - 3 Column Grid -->
+        <div *ngIf="!loading && filteredEnquiries.length > 0 && viewMode === 'card'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div *ngFor="let enquiry of filteredEnquiries; let i = index" 
                class="bg-white rounded-2xl shadow-lg border border-border-light overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer group">
             
@@ -712,101 +678,140 @@
             </div>
 
             <!-- Card Body -->
-            <div class="p-6">
-              <!-- Enquiry Information -->
-              <div class="space-y-4 mb-6">
+            <div class="p-4">
+              <!-- Compact Grid Layout with Icons -->
+              <div class="grid grid-cols-2 gap-3 text-xs mb-4">
                 <!-- Mobile Number -->
-                <div class="flex items-start gap-3">
-                  <div class="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <mat-icon class="text-green-600 text-lg">phone</mat-icon>
-                  </div>
+                <div class="col-span-2 flex items-center gap-2 p-2 bg-gray-50 rounded">
+                  <mat-icon class="text-green-600 text-base">phone</mat-icon>
                   <div class="flex-1 min-w-0">
-                    <p class="text-xs font-medium text-text-muted uppercase tracking-wide mb-1">Mobile Number</p>
-                    <p class="text-sm font-medium text-text-primary">{{ displayMobileNumber(enquiry.mobile_number) }}</p>
+                    <span class="text-gray-500 block text-[10px]">Mobile</span>
+                    <span class="text-gray-900 font-medium">{{ displayMobileNumber(enquiry.mobile_number) }}</span>
                   </div>
                 </div>
 
-                <!-- Business Type -->
-                <div *ngIf="enquiry.business_type" class="flex items-start gap-3">
-                  <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <mat-icon class="text-blue-600 text-lg">business</mat-icon>
-                  </div>
+                <!-- Secondary Mobile -->
+                <div class="col-span-2 flex items-center gap-2 p-2 bg-gray-50 rounded">
+                  <mat-icon class="text-cyan-600 text-base">phone_android</mat-icon>
                   <div class="flex-1 min-w-0">
-                    <p class="text-xs font-medium text-text-muted uppercase tracking-wide mb-1">Business Type</p>
-                    <p class="text-sm font-medium text-text-primary">{{ enquiry.business_type }}</p>
+                    <span class="text-gray-500 block text-[10px]">Secondary</span>
+                    <input type="tel" 
+                           [value]="getDisplayMobileNumber(enquiry.secondary_mobile_number || '')" 
+                           (input)="updateSecondaryMobile(enquiry, $any($event.target).value)"
+                           placeholder="Enter number"
+                           class="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500">
                   </div>
                 </div>
 
                 <!-- GST Status -->
-                <div class="flex items-start gap-3">
-                  <div class="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <mat-icon class="text-indigo-600 text-lg">receipt</mat-icon>
-                  </div>
+                <div class="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                  <mat-icon class="text-indigo-600 text-base">receipt</mat-icon>
                   <div class="flex-1 min-w-0">
-                    <p class="text-xs font-medium text-text-muted uppercase tracking-wide mb-1">GST Status</p>
-                    <span class="inline-flex items-center gap-1.5 px-2 py-1 text-xs rounded-full font-medium"
+                    <span class="text-gray-500 block text-[10px]">GST</span>
+                    <span class="text-xs px-1.5 py-0.5 rounded-full font-medium"
                           [ngClass]="{
                             'bg-green-100 text-green-800': enquiry.gst === 'Yes' && enquiry.gst_status === 'Active',
                             'bg-red-100 text-red-800': enquiry.gst === 'Yes' && enquiry.gst_status === 'Cancel',
-                            'bg-gray-100 text-gray-800': enquiry.gst !== 'Yes'
+                            'bg-gray-200 text-gray-800': enquiry.gst !== 'Yes'
                           }">
                       {{ enquiry.gst === 'Yes' ? (enquiry.gst_status || 'Yes') : (enquiry.gst || 'Not Selected') }}
                     </span>
                   </div>
                 </div>
 
-                <!-- Staff Assignment -->
-                <div class="flex items-start gap-3">
-                  <div class="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <mat-icon class="text-purple-600 text-lg">support_agent</mat-icon>
-                  </div>
+                <!-- Staff -->
+                <div class="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                  <mat-icon class="text-purple-600 text-base">support_agent</mat-icon>
                   <div class="flex-1 min-w-0">
-                    <p class="text-xs font-medium text-text-muted uppercase tracking-wide mb-1">Assigned Staff</p>
-                    <p class="text-sm font-medium text-text-primary">{{ enquiry.staff || 'Unassigned' }}</p>
+                    <span class="text-gray-500 block text-[10px]">Staff</span>
+                    <span class="text-gray-900 font-medium truncate block">{{ enquiry.staff || 'Unassigned' }}</span>
                   </div>
                 </div>
 
-                <!-- WhatsApp Status -->
-                <div class="flex items-start gap-3">
-                  <div class="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <mat-icon class="text-green-600 text-lg">whatsapp</mat-icon>
-                  </div>
+                <!-- Business Name -->
+                <div *ngIf="enquiry.business_name" class="col-span-2 flex items-center gap-2 p-2 bg-gray-50 rounded">
+                  <mat-icon class="text-orange-600 text-base">business</mat-icon>
                   <div class="flex-1 min-w-0">
-                    <p class="text-xs font-medium text-text-muted uppercase tracking-wide mb-1">WhatsApp Status</p>
-                    <div class="flex items-center gap-2">
-                      <mat-icon 
-                        class="text-lg"
-                        [ngClass]="{
-                          'text-green-600': enquiry.whatsapp_sent === true,
-                          'text-red-600': enquiry.whatsapp_sent === false,
-                          'text-gray-400': enquiry.whatsapp_sent === null || enquiry.whatsapp_sent === undefined
-                        }">
-                        {{ getWhatsAppStatusIcon(enquiry) }}
-                      </mat-icon>
-                      <span class="text-sm text-text-primary">{{ getWhatsAppStatusTooltip(enquiry) }}</span>
+                    <span class="text-gray-500 block text-[10px]">Business</span>
+                    <span class="text-gray-900 truncate block">{{ enquiry.business_name }}</span>
+                  </div>
+                </div>
+
+                <!-- Loan Amount -->
+                <div *ngIf="enquiry.loan_amount" class="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                  <mat-icon class="text-emerald-600 text-base">payments</mat-icon>
+                  <div class="flex-1 min-w-0">
+                    <span class="text-gray-500 block text-[10px]">Loan Amt</span>
+                    <span class="text-gray-900 font-medium">{{ enquiry.loan_amount }}</span>
+                  </div>
+                </div>
+
+                <!-- Loan Purpose -->
+                <div *ngIf="enquiry.loan_purpose" class="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                  <mat-icon class="text-amber-600 text-base">description</mat-icon>
+                  <div class="flex-1 min-w-0">
+                    <span class="text-gray-500 block text-[10px]">Purpose</span>
+                    <span class="text-gray-900 truncate block">{{ enquiry.loan_purpose }}</span>
+                  </div>
+                </div>
+
+                <!-- Annual Revenue -->
+                <div *ngIf="enquiry.annual_revenue" class="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                  <mat-icon class="text-teal-600 text-base">attach_money</mat-icon>
+                  <div class="flex-1 min-w-0">
+                    <span class="text-gray-500 block text-[10px]">Revenue</span>
+                    <span class="text-gray-900">{{ enquiry.annual_revenue }}</span>
+                  </div>
+                </div>
+
+                <!-- Email -->
+                <div *ngIf="enquiry.email_address" class="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                  <mat-icon class="text-pink-600 text-base">email</mat-icon>
+                  <div class="flex-1 min-w-0">
+                    <span class="text-gray-500 block text-[10px]">Email</span>
+                    <span class="text-gray-900 truncate block">{{ enquiry.email_address }}</span>
+                  </div>
+                </div>
+
+                <!-- Business Document -->
+                <div *ngIf="enquiry.business_document_url" class="col-span-2 flex items-center gap-2 p-2 bg-gray-50 rounded">
+                  <mat-icon class="text-violet-600 text-base">folder</mat-icon>
+                  <div class="flex-1 min-w-0">
+                    <span class="text-gray-500 block text-[10px] mb-1">Document</span>
+                    <div class="flex gap-1">
+                      <button (click)="previewDocument(enquiry.business_document_url)" 
+                              class="px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded text-[10px] font-medium"
+                              matTooltip="Preview">
+                        <mat-icon class="text-xs">visibility</mat-icon>
+                      </button>
+                      <button (click)="downloadDocument(enquiry.business_document_url, enquiry._id)" 
+                              class="px-2 py-1 bg-green-100 hover:bg-green-200 text-green-700 rounded text-[10px] font-medium"
+                              matTooltip="Download">
+                        <mat-icon class="text-xs">download</mat-icon>
+                      </button>
                     </div>
                   </div>
                 </div>
 
-                <!-- Business Name (if available) -->
-                <div *ngIf="enquiry.business_name" class="flex items-start gap-3">
-                  <div class="w-8 h-8 bg-orange-50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <mat-icon class="text-orange-600 text-lg">business</mat-icon>
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <p class="text-xs font-medium text-text-muted uppercase tracking-wide mb-1">Business Name</p>
-                    <p class="text-sm text-text-primary">{{ enquiry.business_name }}</p>
-                  </div>
-                </div>
-
-                <!-- Annual Revenue (if available) -->
-                <div *ngIf="enquiry.annual_revenue" class="flex items-start gap-3">
-                  <div class="w-8 h-8 bg-teal-50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <mat-icon class="text-teal-600 text-lg">attach_money</mat-icon>
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <p class="text-xs font-medium text-text-muted uppercase tracking-wide mb-1">Annual Revenue</p>
-                    <p class="text-sm text-text-primary">{{ enquiry.annual_revenue }}</p>
+                <!-- Shortlist -->
+                <div class="col-span-2 flex items-center gap-2 p-2 bg-gray-50 rounded">
+                  <mat-icon class="text-red-600 text-base">playlist_add_check</mat-icon>
+                  <div class="flex-1">
+                    <span class="text-gray-500 block text-[10px] mb-1">Shortlist</span>
+                    <button *ngIf="canShowShortlistButton(enquiry)" 
+                            (click)="shortlistEnquiry(enquiry)"
+                            class="w-full px-2 py-1 bg-red-500 hover:bg-red-600 text-white text-xs font-medium rounded"
+                            matTooltip="Shortlist for client creation">
+                      <mat-icon class="text-xs">playlist_add</mat-icon> Shortlist
+                    </button>
+                    <button *ngIf="isEnquirySubmitted(enquiry)"
+                            disabled
+                            class="w-full px-2 py-1 bg-green-500 text-white text-xs font-medium rounded opacity-75 cursor-not-allowed"
+                            [matTooltip]="getShortlistedTooltip(enquiry)">
+                      <mat-icon class="text-xs">{{ getShortlistedIcon(enquiry) }}</mat-icon> {{ getShortlistedText(enquiry) }}
+                    </button>
+                    <span *ngIf="!canShowShortlistButton(enquiry) && !isEnquirySubmitted(enquiry)" 
+                          class="text-gray-400 text-xs">N/A</span>
                   </div>
                 </div>
               </div>
@@ -843,14 +848,20 @@
             </div>
           </div>
         </div>
-      </div>
-    </div>
   </div>
 </div>
 
-  <!-- Registration Form Modal -->
+<!-- Registration Form Modal -->
   <div *ngIf="showRegistrationForm" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[95vh] overflow-hidden">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[95vh] overflow-hidden relative">
+      <!-- Loading Overlay -->
+      <div *ngIf="loading && isEditMode" class="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
+        <div class="text-center">
+          <mat-spinner diameter="48" class="mx-auto mb-4"></mat-spinner>
+          <p class="text-lg font-medium text-gray-700">Updating enquiry...</p>
+          <p class="text-sm text-gray-500 mt-1">Please wait</p>
+        </div>
+      </div>
       <!-- Modal Header with Enhanced Styling -->
       <div class="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 p-6 text-white relative overflow-hidden">
         <!-- Background Pattern -->
@@ -1329,6 +1340,7 @@
               Cancel
             </button>
             <button type="submit" 
+                    *ngIf="!isEditMode || (isEditMode && hasFormChanges)"
                     [disabled]="registrationForm.invalid || loading"
                     class="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl font-medium transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center gap-2 shadow-lg">
               <mat-spinner *ngIf="loading" diameter="16" class="mr-2"></mat-spinner>

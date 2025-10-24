@@ -12,6 +12,7 @@ import { EditClientComponent } from './components/edit-client/edit-client.compon
 import { ContactUsComponent } from './components/contact-us/contact-us.component';
 import { NotificationsComponent } from './components/notifications/notifications.component';
 import { EnquiryComponent } from './components/enquiry/enquiry.component';
+import { EnquiryDetailsComponent } from './components/enquiry-details/enquiry-details.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { WhatsappLinkComponent } from './components/whatsapp-link/whatsapp-link.component';
 import { WhatsappPublicComponent } from './components/whatsapp-public/whatsapp-public.component';
@@ -57,6 +58,11 @@ const routes: Routes = [
   { 
     path: 'enquiry', 
     component: EnquiryComponent, 
+    canActivate: [AuthGuard] 
+  },
+  { 
+    path: 'enquiry-details/:id', 
+    component: EnquiryDetailsComponent, 
     canActivate: [AuthGuard] 
   },
   { 

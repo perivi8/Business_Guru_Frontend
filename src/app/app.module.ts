@@ -49,6 +49,7 @@ import { ClientDetailComponent } from './components/client-detail/client-detail.
 import { EditClientComponent } from './components/edit-client/edit-client.component';
 import { NotificationsComponent } from './components/notifications/notifications.component';
 import { EnquiryComponent } from './components/enquiry/enquiry.component';
+import { EnquiryDetailsComponent } from './components/enquiry-details/enquiry-details.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { AdminApprovalPopupComponent } from './components/admin-approval-popup/admin-approval-popup.component';
 import { ChatbotComponent } from './components/chatbot/chatbot.component';
@@ -87,6 +88,7 @@ import { SocketService } from './services/socket.service';
     EditClientComponent,
     NotificationsComponent,
     EnquiryComponent,
+    EnquiryDetailsComponent,
     ForgotPasswordComponent,
     AdminApprovalPopupComponent,
     ChatbotComponent,
