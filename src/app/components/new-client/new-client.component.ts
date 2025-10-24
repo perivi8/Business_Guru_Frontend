@@ -304,6 +304,14 @@ export class NewClientComponent implements OnInit {
         step1Updates.mobile_number = extractedMobile;
       }
       
+      // Map secondary mobile number (remove country code if present)
+      if (this.enquiryData.secondary_mobile_number) {
+        const originalSecondaryMobile = this.enquiryData.secondary_mobile_number;
+        const extractedSecondaryMobile = this.extractTenDigitMobile(originalSecondaryMobile);
+        console.log(`Secondary mobile number processing: "${originalSecondaryMobile}" -> "${extractedSecondaryMobile}"`);
+        step1Updates.optional_mobile_number = extractedSecondaryMobile;
+      }
+      
       // Map GST information if available
       if (this.enquiryData.gst) {
         if (this.enquiryData.gst === 'Yes') {

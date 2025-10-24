@@ -19,7 +19,7 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   enquiries: Enquiry[] = [];
   filteredEnquiries: Enquiry[] = [];
   displayedColumns: string[] = [
-    'sno', 'date', 'owner_name', 'phone_number', 
+    'sno', 'date', 'owner_name', 'phone_number', 'secondary_mobile',
     'gst', 'business_name', 'loan_amount', 'loan_purpose', 'annual_revenue',
     'email_address', 'business_document', 'staff', 'comments', 'shortlist', 'actions'
   ];
@@ -42,6 +42,9 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   // Edit mode tracking
   isEditMode = false;
   editingEnquiryId: string | null = null;
+  
+  // Duplicate mobile number message tracking
+  showDuplicateMessage = false;
 
   // Cleanup subject for subscriptions
   private destroy$ = new Subject<void>();
@@ -247,7 +250,7 @@ export class EnquiryComponent implements OnInit, OnDestroy {
       user_name: [''],
       country_code: ['+91', Validators.required], // Default to India
       mobile_number: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
-      phone_number: [''],
+      phone_number: ['', [Validators.pattern(/^\d{10}$/)]],
       email_address: ['', [Validators.email]],
       secondary_mobile_number: [''],
       gst: [''], // Optional - user can leave this unselected
@@ -687,6 +690,7 @@ export class EnquiryComponent implements OnInit, OnDestroy {
         business_name: enquiry.business_name || '',
         email_address: enquiry.email_address || '',
         mobile_number: mobileNumber,
+        secondary_mobile_number: enquiry.secondary_mobile_number || '',
         loan_amount: enquiry.loan_amount || '',
         loan_purpose: enquiry.loan_purpose || '',
         business_document_url: enquiry.business_document_url || null,
@@ -778,12 +782,19 @@ export class EnquiryComponent implements OnInit, OnDestroy {
 
   // Update secondary mobile number for an enquiry with debouncing
   updateSecondaryMobile(enquiry: Enquiry, secondaryMobile: string): void {
-    // Update the local value immediately for UI feedback
-    enquiry.secondary_mobile_number = secondaryMobile;
+    // If user enters a 10-digit number, add country code for storage
+    let fullSecondaryMobile = secondaryMobile;
+    if (secondaryMobile && secondaryMobile.length === 10 && /^\d{10}$/.test(secondaryMobile)) {
+      // Add default country code (+91) for 10-digit numbers
+      fullSecondaryMobile = '91' + secondaryMobile;
+    }
+    
+    // Update the local value immediately for UI feedback (keep display format)
+    enquiry.secondary_mobile_number = fullSecondaryMobile;
     
     // Instead of calling the service directly, emit to the debounce subject
     // This will trigger the update after a 3-second delay
-    this.secondaryMobileDebounce.next({enquiry, value: secondaryMobile});
+    this.secondaryMobileDebounce.next({enquiry, value: fullSecondaryMobile});
   }
 
   // Handle GST change for an enquiry
@@ -1228,9 +1239,9 @@ export class EnquiryComponent implements OnInit, OnDestroy {
       user_name: enquiry.user_name || '',
       country_code: countryCode,
       mobile_number: number,
-      phone_number: enquiry.phone_number || '',
+      phone_number: this.getDisplayMobileNumber(enquiry.phone_number || '') || '',
       email_address: enquiry.email_address || '',
-      secondary_mobile_number: enquiry.secondary_mobile_number || '',
+      secondary_mobile_number: this.getDisplayMobileNumber(enquiry.secondary_mobile_number || '') || '',
       gst: enquiry.gst || '',
       gst_status: enquiry.gst_status || '',
       business_type: enquiry.business_type || '',
@@ -1281,6 +1292,15 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     this.editingEnquiryId = null;
   }
 
+  // Close duplicate message and open new enquiry form
+  closeDuplicateMessage(): void {
+    this.showDuplicateMessage = false;
+    this.showRegistrationForm = true;
+    this.registrationForm.reset();
+    this.isEditMode = false;
+    this.editingEnquiryId = null;
+  }
+
   onSubmit(): void {
     if (this.registrationForm.valid) {
       const formData = this.registrationForm.value;
@@ -1303,10 +1323,8 @@ export class EnquiryComponent implements OnInit, OnDestroy {
       
       // Check for duplicate mobile number AFTER combining with country code
       if (this.checkMobileNumberExists(fullMobileNumber)) {
-        this.snackBar.open('Mobile number already exists! Please use a different mobile number.', 'Close', { 
-          duration: 5000,
-          panelClass: ['error-snackbar']
-        });
+        this.showDuplicateMessage = true;
+        this.showRegistrationForm = false;
         return;
       }
       
@@ -1319,6 +1337,16 @@ export class EnquiryComponent implements OnInit, OnDestroy {
         console.log('📱 Secondary full mobile number:', formData.secondary_mobile_number);
       } else {
         formData.secondary_mobile_number = null;
+      }
+
+      // Handle phone number - add country code if it's a 10-digit number
+      if (formData.phone_number && formData.phone_number.trim() !== '') {
+        if (/^\d{10}$/.test(formData.phone_number)) {
+          formData.phone_number = countryCodeDigits + formData.phone_number;
+          console.log('📱 Phone number with country code:', formData.phone_number);
+        }
+      } else {
+        formData.phone_number = null;
       }
 
       // Remove country code fields from form data (don't send to backend)
@@ -1377,7 +1405,7 @@ export class EnquiryComponent implements OnInit, OnDestroy {
               duration: 5000,
               panelClass: panelClass
             });
-            this.hideAddForm();
+            this.closeDuplicateMessage(); // This will reset form and keep it open for new enquiry
             this.loadEnquiries();
           },
           error: (error) => {
@@ -1431,7 +1459,7 @@ export class EnquiryComponent implements OnInit, OnDestroy {
               duration: 5000,
               panelClass: panelClass
             });
-            this.hideAddForm();
+            this.closeDuplicateMessage(); // This will reset form and keep it open for new enquiry
             this.loadEnquiries();
           },
           error: (error) => {
@@ -2314,6 +2342,7 @@ export class EnquiryComponent implements OnInit, OnDestroy {
       business_name: enquiry.business_name || '',
       email_address: enquiry.email_address || '',
       mobile_number: mobileNumber,
+      secondary_mobile_number: enquiry.secondary_mobile_number || '',
       loan_amount: enquiry.loan_amount || '',
       loan_purpose: enquiry.loan_purpose || '',
       annual_revenue: enquiry.annual_revenue || '',
@@ -2364,5 +2393,15 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     if (clientId) {
       this.router.navigate(['/client-detail', clientId]);
     }
+  }
+
+  // Helper method to extract last 10 digits from mobile number (remove country code)
+  getDisplayMobileNumber(mobileNumber: string): string {
+    if (!mobileNumber) {
+      return '';
+    }
+    // Extract last 10 digits
+    const cleanedNumber = mobileNumber.replace(/\D/g, ''); // Remove non-digits
+    return cleanedNumber.length > 10 ? cleanedNumber.slice(-10) : cleanedNumber;
   }
 }

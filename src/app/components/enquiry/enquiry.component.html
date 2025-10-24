@@ -487,6 +487,18 @@
                 </td>
               </ng-container>
 
+              <!-- Secondary Mobile Column -->
+              <ng-container matColumnDef="secondary_mobile">
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm min-w-[140px]">Secondary Mobile</th>
+                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-sm text-text-secondary min-w-[140px]">
+                  <input type="tel" 
+                         [value]="getDisplayMobileNumber(enquiry.secondary_mobile_number)" 
+                         (input)="updateSecondaryMobile(enquiry, $any($event.target).value)"
+                         placeholder="Enter secondary mobile"
+                         class="w-full min-w-[120px] px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                </td>
+              </ng-container>
+
               <!-- GST Column -->
               <ng-container matColumnDef="gst">
                 <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">GST</th>
@@ -920,8 +932,15 @@
               <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number (Optional)</label>
               <input type="tel" 
                      formControlName="phone_number"
-                     placeholder="Enter phone number"
-                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors">
+                     pattern="[0-9]{10}"
+                     maxlength="10"
+                     placeholder="Enter 10-digit mobile number"
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors"
+                     [class.border-red-500]="registrationForm.get('phone_number')?.invalid && registrationForm.get('phone_number')?.touched">
+              <div *ngIf="registrationForm.get('phone_number')?.invalid && registrationForm.get('phone_number')?.touched" 
+                   class="text-red-500 text-xs mt-1">
+                Please enter a valid 10-digit mobile number
+              </div>
             </div>
 
             <!-- Email Address -->
@@ -1298,14 +1317,6 @@
                 </div>
               </div>
 
-              <!-- Additional Comments (Only show in Edit Mode) -->
-              <div class="md:col-span-2" *ngIf="isEditMode">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Additional Comments (Optional)</label>
-                <textarea formControlName="additional_comments" 
-                          rows="3" 
-                          placeholder="Enter any additional comments or notes..."
-                          class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors resize-none"></textarea>
-              </div>
             </div>
           </div>
 
@@ -1326,6 +1337,44 @@
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Duplicate Mobile Number Message Modal -->
+  <div *ngIf="showDuplicateMessage" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden">
+      <!-- Header -->
+      <div class="bg-gradient-to-r from-red-500 to-orange-500 text-white px-6 py-4 text-center">
+        <div class="flex items-center justify-center gap-2">
+          <mat-icon class="text-xl">warning</mat-icon>
+          <span class="font-semibold text-lg">Mobile Number Already Registered</span>
+        </div>
+      </div>
+      
+      <!-- Content -->
+      <div class="p-8 text-center bg-white">
+        <!-- Icon -->
+        <div class="mb-6">
+          <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto">
+            <mat-icon class="text-3xl text-red-500">error_outline</mat-icon>
+          </div>
+        </div>
+        
+        <!-- Message Text -->
+        <div class="mb-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-4">Mobile number already registered.</h3>
+          <p class="text-gray-700 text-base mb-4">Try to register with another mobile number or our team will contact you in 24 hours.</p>
+          <p class="text-lg font-semibold text-gray-900">Thank You!</p>
+        </div>
+        
+        <!-- Close Button -->
+        <button type="button" 
+                (click)="closeDuplicateMessage()"
+                class="w-full px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2">
+          <mat-icon class="text-lg">close</mat-icon>
+          Close
+        </button>
       </div>
     </div>
   </div>

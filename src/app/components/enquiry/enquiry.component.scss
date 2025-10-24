@@ -940,6 +940,17 @@
             border-right: none;
           }
         }
+        
+        // Secondary Mobile column specific styling
+        .mat-column-secondary_mobile {
+          min-width: 150px !important;
+          width: 150px !important;
+          
+          input {
+            min-width: 130px !important;
+            width: 100% !important;
+          }
+        }
       }
       
       // Badge Styling
@@ -1079,6 +1090,41 @@
         box-shadow: var(--shadow-xl);
       }
     }
+  }
+}
+
+// Table layout fixes for Secondary Mobile column
+.enquiry-table {
+  table-layout: auto !important;
+  
+  // Ensure Secondary Mobile column has proper width
+  .mat-column-secondary_mobile {
+    min-width: 150px !important;
+    max-width: 180px !important;
+    width: 150px !important;
+    
+    .mat-mdc-cell, .mat-mdc-header-cell {
+      min-width: 150px !important;
+      max-width: 180px !important;
+      width: 150px !important;
+      padding: 8px 12px !important;
+    }
+    
+    input[type="tel"] {
+      min-width: 130px !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      font-size: 0.875rem !important;
+    }
+  }
+  
+  // Prevent other columns from being too narrow
+  .mat-column-phone_number {
+    min-width: 120px !important;
+  }
+  
+  .mat-column-owner_name {
+    min-width: 100px !important;
   }
 }
 
