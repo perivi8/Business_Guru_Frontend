@@ -1,10 +1,10 @@
 <!-- Modern Admin Dashboard -->
-<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     
     <!-- Loading Spinner -->
     <div *ngIf="loading" class="flex flex-col items-center justify-center py-16">
-      <mat-progress-spinner mode="indeterminate" diameter="50" class="mb-4"></mat-progress-spinner>
+      <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent mb-4"></div>
       <p class="text-gray-600 font-medium">Loading dashboard data...</p>
     </div>
 
@@ -14,127 +14,229 @@
       <!-- Stats Cards Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <!-- Total Clients Card -->
-        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 group">
-          <div class="flex items-center justify-between">
+        <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 group border border-gray-100 relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full -mr-16 -mt-16 opacity-50"></div>
+          <div class="flex items-center justify-between relative z-10">
             <div>
-              <p class="text-blue-100 text-sm font-medium">Total Clients</p>
-              <h3 class="text-3xl font-bold mt-1">{{ stats.totalClients }}</h3>
+              <p class="text-gray-500 text-sm font-semibold uppercase tracking-wide">Total Clients</p>
+              <h3 class="text-4xl font-bold mt-2 text-gray-900">{{ stats.totalClients }}</h3>
             </div>
-            <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-              <mat-icon class="text-2xl">people</mat-icon>
+            <div class="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
+              <svg class="w-7 h-7 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+              </svg>
             </div>
           </div>
         </div>
 
         <!-- Today New Clients Card -->
-        <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 group">
-          <div class="flex items-center justify-between">
+        <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 group border border-gray-100 relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full -mr-16 -mt-16 opacity-50"></div>
+          <div class="flex items-center justify-between relative z-10">
             <div>
-              <p class="text-green-100 text-sm font-medium">Today New Clients</p>
-              <h3 class="text-3xl font-bold mt-1">{{ todayStats.newClientsToday }}</h3>
+              <p class="text-gray-500 text-sm font-semibold uppercase tracking-wide">Today New Clients</p>
+              <h3 class="text-4xl font-bold mt-2 text-gray-900">{{ todayStats.newClientsToday }}</h3>
             </div>
-            <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-              <mat-icon class="text-2xl">today</mat-icon>
+            <div class="w-14 h-14 bg-emerald-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
+              <svg class="w-7 h-7 text-emerald-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+              </svg>
             </div>
           </div>
         </div>
 
         <!-- Pending Review Card -->
-        <div class="bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 group">
-          <div class="flex items-center justify-between">
+        <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 group border border-gray-100 relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-amber-50 rounded-full -mr-16 -mt-16 opacity-50"></div>
+          <div class="flex items-center justify-between relative z-10">
             <div>
-              <p class="text-yellow-100 text-sm font-medium">Pending Review</p>
-              <h3 class="text-3xl font-bold mt-1">{{ stats.pendingClients }}</h3>
+              <p class="text-gray-500 text-sm font-semibold uppercase tracking-wide">Pending Review</p>
+              <h3 class="text-4xl font-bold mt-2 text-gray-900">{{ stats.pendingClients }}</h3>
             </div>
-            <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-              <mat-icon class="text-2xl">schedule</mat-icon>
+            <div class="w-14 h-14 bg-amber-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
+              <svg class="w-7 h-7 text-amber-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+              </svg>
             </div>
           </div>
         </div>
 
         <!-- Interested Card -->
-        <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 group">
-          <div class="flex items-center justify-between">
+        <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 group border border-gray-100 relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-teal-50 rounded-full -mr-16 -mt-16 opacity-50"></div>
+          <div class="flex items-center justify-between relative z-10">
             <div>
-              <p class="text-emerald-100 text-sm font-medium">Interested</p>
-              <h3 class="text-3xl font-bold mt-1">{{ stats.interestedClients }}</h3>
+              <p class="text-gray-500 text-sm font-semibold uppercase tracking-wide">Interested</p>
+              <h3 class="text-4xl font-bold mt-2 text-gray-900">{{ stats.interestedClients }}</h3>
             </div>
-            <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-              <mat-icon class="text-2xl">check_circle</mat-icon>
+            <div class="w-14 h-14 bg-teal-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
+              <svg class="w-7 h-7 text-teal-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              </svg>
             </div>
           </div>
         </div>
 
         <!-- Not Interested Card -->
-        <div class="bg-gradient-to-br from-red-500 to-pink-600 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 group">
-          <div class="flex items-center justify-between">
+        <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 group border border-gray-100 relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-rose-50 rounded-full -mr-16 -mt-16 opacity-50"></div>
+          <div class="flex items-center justify-between relative z-10">
             <div>
-              <p class="text-red-100 text-sm font-medium">Not Interested</p>
-              <h3 class="text-3xl font-bold mt-1">{{ stats.notInterestedClients }}</h3>
+              <p class="text-gray-500 text-sm font-semibold uppercase tracking-wide">Not Interested</p>
+              <h3 class="text-4xl font-bold mt-2 text-gray-900">{{ stats.notInterestedClients }}</h3>
             </div>
-            <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-              <mat-icon class="text-2xl">cancel</mat-icon>
+            <div class="w-14 h-14 bg-rose-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
+              <svg class="w-7 h-7 text-rose-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/>
+              </svg>
             </div>
           </div>
         </div>
 
         <!-- On Hold Card -->
-        <div class="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 group">
-          <div class="flex items-center justify-between">
+        <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 group border border-gray-100 relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-purple-50 rounded-full -mr-16 -mt-16 opacity-50"></div>
+          <div class="flex items-center justify-between relative z-10">
             <div>
-              <p class="text-purple-100 text-sm font-medium">On Hold</p>
-              <h3 class="text-3xl font-bold mt-1">{{ stats.onHoldClients }}</h3>
+              <p class="text-gray-500 text-sm font-semibold uppercase tracking-wide">On Hold</p>
+              <h3 class="text-4xl font-bold mt-2 text-gray-900">{{ stats.onHoldClients }}</h3>
             </div>
-            <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-              <mat-icon class="text-2xl">pause</mat-icon>
+            <div class="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
+              <svg class="w-7 h-7 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+              </svg>
             </div>
           </div>
         </div>
 
         <!-- Processing Card -->
-        <div class="bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 group">
-          <div class="flex items-center justify-between">
+        <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 group border border-gray-100 relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-cyan-50 rounded-full -mr-16 -mt-16 opacity-50"></div>
+          <div class="flex items-center justify-between relative z-10">
             <div>
-              <p class="text-cyan-100 text-sm font-medium">Processing</p>
-              <h3 class="text-3xl font-bold mt-1">{{ stats.processingClients }}</h3>
+              <p class="text-gray-500 text-sm font-semibold uppercase tracking-wide">Processing</p>
+              <h3 class="text-4xl font-bold mt-2 text-gray-900">{{ stats.processingClients }}</h3>
             </div>
-            <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-              <mat-icon class="text-2xl">hourglass_empty</mat-icon>
+            <div class="w-14 h-14 bg-cyan-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
+              <svg class="w-7 h-7 text-cyan-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2H6zm10 14.5V20H8v-3.5l4-4 4 4zm-4-5l-4-4V4h8v3.5l-4 4z"/>
+              </svg>
             </div>
           </div>
         </div>
 
         <!-- Total Team Card -->
-        <div class="bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 group">
-          <div class="flex items-center justify-between">
+        <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 group border border-gray-100 relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full -mr-16 -mt-16 opacity-50"></div>
+          <div class="flex items-center justify-between relative z-10">
             <div>
-              <p class="text-violet-100 text-sm font-medium">Total Team</p>
-              <h3 class="text-3xl font-bold mt-1">{{ stats.totalTeam }}</h3>
+              <p class="text-gray-500 text-sm font-semibold uppercase tracking-wide">Total Team</p>
+              <h3 class="text-4xl font-bold mt-2 text-gray-900">{{ stats.totalTeam }}</h3>
             </div>
-            <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-              <mat-icon class="text-2xl">group</mat-icon>
+            <div class="w-14 h-14 bg-indigo-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
+              <svg class="w-7 h-7 text-indigo-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+              </svg>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Today's User Performance -->
-      <div *ngIf="todayStats.userClientCounts.length > 0" class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-        <div class="bg-gradient-to-r from-indigo-50 to-purple-50 px-6 py-4 border-b border-gray-200">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
-              <mat-icon class="text-indigo-600 text-lg">today</mat-icon>
+      <!-- User Performance by Date Range -->
+      <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+        <div class="p-6 border-b border-gray-200">
+          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5 text-indigo-600" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-gray-800">Client Additions by User</h3>
+                <p class="text-sm text-gray-600">Filter by date range to view performance</p>
+              </div>
             </div>
-            <h3 class="text-lg font-semibold text-gray-900">Today's Client Additions by User</h3>
+            
+            <!-- Filter Dropdown -->
+            <div class="w-48">
+              <label class="block text-xs font-medium text-gray-600 mb-2 uppercase tracking-wide">Select Period</label>
+              <div class="relative">
+                <button type="button"
+                        (click)="toggleUserPerformanceDropdown()"
+                        class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2.5 text-left text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400 transition-colors shadow-sm"
+                        [class.border-indigo-500]="isUserPerformanceDropdownOpen"
+                        [class.ring-2]="isUserPerformanceDropdownOpen"
+                        [class.ring-indigo-500]="isUserPerformanceDropdownOpen">
+                  <span class="block truncate text-gray-700">
+                    {{ getUserPerformanceFilterLabel() }}
+                  </span>
+                  <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                    <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                         [class.rotate-180]="isUserPerformanceDropdownOpen"
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </span>
+                </button>
+                
+                <!-- Dropdown Options -->
+                <div *ngIf="isUserPerformanceDropdownOpen"
+                     class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg">
+                  <button type="button"
+                          (click)="selectUserPerformanceFilter('today')"
+                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
+                          [class.bg-indigo-50]="selectedUserPerformanceFilter === 'today'"
+                          [class.text-indigo-600]="selectedUserPerformanceFilter === 'today'">
+                    Today
+                  </button>
+                  <button type="button"
+                          (click)="selectUserPerformanceFilter('yesterday')"
+                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
+                          [class.bg-indigo-50]="selectedUserPerformanceFilter === 'yesterday'"
+                          [class.text-indigo-600]="selectedUserPerformanceFilter === 'yesterday'">
+                    Yesterday
+                  </button>
+                  <button type="button"
+                          (click)="selectUserPerformanceFilter('custom')"
+                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+                          [class.bg-indigo-50]="selectedUserPerformanceFilter === 'custom'"
+                          [class.text-indigo-600]="selectedUserPerformanceFilter === 'custom'">
+                    Custom Range
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Custom Date Range -->
+          <div *ngIf="selectedUserPerformanceFilter === 'custom'" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="flex-1">
+              <label class="block text-xs font-medium text-gray-600 mb-2 uppercase tracking-wide">Start Date</label>
+              <input type="date" 
+                     [(ngModel)]="userPerformanceStartDate" 
+                     (change)="onUserPerformanceDateChange()"
+                     class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400 transition-colors shadow-sm">
+            </div>
+            <div class="flex-1">
+              <label class="block text-xs font-medium text-gray-600 mb-2 uppercase tracking-wide">End Date</label>
+              <input type="date" 
+                     [(ngModel)]="userPerformanceEndDate" 
+                     (change)="onUserPerformanceDateChange()"
+                     class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400 transition-colors shadow-sm">
+            </div>
           </div>
         </div>
+        
         <div class="p-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div *ngFor="let userStat of todayStats.userClientCounts" 
+          <!-- Staff List with Client Counts -->
+          <div *ngIf="filteredUserStats.length > 0" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div *ngFor="let userStat of filteredUserStats; let i = index" 
                  class="bg-gradient-to-br from-gray-50 to-white rounded-lg p-4 border border-gray-200 hover:shadow-md transition-all duration-200">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                  <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg"
+                       [style.background]="'linear-gradient(135deg, ' + getTeamMemberColor(i) + ', ' + getTeamMemberColor(i) + 'dd)'">
                     {{ userStat.username.charAt(0).toUpperCase() }}
                   </div>
                   <span class="font-medium text-gray-900">{{ userStat.username }}</span>
@@ -148,16 +250,26 @@
               </div>
             </div>
           </div>
+          
+          <!-- Empty State -->
+          <div *ngIf="filteredUserStats.length === 0" class="text-center py-12">
+            <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+            <p class="text-gray-500 font-medium">No client additions found for the selected period</p>
+          </div>
         </div>
       </div>
 
       <!-- Report 1: Weekly Client Additions Chart -->
-      <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
+      <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+        <div class="p-6 border-b border-gray-200">
           <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div class="flex items-center gap-3">
               <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                <mat-icon class="text-blue-600 text-lg">show_chart</mat-icon>
+                <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/>
+                </svg>
               </div>
               <div>
                 <h3 class="text-lg font-semibold text-gray-900">Weekly Client Additions</h3>
@@ -287,11 +399,15 @@
               </div>
               <div class="text-center">
                 <div class="flex items-center justify-center gap-2">
-                  <mat-icon [ngClass]="{
+                  <svg class="w-6 h-6" [ngClass]="{
                     'text-green-600': getWeeklyChange() > 0,
                     'text-red-600': getWeeklyChange() < 0,
                     'text-gray-600': getWeeklyChange() === 0
-                  }">{{ getComparisonIcon() }}</mat-icon>
+                  }" fill="currentColor" viewBox="0 0 24 24">
+                    <path *ngIf="getWeeklyChange() > 0" d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
+                    <path *ngIf="getWeeklyChange() < 0" d="M16 18l2.29-2.29-4.88-4.88-4 4L2 7.41 3.41 6l6 6 4-4 6.3 6.29L22 12v6z"/>
+                    <path *ngIf="getWeeklyChange() === 0" d="M22 12l-4-4v3H3v2h15v3z"/>
+                  </svg>
                   <p class="text-2xl font-bold" [ngClass]="{
                     'text-green-600': getWeeklyChange() > 0,
                     'text-red-600': getWeeklyChange() < 0,
@@ -308,7 +424,9 @@
             <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200">
               <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <mat-icon class="text-blue-600">today</mat-icon>
+                  <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+                  </svg>
                 </div>
                 <div>
                   <h3 class="text-2xl font-bold text-blue-600">{{ getSelectedWeekTotal() }}</h3>
@@ -320,7 +438,9 @@
             <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
               <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <mat-icon class="text-green-600">trending_up</mat-icon>
+                  <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
+                  </svg>
                 </div>
                 <div>
                   <h3 class="text-2xl font-bold text-green-600">{{ getSelectedWeekAverage() | number:'1.1-1' }}</h3>
@@ -332,10 +452,15 @@
             <div *ngIf="showComparison" class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-4 border border-purple-200">
               <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <mat-icon class="text-purple-600" [ngClass]="{
+                  <svg class="w-5 h-5" [ngClass]="{
                     'text-green-600': getWeeklyChange() > 0,
-                    'text-red-600': getWeeklyChange() < 0
-                  }">{{ getComparisonIcon() }}</mat-icon>
+                    'text-red-600': getWeeklyChange() < 0,
+                    'text-purple-600': getWeeklyChange() === 0
+                  }" fill="currentColor" viewBox="0 0 24 24">
+                    <path *ngIf="getWeeklyChange() > 0" d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
+                    <path *ngIf="getWeeklyChange() < 0" d="M16 18l2.29-2.29-4.88-4.88-4 4L2 7.41 3.41 6l6 6 4-4 6.3 6.29L22 12v6z"/>
+                    <path *ngIf="getWeeklyChange() === 0" d="M22 12l-4-4v3H3v2h15v3z"/>
+                  </svg>
                 </div>
                 <div>
                   <h3 class="text-2xl font-bold" [ngClass]="{
@@ -349,25 +474,60 @@
             </div>
           </div>
 
-          <!-- Weekly Line Chart -->
-          <div class="bg-gray-50 rounded-lg p-6">
-            <div class="mb-4">
-              <canvas #weeklyChart class="w-full h-80" data-chart="weekly" width="600" height="300"></canvas>
+          <!-- Weekly Bar Chart - Tailwind CSS -->
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <!-- Modern Bar Chart -->
+            <div class="flex items-end justify-between h-80 gap-1 px-4 relative">
+              <!-- Y-axis scale lines -->
+              <div class="absolute inset-0 flex flex-col justify-between pointer-events-none">
+                <div class="w-full border-t border-gray-100"></div>
+                <div class="w-full border-t border-gray-100"></div>
+                <div class="w-full border-t border-gray-100"></div>
+                <div class="w-full border-t border-gray-100"></div>
+              </div>
+              
+              <!-- Bars -->
+              <div *ngFor="let day of weeklyData; let i = index" class="flex-1 flex flex-col items-center gap-3 relative z-10">
+                <!-- Bar -->
+                <div class="relative w-full flex flex-col items-center justify-end" style="height: 280px;">
+                  <div class="w-full rounded-t-lg transition-all duration-300 hover:opacity-80 cursor-pointer group relative"
+                       [style.height.%]="day.count > 0 ? day.barHeight : 5"
+                       [ngClass]="{
+                         'bg-red-500': day.isToday,
+                         'bg-indigo-600': !day.isToday && !day.isHoliday,
+                         'bg-gray-400': day.isHoliday,
+                         'opacity-30': day.count === 0
+                       }">
+                    <!-- Hover tooltip -->
+                    <div class="absolute -top-10 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-20 pointer-events-none">
+                      <div class="bg-gray-900 text-white text-sm font-bold px-3 py-1.5 rounded shadow-lg whitespace-nowrap">
+                        {{ day.count }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Day Label -->
+                <div class="text-center w-full">
+                  <div class="text-[10px] font-medium text-gray-600 leading-tight whitespace-nowrap">
+                    {{ day.day }}
+                  </div>
+                </div>
+              </div>
             </div>
             
             <!-- Chart Legend -->
-            <div class="flex flex-wrap justify-center gap-6 pt-4 border-t border-gray-200">
+            <div class="flex flex-wrap justify-center gap-6 pt-4 mt-4">
               <div class="flex items-center gap-2">
-                <div class="w-4 h-4 bg-blue-500 rounded-full"></div>
-                <span class="text-sm text-gray-600">Today</span>
+                <div class="w-3 h-3 bg-red-500 rounded"></div>
+                <span class="text-xs font-medium text-gray-600">Today</span>
               </div>
               <div class="flex items-center gap-2">
-                <div class="w-4 h-4 bg-green-500 rounded-full"></div>
-                <span class="text-sm text-gray-600">Working Days</span>
+                <div class="w-3 h-3 bg-indigo-600 rounded"></div>
+                <span class="text-xs font-medium text-gray-600">Working Days</span>
               </div>
               <div class="flex items-center gap-2">
-                <div class="w-4 h-4 bg-red-500 rounded-full"></div>
-                <span class="text-sm text-gray-600">Holiday</span>
+                <div class="w-3 h-3 bg-gray-400 rounded"></div>
+                <span class="text-xs font-medium text-gray-600">Holiday</span>
               </div>
             </div>
           </div>
@@ -375,11 +535,13 @@
       </div>
 
       <!-- Report 2: Client Status Report -->
-      <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden" id="client-status-report">
-        <div class="bg-gradient-to-r from-green-50 to-emerald-50 px-6 py-4 border-b border-gray-200">
+      <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden" id="client-status-report">
+        <div class="p-6 border-b border-gray-200">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-              <mat-icon class="text-green-600 text-lg">pie_chart</mat-icon>
+              <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M11 2v20c-5.07-.5-9-4.79-9-10s3.93-9.5 9-10zm2.03 0v8.99H22c-.47-4.74-4.24-8.52-8.97-8.99zm0 11.01V22c4.74-.47 8.5-4.25 8.97-8.99h-8.97z"/>
+              </svg>
             </div>
             <div>
               <h3 class="text-lg font-semibold text-gray-900">Client Status Report</h3>
@@ -393,38 +555,47 @@
             <h4 class="text-lg font-semibold text-gray-900 mb-4">Client Status Distribution</h4>
             
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-              <!-- Pie Chart -->
-              <div class="flex justify-center">
-                <div class="bg-gray-50 rounded-lg p-6">
-                  <canvas #statusChart class="max-w-full h-auto" data-chart="status" width="400" height="400"></canvas>
+              <!-- Status Bars - Tailwind CSS -->
+              <div class="space-y-4">
+                <div *ngFor="let status of getStatusChartData()" class="group">
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                      <div class="w-3 h-3 rounded-full" [style.background-color]="status.color"></div>
+                      <span class="text-sm font-semibold text-gray-700">{{ status.label }}</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                      <span class="text-sm font-bold text-gray-900">{{ status.value }}</span>
+                      <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-full">{{ status.percentage }}%</span>
+                    </div>
+                  </div>
+                  <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                    <div class="h-full rounded-full transition-all duration-700 ease-out group-hover:scale-105 origin-left"
+                         [style.width.%]="status.percentage"
+                         [style.background]="'linear-gradient(90deg, ' + status.color + ', ' + status.color + '99)'">
+                    </div>
+                  </div>
                 </div>
               </div>
               
-              <!-- Chart Statistics -->
-              <div class="space-y-4">
-                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200">
-                  <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <mat-icon class="text-blue-600">assessment</mat-icon>
-                    </div>
-                    <div>
-                      <p class="text-2xl font-bold text-blue-600">{{ getStatusTotal() }}</p>
-                      <p class="text-sm text-gray-600">Total Clients</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-4 border border-purple-200">
-                  <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                      <mat-icon class="text-purple-600">trending_up</mat-icon>
-                    </div>
-                    <div>
-                      <p class="text-2xl font-bold text-purple-600">{{ getHighestStatusPercentage() }}%</p>
-                      <p class="text-sm text-gray-600">Highest Category</p>
-                    </div>
-                  </div>
-                </div>
+              <!-- Pie Chart -->
+              <div class="flex items-center justify-center">
+                <svg viewBox="0 0 300 300" class="w-full max-w-sm">
+                  <!-- Pie Chart Segments -->
+                  <g *ngFor="let segment of pieSegments; let i = index" class="transition-all duration-300 hover:opacity-80 cursor-pointer">
+                    <path [attr.d]="segment.path" 
+                          [attr.fill]="segment.color"
+                          [attr.stroke]="'#ffffff'"
+                          [attr.stroke-width]="2"
+                          class="drop-shadow-md"/>
+                  </g>
+                  
+                  <!-- Center Circle (Donut effect) -->
+                  <circle cx="150" cy="150" r="60" fill="white" class="drop-shadow-lg"/>
+                  
+                  <!-- Center Text -->
+                  <text x="150" y="140" text-anchor="middle" class="text-2xl font-bold fill-gray-800">{{ getStatusTotal() }}</text>
+                  <text x="150" y="165" text-anchor="middle" class="text-xs fill-gray-600">Total Clients</text>
+                </svg>
               </div>
             </div>
           </div>
@@ -432,11 +603,13 @@
       </div>
 
       <!-- Report 3: Team Performance Report -->
-      <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-        <div class="bg-gradient-to-r from-orange-50 to-yellow-50 px-6 py-4 border-b border-gray-200">
+      <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+        <div class="p-6 border-b border-gray-200">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-              <mat-icon class="text-orange-600 text-lg">group</mat-icon>
+              <svg class="w-5 h-5 text-orange-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+              </svg>
             </div>
             <div>
               <h3 class="text-lg font-semibold text-gray-900">Team Performance Report</h3>
@@ -451,7 +624,9 @@
             <div class="bg-gradient-to-br from-violet-50 to-purple-50 rounded-lg p-4 border border-violet-200 transform hover:scale-105 transition-transform duration-200" style="animation-delay: 0.1s">
               <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-violet-100 rounded-lg flex items-center justify-center">
-                  <mat-icon class="text-violet-600">group</mat-icon>
+                  <svg class="w-5 h-5 text-violet-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                  </svg>
                 </div>
                 <div>
                   <h3 class="text-2xl font-bold text-violet-600">{{ stats.totalTeam }}</h3>
@@ -463,7 +638,9 @@
             <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200 transform hover:scale-105 transition-transform duration-200" style="animation-delay: 0.2s">
               <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <mat-icon class="text-blue-600">add_circle</mat-icon>
+                  <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
+                  </svg>
                 </div>
                 <div>
                   <h3 class="text-2xl font-bold text-blue-600">{{ stats.totalClients }}</h3>
@@ -475,7 +652,9 @@
             <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200 transform hover:scale-105 transition-transform duration-200" style="animation-delay: 0.3s">
               <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <mat-icon class="text-green-600">trending_up</mat-icon>
+                  <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
+                  </svg>
                 </div>
                 <div>
                   <h3 class="text-2xl font-bold text-green-600">{{ getAverageClientsPerMember() }}</h3>
@@ -488,23 +667,35 @@
           <!-- Team Performance Chart -->
           <div class="space-y-6">
             <div class="text-center">
-              <h4 class="text-lg font-semibold text-gray-900 mb-2">Team Member Client Additions (Excluding Admin)</h4>
+              <h4 class="text-lg font-semibold text-gray-900 mb-2">Team Member Client Additions</h4>
             </div>
             
-            <div class="bg-gray-50 rounded-lg p-6">
-              <div class="mb-4">
-                <canvas #teamChart class="w-full h-96" data-chart="team" width="800" height="400"></canvas>
-              </div>
-              
-              <!-- Chart Info -->
-              <div class="flex flex-wrap justify-center gap-6 pt-4 border-t border-gray-200">
-                <div class="flex items-center gap-2">
-                  <mat-icon class="text-blue-600">bar_chart</mat-icon>
-                  <span class="text-sm text-gray-600">Horizontal bars show client count per team member</span>
+            <div class="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
+              <div class="space-y-3">
+                <div *ngFor="let member of getUserPerformanceStats(); let i = index" class="flex items-center gap-4 group">
+                  <!-- Team Member Name (Left side) -->
+                  <div class="w-32 text-right flex-shrink-0">
+                    <span class="text-sm font-semibold text-gray-700">{{ member.username }}</span>
+                  </div>
+                  
+                  <!-- Horizontal Bar -->
+                  <div class="flex-1 relative">
+                    <div class="w-full bg-gray-100 rounded h-10 overflow-hidden">
+                      <div class="h-full rounded transition-all duration-700 ease-out group-hover:opacity-90 flex items-center justify-end pr-3"
+                           [style.width.%]="getTeamMemberPercentage(member.totalClients)"
+                           [style.background]="'linear-gradient(90deg, ' + getTeamMemberColor(i) + 'dd, ' + getTeamMemberColor(i) + ')'">
+                        <span class="text-white font-bold text-sm">{{ member.totalClients }}</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div class="flex items-center gap-2">
-                  <mat-icon class="text-green-600">trending_up</mat-icon>
-                  <span class="text-sm text-gray-600">Performance comparison across team</span>
+                
+                <!-- Empty State -->
+                <div *ngIf="getUserPerformanceStats().length === 0" class="text-center py-12">
+                  <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                  </svg>
+                  <p class="text-gray-500 font-medium">No team performance data available</p>
                 </div>
               </div>
             </div>

@@ -1,22 +1,22 @@
-<!-- Main Container with Gradient Background -->
-<div class="min-h-screen bg-gradient-body">
+<!-- Main Container with Modern Gradient Background -->
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
   <!-- Loading State -->
   <div *ngIf="loading" class="flex flex-col items-center justify-center min-h-screen">
-    <div class="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent mb-4"></div>
-    <p class="text-text-secondary text-lg">Loading client details...</p>
+    <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent mb-4"></div>
+    <p class="text-gray-600 text-lg">Loading client details...</p>
   </div>
 
   <!-- Saving Status Changes Loading Overlay -->
   <div *ngIf="saving" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-    <div class="bg-white rounded-xl p-8 shadow-2xl flex flex-col items-center gap-4">
-      <div class="animate-spin rounded-full h-10 w-10 border-4 border-primary border-t-transparent"></div>
-      <p class="text-text-primary font-medium">Updating client status...</p>
+    <div class="backdrop-blur-xl bg-white/95 rounded-2xl p-8 shadow-2xl flex flex-col items-center gap-4 border border-white/20">
+      <div class="animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent"></div>
+      <p class="text-gray-800 font-medium">Updating client status...</p>
     </div>
   </div>
 
   <!-- Error State -->
   <div *ngIf="error" class="flex flex-col items-center justify-center min-h-screen px-4">
-    <div class="bg-white rounded-xl shadow-lg border border-red-200 p-8 max-w-md w-full text-center">
+    <div class="backdrop-blur-xl bg-white/90 rounded-2xl shadow-xl border border-white/20 p-8 max-w-md w-full text-center">
       <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
         <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -37,20 +37,20 @@
   <!-- Client Details -->
   <div *ngIf="!loading && !error && client" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
     <!-- Header Section -->
-    <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl shadow-lg sticky top-0 z-40 px-6 py-5 mb-6">
+    <div class="backdrop-blur-xl bg-white/90 rounded-2xl shadow-xl border-b border-gray-200 sticky top-0 z-40 px-6 py-5 mb-6">
       <div class="flex items-center justify-between gap-4">
         <!-- Left Section: Icon + Title -->
         <div class="flex items-center gap-4 min-w-0 flex-1">
-          <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+          <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
             <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
             </svg>
           </div>
           <div class="min-w-0 flex flex-col justify-center">
-            <h1 class="text-xl sm:text-2xl font-bold text-white truncate leading-tight">
+            <h1 class="text-xl sm:text-2xl font-bold text-gray-800 truncate leading-tight">
               {{ client.legal_name || client.user_name }}
             </h1>
-            <p class="text-indigo-100 text-xs sm:text-sm truncate leading-tight mt-0.5">
+            <p class="text-gray-600 text-xs sm:text-sm truncate leading-tight mt-0.5">
               {{ client.trade_name || client.business_name }}
             </p>
           </div>
@@ -60,14 +60,14 @@
         <div class="flex items-center gap-2 flex-shrink-0">
           <div *ngIf="isAdmin()" class="flex items-center gap-2">
             <button *ngIf="!isEditing" (click)="startEdit()" 
-                    class="flex items-center gap-2 px-4 py-2 bg-white text-indigo-600 text-sm font-medium rounded-lg hover:bg-indigo-50 transition-all duration-200 shadow-md">
+                    class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-md">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
               </svg>
               <span class="hidden sm:inline">Edit</span>
             </button>
             <button *ngIf="!isEditing" (click)="deleteClient()" 
-                    class="flex items-center gap-2 px-4 py-2 bg-white/10 text-white text-sm font-medium rounded-lg hover:bg-white/20 transition-all duration-200 border border-white/30">
+                    class="flex items-center gap-2 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-all duration-200 shadow-md">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
               </svg>
@@ -76,15 +76,15 @@
             
             <div *ngIf="isEditing" class="flex items-center gap-2">
               <button (click)="saveEdit()" [disabled]="saving"
-                      class="flex items-center gap-2 px-4 py-2 bg-white text-indigo-600 text-sm font-medium rounded-lg hover:bg-indigo-50 transition-all duration-200 shadow-md disabled:opacity-50">
-                <div *ngIf="saving" class="animate-spin rounded-full h-4 w-4 border-2 border-indigo-600 border-t-transparent"></div>
+                      class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-md disabled:opacity-50">
+                <div *ngIf="saving" class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
                 <svg *ngIf="!saving" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
                 </svg>
                 {{ saving ? 'Saving...' : 'Save Changes' }}
               </button>
               <button (click)="cancelEdit()" [disabled]="saving"
-                      class="flex items-center gap-2 px-4 py-2 bg-white/10 text-white text-sm font-medium rounded-lg hover:bg-white/20 transition-all duration-200 border border-white/30 disabled:opacity-50">
+                      class="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-300 transition-all duration-200 disabled:opacity-50">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
@@ -101,95 +101,95 @@
       <!-- Row 1: Business Information and Financial Information side by side -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Business Information Card -->
-        <div class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
-          <div class="p-6 border-b border-border-light">
+        <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+          <div class="p-6 border-b border-gray-200">
             <div class="flex items-center gap-3">
               <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
                 <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                 </svg>
               </div>
-              <h3 class="text-lg font-semibold text-text-primary">Business Information</h3>
+              <h3 class="text-lg font-semibold text-gray-800">Business Information</h3>
             </div>
           </div>
           <div class="p-6">
             <div class="space-y-4">
               <div class="space-y-3">
                 <div class="flex justify-between py-2 border-b border-gray-100">
-                  <span class="text-sm font-medium text-text-secondary">Legal Name:</span>
-                  <span class="text-sm text-text-primary">{{ client.legal_name || 'N/A' }}</span>
+                  <span class="text-sm font-medium text-gray-600">Legal Name:</span>
+                  <span class="text-sm text-gray-800">{{ client.legal_name || 'N/A' }}</span>
                 </div>
                 <div class="flex justify-between py-2 border-b border-gray-100">
-                  <span class="text-sm font-medium text-text-secondary">Trade Name/Business Name:</span>
-                  <span class="text-sm text-text-primary">{{ client.trade_name || 'N/A' }}</span>
+                  <span class="text-sm font-medium text-gray-600">Trade Name/Business Name:</span>
+                  <span class="text-sm text-gray-800">{{ client.trade_name || 'N/A' }}</span>
                 </div>
                 <div class="flex justify-between py-2 border-b border-gray-100">
-                  <span class="text-sm font-medium text-text-secondary">GST Registration Number:</span>
-                  <span class="text-sm text-text-primary">{{ getClientProperty('registration_number') || 'N/A' }}</span>
+                  <span class="text-sm font-medium text-gray-600">GST Registration Number:</span>
+                  <span class="text-sm text-gray-800">{{ getClientProperty('registration_number') || 'N/A' }}</span>
                 </div>
                 <div class="flex justify-between py-2 border-b border-gray-100">
-                  <span class="text-sm font-medium text-text-secondary">GST Status:</span>
-                  <span class="text-sm text-text-primary">{{ getGSTStatus() }}</span>
+                  <span class="text-sm font-medium text-gray-600">GST Status:</span>
+                  <span class="text-sm text-gray-800">{{ getGSTStatus() }}</span>
                 </div>
                 <div class="flex justify-between py-2 border-b border-gray-100">
-                  <span class="text-sm font-medium text-text-secondary">Address:</span>
-                  <span class="text-sm text-text-primary">{{ client.address || 'N/A' }}</span>
+                  <span class="text-sm font-medium text-gray-600">Address:</span>
+                  <span class="text-sm text-gray-800">{{ client.address || 'N/A' }}</span>
                 </div>
                 <div class="flex justify-between py-2 border-b border-gray-100">
-                  <span class="text-sm font-medium text-text-secondary">District:</span>
-                  <span class="text-sm text-text-primary">{{ client.district || 'N/A' }}</span>
+                  <span class="text-sm font-medium text-gray-600">District:</span>
+                  <span class="text-sm text-gray-800">{{ client.district || 'N/A' }}</span>
                 </div>
                 <div class="flex justify-between py-2 border-b border-gray-100">
-                  <span class="text-sm font-medium text-text-secondary">State:</span>
-                  <span class="text-sm text-text-primary">{{ client.state || 'N/A' }}</span>
+                  <span class="text-sm font-medium text-gray-600">State:</span>
+                  <span class="text-sm text-gray-800">{{ client.state || 'N/A' }}</span>
                 </div>
                 <div class="flex justify-between py-2 border-b border-gray-100">
-                  <span class="text-sm font-medium text-text-secondary">Pincode:</span>
-                  <span class="text-sm text-text-primary">{{ client.pincode || 'N/A' }}</span>
+                  <span class="text-sm font-medium text-gray-600">Pincode:</span>
+                  <span class="text-sm text-gray-800">{{ client.pincode || 'N/A' }}</span>
                 </div>
                 <div class="flex justify-between py-2 border-b border-gray-100">
-                  <span class="text-sm font-medium text-text-secondary">User Email:</span>
-                  <span class="text-sm text-text-primary">{{ client.user_email || 'N/A' }}</span>
+                  <span class="text-sm font-medium text-gray-600">User Email:</span>
+                  <span class="text-sm text-gray-800">{{ client.user_email || 'N/A' }}</span>
                 </div>
                 <div class="flex justify-between py-2 border-b border-gray-100">
-                  <span class="text-sm font-medium text-text-secondary">Company Email:</span>
-                  <span class="text-sm text-text-primary">{{ getClientProperty('company_email') || 'N/A' }}</span>
+                  <span class="text-sm font-medium text-gray-600">Company Email:</span>
+                  <span class="text-sm text-gray-800">{{ getClientProperty('company_email') || 'N/A' }}</span>
                 </div>
                 <div class="flex justify-between py-2 border-b border-gray-100">
-                  <span class="text-sm font-medium text-text-secondary">Mobile Number:</span>
-                  <span class="text-sm text-text-primary">{{ client.mobile_number || 'N/A' }}</span>
+                  <span class="text-sm font-medium text-gray-600">Mobile Number:</span>
+                  <span class="text-sm text-gray-800">{{ client.mobile_number || 'N/A' }}</span>
                 </div>
                 <div class="flex justify-between py-2 border-b border-gray-100">
-                  <span class="text-sm font-medium text-text-secondary">Optional Mobile Number:</span>
-                  <span class="text-sm text-text-primary">{{ getClientProperty('optional_mobile_number') || 'N/A' }}</span>
+                  <span class="text-sm font-medium text-gray-600">Optional Mobile Number:</span>
+                  <span class="text-sm text-gray-800">{{ getClientProperty('optional_mobile_number') || 'N/A' }}</span>
                 </div>
                 <div class="flex justify-between py-2 border-b border-gray-100">
-                  <span class="text-sm font-medium text-text-secondary">Constitution Type:</span>
-                  <span class="text-sm text-text-primary">{{ client.constitution_type || 'N/A' }}</span>
+                  <span class="text-sm font-medium text-gray-600">Constitution Type:</span>
+                  <span class="text-sm text-gray-800">{{ client.constitution_type || 'N/A' }}</span>
                 </div>
                 <div *ngIf="getClientProperty('business_pan_name')" class="flex justify-between py-2 border-b border-gray-100">
-                  <span class="text-sm font-medium text-text-secondary">Business PAN Name:</span>
-                  <span class="text-sm text-text-primary">{{ getClientProperty('business_pan_name') }}</span>
+                  <span class="text-sm font-medium text-gray-600">Business PAN Name:</span>
+                  <span class="text-sm text-gray-800">{{ getClientProperty('business_pan_name') }}</span>
                 </div>
                 <div *ngIf="getClientProperty('business_pan_date')" class="flex justify-between py-2 border-b border-gray-100">
-                  <span class="text-sm font-medium text-text-secondary">Business PAN Date:</span>
-                  <span class="text-sm text-text-primary">{{ getClientProperty('business_pan_date') | date:'dd/MM/yyyy' }}</span>
+                  <span class="text-sm font-medium text-gray-600">Business PAN Date:</span>
+                  <span class="text-sm text-gray-800">{{ getClientProperty('business_pan_date') | date:'dd/MM/yyyy' }}</span>
                 </div>
                 <div *ngIf="client.number_of_partners" class="flex justify-between py-2 border-b border-gray-100">
-                  <span class="text-sm font-medium text-text-secondary">Number of Partners:</span>
-                  <span class="text-sm text-text-primary">{{ client.number_of_partners }}</span>
+                  <span class="text-sm font-medium text-gray-600">Number of Partners:</span>
+                  <span class="text-sm text-gray-800">{{ client.number_of_partners }}</span>
                 </div>
                 <div class="flex justify-between py-2 border-b border-gray-100">
-                  <span class="text-sm font-medium text-text-secondary">IE Document:</span>
-                  <span class="text-sm text-text-primary">{{ hasIEDocument() ? 'Yes' : 'No' }}</span>
+                  <span class="text-sm font-medium text-gray-600">IE Document:</span>
+                  <span class="text-sm text-gray-800">{{ hasIEDocument() ? 'Yes' : 'No' }}</span>
                 </div>
                 <div class="flex justify-between py-2 border-b border-gray-100">
-                  <span class="text-sm font-medium text-text-secondary">Business Document:</span>
-                  <span class="text-sm text-text-primary">{{ hasBusinessDocument() ? 'Yes' : 'No' }}</span>
+                  <span class="text-sm font-medium text-gray-600">Business Document:</span>
+                  <span class="text-sm text-gray-800">{{ hasBusinessDocument() ? 'Yes' : 'No' }}</span>
                 </div>
                 <div class="flex justify-between py-2">
-                  <span class="text-sm font-medium text-text-secondary">Website URL:</span>
-                  <span class="text-sm text-text-primary">{{ getWebsiteURL() }}</span>
+                  <span class="text-sm font-medium text-gray-600">Website URL:</span>
+                  <span class="text-sm text-gray-800">{{ getWebsiteURL() }}</span>
                 </div>
               </div>
             </div>
@@ -197,73 +197,78 @@
         </div>
 
         <!-- Financial Information Card -->
-        <div class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
-          <div class="p-6 border-b border-border-light">
+        <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+          <div class="p-6 border-b border-gray-200">
             <div class="flex items-center gap-3">
               <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
                 <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
               </div>
-              <h3 class="text-lg font-semibold text-text-primary">Financial Information</h3>
+              <h3 class="text-lg font-semibold text-gray-800">Financial Information</h3>
             </div>
           </div>
           <div class="p-6">
             <div class="space-y-3">
               <div class="flex justify-between py-2 border-b border-gray-100">
-                <span class="text-sm font-medium text-text-secondary">Required Loan Amount:</span>
-                <span class="text-sm text-text-primary">₹{{ (client.required_loan_amount | number) || 'N/A' }}</span>
+                <span class="text-sm font-medium text-gray-600">Required Loan Amount:</span>
+                <span class="text-sm text-gray-800">₹{{ (client.required_loan_amount | number) || 'N/A' }}</span>
               </div>
               <div class="flex justify-between py-2 border-b border-gray-100">
-                <span class="text-sm font-medium text-text-secondary">Loan Purpose:</span>
-                <span class="text-sm text-text-primary">{{ client.loan_purpose || 'N/A' }}</span>
+                <span class="text-sm font-medium text-gray-600">Loan Purpose:</span>
+                <span class="text-sm text-gray-800">{{ client.loan_purpose || 'N/A' }}</span>
               </div>
               <div class="flex justify-between py-2 border-b border-gray-100">
-                <span class="text-sm font-medium text-text-secondary">Bank Name:</span>
-                <span class="text-sm text-text-primary">{{ client.bank_name || 'N/A' }}</span>
+                <span class="text-sm font-medium text-gray-600">Bank Name:</span>
+                <span class="text-sm text-gray-800">{{ client.bank_name || 'N/A' }}</span>
               </div>
               <div class="flex justify-between py-2 border-b border-gray-100">
-                <span class="text-sm font-medium text-text-secondary">Account Name:</span>
-                <span class="text-sm text-text-primary">{{ client.account_name || 'N/A' }}</span>
+                <span class="text-sm font-medium text-gray-600">Account Name:</span>
+                <span class="text-sm text-gray-800">{{ client.account_name || 'N/A' }}</span>
               </div>
               <div class="flex justify-between py-2 border-b border-gray-100">
-                <span class="text-sm font-medium text-text-secondary">Bank Account Number:</span>
-                <span class="text-sm text-text-primary">{{ client.account_number || 'N/A' }}</span>
+                <span class="text-sm font-medium text-gray-600">Bank Account Number:</span>
+                <span class="text-sm text-gray-800">{{ client.account_number || 'N/A' }}</span>
               </div>
               <div class="flex justify-between py-2 border-b border-gray-100">
-                <span class="text-sm font-medium text-text-secondary">IFSC Code:</span>
-                <span class="text-sm text-text-primary">{{ client.ifsc_code || 'N/A' }}</span>
+                <span class="text-sm font-medium text-gray-600">IFSC Code:</span>
+                <span class="text-sm text-gray-800">{{ client.ifsc_code || 'N/A' }}</span>
               </div>
               <div class="flex justify-between py-2 border-b border-gray-100">
-                <span class="text-sm font-medium text-text-secondary">Bank Account Type:</span>
-                <span class="text-sm text-text-primary">{{ client.bank_type || 'N/A' }}</span>
+                <span class="text-sm font-medium text-gray-600">Bank Account Type:</span>
+                <span class="text-sm text-gray-800">{{ client.bank_type || 'N/A' }}</span>
               </div>
               <div class="flex justify-between py-2 border-b border-gray-100">
-                <span class="text-sm font-medium text-text-secondary">New Current Account:</span>
-                <span class="text-sm text-text-primary">{{ client.new_current_account === 'yes' ? 'Yes' : (client.new_current_account === 'no' ? 'No' : 'N/A') }}</span>
-              </div>
-              
-              <!-- New Bank Details (Show when New Current Account is Yes) -->
-              <div *ngIf="client.new_current_account === 'yes' && getClientProperty('new_bank_name')" class="flex justify-between py-2 border-b border-gray-100">
-                <span class="text-sm font-medium text-text-secondary">New Bank Name:</span>
-                <span class="text-sm text-text-primary">{{ getClientProperty('new_bank_name') }}</span>
-              </div>
-              <div *ngIf="client.new_current_account === 'yes' && getClientProperty('new_account_name')" class="flex justify-between py-2 border-b border-gray-100">
-                <span class="text-sm font-medium text-text-secondary">New Account Name:</span>
-                <span class="text-sm text-text-primary">{{ getClientProperty('new_account_name') }}</span>
-              </div>
-              <div *ngIf="client.new_current_account === 'yes' && getClientProperty('new_bank_account_number')" class="flex justify-between py-2 border-b border-gray-100">
-                <span class="text-sm font-medium text-text-secondary">New Bank Account Number:</span>
-                <span class="text-sm text-text-primary">{{ getClientProperty('new_bank_account_number') }}</span>
-              </div>
-              <div *ngIf="client.new_current_account === 'yes' && getClientProperty('new_ifsc_code')" class="flex justify-between py-2 border-b border-gray-100">
-                <span class="text-sm font-medium text-text-secondary">New IFSC Code:</span>
-                <span class="text-sm text-text-primary">{{ getClientProperty('new_ifsc_code') }}</span>
+                <span class="text-sm font-medium text-gray-600">New Current Account:</span>
+                <span class="text-sm text-gray-800">{{ client.new_current_account || 'N/A' }}</span>
               </div>
               
               <div class="flex justify-between py-2">
-                <span class="text-sm font-medium text-text-secondary">Total Credit Amount:</span>
-                <span class="text-sm text-text-primary">₹{{ (client.total_credit_amount | number) || 'N/A' }}</span>
+                <span class="text-sm font-medium text-gray-600">Total Credit Amount:</span>
+                <span class="text-sm text-gray-800">₹{{ (client.total_credit_amount | number) || 'N/A' }}</span>
+              </div>
+            </div>
+
+            <!-- New Bank Account Details (Show when new_current_account is 'yes') -->
+            <div *ngIf="client.new_current_account === 'yes'" class="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <h4 class="text-sm font-semibold text-gray-800 mb-3">New Bank Account Details</h4>
+              <div class="space-y-2">
+                <div *ngIf="client.new_bank_name" class="flex justify-between py-2 border-b border-blue-100">
+                  <span class="text-sm font-medium text-gray-600">New Bank Name:</span>
+                  <span class="text-sm text-gray-800">{{ client.new_bank_name }}</span>
+                </div>
+                <div *ngIf="client.new_account_name" class="flex justify-between py-2 border-b border-blue-100">
+                  <span class="text-sm font-medium text-gray-600">New Account Name:</span>
+                  <span class="text-sm text-gray-800">{{ client.new_account_name }}</span>
+                </div>
+                <div *ngIf="client.new_bank_account_number" class="flex justify-between py-2 border-b border-blue-100">
+                  <span class="text-sm font-medium text-gray-600">New Account Number:</span>
+                  <span class="text-sm text-gray-800">{{ client.new_bank_account_number }}</span>
+                </div>
+                <div *ngIf="client.new_ifsc_code" class="flex justify-between py-2">
+                  <span class="text-sm font-medium text-gray-600">New IFSC Code:</span>
+                  <span class="text-sm text-gray-800">{{ client.new_ifsc_code }}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -273,39 +278,39 @@
       <!-- Second Row: Personal Information and Staff Information side by side -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Personal Information Card -->
-        <div class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
-          <div class="p-6 border-b border-border-light">
+        <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+          <div class="p-6 border-b border-gray-200">
             <div class="flex items-center gap-3">
               <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
                 <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                 </svg>
               </div>
-              <h3 class="text-lg font-semibold text-text-primary">Personal Information</h3>
+              <h3 class="text-lg font-semibold text-gray-800">Personal Information</h3>
             </div>
           </div>
           <div class="p-6">
             <div class="space-y-3">
               <!-- Owner Information (for Proprietorship and Private Limited) -->
               <div *ngIf="getOwnerName()" class="flex justify-between py-2 border-b border-gray-100">
-                <span class="text-sm font-medium text-text-secondary">Owner Name:</span>
-                <span class="text-sm text-text-primary">{{ getOwnerName() }}</span>
+                <span class="text-sm font-medium text-gray-600">Owner Name:</span>
+                <span class="text-sm text-gray-800">{{ getOwnerName() }}</span>
               </div>
               <div *ngIf="getOwnerDob()" class="flex justify-between py-2 border-b border-gray-100">
-                <span class="text-sm font-medium text-text-secondary">Owner Date of Birth:</span>
-                <span class="text-sm text-text-primary">{{ getOwnerDob() | date:'dd/MM/yyyy' }}</span>
+                <span class="text-sm font-medium text-gray-600">Owner Date of Birth:</span>
+                <span class="text-sm text-gray-800">{{ getOwnerDob() | date:'dd/MM/yyyy' }}</span>
               </div>
               
               <!-- Partner Information (for Partnership) -->
               <ng-container *ngIf="client.constitution_type === 'Partnership'">
                 <ng-container *ngFor="let partner of getPartnersList(); let i = index">
                   <div *ngIf="partner.name" class="flex justify-between py-2 border-b border-gray-100">
-                    <span class="text-sm font-medium text-text-secondary">{{ i === 0 ? 'Managing Partner' : 'Partner ' + (i + 1) }} Name:</span>
-                    <span class="text-sm text-text-primary">{{ partner.name }}</span>
+                    <span class="text-sm font-medium text-gray-600">{{ i === 0 ? 'Managing Partner' : 'Partner ' + (i + 1) }} Name:</span>
+                    <span class="text-sm text-gray-800">{{ partner.name }}</span>
                   </div>
                   <div *ngIf="partner.dob" class="flex justify-between py-2 border-b border-gray-100">
-                    <span class="text-sm font-medium text-text-secondary">{{ i === 0 ? 'Managing Partner' : 'Partner ' + (i + 1) }} DOB:</span>
-                    <span class="text-sm text-text-primary">{{ partner.dob | date:'dd/MM/yyyy' }}</span>
+                    <span class="text-sm font-medium text-gray-600">{{ i === 0 ? 'Managing Partner' : 'Partner ' + (i + 1) }} DOB:</span>
+                    <span class="text-sm text-gray-800">{{ partner.dob | date:'dd/MM/yyyy' }}</span>
                   </div>
                 </ng-container>
               </ng-container>
@@ -314,34 +319,34 @@
         </div>
 
         <!-- Staff Information Card -->
-        <div class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
-          <div class="p-6 border-b border-border-light">
+        <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+          <div class="p-6 border-b border-gray-200">
             <div class="flex items-center gap-3">
               <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
                 <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
                 </svg>
               </div>
-              <h3 class="text-lg font-semibold text-text-primary">Staff Information</h3>
+              <h3 class="text-lg font-semibold text-gray-800">Staff Information</h3>
             </div>
           </div>
           <div class="p-6">
             <div class="space-y-3">
               <div class="flex justify-between py-2 border-b border-gray-100">
-                <span class="text-sm font-medium text-text-secondary">Staff Name:</span>
-                <span class="text-sm text-text-primary">{{ client.staff_name || 'N/A' }}</span>
+                <span class="text-sm font-medium text-gray-600">Staff Name:</span>
+                <span class="text-sm text-gray-800">{{ client.staff_name || 'N/A' }}</span>
               </div>
               <div class="flex justify-between py-2 border-b border-gray-100">
-                <span class="text-sm font-medium text-text-secondary">Staff Email:</span>
-                <span class="text-sm text-text-primary">{{ client.staff_email || 'N/A' }}</span>
+                <span class="text-sm font-medium text-gray-600">Staff Email:</span>
+                <span class="text-sm text-gray-800">{{ client.staff_email || 'N/A' }}</span>
               </div>
               <div class="flex justify-between py-2 border-b border-gray-100">
-                <span class="text-sm font-medium text-text-secondary">Created At:</span>
-                <span class="text-sm text-text-primary">{{ (client.created_at | date:'medium') || 'N/A' }}</span>
+                <span class="text-sm font-medium text-gray-600">Created At:</span>
+                <span class="text-sm text-gray-800">{{ (client.created_at | date:'medium') || 'N/A' }}</span>
               </div>
               <div class="flex justify-between py-2">
-                <span class="text-sm font-medium text-text-secondary">Updated At:</span>
-                <span class="text-sm text-text-primary">{{ (client.updated_at | date:'medium') || 'N/A' }}</span>
+                <span class="text-sm font-medium text-gray-600">Updated At:</span>
+                <span class="text-sm text-gray-800">{{ (client.updated_at | date:'medium') || 'N/A' }}</span>
               </div>
             </div>
           </div>
@@ -349,15 +354,15 @@
       </div>
 
       <!-- Row 3: Documents & Images (Full Width) -->
-      <div *ngIf="getDocumentKeys().length > 0" class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
-        <div class="p-6 border-b border-border-light">
+      <div *ngIf="getDocumentKeys().length > 0" class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+        <div class="p-6 border-b border-gray-200">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
               <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
               </svg>
             </div>
-            <h3 class="text-lg font-semibold text-text-primary">Documents & Images</h3>
+            <h3 class="text-lg font-semibold text-gray-800">Documents & Images</h3>
           </div>
         </div>
         <div class="p-6">
@@ -382,7 +387,7 @@
                 </div>
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2 mb-1">
-                    <h4 class="text-sm font-semibold text-text-primary">{{ formatDocumentName(docType) }}</h4>
+                    <h4 class="text-sm font-semibold text-gray-800">{{ formatDocumentName(docType) }}</h4>
                     <!-- Show "From Enquiry" badge for business documents copied from enquiry -->
                     <span *ngIf="isDocumentFromEnquiry(docType)" 
                           class="flex items-center gap-1 px-2 py-0.5 text-xs bg-purple-100 text-purple-700 rounded-full">
@@ -417,7 +422,7 @@
                     </div>
                   </div>
                   <p class="text-xs text-text-muted truncate mb-1">{{ getDocumentFileName(docType) }}</p>
-                  <p class="text-xs text-text-secondary">{{ formatFileSize(getDocumentFileSize(docType)) }}</p>
+                  <p class="text-xs text-gray-600">{{ formatFileSize(getDocumentFileSize(docType)) }}</p>
                 </div>
               </div>
               <div class="flex items-center gap-2 mt-3 pt-3 border-t border-gray-200">
@@ -460,25 +465,25 @@
       </div>
 
       <!-- Row 4: Payment Gateway Information Card -->
-      <div class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
-        <div class="p-6 border-b border-border-light">
+      <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+        <div class="p-6 border-b border-gray-200">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
               <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
               </svg>
             </div>
-            <h3 class="text-lg font-semibold text-text-primary">Payment Gateway</h3>
+            <h3 class="text-lg font-semibold text-gray-800">Payment Gateway</h3>
           </div>
         </div>
         <div class="p-6">
           <div class="space-y-4">
-            <h4 class="text-sm font-semibold text-text-primary">Selected Payment Gateways:</h4>
+            <h4 class="text-sm font-semibold text-gray-800">Selected Payment Gateways:</h4>
             
             <div *ngIf="getPaymentGateways().length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div *ngFor="let gateway of getPaymentGateways()" class="bg-gray-50 rounded-lg border border-gray-200 p-4">
                 <div class="mb-3">
-                  <span class="text-sm font-semibold text-text-primary block mb-2">{{ gateway }}</span>
+                  <span class="text-sm font-semibold text-gray-800 block mb-2">{{ gateway }}</span>
                   
                   <!-- Status Display for Non-Admin -->
                   <div *ngIf="!isAdmin()">
@@ -544,15 +549,15 @@
       <!-- Row 5: Loan Status and Status & Feedback side by side -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Loan Status Card -->
-        <div class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
-          <div class="p-6 border-b border-border-light">
+        <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+          <div class="p-6 border-b border-gray-200">
             <div class="flex items-center gap-3">
               <div class="w-8 h-8 bg-cyan-100 rounded-lg flex items-center justify-center">
                 <svg class="w-5 h-5 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                 </svg>
               </div>
-              <h3 class="text-lg font-semibold text-text-primary">Loan Status</h3>
+              <h3 class="text-lg font-semibold text-gray-800">Loan Status</h3>
             </div>
           </div>
           <div class="p-6">
@@ -632,29 +637,29 @@
         </div>
 
         <!-- Status and Feedback Card (Visible for all users) -->
-        <div class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
-          <div class="p-6 border-b border-border-light">
+        <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+          <div class="p-6 border-b border-gray-200">
             <div class="flex items-center gap-3">
               <div class="w-8 h-8 bg-pink-100 rounded-lg flex items-center justify-center">
                 <svg class="w-5 h-5 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
                 </svg>
               </div>
-              <h3 class="text-lg font-semibold text-text-primary">Status & Feedback</h3>
+              <h3 class="text-lg font-semibold text-gray-800">Status & Feedback</h3>
             </div>
           </div>
           <div class="p-6">
             <div *ngIf="!isEditing" class="space-y-4">
               <div class="flex justify-between py-2 border-b border-gray-100">
-                <span class="text-sm font-medium text-text-secondary">Status:</span>
+                <span class="text-sm font-medium text-gray-600">Status:</span>
                 <span class="px-3 py-1 text-xs rounded-full font-medium text-white"
                       [style.background-color]="getStatusColor(client.status || 'pending')">
                   {{ (client.status || 'pending') | titlecase }}
                 </span>
               </div>
               <div class="flex justify-between py-2">
-                <span class="text-sm font-medium text-text-secondary">Feedback:</span>
-                <span class="text-sm text-text-primary text-right max-w-xs">{{ client.feedback || 'No feedback provided' }}</span>
+                <span class="text-sm font-medium text-gray-600">Feedback:</span>
+                <span class="text-sm text-gray-800 text-right max-w-xs">{{ client.feedback || 'No feedback provided' }}</span>
               </div>
             </div>
             

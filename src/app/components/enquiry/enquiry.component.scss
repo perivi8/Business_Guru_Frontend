@@ -1,3 +1,57 @@
+// Material Table Row Colors - Force background colors with Tailwind classes
+::ng-deep {
+  .mat-mdc-table {
+    .mat-mdc-row {
+      transition: background-color 0.2s ease, border-left 0.2s ease;
+      
+      &.bg-green-50 {
+        background-color: rgb(220 252 231) !important;
+        border-left: 4px solid rgb(34 197 94) !important;
+        
+        &:hover {
+          background-color: rgb(187 247 208) !important;
+        }
+      }
+      
+      &.bg-red-50 {
+        background-color: rgb(254 226 226) !important;
+        border-left: 4px solid rgb(239 68 68) !important;
+        
+        &:hover {
+          background-color: rgb(254 202 202) !important;
+        }
+      }
+      
+      &.bg-orange-50 {
+        background-color: rgb(255 237 213) !important;
+        border-left: 4px solid rgb(249 115 22) !important;
+        
+        &:hover {
+          background-color: rgb(254 215 170) !important;
+        }
+      }
+      
+      &.bg-gray-50 {
+        background-color: rgb(243 244 246) !important;
+        border-left: 4px solid rgb(156 163 175) !important;
+        
+        &:hover {
+          background-color: rgb(229 231 235) !important;
+        }
+      }
+      
+      &.bg-white {
+        background-color: rgb(249 250 251) !important;
+        border-left: 4px solid rgb(209 213 219) !important;
+        
+        &:hover {
+          background-color: rgb(243 244 246) !important;
+        }
+      }
+    }
+  }
+}
+
 // Modern Page Header
 .page-header {
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
@@ -876,54 +930,49 @@
         border-bottom: 1px solid var(--border-light);
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         
-        &:hover {
-          background: var(--surface-alt);
-          transform: translateY(-1px);
-          box-shadow: var(--shadow);
-        }
-        
-        &:nth-child(even) {
-          background: var(--background-alt);
-        }
-        
-        // Comment-based row colors (keeping existing functionality)
-        &.row-light-blue {
-          background: rgba(59, 130, 246, 0.1) !important;
+        // Comment-based row colors with Tailwind classes
+        &.bg-green-50 {
+          background-color: rgb(240 253 244) !important;
+          border-left: 4px solid rgb(34 197 94) !important;
           
           &:hover {
-            background: rgba(59, 130, 246, 0.2) !important;
+            background-color: rgb(220 252 231) !important;
           }
         }
         
-        &.row-light-yellow {
-          background: rgba(245, 158, 11, 0.1) !important;
+        &.bg-red-50 {
+          background-color: rgb(254 242 242) !important;
+          border-left: 4px solid rgb(239 68 68) !important;
           
           &:hover {
-            background: rgba(245, 158, 11, 0.2) !important;
+            background-color: rgb(254 226 226) !important;
           }
         }
         
-        &.row-light-green {
-          background: rgba(16, 185, 129, 0.1) !important;
+        &.bg-orange-50 {
+          background-color: rgb(255 247 237) !important;
+          border-left: 4px solid rgb(249 115 22) !important;
           
           &:hover {
-            background: rgba(16, 185, 129, 0.2) !important;
+            background-color: rgb(255 237 213) !important;
           }
         }
         
-        &.row-light-red {
-          background: rgba(239, 68, 68, 0.1) !important;
+        &.bg-gray-50 {
+          background-color: rgb(249 250 251) !important;
+          border-left: 4px solid rgb(156 163 175) !important;
           
           &:hover {
-            background: rgba(239, 68, 68, 0.2) !important;
+            background-color: rgb(243 244 246) !important;
           }
         }
         
-        &.row-light-orange {
-          background: rgba(245, 158, 11, 0.15) !important;
+        &.bg-white {
+          background-color: rgb(255 255 255) !important;
+          border-left: 4px solid rgb(209 213 219) !important;
           
           &:hover {
-            background: rgba(245, 158, 11, 0.25) !important;
+            background-color: rgb(249 250 251) !important;
           }
         }
         
@@ -1984,5 +2033,23 @@ select {
   // Dropdown panel styling
   &:focus {
     outline: none;
+  }
+}
+
+// Dropdown Section Z-Index Fix
+// Ensure sections with open dropdowns appear above subsequent sections
+.backdrop-blur-xl {
+  position: relative;
+  z-index: 1;
+  transition: z-index 0s;
+  
+  // When dropdown is active, increase z-index to appear above other sections
+  &.dropdown-active {
+    z-index: 50 !important;
+  }
+  
+  // When filter dropdown is active, increase z-index to appear above table but below navbar
+  &.filter-dropdown-active {
+    z-index: 40 !important;
   }
 }

@@ -1,3 +1,32 @@
+// Material Table Row Colors - Force background colors with specific classes
+::ng-deep {
+  .mat-mdc-table {
+    .mat-mdc-row {
+      transition: background-color 0.2s ease;
+      
+      &.row-interested {
+        background-color: #dcfce7 !important;
+      }
+      
+      &.row-not-interested {
+        background-color: #fee2e2 !important;
+      }
+      
+      &.row-hold {
+        background-color: #fed7aa !important;
+      }
+      
+      &.row-pending {
+        background-color: #fef08a !important;
+      }
+      
+      &.row-processing {
+        background-color: #e9d5ff !important;
+      }
+    }
+  }
+}
+
 .container {
   padding: var(--spacing-lg);
   max-width: 1400px;

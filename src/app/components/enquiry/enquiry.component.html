@@ -1,15 +1,18 @@
-<!-- Main Container with Gradient Background -->
-<div class="min-h-screen bg-gradient-body">
+<!-- Main Container with Modern Gradient Background -->
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
 
   <!-- Main Content Layout -->
   <div class="max-w-7xl mx-auto py-6">
     
     <!-- Horizontal Filters Section -->
-    <div class="bg-white rounded-xl shadow-sm border border-border-light p-6 mb-6">
+    <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 p-6 mb-6 relative z-10"
+         [class.filter-dropdown-active]="isStaffDropdownOpen || isGstDropdownOpen || isInterestDropdownOpen || isShortlistDropdownOpen || isSortDropdownOpen">
       <!-- Filters Header -->
       <div class="flex items-center justify-between mb-6">
-        <h3 class="text-lg font-semibold text-text-primary flex items-center gap-2">
-          <mat-icon class="text-primary">filter_list</mat-icon>
+        <h3 class="text-lg font-semibold text-gray-800 flex items-center gap-2">
+          <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+          </svg>
           Filters
         </h3>
         <div class="flex items-center gap-3">
@@ -28,7 +31,7 @@
               (click)="viewMode = 'card'" 
               [class]="viewMode === 'card' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
               class="flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200"
-              matTooltip="Card View">
+              title="Card View">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14-7H5a2 2 0 00-2 2v12a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2z"></path>
               </svg>
@@ -37,7 +40,7 @@
           <button 
             *ngIf="hasActiveFilters()" 
             (click)="clearAllFilters()"
-            class="px-4 py-2 text-sm font-medium text-primary hover:text-primary-dark border border-primary rounded-lg hover:bg-primary/5 transition-colors">
+            class="px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 border-2 border-blue-600 rounded-lg hover:bg-blue-50 transition-all duration-200 shadow-sm hover:shadow-md">
             Clear All Filters
           </button>
         </div>
@@ -48,42 +51,52 @@
         
         <!-- Search Filter -->
         <div class="lg:col-span-2">
-          <label class="block text-sm font-medium text-text-primary mb-2">Search Enquiries</label>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Search Enquiries</label>
           <div class="relative">
             <input 
               type="text" 
               [(ngModel)]="searchTerm" 
               (input)="applyFilters()"
               placeholder="Name, mobile, business..."
-              class="w-full pl-10 pr-4 py-2 border border-border-light rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
-            <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-muted text-lg">search</mat-icon>
+              class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white hover:border-gray-400 transition-colors">
+            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
           </div>
         </div>
 
         <!-- Staff Filter -->
-        <div>
+        <div class="relative">
           <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-            <mat-icon class="text-blue-600 text-lg">person</mat-icon>
+            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+            </svg>
             Assigned Staff
           </label>
           <div class="relative">
             <button type="button"
-                    (click)="toggleStaffDropdown()"
+                    (click)="toggleStaffDropdown(); $event.stopPropagation()"
                     class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white hover:border-gray-400 transition-colors text-left flex items-center justify-between">
               <span class="truncate">{{ getStaffFilterLabel() }}</span>
-              <mat-icon class="text-gray-400 text-lg transition-transform" [class.rotate-180]="isStaffDropdownOpen">expand_more</mat-icon>
+              <svg class="w-5 h-5 text-gray-400 transition-transform" [class.rotate-180]="isStaffDropdownOpen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
             </button>
-            <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg pointer-events-none">badge</mat-icon>
+            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"></path>
+            </svg>
             
             <!-- Custom Dropdown -->
-            <div *ngIf="isStaffDropdownOpen" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+            <div *ngIf="isStaffDropdownOpen" class="absolute z-[9999] w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-y-auto">
               <button type="button"
                       (click)="selectStaffFilter('all')"
                       class="w-full text-left px-4 py-3 text-sm hover:bg-blue-50 transition-colors flex items-center gap-3 border-b border-gray-100"
                       [class.bg-blue-100]="staffFilter === 'all'"
                       [class.text-blue-700]="staffFilter === 'all'"
                       [class.font-semibold]="staffFilter === 'all'">
-                <mat-icon class="text-lg" [class.text-blue-600]="staffFilter === 'all'">groups</mat-icon>
+                <svg class="w-5 h-5" [class.text-blue-600]="staffFilter === 'all'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
                 <span>All Staff ({{ getStaffCount('all') }})</span>
               </button>
               <button type="button"
@@ -93,9 +106,9 @@
                       [class.bg-blue-100]="staffFilter === staff"
                       [class.text-blue-700]="staffFilter === staff"
                       [class.font-semibold]="staffFilter === staff">
-                <mat-icon class="text-lg" [class.text-blue-600]="staffFilter === staff">
-                  {{ staff === 'Public Form' ? 'public' : (staff === 'Admin' ? 'admin_panel_settings' : 'person') }}
-                </mat-icon>
+                <svg class="w-5 h-5" [class.text-blue-600]="staffFilter === staff" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
                 <span>{{ staff }} ({{ getStaffCount(staff) }})</span>
               </button>
             </div>
@@ -103,29 +116,37 @@
         </div>
 
         <!-- GST Filter -->
-        <div>
+        <div class="relative">
           <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-            <mat-icon class="text-green-600 text-lg">verified</mat-icon>
+            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
             GST Status
           </label>
           <div class="relative">
             <button type="button"
-                    (click)="toggleGstDropdown()"
+                    (click)="toggleGstDropdown(); $event.stopPropagation()"
                     class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm bg-white hover:border-gray-400 transition-colors text-left flex items-center justify-between">
               <span class="truncate">{{ getGstFilterLabel() }}</span>
-              <mat-icon class="text-gray-400 text-lg transition-transform" [class.rotate-180]="isGstDropdownOpen">expand_more</mat-icon>
+              <svg class="w-5 h-5 text-gray-400 transition-transform" [class.rotate-180]="isGstDropdownOpen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
             </button>
-            <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg pointer-events-none">receipt_long</mat-icon>
+            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
             
             <!-- Custom Dropdown -->
-            <div *ngIf="isGstDropdownOpen" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+            <div *ngIf="isGstDropdownOpen" class="absolute z-[9999] w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-y-auto">
               <button type="button"
                       (click)="selectGstFilter('all')"
                       class="w-full text-left px-4 py-3 text-sm hover:bg-green-50 transition-colors flex items-center gap-3 border-b border-gray-100"
                       [class.bg-green-100]="gstFilter === 'all'"
                       [class.text-green-700]="gstFilter === 'all'"
                       [class.font-semibold]="gstFilter === 'all'">
-                <mat-icon class="text-lg" [class.text-green-600]="gstFilter === 'all'">list</mat-icon>
+                <svg class="w-5 h-5" [class.text-green-600]="gstFilter === 'all'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                </svg>
                 <span>All GST ({{ getGstCount('all') }})</span>
               </button>
               <button type="button"
@@ -134,7 +155,9 @@
                       [class.bg-green-100]="gstFilter === 'yes'"
                       [class.text-green-700]="gstFilter === 'yes'"
                       [class.font-semibold]="gstFilter === 'yes'">
-                <mat-icon class="text-lg" [class.text-green-600]="gstFilter === 'yes'">verified</mat-icon>
+                <svg class="w-5 h-5" [class.text-green-600]="gstFilter === 'yes'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
                 <span>GST Active ({{ getGstCount('yes') }})</span>
               </button>
               <button type="button"
@@ -143,7 +166,9 @@
                       [class.bg-green-100]="gstFilter === 'not_selected'"
                       [class.text-green-700]="gstFilter === 'not_selected'"
                       [class.font-semibold]="gstFilter === 'not_selected'">
-                <mat-icon class="text-lg" [class.text-green-600]="gstFilter === 'not_selected'">help_outline</mat-icon>
+                <svg class="w-5 h-5" [class.text-green-600]="gstFilter === 'not_selected'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
                 <span>Not Selected ({{ getGstCount('not_selected') }})</span>
               </button>
             </div>
@@ -151,48 +176,68 @@
         </div>
 
         <!-- Interest Level Filter -->
-        <div>
+        <div class="relative">
           <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-            <mat-icon class="text-purple-600 text-lg">favorite</mat-icon>
+            <svg class="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path>
+            </svg>
             Interest Level
           </label>
           <div class="relative">
             <button type="button"
-                    (click)="toggleInterestDropdown()"
+                    (click)="toggleInterestDropdown(); $event.stopPropagation()"
                     class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm bg-white hover:border-gray-400 transition-colors text-left flex items-center justify-between">
               <span class="truncate">{{ getInterestFilterLabel() }}</span>
-              <mat-icon class="text-gray-400 text-lg transition-transform" [class.rotate-180]="isInterestDropdownOpen">expand_more</mat-icon>
+              <svg class="w-5 h-5 text-gray-400 transition-transform" [class.rotate-180]="isInterestDropdownOpen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
             </button>
-            <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg pointer-events-none">star</mat-icon>
+            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+            </svg>
             
             <!-- Custom Dropdown -->
-            <div *ngIf="isInterestDropdownOpen" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+            <div *ngIf="isInterestDropdownOpen" class="absolute z-[9999] w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-y-auto">
               <button type="button" (click)="selectInterestFilter('all')" class="w-full text-left px-4 py-3 text-sm hover:bg-purple-50 transition-colors flex items-center gap-3 border-b border-gray-100" [class.bg-purple-100]="interestFilter === 'all'" [class.text-purple-700]="interestFilter === 'all'" [class.font-semibold]="interestFilter === 'all'">
-                <mat-icon class="text-lg" [class.text-purple-600]="interestFilter === 'all'">list</mat-icon>
+                <svg class="w-5 h-5" [class.text-purple-600]="interestFilter === 'all'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                </svg>
                 <span>All Interest ({{ getInterestCount('all') }})</span>
               </button>
               <button type="button" (click)="selectInterestFilter('interested')" class="w-full text-left px-4 py-3 text-sm hover:bg-purple-50 transition-colors flex items-center gap-3 border-b border-gray-100" [class.bg-purple-100]="interestFilter === 'interested'" [class.text-purple-700]="interestFilter === 'interested'" [class.font-semibold]="interestFilter === 'interested'">
-                <mat-icon class="text-lg" [class.text-purple-600]="interestFilter === 'interested'">thumb_up</mat-icon>
+                <svg class="w-5 h-5" [class.text-purple-600]="interestFilter === 'interested'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"></path>
+                </svg>
                 <span>Interested ({{ getInterestCount('interested') }})</span>
               </button>
               <button type="button" (click)="selectInterestFilter('not_interested')" class="w-full text-left px-4 py-3 text-sm hover:bg-purple-50 transition-colors flex items-center gap-3 border-b border-gray-100" [class.bg-purple-100]="interestFilter === 'not_interested'" [class.text-purple-700]="interestFilter === 'not_interested'" [class.font-semibold]="interestFilter === 'not_interested'">
-                <mat-icon class="text-lg" [class.text-purple-600]="interestFilter === 'not_interested'">thumb_down</mat-icon>
+                <svg class="w-5 h-5" [class.text-purple-600]="interestFilter === 'not_interested'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018a2 2 0 01.485.06l3.76.94m-7 10v5a2 2 0 002 2h.096c.5 0 .905-.405.905-.904 0-.715.211-1.413.608-2.008L17 13V4m-7 10h2m5-10h2a2 2 0 012 2v6a2 2 0 01-2 2h-2.5"></path>
+                </svg>
                 <span>Not Interested ({{ getInterestCount('not_interested') }})</span>
               </button>
               <button type="button" (click)="selectInterestFilter('no_gst')" class="w-full text-left px-4 py-3 text-sm hover:bg-purple-50 transition-colors flex items-center gap-3 border-b border-gray-100" [class.bg-purple-100]="interestFilter === 'no_gst'" [class.text-purple-700]="interestFilter === 'no_gst'" [class.font-semibold]="interestFilter === 'no_gst'">
-                <mat-icon class="text-lg" [class.text-purple-600]="interestFilter === 'no_gst'">cancel</mat-icon>
+                <svg class="w-5 h-5" [class.text-purple-600]="interestFilter === 'no_gst'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
                 <span>No GST ({{ getInterestCount('no_gst') }})</span>
               </button>
               <button type="button" (click)="selectInterestFilter('gst_cancelled')" class="w-full text-left px-4 py-3 text-sm hover:bg-purple-50 transition-colors flex items-center gap-3 border-b border-gray-100" [class.bg-purple-100]="interestFilter === 'gst_cancelled'" [class.text-purple-700]="interestFilter === 'gst_cancelled'" [class.font-semibold]="interestFilter === 'gst_cancelled'">
-                <mat-icon class="text-lg" [class.text-purple-600]="interestFilter === 'gst_cancelled'">block</mat-icon>
+                <svg class="w-5 h-5" [class.text-purple-600]="interestFilter === 'gst_cancelled'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+                </svg>
                 <span>GST Cancelled ({{ getInterestCount('gst_cancelled') }})</span>
               </button>
               <button type="button" (click)="selectInterestFilter('pending')" class="w-full text-left px-4 py-3 text-sm hover:bg-purple-50 transition-colors flex items-center gap-3 border-b border-gray-100" [class.bg-purple-100]="interestFilter === 'pending'" [class.text-purple-700]="interestFilter === 'pending'" [class.font-semibold]="interestFilter === 'pending'">
-                <mat-icon class="text-lg" [class.text-purple-600]="interestFilter === 'pending'">schedule</mat-icon>
+                <svg class="w-5 h-5" [class.text-purple-600]="interestFilter === 'pending'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
                 <span>Pending ({{ getInterestCount('pending') }})</span>
               </button>
               <button type="button" (click)="selectInterestFilter('unknown')" class="w-full text-left px-4 py-3 text-sm hover:bg-purple-50 transition-colors flex items-center gap-3 last:border-b-0" [class.bg-purple-100]="interestFilter === 'unknown'" [class.text-purple-700]="interestFilter === 'unknown'" [class.font-semibold]="interestFilter === 'unknown'">
-                <mat-icon class="text-lg" [class.text-purple-600]="interestFilter === 'unknown'">help</mat-icon>
+                <svg class="w-5 h-5" [class.text-purple-600]="interestFilter === 'unknown'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
                 <span>Unknown ({{ getInterestCount('unknown') }})</span>
               </button>
             </div>
@@ -200,36 +245,50 @@
         </div>
 
         <!-- Shortlist Filter -->
-        <div>
+        <div class="relative">
           <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-            <mat-icon class="text-pink-600 text-lg">playlist_add_check</mat-icon>
+            <svg class="w-5 h-5 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+            </svg>
             Shortlist Status
           </label>
           <div class="relative">
             <button type="button"
-                    (click)="toggleShortlistDropdown()"
+                    (click)="toggleShortlistDropdown(); $event.stopPropagation()"
                     class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-sm bg-white hover:border-gray-400 transition-colors text-left flex items-center justify-between">
               <span class="truncate">{{ getShortlistFilterLabel() }}</span>
-              <mat-icon class="text-gray-400 text-lg transition-transform" [class.rotate-180]="isShortlistDropdownOpen">expand_more</mat-icon>
+              <svg class="w-5 h-5 text-gray-400 transition-transform" [class.rotate-180]="isShortlistDropdownOpen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
             </button>
-            <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg pointer-events-none">checklist</mat-icon>
+            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+            </svg>
             
             <!-- Custom Dropdown -->
-            <div *ngIf="isShortlistDropdownOpen" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+            <div *ngIf="isShortlistDropdownOpen" class="absolute z-[9999] w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-y-auto">
               <button type="button" (click)="selectShortlistFilter('all')" class="w-full text-left px-4 py-3 text-sm hover:bg-pink-50 transition-colors flex items-center gap-3 border-b border-gray-100" [class.bg-pink-100]="shortlistFilter === 'all'" [class.text-pink-700]="shortlistFilter === 'all'" [class.font-semibold]="shortlistFilter === 'all'">
-                <mat-icon class="text-lg" [class.text-pink-600]="shortlistFilter === 'all'">list</mat-icon>
+                <svg class="w-5 h-5" [class.text-pink-600]="shortlistFilter === 'all'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                </svg>
                 <span>All ({{ getShortlistCount('all') }})</span>
               </button>
               <button type="button" (click)="selectShortlistFilter('shortlist')" class="w-full text-left px-4 py-3 text-sm hover:bg-pink-50 transition-colors flex items-center gap-3 border-b border-gray-100" [class.bg-pink-100]="shortlistFilter === 'shortlist'" [class.text-pink-700]="shortlistFilter === 'shortlist'" [class.font-semibold]="shortlistFilter === 'shortlist'">
-                <mat-icon class="text-lg" [class.text-pink-600]="shortlistFilter === 'shortlist'">playlist_add</mat-icon>
+                <svg class="w-5 h-5" [class.text-pink-600]="shortlistFilter === 'shortlist'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
                 <span>Can Shortlist ({{ getShortlistCount('shortlist') }})</span>
               </button>
               <button type="button" (click)="selectShortlistFilter('shortlisted')" class="w-full text-left px-4 py-3 text-sm hover:bg-pink-50 transition-colors flex items-center gap-3 border-b border-gray-100" [class.bg-pink-100]="shortlistFilter === 'shortlisted'" [class.text-pink-700]="shortlistFilter === 'shortlisted'" [class.font-semibold]="shortlistFilter === 'shortlisted'">
-                <mat-icon class="text-lg" [class.text-pink-600]="shortlistFilter === 'shortlisted'">check_circle</mat-icon>
+                <svg class="w-5 h-5" [class.text-pink-600]="shortlistFilter === 'shortlisted'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
                 <span>Shortlisted ({{ getShortlistCount('shortlisted') }})</span>
               </button>
               <button type="button" (click)="selectShortlistFilter('not_shortlist')" class="w-full text-left px-4 py-3 text-sm hover:bg-pink-50 transition-colors flex items-center gap-3 last:border-b-0" [class.bg-pink-100]="shortlistFilter === 'not_shortlist'" [class.text-pink-700]="shortlistFilter === 'not_shortlist'" [class.font-semibold]="shortlistFilter === 'not_shortlist'">
-                <mat-icon class="text-lg" [class.text-pink-600]="shortlistFilter === 'not_shortlist'">cancel</mat-icon>
+                <svg class="w-5 h-5" [class.text-pink-600]="shortlistFilter === 'not_shortlist'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
                 <span>Not Eligible ({{ getShortlistCount('not_shortlist') }})</span>
               </button>
             </div>
@@ -241,7 +300,9 @@
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-            <mat-icon class="text-indigo-600 text-lg">event</mat-icon>
+            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
             From Date
           </label>
           <div class="relative custom-datepicker">
@@ -252,16 +313,22 @@
                    placeholder="Select from date"
                    readonly
                    class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-white hover:border-gray-400 transition-colors cursor-pointer">
-            <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg pointer-events-none z-10">calendar_today</mat-icon>
+            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
             <mat-datepicker-toggle matSuffix [for]="fromDatePicker" class="absolute right-2 top-1/2 transform -translate-y-1/2">
-              <mat-icon matDatepickerToggleIcon class="text-indigo-600 text-lg">date_range</mat-icon>
+              <svg matDatepickerToggleIcon class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
             </mat-datepicker-toggle>
             <mat-datepicker #fromDatePicker></mat-datepicker>
           </div>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-            <mat-icon class="text-indigo-600 text-lg">event</mat-icon>
+            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
             To Date
           </label>
           <div class="relative custom-datepicker">
@@ -272,43 +339,61 @@
                    placeholder="Select to date"
                    readonly
                    class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-white hover:border-gray-400 transition-colors cursor-pointer">
-            <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg pointer-events-none z-10">calendar_today</mat-icon>
+            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
             <mat-datepicker-toggle matSuffix [for]="toDatePicker" class="absolute right-2 top-1/2 transform -translate-y-1/2">
-              <mat-icon matDatepickerToggleIcon class="text-indigo-600 text-lg">date_range</mat-icon>
+              <svg matDatepickerToggleIcon class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
             </mat-datepicker-toggle>
             <mat-datepicker #toDatePicker></mat-datepicker>
           </div>
         </div>
-        <div>
+        <div class="relative">
           <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-            <mat-icon class="text-orange-600 text-lg">sort</mat-icon>
+            <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"></path>
+            </svg>
             Sort By
           </label>
           <div class="relative">
             <button type="button"
-                    (click)="toggleSortDropdown()"
+                    (click)="toggleSortDropdown(); $event.stopPropagation()"
                     class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm bg-white hover:border-gray-400 transition-colors text-left flex items-center justify-between">
               <span class="truncate">{{ getSortOptionLabel() }}</span>
-              <mat-icon class="text-gray-400 text-lg transition-transform" [class.rotate-180]="isSortDropdownOpen">expand_more</mat-icon>
+              <svg class="w-5 h-5 text-gray-400 transition-transform" [class.rotate-180]="isSortDropdownOpen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
             </button>
-            <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg pointer-events-none">swap_vert</mat-icon>
+            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+            </svg>
             
             <!-- Custom Dropdown -->
-            <div *ngIf="isSortDropdownOpen" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+            <div *ngIf="isSortDropdownOpen" class="absolute z-[9999] w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-y-auto">
               <button type="button" (click)="selectSortOption('date_new')" class="w-full text-left px-4 py-3 text-sm hover:bg-orange-50 transition-colors flex items-center gap-3 border-b border-gray-100" [class.bg-orange-100]="sortOption === 'date_new'" [class.text-orange-700]="sortOption === 'date_new'" [class.font-semibold]="sortOption === 'date_new'">
-                <mat-icon class="text-lg" [class.text-orange-600]="sortOption === 'date_new'">arrow_downward</mat-icon>
+                <svg class="w-5 h-5" [class.text-orange-600]="sortOption === 'date_new'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                </svg>
                 <span>Newest First</span>
               </button>
               <button type="button" (click)="selectSortOption('date_old')" class="w-full text-left px-4 py-3 text-sm hover:bg-orange-50 transition-colors flex items-center gap-3 border-b border-gray-100" [class.bg-orange-100]="sortOption === 'date_old'" [class.text-orange-700]="sortOption === 'date_old'" [class.font-semibold]="sortOption === 'date_old'">
-                <mat-icon class="text-lg" [class.text-orange-600]="sortOption === 'date_old'">arrow_upward</mat-icon>
+                <svg class="w-5 h-5" [class.text-orange-600]="sortOption === 'date_old'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+                </svg>
                 <span>Oldest First</span>
               </button>
               <button type="button" (click)="selectSortOption('name_asc')" class="w-full text-left px-4 py-3 text-sm hover:bg-orange-50 transition-colors flex items-center gap-3 border-b border-gray-100" [class.bg-orange-100]="sortOption === 'name_asc'" [class.text-orange-700]="sortOption === 'name_asc'" [class.font-semibold]="sortOption === 'name_asc'">
-                <mat-icon class="text-lg" [class.text-orange-600]="sortOption === 'name_asc'">sort_by_alpha</mat-icon>
+                <svg class="w-5 h-5" [class.text-orange-600]="sortOption === 'name_asc'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"></path>
+                </svg>
                 <span>Name A-Z</span>
               </button>
               <button type="button" (click)="selectSortOption('name_desc')" class="w-full text-left px-4 py-3 text-sm hover:bg-orange-50 transition-colors flex items-center gap-3 last:border-b-0" [class.bg-orange-100]="sortOption === 'name_desc'" [class.text-orange-700]="sortOption === 'name_desc'" [class.font-semibold]="sortOption === 'name_desc'">
-                <mat-icon class="text-lg" [class.text-orange-600]="sortOption === 'name_desc'">sort_by_alpha</mat-icon>
+                <svg class="w-5 h-5" [class.text-orange-600]="sortOption === 'name_desc'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"></path>
+                </svg>
                 <span>Name Z-A</span>
               </button>
             </div>
@@ -326,43 +411,53 @@
     </div>
         
         <!-- Results Header -->
-        <div class="bg-white rounded-xl shadow-sm border border-border-light p-4 mb-6">
+        <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 p-4 mb-6">
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div class="flex items-center gap-4">
-              <h2 class="text-lg font-semibold text-text-primary">
+              <h2 class="text-lg font-semibold text-gray-800">
                 Enquiries ({{ filteredEnquiries.length }})
               </h2>
               
               <!-- Active Filters Display -->
               <div *ngIf="hasActiveFilters()" class="flex flex-wrap gap-2">
-                <span *ngIf="searchTerm" class="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                <span *ngIf="searchTerm" class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-100 text-blue-800 text-xs rounded-full font-medium">
                   Search: "{{ searchTerm }}"
-                  <button (click)="searchTerm = ''; applyFilters()" class="hover:bg-blue-200 rounded-full p-0.5">
-                    <mat-icon class="text-xs">close</mat-icon>
+                  <button (click)="searchTerm = ''; applyFilters()" class="hover:bg-blue-200 rounded-full p-0.5 transition-colors">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
                   </button>
                 </span>
-                <span *ngIf="staffFilter !== 'all'" class="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                <span *ngIf="staffFilter !== 'all'" class="inline-flex items-center gap-1 px-3 py-1.5 bg-green-100 text-green-800 text-xs rounded-full font-medium">
                   Staff: {{ staffFilter }}
-                  <button (click)="clearStaffFilter()" class="hover:bg-green-200 rounded-full p-0.5">
-                    <mat-icon class="text-xs">close</mat-icon>
+                  <button (click)="clearStaffFilter()" class="hover:bg-green-200 rounded-full p-0.5 transition-colors">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
                   </button>
                 </span>
-                <span *ngIf="gstFilter !== 'all'" class="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
+                <span *ngIf="gstFilter !== 'all'" class="inline-flex items-center gap-1 px-3 py-1.5 bg-purple-100 text-purple-800 text-xs rounded-full font-medium">
                   GST: {{ getGstFilterDisplay() }}
-                  <button (click)="clearGstFilter()" class="hover:bg-purple-200 rounded-full p-0.5">
-                    <mat-icon class="text-xs">close</mat-icon>
+                  <button (click)="clearGstFilter()" class="hover:bg-purple-200 rounded-full p-0.5 transition-colors">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
                   </button>
                 </span>
-                <span *ngIf="interestFilter !== 'all'" class="inline-flex items-center gap-1 px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full">
+                <span *ngIf="interestFilter !== 'all'" class="inline-flex items-center gap-1 px-3 py-1.5 bg-orange-100 text-orange-800 text-xs rounded-full font-medium">
                   Interest: {{ getInterestLevelDisplay() }}
-                  <button (click)="clearInterestFilter()" class="hover:bg-orange-200 rounded-full p-0.5">
-                    <mat-icon class="text-xs">close</mat-icon>
+                  <button (click)="clearInterestFilter()" class="hover:bg-orange-200 rounded-full p-0.5 transition-colors">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
                   </button>
                 </span>
-                <span *ngIf="fromDate || toDate" class="inline-flex items-center gap-1 px-2 py-1 bg-indigo-100 text-indigo-800 text-xs rounded-full">
+                <span *ngIf="fromDate || toDate" class="inline-flex items-center gap-1 px-3 py-1.5 bg-indigo-100 text-indigo-800 text-xs rounded-full font-medium">
                   Date: {{ formatDateRange() }}
-                  <button (click)="clearDateRange()" class="hover:bg-indigo-200 rounded-full p-0.5">
-                    <mat-icon class="text-xs">close</mat-icon>
+                  <button (click)="clearDateRange()" class="hover:bg-indigo-200 rounded-full p-0.5 transition-colors">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
                   </button>
                 </span>
               </div>
@@ -372,8 +467,10 @@
             <button 
               *ngIf="hasActiveFilters()" 
               (click)="clearAllFilters()"
-              class="btn btn-outline text-status-error border-status-error hover:bg-status-error hover:text-white flex items-center gap-2 px-3 py-1.5 text-sm">
-              <mat-icon class="text-sm">clear_all</mat-icon>
+              class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 border-2 border-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all duration-200 shadow-sm hover:shadow-md">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
               Clear All
             </button>
           </div>
@@ -381,53 +478,57 @@
 
         <!-- Loading State -->
         <div *ngIf="loading" class="flex flex-col items-center justify-center py-16">
-          <mat-spinner diameter="40" class="mb-4"></mat-spinner>
-          <p class="text-text-secondary">Loading enquiries...</p>
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+          <p class="text-gray-600">Loading enquiries...</p>
         </div>
 
         <!-- Empty State -->
         <div *ngIf="!loading && filteredEnquiries.length === 0" class="text-center py-16">
-          <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <mat-icon class="text-gray-400 text-3xl">contact_support</mat-icon>
+          <div class="w-24 h-24 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
           </div>
-          <h3 class="text-xl font-semibold text-text-primary mb-2">No enquiries found</h3>
-          <p class="text-text-secondary mb-6 max-w-md mx-auto">
+          <h3 class="text-xl font-semibold text-gray-800 mb-2">No enquiries found</h3>
+          <p class="text-gray-600 mb-6 max-w-md mx-auto">
             <span *ngIf="hasActiveFilters()">
               Try adjusting your search criteria or filters to find what you're looking for.
             </span>
           </p>
-          <button (click)="showAddForm()" class="btn btn-primary">
-            <mat-icon class="mr-2">add</mat-icon>
+          <button (click)="showAddForm()" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
             Add New Enquiry
           </button>
         </div>
 
         <!-- Table View -->
-        <div *ngIf="!loading && filteredEnquiries.length > 0 && viewMode === 'table'" class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
+        <div *ngIf="!loading && filteredEnquiries.length > 0 && viewMode === 'table'" class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
           <div class="overflow-x-auto">
             <table mat-table [dataSource]="filteredEnquiries" class="w-full text-xs">
               <!-- Serial Number Column -->
               <ng-container matColumnDef="sno">
-                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">S.No</th>
-                <td mat-cell *matCellDef="let enquiry; let i = index" class="px-4 py-3 text-sm text-text-secondary">{{ getSerialNumber(i) }}</td>
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-gray-800 bg-gradient-to-r from-gray-50 to-gray-100 px-4 py-3 text-sm">S.No</th>
+                <td mat-cell *matCellDef="let enquiry; let i = index" class="px-4 py-3 text-sm text-gray-600">{{ getSerialNumber(i) }}</td>
               </ng-container>
 
               <!-- Date Column -->
               <ng-container matColumnDef="date">
-                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Date</th>
-                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-sm text-text-secondary">
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-gray-800 bg-gradient-to-r from-gray-50 to-gray-100 px-4 py-3 text-sm">Date</th>
+                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-sm text-gray-600">
                   {{ enquiry.date | date:'dd/MM/yyyy' }}
                 </td>
               </ng-container>
 
               <!-- Owner Name Column -->
               <ng-container matColumnDef="owner_name">
-                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Owner Name</th>
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-gray-800 bg-gradient-to-r from-gray-50 to-gray-100 px-4 py-3 text-sm">Owner Name</th>
                 <td mat-cell *matCellDef="let enquiry" class="px-4 py-3">
-                  <div class="font-medium text-text-primary text-sm">
+                  <div class="font-medium text-gray-800 text-sm">
                     {{ enquiry.owner_name || enquiry.wati_name }}
                   </div>
-                  <div class="text-xs text-text-muted mt-1" *ngIf="enquiry.user_name">
+                  <div class="text-xs text-gray-500 mt-1" *ngIf="enquiry.user_name">
                     User: {{ enquiry.user_name }}
                   </div>
                 </td>
@@ -435,16 +536,16 @@
 
               <!-- Phone Number Column -->
               <ng-container matColumnDef="phone_number">
-                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Phone Number</th>
-                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-sm text-text-secondary">
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-gray-800 bg-gradient-to-r from-gray-50 to-gray-100 px-4 py-3 text-sm">Phone Number</th>
+                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-sm text-gray-600">
                   {{ enquiry.phone_number || enquiry.mobile_number }}
                 </td>
               </ng-container>
 
               <!-- Secondary Mobile Column -->
               <ng-container matColumnDef="secondary_mobile">
-                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm min-w-[140px]">Secondary Mobile</th>
-                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-sm text-text-secondary min-w-[140px]">
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-gray-800 bg-gradient-to-r from-gray-50 to-gray-100 px-4 py-3 text-sm min-w-[140px]">Secondary Mobile</th>
+                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-sm text-gray-600 min-w-[140px]">
                   <input type="tel" 
                          [value]="getDisplayMobileNumber(enquiry.secondary_mobile_number)" 
                          (input)="updateSecondaryMobile(enquiry, $any($event.target).value)"
@@ -455,7 +556,7 @@
 
               <!-- GST Column -->
               <ng-container matColumnDef="gst">
-                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">GST</th>
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-gray-800 bg-gradient-to-r from-gray-50 to-gray-100 px-4 py-3 text-sm">GST</th>
                 <td mat-cell *matCellDef="let enquiry" class="px-4 py-3">
                   <span class="px-2 py-1 text-xs rounded-full font-medium"
                         [ngClass]="{
@@ -470,61 +571,66 @@
 
               <!-- Business Name Column -->
               <ng-container matColumnDef="business_name">
-                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Business Name</th>
-                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-sm text-text-secondary">
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-gray-800 bg-gradient-to-r from-gray-50 to-gray-100 px-4 py-3 text-sm">Business Name</th>
+                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-sm text-gray-600">
                   {{ enquiry.business_name || '-' }}
                 </td>
               </ng-container>
 
               <!-- Loan Amount Column -->
               <ng-container matColumnDef="loan_amount">
-                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Loan Amount</th>
-                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-sm text-text-secondary">
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-gray-800 bg-gradient-to-r from-gray-50 to-gray-100 px-4 py-3 text-sm">Loan Amount</th>
+                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-sm text-gray-600">
                   {{ enquiry.loan_amount || '-' }}
                 </td>
               </ng-container>
 
               <!-- Loan Purpose Column -->
               <ng-container matColumnDef="loan_purpose">
-                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Loan Purpose</th>
-                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-sm text-text-secondary">
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-gray-800 bg-gradient-to-r from-gray-50 to-gray-100 px-4 py-3 text-sm">Loan Purpose</th>
+                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-sm text-gray-600">
                   {{ enquiry.loan_purpose || '-' }}
                 </td>
               </ng-container>
 
               <!-- Annual Revenue Column -->
               <ng-container matColumnDef="annual_revenue">
-                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Annual Revenue</th>
-                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-sm text-text-secondary">
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-gray-800 bg-gradient-to-r from-gray-50 to-gray-100 px-4 py-3 text-sm">Annual Revenue</th>
+                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-sm text-gray-600">
                   {{ enquiry.annual_revenue || '-' }}
                 </td>
               </ng-container>
 
               <!-- Email Address Column -->
               <ng-container matColumnDef="email_address">
-                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Email Address</th>
-                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-sm text-text-secondary">
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-gray-800 bg-gradient-to-r from-gray-50 to-gray-100 px-4 py-3 text-sm">Email Address</th>
+                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-sm text-gray-600">
                   {{ enquiry.email_address || '-' }}
                 </td>
               </ng-container>
 
               <!-- Business Document Column -->
               <ng-container matColumnDef="business_document">
-                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Business Document</th>
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-gray-800 bg-gradient-to-r from-gray-50 to-gray-100 px-4 py-3 text-sm">Business Document</th>
                 <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-sm text-center">
                   <div *ngIf="enquiry.business_document_url; else noDocument" class="flex items-center justify-center gap-2">
                     <!-- Preview Button -->
                     <button (click)="previewDocument(enquiry.business_document_url)" 
                             class="inline-flex items-center justify-center w-8 h-8 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full transition-colors"
-                            matTooltip="Preview Document">
-                      <mat-icon class="text-sm">visibility</mat-icon>
+                            title="Preview Document">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                      </svg>
                     </button>
                     
                     <!-- Download Button -->
                     <button (click)="downloadDocument(enquiry.business_document_url, enquiry._id)" 
                             class="inline-flex items-center justify-center w-8 h-8 bg-green-100 hover:bg-green-200 text-green-700 rounded-full transition-colors"
-                            matTooltip="Download Document">
-                      <mat-icon class="text-sm">download</mat-icon>
+                            title="Download Document">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                      </svg>
                     </button>
                   </div>
                   <ng-template #noDocument>
@@ -535,15 +641,15 @@
 
               <!-- Staff Column -->
               <ng-container matColumnDef="staff">
-                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Staff</th>
-                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-sm text-text-secondary">
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-gray-800 bg-gradient-to-r from-gray-50 to-gray-100 px-4 py-3 text-sm">Staff</th>
+                <td mat-cell *matCellDef="let enquiry" class="px-4 py-3 text-sm text-gray-600">
                   {{ enquiry.staff || 'Unassigned' }}
                 </td>
               </ng-container>
 
               <!-- Comments Column -->
               <ng-container matColumnDef="comments">
-                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Comments</th>
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-gray-800 bg-gradient-to-r from-gray-50 to-gray-100 px-4 py-3 text-sm">Comments</th>
                 <td mat-cell *matCellDef="let enquiry" class="px-4 py-3">
                   <span class="inline-block px-3 py-1 text-xs rounded-full font-medium whitespace-nowrap truncate max-w-[150px]"
                         [style.background-color]="getStatusColor(enquiry.comments)"
@@ -634,7 +740,7 @@
               <tr mat-header-row *matHeaderRowDef="displayedColumns" class="border-b border-border-light"></tr>
               <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
                   (click)="viewEnquiryDetails(row)"
-                  class="border-b border-border-light hover:bg-surface-alt transition-colors cursor-pointer"
+                  class="border-b border-border-light transition-colors cursor-pointer"
                   [ngClass]="getRowColorClass(row)"></tr>
             </table>
           </div>
@@ -643,7 +749,8 @@
         <!-- Card View - 3 Column Grid -->
         <div *ngIf="!loading && filteredEnquiries.length > 0 && viewMode === 'card'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div *ngFor="let enquiry of filteredEnquiries; let i = index" 
-               class="bg-white rounded-2xl shadow-lg border border-border-light overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer group">
+               class="rounded-2xl shadow-lg border-2 overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer group"
+               [ngClass]="getCardColorClass(enquiry)">
             
             <!-- Card Header with Gradient -->
             <div class="relative bg-gradient-to-r from-primary/5 to-secondary/5 p-6 border-b border-border-light">
@@ -851,48 +958,53 @@
 </div>
 
 <!-- Registration Form Modal -->
-  <div *ngIf="showRegistrationForm" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[95vh] overflow-hidden relative">
+  <div *ngIf="showRegistrationForm" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" (click)="onModalBackdropClick($event)">
+    <div class="backdrop-blur-xl bg-white/95 rounded-2xl shadow-2xl w-full max-w-5xl max-h-[95vh] overflow-hidden relative border border-white/20 modal-content">
       <!-- Loading Overlay -->
       <div *ngIf="loading && isEditMode" class="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
         <div class="text-center">
-          <mat-spinner diameter="48" class="mx-auto mb-4"></mat-spinner>
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p class="text-lg font-medium text-gray-700">Updating enquiry...</p>
           <p class="text-sm text-gray-500 mt-1">Please wait</p>
         </div>
       </div>
-      <!-- Modal Header with Enhanced Styling -->
-      <div class="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 p-6 text-white relative overflow-hidden">
-        <!-- Background Pattern -->
-        <div class="absolute inset-0 bg-white/10 opacity-20"></div>
-        
-        <div class="flex items-center justify-between relative z-10">
+      <!-- Modal Header with Clean Styling -->
+      <div class="backdrop-blur-xl bg-white/90 p-6 border-b border-gray-200 relative">
+        <div class="flex items-center justify-between">
           <div class="flex items-center gap-4">
             <!-- Icon -->
-            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-              <mat-icon class="text-white text-2xl">{{ isEditMode ? 'edit' : 'add_circle' }}</mat-icon>
+            <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path *ngIf="isEditMode" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                <path *ngIf="!isEditMode" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
             </div>
             <div>
-              <h2 class="text-2xl font-bold tracking-tight">{{ isEditMode ? 'Edit Enquiry' : 'Add New Enquiry' }}</h2>
-              <p class="text-white/90 text-sm mt-1 font-medium">{{ isEditMode ? 'Update enquiry information below' : 'Fill in the details to create a new enquiry' }}</p>
+              <h2 class="text-2xl font-bold tracking-tight text-gray-800">{{ isEditMode ? 'Edit Enquiry' : 'Add New Enquiry' }}</h2>
+              <p class="text-gray-600 text-sm mt-1 font-medium">{{ isEditMode ? 'Update enquiry information below' : 'Fill in the details to create a new enquiry' }}</p>
             </div>
           </div>
           <button (click)="hideAddForm()" 
-                  class="w-11 h-11 rounded-xl bg-white/20 hover:bg-white/30 flex items-center justify-center transition-all duration-200 hover:scale-105 backdrop-blur-sm">
-            <mat-icon class="text-white">close</mat-icon>
+                  class="w-11 h-11 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-all duration-200 hover:scale-105">
+            <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
           </button>
         </div>
       </div>
 
       <!-- Modal Body with Enhanced Layout -->
-      <div class="p-8 overflow-y-auto max-h-[calc(95vh-140px)] bg-gray-50">
+      <div class="p-8 overflow-y-auto max-h-[calc(95vh-140px)] bg-gradient-to-br from-gray-50 to-blue-50">
         <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="space-y-8">
           
           <!-- Personal Information Section -->
-          <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+          <div class="backdrop-blur-xl bg-white/70 rounded-2xl p-6 shadow-xl border border-white/20 overflow-visible"
+               [class.dropdown-active]="isDropdownOpen('countryCode')">
             <div class="flex items-center gap-3 mb-6">
               <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                <mat-icon class="text-blue-600 text-lg">person</mat-icon>
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
               </div>
               <h3 class="text-lg font-semibold text-gray-900">Personal Information</h3>
             </div>
@@ -967,7 +1079,7 @@
               <label class="block text-sm font-medium text-gray-700 mb-2">Country Code *</label>
               <div class="relative">
                 <button type="button"
-                        (click)="toggleDropdown('countryCode')"
+                        (click)="toggleDropdown('countryCode'); $event.stopPropagation()"
                         class="w-full bg-white border border-gray-300 rounded-lg px-3 py-3 text-left text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors"
                         [class.border-blue-500]="isDropdownOpen('countryCode')"
                         [class.ring-2]="isDropdownOpen('countryCode')"
@@ -990,7 +1102,7 @@
                 
                 <!-- Dropdown Options -->
                 <div *ngIf="isDropdownOpen('countryCode')"
-                     class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                     class="absolute z-[9999] w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-xl max-h-60 overflow-y-auto">
                   <button type="button"
                           *ngFor="let country of countryCodes"
                           (click)="selectCountryCode(country.code)"
@@ -1033,10 +1145,13 @@
         </div>
 
         <!-- Business Information Section -->
-        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+        <div class="backdrop-blur-xl bg-white/70 rounded-2xl p-6 shadow-xl border border-white/20 overflow-visible"
+             [class.dropdown-active]="isDropdownOpen('businessType') || isDropdownOpen('gst') || isDropdownOpen('gstStatus')">
           <div class="flex items-center gap-3 mb-6">
             <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-              <mat-icon class="text-green-600 text-lg">business</mat-icon>
+              <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+              </svg>
             </div>
             <h3 class="text-lg font-semibold text-gray-900">Business Information</h3>
             </div>
@@ -1047,7 +1162,7 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2">Business Type (Optional)</label>
                 <div class="relative">
                   <button type="button"
-                          (click)="toggleDropdown('businessType')"
+                          (click)="toggleDropdown('businessType'); $event.stopPropagation()"
                           class="w-full bg-white border border-gray-300 rounded-lg px-3 py-3 text-left text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors"
                           [class.border-blue-500]="isDropdownOpen('businessType')"
                           [class.ring-2]="isDropdownOpen('businessType')"
@@ -1066,7 +1181,7 @@
                   
                   <!-- Dropdown Options -->
                   <div *ngIf="isDropdownOpen('businessType')"
-                       class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                       class="absolute z-[9999] w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-xl max-h-60 overflow-y-auto">
                     <button type="button"
                             (click)="selectBusinessType('')"
                             class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
@@ -1100,7 +1215,7 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2">GST (Optional)</label>
                 <div class="relative">
                   <button type="button"
-                          (click)="toggleDropdown('gst')"
+                          (click)="toggleDropdown('gst'); $event.stopPropagation()"
                           class="w-full bg-white border border-gray-300 rounded-lg px-3 py-3 text-left text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors"
                           [class.border-blue-500]="isDropdownOpen('gst')"
                           [class.ring-2]="isDropdownOpen('gst')"
@@ -1119,7 +1234,7 @@
                   
                   <!-- Dropdown Options -->
                   <div *ngIf="isDropdownOpen('gst')"
-                       class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                       class="absolute z-[9999] w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-xl max-h-60 overflow-y-auto">
                     <button type="button"
                             (click)="selectGst('')"
                             class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
@@ -1150,7 +1265,7 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2">GST Status</label>
                 <div class="relative">
                   <button type="button"
-                          (click)="toggleDropdown('gstStatus')"
+                          (click)="toggleDropdown('gstStatus'); $event.stopPropagation()"
                           class="w-full bg-white border border-gray-300 rounded-lg px-3 py-3 text-left text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors"
                           [class.border-blue-500]="isDropdownOpen('gstStatus')"
                           [class.ring-2]="isDropdownOpen('gstStatus')"
@@ -1169,7 +1284,7 @@
                   
                   <!-- Dropdown Options -->
                   <div *ngIf="isDropdownOpen('gstStatus')"
-                       class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                       class="absolute z-[9999] w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-xl max-h-60 overflow-y-auto">
                     <button type="button"
                             (click)="selectGstStatus('Active')"
                             class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
@@ -1191,10 +1306,13 @@
           </div>
 
           <!-- Loan Information Section -->
-          <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+          <div class="backdrop-blur-xl bg-white/70 rounded-2xl p-6 shadow-xl border border-white/20 overflow-visible"
+               [class.dropdown-active]="false">
             <div class="flex items-center gap-3 mb-6">
               <div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
-                <mat-icon class="text-yellow-600 text-lg">account_balance</mat-icon>
+                <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path>
+                </svg>
               </div>
               <h3 class="text-lg font-semibold text-gray-900">Loan Information</h3>
             </div>
@@ -1230,21 +1348,24 @@
           </div>
 
           <!-- Assignment & Comments Section -->
-          <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+          <div class="backdrop-blur-xl bg-white/70 rounded-2xl p-6 shadow-xl border border-white/20 overflow-visible"
+               [class.dropdown-active]="isDropdownOpen('staff') || isDropdownOpen('comments')">
             <div class="flex items-center gap-3 mb-6">
               <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                <mat-icon class="text-purple-600 text-lg">assignment</mat-icon>
+                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                </svg>
               </div>
               <h3 class="text-lg font-semibold text-gray-900">Assignment & Comments</h3>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 overflow-visible">
               <!-- Staff Assignment -->
               <div class="w-full">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Assign Staff *</label>
                 <div class="relative">
                   <button type="button"
-                          (click)="toggleDropdown('staff')"
+                          (click)="toggleDropdown('staff'); $event.stopPropagation()"
                           class="w-full bg-white border border-gray-300 rounded-lg px-3 py-3 text-left text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors"
                           [class.border-blue-500]="isDropdownOpen('staff')"
                           [class.ring-2]="isDropdownOpen('staff')"
@@ -1263,7 +1384,7 @@
                   
                   <!-- Dropdown Options -->
                   <div *ngIf="isDropdownOpen('staff')"
-                       class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                       class="absolute z-[9999] w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-xl max-h-60 overflow-y-auto">
                     <button type="button"
                             (click)="selectStaff('')"
                             class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
@@ -1288,7 +1409,7 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2">Comments (Optional)</label>
                 <div class="relative">
                   <button type="button"
-                          (click)="toggleDropdown('comments')"
+                          (click)="toggleDropdown('comments'); $event.stopPropagation()"
                           class="w-full bg-white border border-gray-300 rounded-lg px-3 py-3 text-left text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors"
                           [class.border-blue-500]="isDropdownOpen('comments')"
                           [class.ring-2]="isDropdownOpen('comments')"
@@ -1307,7 +1428,7 @@
                   
                   <!-- Dropdown Options -->
                   <div *ngIf="isDropdownOpen('comments')"
-                       class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                       class="absolute z-[9999] w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-xl max-h-60 overflow-y-auto">
                     <button type="button"
                             (click)="selectComment('')"
                             class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
@@ -1331,19 +1452,26 @@
           </div>
 
           <!-- Form Actions -->
-          <div class="flex items-center justify-end gap-4 pt-6 border-t border-gray-200 bg-white rounded-xl p-6 shadow-sm">
+          <div class="flex items-center justify-end gap-4 pt-6 border-t border-gray-200 backdrop-blur-xl bg-white/70 rounded-xl p-6 shadow-sm">
             <button type="button" 
                     (click)="hideAddForm()"
-                    class="px-8 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium transition-all duration-200 hover:scale-105 flex items-center gap-2">
-              <mat-icon>close</mat-icon>
+                    class="px-8 py-3 text-gray-700 bg-white border-2 border-gray-300 hover:bg-gray-50 hover:border-gray-400 rounded-xl font-semibold transition-all duration-200 flex items-center gap-2 shadow-sm hover:shadow-md">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
               Cancel
             </button>
             <button type="submit" 
                     *ngIf="!isEditMode || (isEditMode && hasFormChanges)"
                     [disabled]="registrationForm.invalid || loading"
-                    class="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl font-medium transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center gap-2 shadow-lg">
-              <mat-spinner *ngIf="loading" diameter="16" class="mr-2"></mat-spinner>
-              <mat-icon *ngIf="!loading">{{ isEditMode ? 'save' : 'add_circle' }}</mat-icon>
+                    class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg hover:shadow-xl">
+              <div *ngIf="loading" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+              <svg *ngIf="!loading && isEditMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V7a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+              </svg>
+              <svg *ngIf="!loading && !isEditMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
               {{ isEditMode ? 'Update Enquiry' : 'Create Enquiry' }}
             </button>
           </div>

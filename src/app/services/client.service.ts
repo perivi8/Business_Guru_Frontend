@@ -51,6 +51,13 @@ export interface Client {
   average_monthly_balance?: number;
   transaction_months?: number;
   new_business_account?: string;
+  
+  // New bank account details (when new_current_account is 'yes')
+  new_bank_name?: string;
+  new_account_name?: string;
+  new_bank_account_number?: string;
+  new_ifsc_code?: string;
+  
   staff_id: string;
   staff_name: string;
   staff_email: string;

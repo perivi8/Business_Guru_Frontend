@@ -1,20 +1,22 @@
-<!-- Main Container with Gradient Background -->
-<div class="min-h-screen bg-gradient-body">
+<!-- Main Container with Modern Gradient Background -->
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
   <!-- Page Header -->
   <div class="sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl shadow-lg px-6 py-5">
+      <div class="backdrop-blur-xl bg-white/90 rounded-2xl shadow-xl border-b border-gray-200 px-6 py-5">
         <div class="flex items-center justify-between gap-4">
           <!-- Left Section: Icon + Title -->
           <div class="flex items-center gap-4 min-w-0 flex-1">
-            <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
-              <mat-icon class="text-white text-2xl">edit</mat-icon>
+            <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+              </svg>
             </div>
             <div class="min-w-0 flex flex-col justify-center">
-              <h1 class="text-xl sm:text-2xl font-bold text-white truncate leading-tight">
+              <h1 class="text-xl sm:text-2xl font-bold text-gray-800 truncate leading-tight">
                 Edit Client
               </h1>
-              <p class="text-indigo-100 text-xs sm:text-sm truncate leading-tight mt-0.5">
+              <p class="text-gray-600 text-xs sm:text-sm truncate leading-tight mt-0.5">
                 Update client information and details
               </p>
             </div>
@@ -23,14 +25,18 @@
           <!-- Right Section: Action Buttons -->
           <div class="flex items-center gap-2 flex-shrink-0">
             <button (click)="cancel()" 
-                    class="flex items-center gap-2 px-4 py-2 bg-white/10 text-white text-sm font-medium rounded-lg hover:bg-white/20 transition-all duration-200 border border-white/30">
-              <mat-icon class="text-base">cancel</mat-icon>
+                    class="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-300 transition-all duration-200">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
               <span class="hidden sm:inline">Cancel</span>
             </button>
             <button (click)="saveClient()" [disabled]="saving"
-                    class="flex items-center gap-2 px-4 py-2 bg-white text-indigo-600 text-sm font-medium rounded-lg hover:bg-indigo-50 transition-all duration-200 shadow-md disabled:opacity-50">
-              <mat-spinner *ngIf="saving" diameter="16"></mat-spinner>
-              <mat-icon *ngIf="!saving" class="text-base">save</mat-icon>
+                    class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-md disabled:opacity-50">
+              <div *ngIf="saving" class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+              <svg *ngIf="!saving" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+              </svg>
               {{ saving ? 'Saving...' : 'Save Changes' }}
             </button>
           </div>
@@ -41,23 +47,25 @@
 
   <!-- Loading State -->
   <div *ngIf="loading" class="flex flex-col items-center justify-center min-h-[60vh]">
-    <mat-spinner diameter="50" class="mb-4"></mat-spinner>
-    <p class="text-text-secondary text-lg">Loading client details...</p>
+    <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent mb-4"></div>
+    <p class="text-gray-600 text-lg">Loading client details...</p>
   </div>
 
   <!-- Form Container -->
   <div *ngIf="!loading && client && clientForm" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
     <form [formGroup]="clientForm" class="space-y-6">
       <!-- Personal Information Section -->
-      <div class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
-        <div class="p-6 border-b border-border-light">
+      <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+        <div class="p-6 border-b border-gray-200">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-              <mat-icon class="text-purple-600 text-lg">person</mat-icon>
+              <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+              </svg>
             </div>
             <div>
-              <h3 class="text-lg font-semibold text-text-primary">Personal Information</h3>
-              <p class="text-sm text-text-secondary">Basic business and contact details</p>
+              <h3 class="text-lg font-semibold text-gray-800">Personal Information</h3>
+              <p class="text-sm text-gray-600">Basic business and contact details</p>
             </div>
           </div>
         </div>
@@ -157,15 +165,15 @@
       </div>
 
       <!-- GST Details Section -->
-      <div class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
-        <div class="p-6 border-b border-border-light">
+      <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+        <div class="p-6 border-b border-gray-200">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
               <mat-icon class="text-green-600 text-lg">receipt</mat-icon>
             </div>
             <div>
-              <h3 class="text-lg font-semibold text-text-primary">GST Details</h3>
-              <p class="text-sm text-text-secondary">GST registration and tax information</p>
+              <h3 class="text-lg font-semibold text-gray-800">GST Details</h3>
+              <p class="text-sm text-gray-600">GST registration and tax information</p>
             </div>
           </div>
         </div>
@@ -274,7 +282,7 @@
           <!-- Document Uploads -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
             <div class="space-y-3">
-              <label class="text-sm font-medium text-text-primary">GST Document</label>
+              <label class="text-sm font-medium text-gray-800">GST Document</label>
               <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors"
                    [ngClass]="{'border-green-500 bg-green-50': documents['gst_document']}">
                 <input type="file" (change)="onFileSelected($event, 'gst_document')" accept=".pdf,.jpg,.jpeg,.png" 
@@ -302,7 +310,7 @@
             </div>
             
             <div class="space-y-3">
-              <label class="text-sm font-medium text-text-primary">MSME/Udyam Document</label>
+              <label class="text-sm font-medium text-gray-800">MSME/Udyam Document</label>
               <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors"
                    [ngClass]="{'border-green-500 bg-green-50': documents['msme_document']}">
                 <input type="file" (change)="onFileSelected($event, 'msme_document')" accept=".pdf,.jpg,.jpeg,.png" 
@@ -333,15 +341,15 @@
       </div>
 
       <!-- Address Information Section -->
-      <div class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
-        <div class="p-6 border-b border-border-light">
+      <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+        <div class="p-6 border-b border-gray-200">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
               <mat-icon class="text-orange-600 text-lg">location_on</mat-icon>
             </div>
             <div>
-              <h3 class="text-lg font-semibold text-text-primary">Address Information</h3>
-              <p class="text-sm text-text-secondary">Business location and contact address</p>
+              <h3 class="text-lg font-semibold text-gray-800">Address Information</h3>
+              <p class="text-sm text-gray-600">Business location and contact address</p>
             </div>
           </div>
         </div>
@@ -395,15 +403,15 @@
       </div>
 
       <!-- Business Information Section -->
-      <div class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
-        <div class="p-6 border-b border-border-light">
+      <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+        <div class="p-6 border-b border-gray-200">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
               <mat-icon class="text-blue-600 text-lg">business</mat-icon>
             </div>
             <div>
-              <h3 class="text-lg font-semibold text-text-primary">Business Information</h3>
-              <p class="text-sm text-text-secondary">Company structure and registration details</p>
+              <h3 class="text-lg font-semibold text-gray-800">Business Information</h3>
+              <p class="text-sm text-gray-600">Company structure and registration details</p>
             </div>
           </div>
         </div>
@@ -515,12 +523,12 @@
           <!-- Business Document Upload Section -->
           <div class="mt-6 pt-6 border-t border-gray-200">
             <div class="mb-4">
-              <h4 class="text-base font-semibold text-text-primary mb-2">Business Document</h4>
-              <p class="text-sm text-text-secondary">Upload business registration certificate, incorporation certificate, or other business documents</p>
+              <h4 class="text-base font-semibold text-gray-800 mb-2">Business Document</h4>
+              <p class="text-sm text-gray-600">Upload business registration certificate, incorporation certificate, or other business documents</p>
             </div>
             
             <div class="space-y-3">
-              <label class="text-sm font-medium text-text-primary">Business Document</label>
+              <label class="text-sm font-medium text-gray-800">Business Document</label>
               <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors"
                    [ngClass]="{'border-green-500 bg-green-50': documents['business_document']}">
                 <input type="file" (change)="onFileSelected($event, 'business_document')" accept=".pdf,.jpg,.jpeg,.png" 
@@ -552,15 +560,15 @@
 
       <!-- Business PAN Details Section -->
       <div *ngIf="(clientForm.get('constitution_type')?.value === 'Proprietorship' || clientForm.get('constitution_type')?.value === 'Partnership' || clientForm.get('constitution_type')?.value === 'Private Limited') && (clientForm.get('has_business_pan')?.value === 'yes' || hasExistingDocument('business_pan_document'))" 
-           class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
-        <div class="p-6 border-b border-border-light">
+           class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+        <div class="p-6 border-b border-gray-200">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
               <mat-icon class="text-indigo-600 text-lg">credit_card</mat-icon>
             </div>
             <div>
-              <h3 class="text-lg font-semibold text-text-primary">Business PAN Details</h3>
-              <p class="text-sm text-text-secondary">Business PAN card information and documentation</p>
+              <h3 class="text-lg font-semibold text-gray-800">Business PAN Details</h3>
+              <p class="text-sm text-gray-600">Business PAN card information and documentation</p>
             </div>
           </div>
         </div>
@@ -585,7 +593,7 @@
           </div>
 
           <div class="space-y-3">
-            <label class="text-sm font-medium text-text-primary">Business PAN Document</label>
+            <label class="text-sm font-medium text-gray-800">Business PAN Document</label>
             <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors"
                  [ngClass]="{'border-green-500 bg-green-50': documents['business_pan_document']}">
               <input type="file" (change)="onFileSelected($event, 'business_pan_document')" accept=".pdf,.jpg,.jpeg,.png" 
@@ -616,15 +624,15 @@
 
       <!-- Owner Details Section -->
       <div *ngIf="clientForm.get('constitution_type')?.value === 'Private Limited' || (clientForm.get('constitution_type')?.value === 'Proprietorship' && (clientForm.get('has_business_pan')?.value === 'yes' || hasExistingDocument('owner_aadhar') || hasExistingDocument('owner_pan')))"
-           class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
-        <div class="p-6 border-b border-border-light">
+           class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+        <div class="p-6 border-b border-gray-200">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center">
               <mat-icon class="text-teal-600 text-lg">person_outline</mat-icon>
             </div>
             <div>
-              <h3 class="text-lg font-semibold text-text-primary">Owner Details</h3>
-              <p class="text-sm text-text-secondary">Owner information and documentation</p>
+              <h3 class="text-lg font-semibold text-gray-800">Owner Details</h3>
+              <p class="text-sm text-gray-600">Owner information and documentation</p>
             </div>
           </div>
         </div>
@@ -650,7 +658,7 @@
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="space-y-3">
-              <label class="text-sm font-medium text-text-primary">Owner Aadhar Card</label>
+              <label class="text-sm font-medium text-gray-800">Owner Aadhar Card</label>
               <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors"
                    [ngClass]="{'border-green-500 bg-green-50': documents['owner_aadhar']}">
                 <input type="file" (change)="onFileSelected($event, 'owner_aadhar')" accept=".pdf,.jpg,.jpeg,.png" 
@@ -678,7 +686,7 @@
             </div>
 
             <div class="space-y-3">
-              <label class="text-sm font-medium text-text-primary">Owner PAN Card</label>
+              <label class="text-sm font-medium text-gray-800">Owner PAN Card</label>
               <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors"
                    [ngClass]="{'border-green-500 bg-green-50': documents['owner_pan']}">
                 <input type="file" (change)="onFileSelected($event, 'owner_pan')" accept=".pdf,.jpg,.jpeg,.png" 
@@ -709,15 +717,15 @@
       </div>
 
       <!-- Partnership Details Section -->
-      <div *ngIf="clientForm.get('constitution_type')?.value === 'Partnership'" class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
-        <div class="p-6 border-b border-border-light">
+      <div *ngIf="clientForm.get('constitution_type')?.value === 'Partnership'" class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+        <div class="p-6 border-b border-gray-200">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
               <mat-icon class="text-amber-600 text-lg">group</mat-icon>
             </div>
             <div>
-              <h3 class="text-lg font-semibold text-text-primary">Partnership Details</h3>
-              <p class="text-sm text-text-secondary">Partner information and documentation</p>
+              <h3 class="text-lg font-semibold text-gray-800">Partnership Details</h3>
+              <p class="text-sm text-gray-600">Partner information and documentation</p>
             </div>
           </div>
         </div>
@@ -737,7 +745,7 @@
 
           <div class="space-y-8">
             <div *ngFor="let i of getPartnerArray(); let idx = index" class="p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <h4 class="text-base font-semibold text-text-primary mb-4">{{ idx === 0 ? 'Managing Partner' : 'Partner ' + (idx + 1) }}</h4>
+              <h4 class="text-base font-semibold text-gray-800 mb-4">{{ idx === 0 ? 'Managing Partner' : 'Partner ' + (idx + 1) }}</h4>
               
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <!-- Partner Name -->
@@ -760,7 +768,7 @@
 
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="space-y-3">
-                  <label class="text-sm font-medium text-text-primary">Partner Aadhar Card</label>
+                  <label class="text-sm font-medium text-gray-800">Partner Aadhar Card</label>
                   <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors"
                        [ngClass]="{'border-green-500 bg-green-50': documents['partner_aadhar_' + idx]}">
                     <input type="file" (change)="onFileSelected($event, 'partner_aadhar_' + idx)" accept=".pdf,.jpg,.jpeg,.png" 
@@ -788,7 +796,7 @@
                 </div>
 
                 <div class="space-y-3">
-                  <label class="text-sm font-medium text-text-primary">Partner PAN Card</label>
+                  <label class="text-sm font-medium text-gray-800">Partner PAN Card</label>
                   <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors"
                        [ngClass]="{'border-green-500 bg-green-50': documents['partner_pan_' + idx]}">
                     <input type="file" (change)="onFileSelected($event, 'partner_pan_' + idx)" accept=".pdf,.jpg,.jpeg,.png" 
@@ -821,15 +829,15 @@
       </div>
 
       <!-- Financial Information Section -->
-      <div class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
-        <div class="p-6 border-b border-border-light">
+      <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+        <div class="p-6 border-b border-gray-200">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
               <mat-icon class="text-emerald-600 text-lg">account_balance</mat-icon>
             </div>
             <div>
-              <h3 class="text-lg font-semibold text-text-primary">Financial Information</h3>
-              <p class="text-sm text-text-secondary">Banking details and financial requirements</p>
+              <h3 class="text-lg font-semibold text-gray-800">Financial Information</h3>
+              <p class="text-sm text-gray-600">Banking details and financial requirements</p>
             </div>
           </div>
         </div>
@@ -899,15 +907,15 @@
       </div>
 
       <!-- Bank Information Section -->
-      <div class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
-        <div class="p-6 border-b border-border-light">
+      <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+        <div class="p-6 border-b border-gray-200">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-cyan-100 rounded-lg flex items-center justify-center">
               <mat-icon class="text-cyan-600 text-lg">account_balance_wallet</mat-icon>
             </div>
             <div>
-              <h3 class="text-lg font-semibold text-text-primary">Bank Information</h3>
-              <p class="text-sm text-text-secondary">Current banking details and account information</p>
+              <h3 class="text-lg font-semibold text-gray-800">Bank Information</h3>
+              <p class="text-sm text-gray-600">Current banking details and account information</p>
             </div>
           </div>
         </div>
@@ -1050,7 +1058,7 @@
 
           <!-- New Bank Details Section (Show when New Current Account is Yes) -->
           <div *ngIf="clientForm.get('new_current_account')?.value === 'yes'" class="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <h4 class="text-base font-semibold text-text-primary mb-4">New Bank Account Details</h4>
+            <h4 class="text-base font-semibold text-gray-800 mb-4">New Bank Account Details</h4>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
               <!-- New Bank Name -->
@@ -1105,13 +1113,30 @@
             </div>
           </div>
 
+          <!-- Number of Months Transaction Shared -->
+          <div class="mt-6">
+            <div class="w-full md:w-1/2">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Number of Months Transaction Shared</label>
+              <input type="number" 
+                     formControlName="transaction_months" 
+                     min="1"
+                     placeholder="Enter number of months"
+                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 hover:border-gray-400 transition-colors shadow-sm"
+                     [class.border-red-500]="clientForm.get('transaction_months')?.hasError('min') && clientForm.get('transaction_months')?.touched"
+                     [class.focus:ring-red-500]="clientForm.get('transaction_months')?.hasError('min') && clientForm.get('transaction_months')?.touched">
+              <div *ngIf="clientForm.get('transaction_months')?.hasError('min') && clientForm.get('transaction_months')?.touched" class="mt-1 text-sm text-red-600">
+                Must be at least 1 month
+              </div>
+            </div>
+          </div>
+
           <!-- Bank Statements Section -->
           <div class="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
             <div class="flex items-center gap-3 mb-4">
               <mat-icon class="text-blue-600">description</mat-icon>
               <div>
-                <h4 class="text-base font-semibold text-text-primary">Bank Statements</h4>
-                <p class="text-sm text-text-secondary">Upload your recent bank statements for verification</p>
+                <h4 class="text-base font-semibold text-gray-800">Bank Statements</h4>
+                <p class="text-sm text-gray-600">Upload your recent bank statements for verification</p>
               </div>
             </div>
             
@@ -1119,17 +1144,17 @@
             <div *ngIf="getExistingBankStatements().length > 0" class="mb-6">
               <div class="flex items-center gap-2 mb-3">
                 <mat-icon class="text-green-600">folder</mat-icon>
-                <h5 class="text-sm font-semibold text-text-primary">Existing Bank Statements</h5>
+                <h5 class="text-sm font-semibold text-gray-800">Existing Bank Statements</h5>
               </div>
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div *ngFor="let statement of getExistingBankStatements(); let i = index" class="bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
                   <div class="flex items-start gap-3">
                     <mat-icon class="text-blue-600 mt-1">insert_drive_file</mat-icon>
                     <div class="flex-1 min-w-0">
-                      <span class="text-sm font-medium text-text-primary block">Bank Statement {{ i + 1 }}</span>
+                      <span class="text-sm font-medium text-gray-800 block">Bank Statement {{ i + 1 }}</span>
                       <div class="space-y-1">
                         <small *ngIf="statement.file_name" class="text-xs text-text-muted block truncate">{{ statement.file_name }}</small>
-                        <small *ngIf="statement.file_size" class="text-xs text-text-secondary block">{{ formatFileSize(statement.file_size) }}</small>
+                        <small *ngIf="statement.file_size" class="text-xs text-gray-600 block">{{ formatFileSize(statement.file_size) }}</small>
                       </div>
                     </div>
                     <button class="w-8 h-8 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-colors" matTooltip="Download">
@@ -1144,7 +1169,7 @@
             <div>
               <div class="flex items-center gap-2 mb-3">
                 <mat-icon class="text-purple-600">cloud_upload</mat-icon>
-                <h5 class="text-sm font-semibold text-text-primary">{{ getExistingBankStatements().length > 0 ? 'Update Bank Statements' : 'Upload Bank Statements' }}</h5>
+                <h5 class="text-sm font-semibold text-gray-800">{{ getExistingBankStatements().length > 0 ? 'Update Bank Statements' : 'Upload Bank Statements' }}</h5>
               </div>
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
                 <div *ngFor="let i of [].constructor(bankStatementsCount); let idx = index" class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors"
@@ -1153,13 +1178,13 @@
                   <label [for]="'bank_statement_' + idx" class="cursor-pointer">
                     <div *ngIf="!documents['bank_statement_' + idx]">
                       <mat-icon class="text-3xl mb-2 text-gray-400">cloud_upload</mat-icon>
-                      <span class="block text-sm font-medium text-text-primary">Bank Statement {{ idx + 1 }}</span>
-                      <small class="text-xs text-text-secondary">Click to upload PDF, JPG, PNG</small>
+                      <span class="block text-sm font-medium text-gray-800">Bank Statement {{ idx + 1 }}</span>
+                      <small class="text-xs text-gray-600">Click to upload PDF, JPG, PNG</small>
                     </div>
                     <div *ngIf="documents['bank_statement_' + idx]" class="space-y-2">
                       <mat-icon class="text-3xl text-green-600">check_circle</mat-icon>
                       <div class="flex items-center justify-between">
-                        <span class="text-sm font-medium text-text-primary truncate">{{ documents['bank_statement_' + idx].name }}</span>
+                        <span class="text-sm font-medium text-gray-800 truncate">{{ documents['bank_statement_' + idx].name }}</span>
                         <button type="button" (click)="removeDocument('bank_statement_' + idx)" class="text-red-600 hover:text-red-800 ml-2" matTooltip="Remove file">
                           <mat-icon class="text-sm">close</mat-icon>
                         </button>
@@ -1185,106 +1210,64 @@
             </div>
           </div>
 
-          <!-- Signature Upload -->
-          <div class="mt-6">
-            <div class="space-y-3">
-              <label class="text-sm font-medium text-text-primary">Signature Upload</label>
-              <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors"
-                   [ngClass]="{'border-green-500 bg-green-50': documents['signature']}">
-                <input type="file" id="signature" (change)="onFileSelected($event, 'signature')" accept=".jpg,.jpeg,.png" class="hidden">
-                <label for="signature" class="cursor-pointer">
-                  <mat-icon class="text-3xl mb-2" [ngClass]="{'text-green-600': documents['signature'], 'text-gray-400': !documents['signature']}">{{ documents['signature'] ? 'check_circle' : 'upload_file' }}</mat-icon>
-                  <p class="text-sm" *ngIf="!documents['signature']">Upload Signature (JPG, PNG)</p>
-                  <div *ngIf="documents['signature']" class="flex items-center justify-between">
-                    <span class="text-sm font-medium">{{ documents['signature'].name }}</span>
-                    <button type="button" (click)="removeDocument('signature')" class="text-red-600 hover:text-red-800" matTooltip="Remove">
-                      <mat-icon>delete</mat-icon>
-                    </button>
-                  </div>
-                </label>
-              </div>
+        </div>
+      </div>
+
+      <!-- Upload Signature Section -->
+      <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+        <div class="p-6 border-b border-gray-200">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-gray-800">Upload Signature</h3>
+              <p class="text-sm text-gray-600">Upload authorized signature for verification</p>
             </div>
           </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-            <!-- Number of Months Transaction Shared -->
-            <div class="w-full">
-              <label class="block text-sm font-medium text-gray-700 mb-2">Number of Months Transaction Shared</label>
-              <input type="number" 
-                     formControlName="transaction_months" 
-                     min="1"
-                     placeholder="Enter number of months"
-                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 hover:border-gray-400 transition-colors shadow-sm"
-                     [class.border-red-500]="clientForm.get('transaction_months')?.hasError('min') && clientForm.get('transaction_months')?.touched"
-                     [class.focus:ring-red-500]="clientForm.get('transaction_months')?.hasError('min') && clientForm.get('transaction_months')?.touched">
-              <div *ngIf="clientForm.get('transaction_months')?.hasError('min') && clientForm.get('transaction_months')?.touched" class="mt-1 text-sm text-red-600">
-                Must be at least 1 month
-              </div>
-            </div>
-
-            <!-- New Business Account -->
-            <div class="w-full">
-              <label class="block text-sm font-medium text-gray-700 mb-2">New Business Account</label>
-              <div class="relative">
-                <button type="button"
-                        (click)="toggleNewBusinessAccountDropdown()"
-                        class="w-full bg-white border border-gray-300 rounded-lg px-3 py-3 text-left text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 hover:border-gray-400 transition-colors shadow-sm"
-                        [class.border-cyan-500]="isNewBusinessAccountDropdownOpen"
-                        [class.ring-2]="isNewBusinessAccountDropdownOpen"
-                        [class.ring-cyan-500]="isNewBusinessAccountDropdownOpen">
-                  <span class="block truncate text-gray-700">
-                    {{ getNewBusinessAccountLabel(clientForm.get('new_business_account')?.value) }}
-                  </span>
-                  <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                    <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
-                         [class.rotate-180]="isNewBusinessAccountDropdownOpen"
-                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                  </span>
-                </button>
-                
-                <!-- Dropdown Options -->
-                <div *ngIf="isNewBusinessAccountDropdownOpen"
-                     class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                  <button type="button"
-                          (click)="selectNewBusinessAccount('')"
-                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
-                          [class.bg-cyan-50]="clientForm.get('new_business_account')?.value === ''"
-                          [class.text-cyan-600]="clientForm.get('new_business_account')?.value === ''">
-                    Select
-                  </button>
-                  <button type="button"
-                          (click)="selectNewBusinessAccount('yes')"
-                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
-                          [class.bg-cyan-50]="clientForm.get('new_business_account')?.value === 'yes'"
-                          [class.text-cyan-600]="clientForm.get('new_business_account')?.value === 'yes'">
-                    Yes
-                  </button>
-                  <button type="button"
-                          (click)="selectNewBusinessAccount('no')"
-                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
-                          [class.bg-cyan-50]="clientForm.get('new_business_account')?.value === 'no'"
-                          [class.text-cyan-600]="clientForm.get('new_business_account')?.value === 'no'">
-                    No
+        </div>
+        <div class="p-6">
+          <div class="space-y-3">
+            <label class="text-sm font-medium text-gray-800">Signature Upload</label>
+            <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors"
+                 [ngClass]="{'border-green-500 bg-green-50': documents['signature']}">
+              <input type="file" id="signature" (change)="onFileSelected($event, 'signature')" accept=".jpg,.jpeg,.png" class="hidden">
+              <label for="signature" class="cursor-pointer">
+                <mat-icon class="text-3xl mb-2" [ngClass]="{'text-green-600': documents['signature'], 'text-gray-400': !documents['signature']}">{{ documents['signature'] ? 'check_circle' : 'upload_file' }}</mat-icon>
+                <p class="text-sm" *ngIf="!documents['signature']">Upload Signature (JPG, PNG)</p>
+                <div *ngIf="documents['signature']" class="flex items-center justify-between">
+                  <span class="text-sm font-medium">{{ documents['signature'].name }}</span>
+                  <button type="button" (click)="removeDocument('signature')" class="text-red-600 hover:text-red-800" matTooltip="Remove">
+                    <mat-icon>delete</mat-icon>
                   </button>
                 </div>
-              </div>
+              </label>
+            </div>
+            <div *ngIf="existingDocuments['signature']" class="flex items-center justify-between p-2 bg-blue-50 rounded">
+              <small class="text-blue-800">
+                {{ existingDocuments['signature'].file_name }} 
+                ({{ formatFileSize(existingDocuments['signature'].file_size) }})
+              </small>
+              <button (click)="downloadDocument('signature')" class="text-blue-600 hover:text-blue-800">
+                <mat-icon>download</mat-icon>
+              </button>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Payment Gateway Section -->
-      <div class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
-        <div class="p-6 border-b border-border-light">
+      <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+        <div class="p-6 border-b border-gray-200">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-rose-100 rounded-lg flex items-center justify-center">
               <mat-icon class="text-rose-600 text-lg">payment</mat-icon>
             </div>
             <div>
-              <h3 class="text-lg font-semibold text-text-primary">Payment Gateway Configuration</h3>
-              <p class="text-sm text-text-secondary">Select available payment methods for your business</p>
+              <h3 class="text-lg font-semibold text-gray-800">Payment Gateway Configuration</h3>
+              <p class="text-sm text-gray-600">Select available payment methods for your business</p>
             </div>
           </div>
         </div>
@@ -1293,9 +1276,9 @@
             <div class="space-y-4">
               <div class="flex items-center gap-3">
                 <mat-icon class="text-primary">tune</mat-icon>
-                <h4 class="text-base font-semibold text-text-primary">Available Payment Gateways</h4>
+                <h4 class="text-base font-semibold text-gray-800">Available Payment Gateways</h4>
               </div>
-              <p class="text-sm text-text-secondary">Choose one or more payment gateways that your business will support:</p>
+              <p class="text-sm text-gray-600">Choose one or more payment gateways that your business will support:</p>
               
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div *ngFor="let gateway of availableGateways" class="relative">
@@ -1309,7 +1292,7 @@
                            [style.background-color]="getGatewayColor(gateway) + '20'">
                         <mat-icon class="text-lg" [style.color]="getGatewayColor(gateway)">{{ getGatewayIcon(gateway) }}</mat-icon>
                       </div>
-                      <span class="text-sm font-medium text-text-primary">{{ gateway }}</span>
+                      <span class="text-sm font-medium text-gray-800">{{ gateway }}</span>
                     </div>
                   </mat-checkbox>
                 </div>
@@ -1320,7 +1303,7 @@
               <div *ngIf="getSelectedGateways().length > 0" class="space-y-4">
                 <div class="flex items-center gap-3">
                   <mat-icon class="text-green-600">check_circle</mat-icon>
-                  <h5 class="text-base font-semibold text-text-primary">Selected Payment Gateways ({{ getSelectedGateways().length }})</h5>
+                  <h5 class="text-base font-semibold text-gray-800">Selected Payment Gateways ({{ getSelectedGateways().length }})</h5>
                 </div>
                 <div class="flex flex-wrap gap-3">
                   <div *ngFor="let gateway of getSelectedGateways()" 
@@ -1342,7 +1325,7 @@
                   <mat-icon class="text-gray-400 text-2xl">info</mat-icon>
                 </div>
                 <p class="text-text-muted font-medium">No payment gateways selected yet</p>
-                <p class="text-sm text-text-secondary mt-1">Please select at least one payment gateway above</p>
+                <p class="text-sm text-gray-600 mt-1">Please select at least one payment gateway above</p>
               </div>
             </div>
           </div>

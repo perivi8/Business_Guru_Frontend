@@ -1159,52 +1159,6 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     return '';
   }
 
-
-  getRowColorClass(enquiry: Enquiry): string {
-    // Check for GST Cancelled first
-    if (enquiry.gst === 'Yes' && enquiry.gst_status === 'Cancel') {
-      return 'row-light-red';
-    }
-    
-    // Check for GST Cancelled comment
-    if (enquiry.comments === 'GST Cancelled') {
-      return 'row-light-red';
-    }
-    
-    switch (enquiry.comments) {
-      case 'Will share Doc':
-        return 'row-light-blue';
-      
-      case 'Doc Shared(Yet to Verify)':
-        return 'row-light-yellow';
-      
-      case 'Verified(Shortlisted)':
-        return 'row-light-green';
-      
-      case 'Not Eligible':
-      case 'No MSME':
-      case 'No GST':
-      case 'Personal Loan':
-      case 'Start Up':
-      case 'Asking Less than 5 Laks':
-      case '3rd call completed':
-      case 'By Mistake':
-        return 'row-light-red';
-      
-      case 'Aadhar/PAN name mismatch':
-      case 'MSME/GST Address Different':
-        return 'row-light-orange';
-      
-      case 'Will call back':
-      case '1st call completed':
-      case '2nd call completed':
-      case 'Switch off':
-      case 'Not connected':
-      default:
-        return ''; // No color
-    }
-  }
-
   viewMode: 'table' | 'card' = 'table';
 
   checkMobileView(): void {
@@ -1321,6 +1275,54 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Get row color class based on comment status and GST status
+  getRowColorClass(enquiry: any): string {
+    // First check for GST Cancelled status
+    if (enquiry.gst === 'Yes' && enquiry.gst_status === 'Cancel') {
+      return 'bg-red-50 hover:bg-red-100 border-l-4 border-l-red-500';
+    }
+
+    const comment = enquiry.comments;
+    
+    if (this.interestComments.includes(comment)) {
+      return 'bg-green-50 hover:bg-green-100 border-l-4 border-l-green-500';
+    } else if (this.notInterestedComments.includes(comment) || 
+               this.noGstComments.includes(comment) || 
+               this.gstCancelledComments.includes(comment)) {
+      return 'bg-red-50 hover:bg-red-100 border-l-4 border-l-red-500';
+    } else if (this.pendingComments.includes(comment)) {
+      return 'bg-orange-50 hover:bg-orange-100 border-l-4 border-l-orange-500';
+    } else if (this.unknownComments.includes(comment)) {
+      return 'bg-gray-50 hover:bg-gray-100 border-l-4 border-l-gray-400';
+    } else {
+      return 'bg-white hover:bg-gray-50 border-l-4 border-l-gray-300';
+    }
+  }
+
+  // Get card color class based on comment status and GST status
+  getCardColorClass(enquiry: any): string {
+    // First check for GST Cancelled status
+    if (enquiry.gst === 'Yes' && enquiry.gst_status === 'Cancel') {
+      return 'bg-red-50/60 border-red-500 hover:bg-red-100/70';
+    }
+
+    const comment = enquiry.comments;
+    
+    if (this.interestComments.includes(comment)) {
+      return 'bg-green-50/60 border-green-500 hover:bg-green-100/70';
+    } else if (this.notInterestedComments.includes(comment) || 
+               this.noGstComments.includes(comment) || 
+               this.gstCancelledComments.includes(comment)) {
+      return 'bg-red-50/60 border-red-500 hover:bg-red-100/70';
+    } else if (this.pendingComments.includes(comment)) {
+      return 'bg-orange-50/60 border-orange-500 hover:bg-orange-100/70';
+    } else if (this.unknownComments.includes(comment)) {
+      return 'bg-gray-50/60 border-gray-400 hover:bg-gray-100/70';
+    } else {
+      return 'bg-white border-gray-300 hover:bg-gray-50';
+    }
+  }
+
   showAddForm(): void {
     this.showRegistrationForm = true;
     this.registrationForm.reset();
@@ -1423,10 +1425,33 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   }
 
   hideAddForm(): void {
+    // Check if form has unsaved changes
+    this.checkFormChanges();
+    
+    // If in edit mode and there are unsaved changes, ask for confirmation
+    if (this.isEditMode && this.hasFormChanges) {
+      const confirmClose = confirm('You have unsaved changes. Are you sure you want to close without saving?');
+      if (!confirmClose) {
+        return; // Don't close if user cancels
+      }
+    }
+    
+    // Close the form
     this.showRegistrationForm = false;
     this.registrationForm.reset();
     this.isEditMode = false;
     this.editingEnquiryId = null;
+    this.hasFormChanges = false;
+    this.originalFormValues = null;
+  }
+
+  // Handle clicks on modal backdrop - only close modal if clicking outside modal content
+  onModalBackdropClick(event: Event): void {
+    const target = event.target as HTMLElement;
+    // Check if click is directly on the backdrop (not on modal content or its children)
+    if (!target.closest('.modal-content')) {
+      this.hideAddForm();
+    }
   }
 
   // Close duplicate message and open new enquiry form
@@ -2390,8 +2415,13 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event): void {
     const target = event.target as HTMLElement;
-    // Check if the click is outside any dropdown
-    if (!target.closest('.relative')) {
+    
+    // Check if the click is inside a dropdown menu (the actual dropdown options)
+    // Dropdown toggle buttons have stopPropagation, so clicks on them won't reach here
+    const clickedInsideDropdownMenu = target.closest('.absolute.z-\\[9999\\]');
+    
+    // If click is outside dropdown menu, close all dropdowns
+    if (!clickedInsideDropdownMenu) {
       this.closeDropdown();
       // Close filter dropdowns
       this.isStaffDropdownOpen = false;

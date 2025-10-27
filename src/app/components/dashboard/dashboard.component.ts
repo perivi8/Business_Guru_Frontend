@@ -1,11 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService, User } from '../../services/auth.service';
 import { ClientService, Client } from '../../services/client.service';
 import { UserService } from '../../services/user.service';
-import { ConfirmDeleteDialogComponent } from '../confirm-delete-dialog/confirm-delete-dialog.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -31,9 +28,7 @@ export class DashboardComponent implements OnInit {
     private authService: AuthService,
     private clientService: ClientService,
     private userService: UserService,
-    private router: Router,
-    private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -64,18 +59,12 @@ export class DashboardComponent implements OnInit {
         // Handle specific error types
         if (error.status === 404) {
           console.warn('Clients endpoint returned 404 - API may be deploying or unavailable');
-          this.snackBar.open('Unable to load clients. The server may be updating. Please try again in a few moments.', 'Close', {
-            duration: 5000
-          });
+          alert('Unable to load clients. The server may be updating. Please try again in a few moments.');
         } else if (error.status === 0) {
           console.warn('Network error - server may be unreachable');
-          this.snackBar.open('Network error. Please check your connection and try again.', 'Close', {
-            duration: 5000
-          });
+          alert('Network error. Please check your connection and try again.');
         } else {
-          this.snackBar.open('Failed to load clients. Please try again later.', 'Close', {
-            duration: 3000
-          });
+          alert('Failed to load clients. Please try again later.');
         }
         
         // Set empty array to prevent undefined issues
@@ -135,25 +124,25 @@ export class DashboardComponent implements OnInit {
   // Admin utility methods
   debugAllUsers(): void {
     if (this.currentUser?.role !== 'admin') {
-      this.snackBar.open('Admin access required', 'Close', { duration: 3000 });
+      alert('Admin access required');
       return;
     }
 
     this.authService.debugAllUsers().subscribe({
       next: (response) => {
         console.log('Debug - All users in database:', response);
-        this.snackBar.open(`Found ${response.total_count} total users in database. Check console for details.`, 'Close', { duration: 5000 });
+        alert(`Found ${response.total_count} total users in database. Check console for details.`);
       },
       error: (error) => {
         console.error('Error debugging users:', error);
-        this.snackBar.open('Error debugging users', 'Close', { duration: 3000 });
+        alert('Error debugging users');
       }
     });
   }
 
   cleanupRejectedUsers(): void {
     if (this.currentUser?.role !== 'admin') {
-      this.snackBar.open('Admin access required', 'Close', { duration: 3000 });
+      alert('Admin access required');
       return;
     }
 
@@ -163,14 +152,14 @@ export class DashboardComponent implements OnInit {
       this.authService.cleanupRejectedUsers().subscribe({
         next: (response) => {
           console.log('Cleanup result:', response);
-          this.snackBar.open(`Successfully removed ${response.deleted_count} rejected users`, 'Close', { duration: 5000 });
+          alert(`Successfully removed ${response.deleted_count} rejected users`);
           
           // Reload stats to reflect changes
           this.loadUserStats();
         },
         error: (error) => {
           console.error('Error cleaning up rejected users:', error);
-          this.snackBar.open('Error cleaning up rejected users', 'Close', { duration: 3000 });
+          alert('Error cleaning up rejected users');
         }
       });
     }
@@ -216,36 +205,26 @@ export class DashboardComponent implements OnInit {
       const whatsappUrl = `https://wa.me/${mobileNumber.replace(/[^0-9]/g, '')}`;
       window.open(whatsappUrl, '_blank');
     } else {
-      this.snackBar.open('No mobile number available for this client', 'Close', {
-        duration: 3000
-      });
+      alert('No mobile number available for this client');
     }
   }
 
   deleteClient(client: Client): void {
-    const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, {
-      width: '400px',
-      data: { name: client.legal_name || client.user_name || 'this client' }
-    });
+    const clientName = client.legal_name || client.user_name || 'this client';
+    const confirmed = confirm(`Are you sure you want to delete ${clientName}? This action cannot be undone.`);
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.clientService.deleteClient(client._id).subscribe({
-          next: () => {
-            this.clients = this.clients.filter(c => c._id !== client._id);
-            this.calculateStats();
-            this.snackBar.open('Client deleted successfully', 'Close', {
-              duration: 3000
-            });
-          },
-          error: (error) => {
-            this.snackBar.open('Failed to delete client', 'Close', {
-              duration: 3000
-            });
-          }
-        });
-      }
-    });
+    if (confirmed) {
+      this.clientService.deleteClient(client._id).subscribe({
+        next: () => {
+          this.clients = this.clients.filter(c => c._id !== client._id);
+          this.calculateStats();
+          alert('Client deleted successfully');
+        },
+        error: (error) => {
+          alert('Failed to delete client');
+        }
+      });
+    }
   }
 
   refreshClientData(clientId: string): void {

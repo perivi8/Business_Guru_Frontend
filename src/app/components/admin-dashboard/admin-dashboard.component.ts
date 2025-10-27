@@ -54,6 +54,13 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
     userClientCounts: [] as { username: string, count: number }[]
   };
 
+  // User Performance Filter
+  selectedUserPerformanceFilter: string = 'today';
+  userPerformanceStartDate: string = '';
+  userPerformanceEndDate: string = '';
+  isUserPerformanceDropdownOpen: boolean = false;
+  filteredUserStats: { username: string, count: number }[] = [];
+
   newClientsCount = 0;
   updatedClientsCount = 0;
   lastAdminVisit: Date | null = null;
@@ -63,8 +70,8 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
 
   // Week Selection Properties
   selectedWeekOption: string = 'current';
-  customStartDate: Date | null = null;
-  customEndDate: Date | null = null;
+  customStartDate: string = '';
+  customEndDate: string = '';
   showComparison: boolean = false;
   selectedWeekData: any[] = [];
   previousWeekData: any[] = [];
@@ -748,6 +755,9 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
     this.calculateNewClientsAndUpdates();
     this.calculateTodayStats();
     
+    // Initialize user performance filter
+    this.filterUserPerformanceData();
+    
     // Update charts after all data is ready - use proper timing
     setTimeout(() => {
       this.updateChartsWithData();
@@ -891,55 +901,97 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
 
   // Weekly Data for Report 1
   generateWeeklyData(): void {
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    console.log('=== GENERATING WEEKLY DATA ===');
+    
+    // Get the selected week range
+    const selectedRange = this.weekRanges[this.selectedWeekOption];
+    if (!selectedRange) {
+      console.warn('No selected range found, using current week');
+      const today = new Date();
+      const currentWeekStart = this.getWeekStart(today);
+      const currentWeekEnd = new Date(currentWeekStart);
+      currentWeekEnd.setDate(currentWeekStart.getDate() + 6);
+      this.generateWeeklyDataForRange(currentWeekStart, currentWeekEnd);
+      return;
+    }
+    
+    console.log('Selected range:', selectedRange);
+    this.generateWeeklyDataForRange(selectedRange.start, selectedRange.end);
+  }
+
+  generateWeeklyDataForRange(startDate: Date, endDate: Date): void {
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const today = new Date();
-    const currentWeekStart = this.getWeekStart(today);
+    today.setHours(0, 0, 0, 0);
+    
+    // Calculate number of days in range (inclusive of both start and end dates)
+    // For a week: Mon to Sun = 7 days
+    const daysDifference = Math.round((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    
+    // For standard weeks (Mon-Sun), ensure we only show 7 days
+    const daysToShow = (daysDifference === 8) ? 7 : daysDifference;
+    console.log('Generating data for', daysToShow, 'days (calculated:', daysDifference, ')');
     
     // Initialize weekly data array
     this.weeklyData = [];
     
-    // Process each day of the week
-    days.forEach((day, index) => {
-      const dayDate = new Date(currentWeekStart);
-      dayDate.setDate(currentWeekStart.getDate() + index);
+    // For exactly 7 days (normal week), ensure we show Mon-Sun with dates
+    const isNormalWeek = daysToShow === 7;
+    
+    // Process each day in the range
+    for (let i = 0; i < daysToShow; i++) {
+      const dayDate = new Date(startDate);
+      dayDate.setDate(startDate.getDate() + i);
+      dayDate.setHours(0, 0, 0, 0);
       
-      // Count clients for this day
-      const dayClients = this.clients.filter(client => {
+      // Count clients for this day from selectedWeekData
+      const dayClients = this.selectedWeekData.filter(client => {
         if (!client.created_at) return false;
         const clientDate = new Date(client.created_at);
         return this.isSameDay(clientDate, dayDate);
       });
       
+      const isHoliday = dayDate.getDay() === 0; // Sunday is holiday
+      const dayOfWeek = dayNames[dayDate.getDay()];
+      
+      // For normal week (7 days), show day names with dates (Mon 27/10)
+      // For ranges > 7 days, show date only
+      let displayLabel: string;
+      if (daysToShow === 7) {
+        // Show day name with date for normal week (Mon-Sun)
+        displayLabel = `${dayOfWeek} ${dayDate.getDate()}/${dayDate.getMonth() + 1}`;
+      } else if (daysToShow > 7) {
+        // Show date only for longer ranges
+        displayLabel = `${dayDate.getDate()}/${dayDate.getMonth() + 1}`;
+      } else {
+        // For shorter ranges, show day name only
+        displayLabel = dayOfWeek;
+      }
+      
       this.weeklyData.push({
-        day: day,
-        date: dayDate,
+        day: displayLabel,
+        fullDay: dayOfWeek,
+        date: new Date(dayDate),
         count: dayClients.length,
         isToday: this.isSameDay(dayDate, today),
         barHeight: 0, // Will be calculated based on max count
-        isHoliday: false
+        isHoliday: isHoliday
       });
-    });
-    
-    // Add Sunday as Holiday
-    const sundayDate = new Date(currentWeekStart);
-    sundayDate.setDate(currentWeekStart.getDate() + 6);
-    this.weeklyData.push({
-      day: 'Sunday',
-      date: sundayDate,
-      count: 0,
-      isToday: this.isSameDay(sundayDate, today),
-      barHeight: 0,
-      isHoliday: true
-    });
+      
+      console.log(`${displayLabel} (${dayDate.toDateString()}): ${dayClients.length} clients`);
+    }
     
     // Calculate max count for scaling
     const maxCount = Math.max(...this.weeklyData.map(day => day.count), 1);
+    console.log('Max count for scaling:', maxCount);
     
-    // Update bar heights based on max count
+    // Update bar heights based on max count with better scaling
     this.weeklyData = this.weeklyData.map(day => ({
       ...day,
-      barHeight: day.count > 0 ? Math.max((day.count / maxCount) * 100, 10) : 0
+      barHeight: day.count > 0 ? Math.max((day.count / maxCount) * 80, 20) + 10 : 0
     }));
+    
+    console.log('Generated weekly data:', this.weeklyData);
   }
 
   getWeekStart(date: Date): Date {
@@ -1851,17 +1903,37 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
 
   onWeekSelectionChange() {
     this.filterWeeklyData();
-    this.updateWeeklyChart();
+    // Chart will update automatically via weeklyData binding
   }
 
   onCustomDateChange() {
+    console.log('Custom date change:', this.customStartDate, this.customEndDate);
     if (this.customStartDate && this.customEndDate) {
+      const startDate = new Date(this.customStartDate);
+      const endDate = new Date(this.customEndDate);
+      
+      // Validate dates
+      if (startDate > endDate) {
+        alert('Start date must be before end date');
+        return;
+      }
+      
+      // Calculate date difference
+      const daysDifference = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+      
+      // Validate maximum range (31 days)
+      if (daysDifference > 31) {
+        alert('Date range cannot exceed 31 days (1 month)');
+        return;
+      }
+      
+      console.log('Setting custom range:', startDate, endDate, 'Days:', daysDifference);
       this.weekRanges['custom'] = {
-        start: this.customStartDate,
-        end: this.customEndDate
+        start: startDate,
+        end: endDate
       };
       this.filterWeeklyData();
-      this.updateWeeklyChart();
+      // Chart will update automatically via weeklyData binding
     }
   }
 
@@ -1926,6 +1998,9 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
     });
 
     console.log('Previous week clients count:', this.previousWeekData.length);
+    
+    // Regenerate weekly data after filtering
+    this.generateWeeklyData();
   }
 
   refreshWeeklyData() {
@@ -2066,6 +2141,97 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
     this.onWeekSelectionChange();
   }
 
+  // User Performance Filter Methods
+  toggleUserPerformanceDropdown(): void {
+    this.isUserPerformanceDropdownOpen = !this.isUserPerformanceDropdownOpen;
+  }
+
+  selectUserPerformanceFilter(filter: string): void {
+    this.selectedUserPerformanceFilter = filter;
+    this.isUserPerformanceDropdownOpen = false;
+    this.filterUserPerformanceData();
+  }
+
+  onUserPerformanceDateChange(): void {
+    if (this.userPerformanceStartDate && this.userPerformanceEndDate) {
+      const startDate = new Date(this.userPerformanceStartDate);
+      const endDate = new Date(this.userPerformanceEndDate);
+      
+      if (startDate > endDate) {
+        alert('Start date must be before end date');
+        return;
+      }
+      
+      this.filterUserPerformanceData();
+    }
+  }
+
+  filterUserPerformanceData(): void {
+    let startDate: Date;
+    let endDate: Date;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    switch (this.selectedUserPerformanceFilter) {
+      case 'today':
+        startDate = new Date(today);
+        endDate = new Date(today);
+        endDate.setHours(23, 59, 59, 999);
+        break;
+      case 'yesterday':
+        startDate = new Date(today);
+        startDate.setDate(today.getDate() - 1);
+        endDate = new Date(startDate);
+        endDate.setHours(23, 59, 59, 999);
+        break;
+      case 'custom':
+        if (!this.userPerformanceStartDate || !this.userPerformanceEndDate) {
+          this.filteredUserStats = [];
+          return;
+        }
+        startDate = new Date(this.userPerformanceStartDate);
+        endDate = new Date(this.userPerformanceEndDate);
+        endDate.setHours(23, 59, 59, 999);
+        break;
+      default:
+        startDate = new Date(today);
+        endDate = new Date(today);
+        endDate.setHours(23, 59, 59, 999);
+    }
+
+    // Filter clients by date range
+    const filteredClients = this.clients.filter(client => {
+      if (!client.created_at) return false;
+      const createdAt = new Date(client.created_at);
+      return createdAt >= startDate && createdAt <= endDate;
+    });
+
+    // Count clients per user
+    const userCounts = new Map<string, number>();
+    filteredClients.forEach(client => {
+      const username = client.created_by_name || client.staff_name || 'Unknown';
+      userCounts.set(username, (userCounts.get(username) || 0) + 1);
+    });
+
+    this.filteredUserStats = Array.from(userCounts.entries())
+      .map(([username, count]) => ({ username, count }))
+      .sort((a, b) => b.count - a.count);
+  }
+
+  getUserPerformanceFilterLabel(): string {
+    switch (this.selectedUserPerformanceFilter) {
+      case 'today': return 'Today';
+      case 'yesterday': return 'Yesterday';
+      case 'custom': return 'Custom Range';
+      default: return 'Select Period';
+    }
+  }
+
+  getMaxUserPerformanceCount(): number {
+    if (this.filteredUserStats.length === 0) return 1;
+    return Math.max(...this.filteredUserStats.map(u => u.count), 1);
+  }
+
   // Close dropdown when clicking outside
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event): void {
@@ -2074,5 +2240,35 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
     if (!target.closest('.relative')) {
       this.isWeekDropdownOpen = false;
     }
+  }
+
+  // Helper methods for Tailwind CSS visualizations
+  getTeamMemberColor(index: number): string {
+    const colors = [
+      '#4CAF50', // Green
+      '#2196F3', // Blue  
+      '#FF9800', // Orange
+      '#9C27B0', // Purple
+      '#F44336', // Red
+      '#00BCD4', // Cyan
+      '#795548', // Brown
+      '#607D8B'  // Blue Grey
+    ];
+    return colors[index % colors.length];
+  }
+
+  getTeamMemberPercentage(clientCount: number): number {
+    if (!this.clients || this.clients.length === 0) return 0;
+    const maxCount = Math.max(...this.getUserPerformanceStats().map(m => m.totalClients), 1);
+    return Math.min((clientCount / maxCount) * 100, 100);
+  }
+
+  // Helper method to determine chart type based on date range
+  isShortDateRange(): boolean {
+    return this.weeklyData.length <= 3;
+  }
+
+  getDateRangeDays(): number {
+    return this.weeklyData.length;
   }
 }

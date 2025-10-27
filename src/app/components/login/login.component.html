@@ -1,11 +1,23 @@
 <!-- Login Page -->
-<div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center p-4">
-  <div class="w-full max-w-md">
-    <!-- Main Card -->
-    <div class="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-200 p-8 space-y-6">
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center p-4 relative overflow-hidden">
+  <!-- Animated Background Elements -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute top-20 left-10 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
+    <div class="absolute top-40 right-10 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
+    <div class="absolute -bottom-8 left-20 w-72 h-72 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
+  </div>
+
+  <div class="w-full max-w-md relative z-10">
+    <!-- Main Card with Glassy Effect -->
+    <div class="backdrop-blur-xl bg-white/70 rounded-3xl shadow-2xl border border-white/20 p-8 space-y-6">
       <!-- Header -->
-      <div class="text-center">
-        <h2 class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+      <div class="text-center space-y-2">
+        <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+          <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+          </svg>
+        </div>
+        <h2 class="text-3xl font-bold text-gray-900">
           Welcome Back
         </h2>
         <p class="text-gray-600">Sign in to your account</p>
@@ -13,15 +25,19 @@
       
       <!-- Approval Message -->
       <div *ngIf="approvalMessage" 
-           class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
-        <mat-icon class="text-green-500">check_circle</mat-icon>
+           class="backdrop-blur-sm bg-green-50/80 border border-green-200 rounded-xl p-4 flex items-center gap-3 shadow-sm">
+        <svg class="w-6 h-6 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+        </svg>
         <span class="text-green-700 text-sm font-medium">{{ approvalMessage }}</span>
       </div>
       
       <!-- Error Message -->
       <div *ngIf="error" 
-           class="bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-lg p-4 flex items-center gap-3">
-        <mat-icon class="text-red-500">error_outline</mat-icon>
+           class="backdrop-blur-sm bg-red-50/80 border border-red-200 rounded-xl p-4 flex items-center gap-3 shadow-sm">
+        <svg class="w-6 h-6 text-red-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+        </svg>
         <span class="text-red-700 text-sm">{{ error }}</span>
       </div>
       
@@ -36,10 +52,26 @@
                    placeholder="Enter your email"
                    (input)="onEmailChange($event)"
                    class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors shadow-sm text-gray-800"
-                   [class.border-red-500]="f['email'].invalid && f['email'].touched"
-                   [class.focus:ring-red-500]="f['email'].invalid && f['email'].touched">
+                   [class.border-red-500]="(f['email'].invalid && f['email'].touched) || statusError"
+                   [class.border-green-500]="statusMessage"
+                   [class.focus:ring-red-500]="(f['email'].invalid && f['email'].touched) || statusError"
+                   [class.focus:ring-green-500]="statusMessage">
             <span class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <!-- Checking status spinner -->
+              <svg *ngIf="checkingStatus" class="animate-spin h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <!-- Approved icon (green checkmark) -->
+              <svg *ngIf="!checkingStatus && statusMessage" class="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+              </svg>
+              <!-- Rejected/Not approved icon (red X) -->
+              <svg *ngIf="!checkingStatus && statusError" class="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+              </svg>
+              <!-- Default email icon -->
+              <svg *ngIf="!checkingStatus && !statusMessage && !statusError" class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
               </svg>
             </span>
@@ -88,31 +120,6 @@
         </button>
       </form>
 
-      <!-- Automatic Registration Status Display -->
-      <div *ngIf="statusMessage || statusError" class="space-y-4">
-        <!-- Success Status Message -->
-        <div *ngIf="statusMessage" 
-             class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
-          <mat-icon class="text-green-500">check_circle</mat-icon>
-          <span class="text-green-700 text-sm font-medium">{{ statusMessage }}</span>
-        </div>
-
-        <!-- Error Status Message -->
-        <div *ngIf="statusError" 
-             class="bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-lg p-4 space-y-3">
-          <div class="flex items-center gap-3">
-            <mat-icon class="text-red-500">error</mat-icon>
-            <span class="text-red-700 text-sm font-medium">{{ statusError }}</span>
-          </div>
-          <div class="text-center">
-            <a routerLink="/register" 
-               class="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 font-medium transition-colors duration-200 hover:underline">
-              <mat-icon class="text-sm">person_add</mat-icon>
-              Click here to register again
-            </a>
-          </div>
-        </div>
-      </div>
 
       <!-- Footer Links -->
       <div class="text-center space-y-4 pt-6 border-t border-gray-200">

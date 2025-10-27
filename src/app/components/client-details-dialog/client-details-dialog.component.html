@@ -1,9 +1,9 @@
 <!-- Modern Dialog Container -->
 <div class="max-w-4xl mx-auto">
   <!-- Dialog Header -->
-  <div class="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-primary/5 to-secondary/5">
+  <div class="flex items-center justify-between p-6 border-b border-gray-200 backdrop-blur-xl bg-white/90">
     <div class="flex flex-col">
-      <h2 class="text-xl font-bold text-text-primary">Client Details</h2>
+      <h2 class="text-xl font-bold text-gray-800">Client Details</h2>
       <div *ngIf="client.enquiry_id" class="flex items-center gap-2 mt-1">
         <span class="text-sm text-gray-600">From Enquiry:</span>
         <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
@@ -20,18 +20,18 @@
     </button>
   </div>
 
-  <div class="p-6 max-h-[70vh] overflow-y-auto">
+  <div class="p-6 max-h-[70vh] overflow-y-auto bg-gradient-to-br from-gray-50 to-blue-50">
     <!-- Client Summary -->
-    <div class="bg-white rounded-xl shadow-sm border border-border-light p-6 mb-6">
+    <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 p-6 mb-6">
       <div class="flex items-start gap-4">
-        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg flex-shrink-0"
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg flex-shrink-0"
              [ngClass]="{'bg-gray-200': !client.legal_name && !client.user_name}">
           <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
           </svg>
         </div>
         <div class="flex-1 min-w-0">
-          <h3 class="text-lg font-bold text-text-primary mb-2"
+          <h3 class="text-lg font-bold text-gray-800 mb-2"
               [ngClass]="{'text-gray-400': !client.legal_name && !client.user_name}">
             {{ client.legal_name || client.user_name || 'Client Name Not Provided' }}
           </h3>
@@ -68,173 +68,173 @@
     <!-- Information Sections -->
     <div class="space-y-6">
       <!-- Personal Information -->
-      <div *ngIf="hasPersonalInfo()" class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
-        <div class="p-4 border-b border-border-light">
+      <div *ngIf="hasPersonalInfo()" class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+        <div class="p-4 border-b border-gray-200">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
               <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
               </svg>
             </div>
-            <h3 class="text-lg font-semibold text-text-primary">Personal Information</h3>
+            <h3 class="text-lg font-semibold text-gray-800">Personal Information</h3>
           </div>
         </div>
         <div class="p-4">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div *ngIf="client.legal_name" class="flex justify-between py-2 border-b border-gray-100">
-              <span class="text-sm font-medium text-text-secondary">Legal Name:</span>
-              <span class="text-sm text-text-primary">{{ client.legal_name }}</span>
+              <span class="text-sm font-medium text-gray-600">Legal Name:</span>
+              <span class="text-sm text-gray-800 font-medium">{{ client.legal_name }}</span>
             </div>
             <div *ngIf="client['optional_mobile_number']" class="flex justify-between py-2 border-b border-gray-100">
-              <span class="text-sm font-medium text-text-secondary">Optional Mobile:</span>
-              <span class="text-sm text-text-primary">{{ client['optional_mobile_number'] }}</span>
+              <span class="text-sm font-medium text-gray-600">Optional Mobile:</span>
+              <span class="text-sm text-gray-800 font-medium">{{ client['optional_mobile_number'] }}</span>
             </div>
             <div *ngIf="client.email" class="flex justify-between py-2 border-b border-gray-100">
-              <span class="text-sm font-medium text-text-secondary">Email:</span>
-              <span class="text-sm text-text-primary">{{ client.email }}</span>
+              <span class="text-sm font-medium text-gray-600">Email:</span>
+              <span class="text-sm text-gray-800 font-medium">{{ client.email }}</span>
             </div>
             <div *ngIf="client.mobile_number" class="flex justify-between py-2 border-b border-gray-100">
-              <span class="text-sm font-medium text-text-secondary">Mobile:</span>
-              <span class="text-sm text-text-primary">{{ client.mobile_number }}</span>
+              <span class="text-sm font-medium text-gray-600">Mobile:</span>
+              <span class="text-sm text-gray-800 font-medium">{{ client.mobile_number }}</span>
             </div>
             <div *ngIf="client.date_of_birth" class="flex justify-between py-2 border-b border-gray-100">
-              <span class="text-sm font-medium text-text-secondary">Date of Birth:</span>
-              <span class="text-sm text-text-primary">{{ formatDate(client.date_of_birth) }}</span>
+              <span class="text-sm font-medium text-gray-600">Date of Birth:</span>
+              <span class="text-sm text-gray-800">{{ formatDate(client.date_of_birth) }}</span>
             </div>
             <div *ngIf="client.gender" class="flex justify-between py-2 border-b border-gray-100">
-              <span class="text-sm font-medium text-text-secondary">Gender:</span>
-              <span class="text-sm text-text-primary">{{ client.gender }}</span>
+              <span class="text-sm font-medium text-gray-600">Gender:</span>
+              <span class="text-sm text-gray-800">{{ client.gender }}</span>
             </div>
             <div *ngIf="hasValue(client.address) || hasValue(client.district) || hasValue(client.state) || hasValue(client.pincode)" 
                  class="md:col-span-2 flex justify-between py-2">
-              <span class="text-sm font-medium text-text-secondary">Address:</span>
-              <span class="text-sm text-text-primary text-right max-w-xs">{{ formatAddress() }}</span>
+              <span class="text-sm font-medium text-gray-600">Address:</span>
+              <span class="text-sm text-gray-800 text-right max-w-xs">{{ formatAddress() }}</span>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Business Information -->
-      <div *ngIf="hasBusinessInfo()" class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
-        <div class="p-4 border-b border-border-light">
+      <div *ngIf="hasBusinessInfo()" class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+        <div class="p-4 border-b border-gray-200">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
               <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
               </svg>
             </div>
-            <h3 class="text-lg font-semibold text-text-primary">Business Information</h3>
+            <h3 class="text-lg font-semibold text-gray-800">Business Information</h3>
           </div>
         </div>
         <div class="p-4">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div *ngIf="client.business_name" class="flex justify-between py-2 border-b border-gray-100">
-              <span class="text-sm font-medium text-text-secondary">Business Name:</span>
-              <span class="text-sm text-text-primary">{{ client.business_name }}</span>
+              <span class="text-sm font-medium text-gray-600">Business Name:</span>
+              <span class="text-sm text-gray-800">{{ client.business_name }}</span>
             </div>
             <div *ngIf="client['legal_business_name']" class="flex justify-between py-2 border-b border-gray-100">
-              <span class="text-sm font-medium text-text-secondary">Legal Business Name:</span>
-              <span class="text-sm text-text-primary">{{ client['legal_business_name'] }}</span>
+              <span class="text-sm font-medium text-gray-600">Legal Business Name:</span>
+              <span class="text-sm text-gray-800">{{ client['legal_business_name'] }}</span>
             </div>
             <div *ngIf="client.business_type" class="flex justify-between py-2 border-b border-gray-100">
-              <span class="text-sm font-medium text-text-secondary">Business Type:</span>
-              <span class="text-sm text-text-primary">{{ client.business_type }}</span>
+              <span class="text-sm font-medium text-gray-600">Business Type:</span>
+              <span class="text-sm text-gray-800">{{ client.business_type }}</span>
             </div>
             <div *ngIf="client['constitution_type']" class="flex justify-between py-2 border-b border-gray-100">
-              <span class="text-sm font-medium text-text-secondary">Constitution Type:</span>
-              <span class="text-sm text-text-primary">{{ client['constitution_type'] }}</span>
+              <span class="text-sm font-medium text-gray-600">Constitution Type:</span>
+              <span class="text-sm text-gray-800">{{ client['constitution_type'] }}</span>
             </div>
             <div *ngIf="client['has_business_pan']" class="flex justify-between py-2 border-b border-gray-100">
-              <span class="text-sm font-medium text-text-secondary">Has Business PAN:</span>
-              <span class="text-sm text-text-primary">{{ client['has_business_pan'] }}</span>
+              <span class="text-sm font-medium text-gray-600">Has Business PAN:</span>
+              <span class="text-sm text-gray-800">{{ client['has_business_pan'] }}</span>
             </div>
             <div *ngIf="client['number_of_partners'] !== undefined" class="flex justify-between py-2 border-b border-gray-100">
-              <span class="text-sm font-medium text-text-secondary">Number of Partners:</span>
-              <span class="text-sm text-text-primary">{{ client['number_of_partners'] }}</span>
+              <span class="text-sm font-medium text-gray-600">Number of Partners:</span>
+              <span class="text-sm text-gray-800">{{ client['number_of_partners'] }}</span>
             </div>
             <div *ngIf="client['business_pan']" class="flex justify-between py-2 border-b border-gray-100">
-              <span class="text-sm font-medium text-text-secondary">Business PAN:</span>
-              <span class="text-sm text-text-primary">{{ client['business_pan'] }}</span>
+              <span class="text-sm font-medium text-gray-600">Business PAN:</span>
+              <span class="text-sm text-gray-800">{{ client['business_pan'] }}</span>
             </div>
             <div *ngIf="client['ie_code']" class="flex justify-between py-2 border-b border-gray-100">
-              <span class="text-sm font-medium text-text-secondary">IE Code:</span>
-              <span class="text-sm text-text-primary">{{ client['ie_code'] }}</span>
+              <span class="text-sm font-medium text-gray-600">IE Code:</span>
+              <span class="text-sm text-gray-800">{{ client['ie_code'] }}</span>
             </div>
             <div *ngIf="client['website']" class="flex justify-between py-2 border-b border-gray-100">
-              <span class="text-sm font-medium text-text-secondary">Website:</span>
-              <span class="text-sm text-primary hover:text-primary-dark">
+              <span class="text-sm font-medium text-gray-600">Website:</span>
+              <span class="text-sm text-blue-600 hover:text-blue-700 font-medium">
                 <a [href]="client['website']" target="_blank" rel="noopener">{{ client['website'] }}</a>
               </span>
             </div>
             <div *ngIf="client.business_address" class="md:col-span-2 flex justify-between py-2">
-              <span class="text-sm font-medium text-text-secondary">Business Address:</span>
-              <span class="text-sm text-text-primary text-right max-w-xs">{{ client.business_address }}</span>
+              <span class="text-sm font-medium text-gray-600">Business Address:</span>
+              <span class="text-sm text-gray-800 text-right max-w-xs">{{ client.business_address }}</span>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Banking Information -->
-      <div *ngIf="hasBankingInfo()" class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
-        <div class="p-4 border-b border-border-light">
+      <div *ngIf="hasBankingInfo()" class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+        <div class="p-4 border-b border-gray-200">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
               <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
             </div>
-            <h3 class="text-lg font-semibold text-text-primary">Banking Information</h3>
+            <h3 class="text-lg font-semibold text-gray-800">Banking Information</h3>
           </div>
         </div>
         <div class="p-4">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div *ngIf="client['bank_name']" class="flex justify-between py-2 border-b border-gray-100">
-              <span class="text-sm font-medium text-text-secondary">Bank Name:</span>
-              <span class="text-sm text-text-primary">{{ client['bank_name'] }}</span>
+              <span class="text-sm font-medium text-gray-600">Bank Name:</span>
+              <span class="text-sm text-gray-800">{{ client['bank_name'] }}</span>
             </div>
             <div *ngIf="client['account_number']" class="flex justify-between py-2 border-b border-gray-100">
-              <span class="text-sm font-medium text-text-secondary">Account Number:</span>
-              <span class="text-sm text-text-primary">{{ client['account_number'] }}</span>
+              <span class="text-sm font-medium text-gray-600">Account Number:</span>
+              <span class="text-sm text-gray-800">{{ client['account_number'] }}</span>
             </div>
             <div *ngIf="client['ifsc_code']" class="flex justify-between py-2 border-b border-gray-100">
-              <span class="text-sm font-medium text-text-secondary">IFSC Code:</span>
-              <span class="text-sm text-text-primary">{{ client['ifsc_code'] }}</span>
+              <span class="text-sm font-medium text-gray-600">IFSC Code:</span>
+              <span class="text-sm text-gray-800">{{ client['ifsc_code'] }}</span>
             </div>
             <div *ngIf="client['account_type'] !== undefined" class="flex justify-between py-2 border-b border-gray-100">
-              <span class="text-sm font-medium text-text-secondary">Account Type:</span>
-              <span class="text-sm text-text-primary">{{ client['account_type'] }}</span>
+              <span class="text-sm font-medium text-gray-600">Account Type:</span>
+              <span class="text-sm text-gray-800">{{ client['account_type'] }}</span>
             </div>
             <div *ngIf="client['new_current_account']" class="flex justify-between py-2">
-              <span class="text-sm font-medium text-text-secondary">New Current Account:</span>
-              <span class="text-sm text-text-primary">{{ client['new_current_account'] }}</span>
+              <span class="text-sm font-medium text-gray-600">New Current Account:</span>
+              <span class="text-sm text-gray-800">{{ client['new_current_account'] }}</span>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Loan Status Section -->
-      <div class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
-        <div class="p-4 border-b border-border-light">
+      <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+        <div class="p-4 border-b border-gray-200">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-cyan-100 rounded-lg flex items-center justify-center">
               <svg class="w-5 h-5 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
               </svg>
             </div>
-            <h3 class="text-lg font-semibold text-text-primary">Loan Status</h3>
+            <h3 class="text-lg font-semibold text-gray-800">Loan Status</h3>
           </div>
         </div>
         <div class="p-4">
           <div class="space-y-4">
             <div class="flex justify-between items-center py-2 border-b border-gray-100">
-              <span class="text-sm font-medium text-text-secondary">Current Loan Status:</span>
+              <span class="text-sm font-medium text-gray-600">Current Loan Status:</span>
               <span class="px-3 py-1 text-xs rounded-full font-medium text-white"
                     [style.background-color]="getLoanStatusColor(getLoanStatus())">
                 {{ getLoanStatus() | titlecase }}
               </span>
             </div>
             <div class="flex justify-between items-center py-2 border-b border-gray-100">
-              <span class="text-sm font-medium text-text-secondary">Update Loan Status:</span>
+              <span class="text-sm font-medium text-gray-600">Update Loan Status:</span>
               <div class="w-48">
                 <select [(ngModel)]="selectedLoanStatus" 
                         (change)="onLoanStatusChange($event)"
@@ -248,27 +248,27 @@
               </div>
             </div>
             <div *ngIf="client.required_loan_amount" class="flex justify-between py-2 border-b border-gray-100">
-              <span class="text-sm font-medium text-text-secondary">Required Loan Amount:</span>
-              <span class="text-sm text-text-primary font-semibold">₹{{ client.required_loan_amount | number }}</span>
+              <span class="text-sm font-medium text-gray-600">Required Loan Amount:</span>
+              <span class="text-sm text-gray-800 font-semibold">₹{{ client.required_loan_amount | number }}</span>
             </div>
             <div *ngIf="client.loan_purpose" class="flex justify-between py-2">
-              <span class="text-sm font-medium text-text-secondary">Loan Purpose:</span>
-              <span class="text-sm text-text-primary">{{ client.loan_purpose }}</span>
+              <span class="text-sm font-medium text-gray-600">Loan Purpose:</span>
+              <span class="text-sm text-gray-800">{{ client.loan_purpose }}</span>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Documents Section -->
-      <div *ngIf="hasDocuments()" class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
-        <div class="p-4 border-b border-border-light">
+      <div *ngIf="hasDocuments()" class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+        <div class="p-4 border-b border-gray-200">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
               <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
               </svg>
             </div>
-            <h3 class="text-lg font-semibold text-text-primary">Documents</h3>
+            <h3 class="text-lg font-semibold text-gray-800">Documents</h3>
           </div>
         </div>
         <div class="p-4">
@@ -280,7 +280,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                   </svg>
                 </div>
-                <span class="text-sm font-medium text-text-primary">{{ getDocumentName(docType) }}</span>
+                <span class="text-sm font-medium text-gray-800">{{ getDocumentName(docType) }}</span>
               </div>
               <div class="flex items-center gap-1">
                 <button (click)="previewDocument(docType)" 
@@ -313,7 +313,7 @@
       </div>
 
       <!-- No Documents Message -->
-      <div *ngIf="!hasDocuments()" class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
+      <div *ngIf="!hasDocuments()" class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
         <div class="p-8 text-center">
           <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -321,7 +321,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
           </div>
-          <p class="text-text-muted">No documents have been uploaded for this client</p>
+          <p class="text-gray-600">No documents have been uploaded for this client</p>
         </div>
       </div>
     </div>

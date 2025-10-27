@@ -1,5 +1,5 @@
-<!-- Dashboard Container with Responsive Padding -->
-<div class="min-h-screen bg-gradient-body p-4 sm:p-6 lg:p-8">
+<!-- Dashboard Container with Modern Gradient Background -->
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4 sm:p-6 lg:p-8">
   <div class="max-w-7xl mx-auto space-y-6 lg:space-y-8">
     
 
@@ -7,226 +7,194 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
       
       <!-- Total Clients Card -->
-      <div class="bg-white rounded-xl shadow-lg border border-border-light p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
-        <div class="flex items-center justify-between">
-          <div class="flex-1">
-            <div class="flex items-center gap-3 mb-3">
-              <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-                <mat-icon class="text-blue-600 text-xl">people</mat-icon>
-              </div>
-              <div>
-                <h3 class="text-2xl sm:text-3xl font-bold text-text-primary font-heading">
-                  {{ stats.totalClients }}
-                </h3>
-                <p class="text-text-secondary text-sm font-medium">Total Clients</p>
-              </div>
-            </div>
+      <div class="group relative backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl hover:bg-white/80 transition-all duration-300 hover:-translate-y-2 hover:scale-105">
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <div class="relative flex items-center gap-4">
+          <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ stats.totalClients }}</h3>
+            <p class="text-sm font-medium text-gray-600">Total Clients</p>
           </div>
         </div>
       </div>
 
       <!-- Today New Clients Card -->
-      <div class="bg-white rounded-xl shadow-lg border border-border-light p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
-        <div class="flex items-center justify-between">
-          <div class="flex-1">
-            <div class="flex items-center gap-3 mb-3">
-              <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center group-hover:bg-green-200 transition-colors">
-                <mat-icon class="text-green-600 text-xl">today</mat-icon>
-              </div>
-              <div>
-                <h3 class="text-2xl sm:text-3xl font-bold text-text-primary font-heading">
-                  {{ stats.todayNewClients }}
-                </h3>
-                <p class="text-text-secondary text-sm font-medium">Today New</p>
-              </div>
-            </div>
+      <div class="group relative backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl hover:bg-white/80 transition-all duration-300 hover:-translate-y-2 hover:scale-105">
+        <div class="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <div class="relative flex items-center gap-4">
+          <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ stats.todayNewClients }}</h3>
+            <p class="text-sm font-medium text-gray-600">Today New</p>
           </div>
         </div>
       </div>
 
       <!-- Pending Review Card -->
-      <div class="bg-white rounded-xl shadow-lg border border-border-light p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
-        <div class="flex items-center justify-between">
-          <div class="flex-1">
-            <div class="flex items-center gap-3 mb-3">
-              <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center group-hover:bg-yellow-200 transition-colors">
-                <mat-icon class="text-yellow-600 text-xl">schedule</mat-icon>
-              </div>
-              <div>
-                <h3 class="text-2xl sm:text-3xl font-bold text-text-primary font-heading">
-                  {{ stats.pendingClients }}
-                </h3>
-                <p class="text-text-secondary text-sm font-medium">Pending Review</p>
-              </div>
-            </div>
+      <div class="group relative backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl hover:bg-white/80 transition-all duration-300 hover:-translate-y-2 hover:scale-105">
+        <div class="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <div class="relative flex items-center gap-4">
+          <div class="w-14 h-14 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ stats.pendingClients }}</h3>
+            <p class="text-sm font-medium text-gray-600">Pending Review</p>
           </div>
         </div>
       </div>
 
       <!-- Interested Clients Card -->
-      <div class="bg-white rounded-xl shadow-lg border border-border-light p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
-        <div class="flex items-center justify-between">
-          <div class="flex-1">
-            <div class="flex items-center gap-3 mb-3">
-              <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
-                <mat-icon class="text-emerald-600 text-xl">check_circle</mat-icon>
-              </div>
-              <div>
-                <h3 class="text-2xl sm:text-3xl font-bold text-text-primary font-heading">
-                  {{ stats.interestedClients }}
-                </h3>
-                <p class="text-text-secondary text-sm font-medium">Interested</p>
-              </div>
-            </div>
+      <div class="group relative backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl hover:bg-white/80 transition-all duration-300 hover:-translate-y-2 hover:scale-105">
+        <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <div class="relative flex items-center gap-4">
+          <div class="w-14 h-14 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ stats.interestedClients }}</h3>
+            <p class="text-sm font-medium text-gray-600">Interested</p>
           </div>
         </div>
       </div>
 
       <!-- Not Interested Card -->
-      <div class="bg-white rounded-xl shadow-lg border border-border-light p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
-        <div class="flex items-center justify-between">
-          <div class="flex-1">
-            <div class="flex items-center gap-3 mb-3">
-              <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center group-hover:bg-red-200 transition-colors">
-                <mat-icon class="text-red-600 text-xl">cancel</mat-icon>
-              </div>
-              <div>
-                <h3 class="text-2xl sm:text-3xl font-bold text-text-primary font-heading">
-                  {{ stats.notInterestedClients }}
-                </h3>
-                <p class="text-text-secondary text-sm font-medium">Not Interested</p>
-              </div>
-            </div>
+      <div class="group relative backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl hover:bg-white/80 transition-all duration-300 hover:-translate-y-2 hover:scale-105">
+        <div class="absolute inset-0 bg-gradient-to-br from-red-500/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <div class="relative flex items-center gap-4">
+          <div class="w-14 h-14 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ stats.notInterestedClients }}</h3>
+            <p class="text-sm font-medium text-gray-600">Not Interested</p>
           </div>
         </div>
       </div>
 
       <!-- On Hold Card -->
-      <div class="bg-white rounded-xl shadow-lg border border-border-light p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
-        <div class="flex items-center justify-between">
-          <div class="flex-1">
-            <div class="flex items-center gap-3 mb-3">
-              <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center group-hover:bg-orange-200 transition-colors">
-                <mat-icon class="text-orange-600 text-xl">pause_circle</mat-icon>
-              </div>
-              <div>
-                <h3 class="text-2xl sm:text-3xl font-bold text-text-primary font-heading">
-                  {{ stats.onHoldClients }}
-                </h3>
-                <p class="text-text-secondary text-sm font-medium">On Hold</p>
-              </div>
-            </div>
+      <div class="group relative backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl hover:bg-white/80 transition-all duration-300 hover:-translate-y-2 hover:scale-105">
+        <div class="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <div class="relative flex items-center gap-4">
+          <div class="w-14 h-14 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ stats.onHoldClients }}</h3>
+            <p class="text-sm font-medium text-gray-600">On Hold</p>
           </div>
         </div>
       </div>
 
       <!-- Processing Card -->
-      <div class="bg-white rounded-xl shadow-lg border border-border-light p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
-        <div class="flex items-center justify-between">
-          <div class="flex-1">
-            <div class="flex items-center gap-3 mb-3">
-              <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center group-hover:bg-purple-200 transition-colors">
-                <mat-icon class="text-purple-600 text-xl">sync</mat-icon>
-              </div>
-              <div>
-                <h3 class="text-2xl sm:text-3xl font-bold text-text-primary font-heading">
-                  {{ stats.processingClients }}
-                </h3>
-                <p class="text-text-secondary text-sm font-medium">Processing</p>
-              </div>
-            </div>
+      <div class="group relative backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl hover:bg-white/80 transition-all duration-300 hover:-translate-y-2 hover:scale-105">
+        <div class="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <div class="relative flex items-center gap-4">
+          <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ stats.processingClients }}</h3>
+            <p class="text-sm font-medium text-gray-600">Processing</p>
           </div>
         </div>
       </div>
 
       <!-- Total Team Card -->
-      <div class="bg-white rounded-xl shadow-lg border border-border-light p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
-        <div class="flex items-center justify-between">
-          <div class="flex-1">
-            <div class="flex items-center gap-3 mb-3">
-              <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center group-hover:bg-indigo-200 transition-colors">
-                <mat-icon class="text-indigo-600 text-xl">group</mat-icon>
-              </div>
-              <div>
-                <h3 class="text-2xl sm:text-3xl font-bold text-text-primary font-heading">
-                  {{ stats.totalTeam }}
-                </h3>
-                <p class="text-text-secondary text-sm font-medium">Total Team</p>
-              </div>
-            </div>
+      <div class="group relative backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 p-6 hover:shadow-2xl hover:bg-white/80 transition-all duration-300 hover:-translate-y-2 hover:scale-105">
+        <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <div class="relative flex items-center gap-4">
+          <div class="w-14 h-14 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-3xl font-bold text-gray-800 mb-1">{{ stats.totalTeam }}</h3>
+            <p class="text-sm font-medium text-gray-600">Total Team</p>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Admin Utilities (only for admins) -->
-    <div *ngIf="currentUser?.role === 'admin'" class="bg-white rounded-xl shadow-lg border border-border-light p-6">
+    <div *ngIf="currentUser?.role === 'admin'" class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 p-6">
       <div class="flex items-center gap-3 mb-6">
-        <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-          <mat-icon class="text-red-600">admin_panel_settings</mat-icon>
+        <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+          </svg>
         </div>
         <div>
-          <h2 class="text-xl font-bold text-text-primary font-heading">Admin Utilities</h2>
-          <p class="text-text-secondary text-sm">Database management tools</p>
+          <h2 class="text-xl font-bold text-gray-800">Admin Utilities</h2>
+          <p class="text-gray-600 text-sm">Database management tools</p>
         </div>
       </div>
       
       <div class="flex flex-col sm:flex-row gap-4">
         <button 
-          mat-stroked-button 
-          color="primary" 
           (click)="debugAllUsers()"
-          class="flex-1 sm:flex-none btn btn-outline hover:bg-primary hover:text-white transition-all duration-200">
-          <mat-icon class="mr-2">bug_report</mat-icon>
+          class="flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
           Debug All Users
         </button>
         <button 
-          mat-stroked-button 
-          color="warn" 
           (click)="cleanupRejectedUsers()"
-          class="flex-1 sm:flex-none btn btn-outline hover:bg-status-error hover:text-white transition-all duration-200">
-          <mat-icon class="mr-2">cleaning_services</mat-icon>
+          class="flex items-center justify-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
           Cleanup Rejected Users
         </button>
       </div>
     </div>
 
     <!-- Recent Clients Table -->
-    <div class="bg-white rounded-xl shadow-lg border border-border-light overflow-hidden">
-      <div class="p-6 border-b border-border-light">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h2 class="text-xl font-bold text-text-primary font-heading">Recent Clients</h2>
-            <p class="text-text-secondary text-sm">Latest client registrations and their status</p>
-          </div>
-          <button 
-            routerLink="/new-client"
-            class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
-            </svg>
-            <span class="hidden sm:inline">Add New Client</span>
-            <span class="sm:hidden">Add Client</span>
-          </button>
+    <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+      <div class="p-6 border-b border-white/20">
+        <div class="flex items-center">
+          <h2 class="text-xl font-bold text-gray-800">Recent Clients</h2>
         </div>
       </div>
 
       <!-- Loading State -->
       <div *ngIf="loading" class="flex flex-col items-center justify-center py-12 px-6">
-        <mat-spinner diameter="40" class="mb-4"></mat-spinner>
-        <p class="text-text-secondary">Loading clients...</p>
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+        <p class="text-gray-600">Loading clients...</p>
       </div>
 
       <!-- Empty State -->
       <div *ngIf="!loading && clients.length === 0" class="flex flex-col items-center justify-center py-12 px-6 text-center">
-        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-          <mat-icon class="text-gray-400 text-2xl">person_add</mat-icon>
+        <div class="w-20 h-20 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center mb-4">
+          <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+          </svg>
         </div>
-        <h3 class="text-lg font-semibold text-text-primary mb-2">No clients yet</h3>
-        <p class="text-text-secondary mb-6 max-w-sm">Start building your client base by adding your first client to the system</p>
+        <h3 class="text-lg font-semibold text-gray-800 mb-2">No clients yet</h3>
+        <p class="text-gray-600 mb-6 max-w-sm">Start building your client base by adding your first client to the system</p>
         <button 
           routerLink="/new-client"
-          class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2">
+          class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
           </svg>
@@ -239,22 +207,24 @@
         <!-- Mobile Card View (Hidden on larger screens) -->
         <div class="block lg:hidden space-y-4 p-6">
           <div *ngFor="let client of clients.slice(0, 5); let i = index" 
-               class="bg-surface-alt rounded-lg p-4 border border-border-light hover:shadow-md transition-shadow cursor-pointer"
+               class="backdrop-blur-sm bg-white/50 rounded-xl p-4 border border-white/30 hover:shadow-lg hover:bg-white/70 transition-all duration-200 cursor-pointer"
                (click)="viewClientDetails(client)">
             <div class="flex items-start justify-between mb-3">
               <div class="flex-1">
-                <h4 class="font-semibold text-text-primary text-sm">
+                <h4 class="font-semibold text-gray-800 text-sm">
                   {{ client.legal_name || client.user_name || 'N/A' }}
                 </h4>
-                <p class="text-text-secondary text-xs mt-1">
+                <p class="text-gray-600 text-xs mt-1">
                   {{ client.trade_name || client.business_name || client.legal_name || 'N/A' }}
                 </p>
-                <p *ngIf="client.mobile_number" class="text-text-secondary text-xs mt-1 flex items-center gap-1">
-                  <mat-icon class="text-xs">phone</mat-icon>
+                <p *ngIf="client.mobile_number" class="text-gray-600 text-xs mt-1 flex items-center gap-1">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                  </svg>
                   {{ client.mobile_number }}
                 </p>
               </div>
-              <span class="text-xs text-text-muted">#{{ i + 1 }}</span>
+              <span class="text-xs text-gray-500 font-medium">#{{ i + 1 }}</span>
             </div>
             
             <div class="flex flex-wrap gap-2 mb-3">
@@ -273,169 +243,150 @@
               </span>
             </div>
             
-            <div class="flex items-center justify-between text-xs text-text-muted">
+            <div class="flex items-center justify-between text-xs text-gray-500">
               <span>Staff: {{ client.staff_name || 'Unassigned' }}</span>
               <span>{{ client.created_at | date:'short' }}</span>
             </div>
             
-            <div class="flex gap-2 mt-3 pt-3 border-t border-border-light">
-              <button mat-icon-button 
+            <div class="flex gap-2 mt-3 pt-3 border-t border-white/30">
+              <button 
                       (click)="editClient(client); $event.stopPropagation()" 
-                      class="text-primary hover:bg-primary/10 rounded-lg p-2"
-                      matTooltip="Edit Client">
-                <mat-icon class="text-lg">edit</mat-icon>
+                      class="flex items-center justify-center w-10 h-10 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                      title="Edit Client">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
               </button>
-              <button mat-icon-button 
+              <button 
                       (click)="openWhatsApp(client); $event.stopPropagation()" 
-                      class="text-green-600 hover:bg-green-50 rounded-lg p-2"
-                      matTooltip="WhatsApp">
-                <mat-icon svgIcon="whatsapp" class="text-lg"></mat-icon>
+                      class="flex items-center justify-center w-10 h-10 text-green-600 hover:bg-green-50 rounded-lg transition-colors duration-200"
+                      title="WhatsApp">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                </svg>
               </button>
-              <button mat-icon-button 
+              <button 
                       (click)="deleteClient(client); $event.stopPropagation()" 
-                      class="text-status-error hover:bg-red-50 rounded-lg p-2"
-                      matTooltip="Delete Client">
-                <mat-icon class="text-lg">delete</mat-icon>
+                      class="flex items-center justify-center w-10 h-10 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                      title="Delete Client">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
               </button>
             </div>
           </div>
         </div>
 
         <!-- Desktop Table View (Hidden on mobile) -->
-        <div class="hidden lg:block">
-          <table mat-table [dataSource]="clients.slice(0, 5)" class="w-full">
-            <!-- Serial Number Column -->
-            <ng-container matColumnDef="serial">
-              <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">S.No</th>
-              <td mat-cell *matCellDef="let client; let i = index" class="px-4 py-3 text-sm text-text-secondary">{{ i + 1 }}</td>
-            </ng-container>
-
-            <!-- Name Column -->
-            <ng-container matColumnDef="name">
-              <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Client Name</th>
-              <td mat-cell *matCellDef="let client" 
-                  (click)="viewClientDetails(client)" 
-                  class="px-4 py-3 cursor-pointer hover:bg-surface-alt transition-colors">
-                <div class="font-medium text-text-primary text-sm">
-                  {{ client.legal_name || client.user_name || 'N/A' }}
-                </div>
-              </td>
-            </ng-container>
-
-            <!-- Business Column -->
-            <ng-container matColumnDef="business">
-              <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Business</th>
-              <td mat-cell *matCellDef="let client" 
-                  (click)="viewClientDetails(client)" 
-                  class="px-4 py-3 cursor-pointer hover:bg-surface-alt transition-colors">
-                <div class="font-medium text-text-primary text-sm">
-                  {{ client.trade_name || client.business_name || client.legal_name || 'N/A' }}
-                </div>
-              </td>
-            </ng-container>
-
-            <!-- Mobile Number Column -->
-            <ng-container matColumnDef="mobile">
-              <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Mobile Number</th>
-              <td mat-cell *matCellDef="let client" class="px-4 py-3">
-                <div class="text-text-secondary text-sm">
-                  {{ client.mobile_number || 'N/A' }}
-                </div>
-              </td>
-            </ng-container>
-
-            <!-- Staff Column -->
-            <ng-container matColumnDef="staff">
-              <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Staff</th>
-              <td mat-cell *matCellDef="let client" class="px-4 py-3">
-                <div class="text-text-secondary text-sm">
-                  {{ client.staff_name || 'Unassigned' }}
-                </div>
-              </td>
-            </ng-container>
-
-            <!-- Status Column -->
-            <ng-container matColumnDef="status">
-              <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Status</th>
-              <td mat-cell *matCellDef="let client" class="px-4 py-3">
-                <span class="status-badge px-2 py-1 text-xs rounded-full font-medium"
-                      [ngClass]="{
-                        'bg-green-100 text-green-800': client.status === 'interested',
-                        'bg-red-100 text-red-800': client.status === 'not_interested',
-                        'bg-yellow-100 text-yellow-800': client.status === 'pending',
-                        'bg-orange-100 text-orange-800': client.status === 'hold',
-                        'bg-purple-100 text-purple-800': client.status === 'processing'
-                      }">
-                  {{ client.status | titlecase }}
-                </span>
-              </td>
-            </ng-container>
-
-            <!-- Loan Status Column -->
-            <ng-container matColumnDef="loan_status">
-              <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Loan Status</th>
-              <td mat-cell *matCellDef="let client" class="px-4 py-3">
-                <span class="status-badge px-2 py-1 text-xs rounded-full font-medium bg-blue-100 text-blue-800">
-                  {{ getLoanStatus(client) | titlecase }}
-                </span>
-              </td>
-            </ng-container>
-
-            <!-- Created Column -->
-            <ng-container matColumnDef="date">
-              <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Created</th>
-              <td mat-cell *matCellDef="let client" class="px-4 py-3 text-sm text-text-secondary">
-                {{ client.created_at | date:'short' }}
-              </td>
-            </ng-container>
-
-            <!-- Actions Column -->
-            <ng-container matColumnDef="actions">
-              <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Actions</th>
-              <td mat-cell *matCellDef="let client" class="px-4 py-3">
-                <div class="flex gap-1">
-                  <button mat-icon-button 
-                          (click)="editClient(client); $event.stopPropagation()" 
-                          class="text-primary hover:bg-primary/10 w-8 h-8"
-                          matTooltip="Edit Client">
-                    <mat-icon class="text-lg">edit</mat-icon>
-                  </button>
-                  <button mat-icon-button 
-                          (click)="openWhatsApp(client); $event.stopPropagation()" 
-                          class="text-green-600 hover:bg-green-50 w-8 h-8"
-                          matTooltip="WhatsApp">
-                    <mat-icon svgIcon="whatsapp" class="text-lg"></mat-icon>
-                  </button>
-                  <button mat-icon-button 
-                          (click)="deleteClient(client); $event.stopPropagation()" 
-                          class="text-status-error hover:bg-red-50 w-8 h-8"
-                          matTooltip="Delete Client">
-                    <mat-icon class="text-lg">delete</mat-icon>
-                  </button>
-                </div>
-              </td>
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="['serial', 'name', 'business', 'mobile', 'staff', 'status', 'loan_status', 'date', 'actions']" class="border-b border-border-light"></tr>
-            <tr mat-row *matRowDef="let row; columns: ['serial', 'name', 'business', 'mobile', 'staff', 'status', 'loan_status', 'date', 'actions'];" 
-                class="border-b border-border-light hover:bg-surface-alt transition-colors"
-                [class.bg-green-50]="row.status === 'interested'"
-                [class.bg-red-50]="row.status === 'not_interested'"
-                [class.bg-orange-50]="row.status === 'hold'"
-                [class.bg-yellow-50]="row.status === 'pending'"
-                [class.bg-purple-50]="row.status === 'processing'"></tr>
+        <div class="hidden lg:block overflow-hidden">
+          <table class="w-full border-collapse">
+            <thead>
+              <tr class="bg-gradient-to-r from-gray-50 to-gray-100 border-b-2 border-gray-200">
+                <th class="text-left font-semibold text-gray-700 px-4 py-3 text-sm">S.No</th>
+                <th class="text-left font-semibold text-gray-700 px-4 py-3 text-sm">Client Name</th>
+                <th class="text-left font-semibold text-gray-700 px-4 py-3 text-sm">Business</th>
+                <th class="text-left font-semibold text-gray-700 px-4 py-3 text-sm">Mobile Number</th>
+                <th class="text-left font-semibold text-gray-700 px-4 py-3 text-sm">Staff</th>
+                <th class="text-left font-semibold text-gray-700 px-4 py-3 text-sm">Status</th>
+                <th class="text-left font-semibold text-gray-700 px-4 py-3 text-sm">Loan Status</th>
+                <th class="text-left font-semibold text-gray-700 px-4 py-3 text-sm">Created</th>
+                <th class="text-left font-semibold text-gray-700 px-4 py-3 text-sm">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let client of clients.slice(0, 5); let i = index" 
+                  class="border-b border-gray-200 hover:bg-white/80 transition-colors duration-150"
+                  [ngClass]="{
+                    'bg-green-200': client.status === 'interested',
+                    'bg-red-200': client.status === 'not_interested',
+                    'bg-orange-200': client.status === 'hold',
+                    'bg-yellow-200': client.status === 'pending',
+                    'bg-purple-200': client.status === 'processing'
+                  }">
+                <td class="px-4 py-3 text-sm text-gray-600">{{ i + 1 }}</td>
+                <td class="px-4 py-3 cursor-pointer" (click)="viewClientDetails(client)">
+                  <div class="font-medium text-gray-800 text-sm hover:text-blue-600 transition-colors">
+                    {{ client.legal_name || client.user_name || 'N/A' }}
+                  </div>
+                </td>
+                <td class="px-4 py-3 cursor-pointer" (click)="viewClientDetails(client)">
+                  <div class="font-medium text-gray-800 text-sm hover:text-blue-600 transition-colors">
+                    {{ client.trade_name || client.business_name || client.legal_name || 'N/A' }}
+                  </div>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="text-gray-600 text-sm">
+                    {{ client.mobile_number || 'N/A' }}
+                  </div>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="text-gray-600 text-sm">
+                    {{ client.staff_name || 'Unassigned' }}
+                  </div>
+                </td>
+                <td class="px-4 py-3">
+                  <span class="px-3 py-1 text-xs rounded-full font-semibold shadow-sm"
+                        [ngClass]="{
+                          'bg-green-100 text-green-700 border border-green-200': client.status === 'interested',
+                          'bg-red-100 text-red-700 border border-red-200': client.status === 'not_interested',
+                          'bg-yellow-100 text-yellow-700 border border-yellow-200': client.status === 'pending',
+                          'bg-orange-100 text-orange-700 border border-orange-200': client.status === 'hold',
+                          'bg-purple-100 text-purple-700 border border-purple-200': client.status === 'processing'
+                        }">
+                    {{ client.status | titlecase }}
+                  </span>
+                </td>
+                <td class="px-4 py-3">
+                  <span class="px-3 py-1 text-xs rounded-full font-semibold bg-blue-100 text-blue-700 border border-blue-200 shadow-sm">
+                    {{ getLoanStatus(client) | titlecase }}
+                  </span>
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-600">
+                  {{ client.created_at | date:'short' }}
+                </td>
+                <td class="px-4 py-3">
+                  <div class="flex gap-1">
+                    <button 
+                            (click)="editClient(client); $event.stopPropagation()" 
+                            class="flex items-center justify-center w-8 h-8 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                            title="Edit Client">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                      </svg>
+                    </button>
+                    <button 
+                            (click)="openWhatsApp(client); $event.stopPropagation()" 
+                            class="flex items-center justify-center w-8 h-8 text-green-600 hover:bg-green-50 rounded-lg transition-colors duration-200"
+                            title="WhatsApp">
+                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                      </svg>
+                    </button>
+                    <button 
+                            (click)="deleteClient(client); $event.stopPropagation()" 
+                            class="flex items-center justify-center w-8 h-8 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                            title="Delete Client">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
           </table>
         </div>
 
         <!-- View All Button -->
-        <div *ngIf="clients.length > 5" class="p-6 border-t border-border-light bg-surface-alt">
+        <div *ngIf="clients.length > 5" class="p-6 border-t border-white/20 bg-gradient-to-r from-gray-50 to-gray-100">
           <div class="flex justify-center">
             <button 
-              mat-stroked-button 
-              color="primary" 
               routerLink="/clients"
-              class="btn btn-outline flex items-center gap-2 px-6 py-2">
-              <mat-icon class="text-sm">visibility</mat-icon>
+              class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+              </svg>
               View All Clients ({{ clients.length }})
             </button>
           </div>
