@@ -63,7 +63,14 @@
                 }
               ],
               "outputHashing": "all",
-              "sourceMap": false
+              "sourceMap": false,
+              "extractCss": true,
+              "optimization": {
+                "styles": {
+                  "minify": true,
+                  "inlineCritical": false
+                }
+              }
             },
             "development": {
               "buildOptimizer": false,

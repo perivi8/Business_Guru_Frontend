@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "dist/tmis-business-guru/index.html",
+      "use": "@vercel/static",
+      "config": {
+        "outputDirectory": "dist/tmis-business-guru"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}
