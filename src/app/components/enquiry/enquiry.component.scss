@@ -1093,6 +1093,35 @@
   }
 }
 
+// Dark theme table styling
+::ng-deep .mat-mdc-table {
+  background-color: #1f2937 !important; // gray-800
+  
+  .mat-mdc-header-row {
+    background-color: #374151 !important; // gray-700
+    
+    .mat-mdc-header-cell {
+      background-color: #374151 !important; // gray-700
+      color: white !important;
+      border-bottom-color: #4b5563 !important; // gray-600
+    }
+  }
+  
+  .mat-mdc-row {
+    background-color: #1f2937 !important; // gray-800
+    border-bottom-color: #374151 !important; // gray-700
+    
+    &:hover {
+      background-color: #374151 !important; // gray-700
+    }
+    
+    .mat-mdc-cell {
+      color: #d1d5db !important; // gray-300
+      border-bottom-color: #374151 !important; // gray-700
+    }
+  }
+}
+
 // Table layout fixes and column widths
 .enquiry-table {
   table-layout: fixed !important;

@@ -1022,7 +1022,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
       if (currentComment === option.value) {
         target.style.backgroundColor = '#3b82f6';
       } else {
-        target.style.backgroundColor = isEntering ? '#f3f4f6' : 'transparent';
+        target.style.backgroundColor = isEntering ? '#4b5563' : 'transparent';
       }
     }
   }

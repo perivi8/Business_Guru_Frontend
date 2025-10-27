@@ -1,149 +1,192 @@
-<!-- Modern Admin Dashboard -->
-<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<!-- Admin Dashboard with Dark Theme -->
+<div class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-4 sm:p-6 lg:p-8">
+  <div class="max-w-7xl mx-auto space-y-6 lg:space-y-8">
     
     <!-- Loading Spinner -->
     <div *ngIf="loading" class="flex flex-col items-center justify-center py-16">
-      <mat-progress-spinner mode="indeterminate" diameter="50" class="mb-4"></mat-progress-spinner>
-      <p class="text-gray-600 font-medium">Loading dashboard data...</p>
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
+      <p class="text-gray-400">Loading dashboard data...</p>
     </div>
 
     <!-- Dashboard Content -->
     <div *ngIf="!loading" class="space-y-8">
 
-      <!-- Stats Cards Grid -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <!-- Total Clients Card -->
-        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 group">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-blue-100 text-sm font-medium">Total Clients</p>
-              <h3 class="text-3xl font-bold mt-1">{{ stats.totalClients }}</h3>
+      <!-- Stats Cards Grid - 8 Glassy Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-4 lg:gap-6 stats-grid">
+        
+        <!-- Total Clients Card - Blue Gradient -->
+        <div class="glass-card group relative overflow-hidden rounded-3xl p-6 transform transition-all duration-700 hover:scale-110 hover:-translate-y-3 cursor-pointer card-animate"
+             style="background: linear-gradient(135deg, rgba(33, 150, 243, 0.95) 0%, rgba(25, 118, 210, 0.95) 100%); box-shadow: 0 20px 60px rgba(33, 150, 243, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);">
+          <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+          <div class="absolute inset-0 backdrop-blur-xl bg-white/5 rounded-3xl border border-white/20"></div>
+          <div class="relative z-10 flex flex-col items-start gap-3">
+            <div class="w-14 h-14 bg-white/30 backdrop-blur-md rounded-2xl flex items-center justify-center transform group-hover:rotate-[360deg] group-hover:scale-110 transition-all duration-700 shadow-lg icon-glow">
+              <svg class="w-7 h-7 text-white drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+              </svg>
             </div>
-            <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-              <mat-icon class="text-2xl">people</mat-icon>
-            </div>
+            <div class="text-5xl font-extrabold text-white drop-shadow-2xl number-animate">{{ stats.totalClients }}</div>
+            <div class="text-sm font-semibold text-white/95 tracking-wide uppercase">Total Clients</div>
           </div>
+          <div class="absolute bottom-0 right-0 w-32 h-32 bg-white/10 rounded-tl-full transform translate-x-12 translate-y-12 group-hover:scale-150 transition-transform duration-700"></div>
+          <div class="absolute top-0 left-0 w-20 h-20 bg-white/5 rounded-full blur-2xl"></div>
         </div>
 
-        <!-- Today New Clients Card -->
-        <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 group">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-green-100 text-sm font-medium">Today New Clients</p>
-              <h3 class="text-3xl font-bold mt-1">{{ todayStats.newClientsToday }}</h3>
+        <!-- Today New Clients Card - Green Gradient -->
+        <div class="glass-card group relative overflow-hidden rounded-3xl p-6 transform transition-all duration-700 hover:scale-110 hover:-translate-y-3 cursor-pointer card-animate"
+             style="background: linear-gradient(135deg, rgba(76, 175, 80, 0.95) 0%, rgba(56, 142, 60, 0.95) 100%); box-shadow: 0 20px 60px rgba(76, 175, 80, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2); animation-delay: 0.1s;">
+          <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+          <div class="absolute inset-0 backdrop-blur-xl bg-white/5 rounded-3xl border border-white/20"></div>
+          <div class="relative z-10 flex flex-col items-start gap-3">
+            <div class="w-14 h-14 bg-white/30 backdrop-blur-md rounded-2xl flex items-center justify-center transform group-hover:rotate-[360deg] group-hover:scale-110 transition-all duration-700 shadow-lg icon-glow">
+              <svg class="w-7 h-7 text-white drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
             </div>
-            <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-              <mat-icon class="text-2xl">today</mat-icon>
-            </div>
+            <div class="text-5xl font-extrabold text-white drop-shadow-2xl number-animate">{{ todayStats.newClientsToday }}</div>
+            <div class="text-sm font-semibold text-white/95 tracking-wide uppercase">Today New</div>
           </div>
+          <div class="absolute bottom-0 right-0 w-32 h-32 bg-white/10 rounded-tl-full transform translate-x-12 translate-y-12 group-hover:scale-150 transition-transform duration-700"></div>
+          <div class="absolute top-0 left-0 w-20 h-20 bg-white/5 rounded-full blur-2xl"></div>
         </div>
 
-        <!-- Pending Review Card -->
-        <div class="bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 group">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-yellow-100 text-sm font-medium">Pending Review</p>
-              <h3 class="text-3xl font-bold mt-1">{{ stats.pendingClients }}</h3>
+        <!-- Pending Review Card - Purple Gradient -->
+        <div class="glass-card group relative overflow-hidden rounded-3xl p-6 transform transition-all duration-700 hover:scale-110 hover:-translate-y-3 cursor-pointer card-animate"
+             style="background: linear-gradient(135deg, rgba(156, 39, 176, 0.95) 0%, rgba(123, 31, 162, 0.95) 100%); box-shadow: 0 20px 60px rgba(156, 39, 176, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2); animation-delay: 0.2s;">
+          <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+          <div class="absolute inset-0 backdrop-blur-xl bg-white/5 rounded-3xl border border-white/20"></div>
+          <div class="relative z-10 flex flex-col items-start gap-3">
+            <div class="w-14 h-14 bg-white/30 backdrop-blur-md rounded-2xl flex items-center justify-center transform group-hover:rotate-[360deg] group-hover:scale-110 transition-all duration-700 shadow-lg icon-glow">
+              <svg class="w-7 h-7 text-white drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
             </div>
-            <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-              <mat-icon class="text-2xl">schedule</mat-icon>
-            </div>
+            <div class="text-5xl font-extrabold text-white drop-shadow-2xl number-animate">{{ stats.pendingClients }}</div>
+            <div class="text-sm font-semibold text-white/95 tracking-wide uppercase">Pending Review</div>
           </div>
+          <div class="absolute bottom-0 right-0 w-32 h-32 bg-white/10 rounded-tl-full transform translate-x-12 translate-y-12 group-hover:scale-150 transition-transform duration-700"></div>
+          <div class="absolute top-0 left-0 w-20 h-20 bg-white/5 rounded-full blur-2xl"></div>
         </div>
 
-        <!-- Interested Card -->
-        <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 group">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-emerald-100 text-sm font-medium">Interested</p>
-              <h3 class="text-3xl font-bold mt-1">{{ stats.interestedClients }}</h3>
+        <!-- Interested Clients Card - Emerald Gradient -->
+        <div class="glass-card group relative overflow-hidden rounded-3xl p-6 transform transition-all duration-700 hover:scale-110 hover:-translate-y-3 cursor-pointer card-animate"
+             style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.95) 0%, rgba(5, 150, 105, 0.95) 100%); box-shadow: 0 20px 60px rgba(16, 185, 129, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2); animation-delay: 0.3s;">
+          <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+          <div class="absolute inset-0 backdrop-blur-xl bg-white/5 rounded-3xl border border-white/20"></div>
+          <div class="relative z-10 flex flex-col items-start gap-3">
+            <div class="w-14 h-14 bg-white/30 backdrop-blur-md rounded-2xl flex items-center justify-center transform group-hover:rotate-[360deg] group-hover:scale-110 transition-all duration-700 shadow-lg icon-glow">
+              <svg class="w-7 h-7 text-white drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
             </div>
-            <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-              <mat-icon class="text-2xl">check_circle</mat-icon>
-            </div>
+            <div class="text-5xl font-extrabold text-white drop-shadow-2xl number-animate">{{ stats.interestedClients }}</div>
+            <div class="text-sm font-semibold text-white/95 tracking-wide uppercase">Interested</div>
           </div>
+          <div class="absolute bottom-0 right-0 w-32 h-32 bg-white/10 rounded-tl-full transform translate-x-12 translate-y-12 group-hover:scale-150 transition-transform duration-700"></div>
+          <div class="absolute top-0 left-0 w-20 h-20 bg-white/5 rounded-full blur-2xl"></div>
         </div>
 
-        <!-- Not Interested Card -->
-        <div class="bg-gradient-to-br from-red-500 to-pink-600 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 group">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-red-100 text-sm font-medium">Not Interested</p>
-              <h3 class="text-3xl font-bold mt-1">{{ stats.notInterestedClients }}</h3>
+        <!-- Not Interested Card - Red Gradient -->
+        <div class="glass-card group relative overflow-hidden rounded-3xl p-6 transform transition-all duration-700 hover:scale-110 hover:-translate-y-3 cursor-pointer card-animate"
+             style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.95) 0%, rgba(220, 38, 38, 0.95) 100%); box-shadow: 0 20px 60px rgba(239, 68, 68, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2); animation-delay: 0.4s;">
+          <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+          <div class="absolute inset-0 backdrop-blur-xl bg-white/5 rounded-3xl border border-white/20"></div>
+          <div class="relative z-10 flex flex-col items-start gap-3">
+            <div class="w-14 h-14 bg-white/30 backdrop-blur-md rounded-2xl flex items-center justify-center transform group-hover:rotate-[360deg] group-hover:scale-110 transition-all duration-700 shadow-lg icon-glow">
+              <svg class="w-7 h-7 text-white drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
             </div>
-            <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-              <mat-icon class="text-2xl">cancel</mat-icon>
-            </div>
+            <div class="text-5xl font-extrabold text-white drop-shadow-2xl number-animate">{{ stats.notInterestedClients }}</div>
+            <div class="text-sm font-semibold text-white/95 tracking-wide uppercase">Not Interested</div>
           </div>
+          <div class="absolute bottom-0 right-0 w-32 h-32 bg-white/10 rounded-tl-full transform translate-x-12 translate-y-12 group-hover:scale-150 transition-transform duration-700"></div>
+          <div class="absolute top-0 left-0 w-20 h-20 bg-white/5 rounded-full blur-2xl"></div>
         </div>
 
-        <!-- On Hold Card -->
-        <div class="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 group">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-purple-100 text-sm font-medium">On Hold</p>
-              <h3 class="text-3xl font-bold mt-1">{{ stats.onHoldClients }}</h3>
+        <!-- On Hold Card - Orange Gradient -->
+        <div class="glass-card group relative overflow-hidden rounded-3xl p-6 transform transition-all duration-700 hover:scale-110 hover:-translate-y-3 cursor-pointer card-animate"
+             style="background: linear-gradient(135deg, rgba(251, 146, 60, 0.95) 0%, rgba(249, 115, 22, 0.95) 100%); box-shadow: 0 20px 60px rgba(251, 146, 60, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2); animation-delay: 0.5s;">
+          <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+          <div class="absolute inset-0 backdrop-blur-xl bg-white/5 rounded-3xl border border-white/20"></div>
+          <div class="relative z-10 flex flex-col items-start gap-3">
+            <div class="w-14 h-14 bg-white/30 backdrop-blur-md rounded-2xl flex items-center justify-center transform group-hover:rotate-[360deg] group-hover:scale-110 transition-all duration-700 shadow-lg icon-glow">
+              <svg class="w-7 h-7 text-white drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
             </div>
-            <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-              <mat-icon class="text-2xl">pause</mat-icon>
-            </div>
+            <div class="text-5xl font-extrabold text-white drop-shadow-2xl number-animate">{{ stats.onHoldClients }}</div>
+            <div class="text-sm font-semibold text-white/95 tracking-wide uppercase">On Hold</div>
           </div>
+          <div class="absolute bottom-0 right-0 w-32 h-32 bg-white/10 rounded-tl-full transform translate-x-12 translate-y-12 group-hover:scale-150 transition-transform duration-700"></div>
+          <div class="absolute top-0 left-0 w-20 h-20 bg-white/5 rounded-full blur-2xl"></div>
         </div>
 
-        <!-- Processing Card -->
-        <div class="bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 group">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-cyan-100 text-sm font-medium">Processing</p>
-              <h3 class="text-3xl font-bold mt-1">{{ stats.processingClients }}</h3>
+        <!-- Processing Card - Cyan Gradient -->
+        <div class="glass-card group relative overflow-hidden rounded-3xl p-6 transform transition-all duration-700 hover:scale-110 hover:-translate-y-3 cursor-pointer card-animate"
+             style="background: linear-gradient(135deg, rgba(6, 182, 212, 0.95) 0%, rgba(8, 145, 178, 0.95) 100%); box-shadow: 0 20px 60px rgba(6, 182, 212, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2); animation-delay: 0.6s;">
+          <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+          <div class="absolute inset-0 backdrop-blur-xl bg-white/5 rounded-3xl border border-white/20"></div>
+          <div class="relative z-10 flex flex-col items-start gap-3">
+            <div class="w-14 h-14 bg-white/30 backdrop-blur-md rounded-2xl flex items-center justify-center transform group-hover:rotate-[360deg] group-hover:scale-110 transition-all duration-700 shadow-lg icon-glow">
+              <svg class="w-7 h-7 text-white drop-shadow-lg animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
             </div>
-            <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-              <mat-icon class="text-2xl">hourglass_empty</mat-icon>
-            </div>
+            <div class="text-5xl font-extrabold text-white drop-shadow-2xl number-animate">{{ stats.processingClients }}</div>
+            <div class="text-sm font-semibold text-white/95 tracking-wide uppercase">Processing</div>
           </div>
+          <div class="absolute bottom-0 right-0 w-32 h-32 bg-white/10 rounded-tl-full transform translate-x-12 translate-y-12 group-hover:scale-150 transition-transform duration-700"></div>
+          <div class="absolute top-0 left-0 w-20 h-20 bg-white/5 rounded-full blur-2xl"></div>
         </div>
 
-        <!-- Total Team Card -->
-        <div class="bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 group">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-violet-100 text-sm font-medium">Total Team</p>
-              <h3 class="text-3xl font-bold mt-1">{{ stats.totalTeam }}</h3>
+        <!-- Total Team Card - Violet Gradient -->
+        <div class="glass-card group relative overflow-hidden rounded-3xl p-6 transform transition-all duration-700 hover:scale-110 hover:-translate-y-3 cursor-pointer card-animate"
+             style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.95) 0%, rgba(124, 58, 237, 0.95) 100%); box-shadow: 0 20px 60px rgba(139, 92, 246, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2); animation-delay: 0.7s;">
+          <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+          <div class="absolute inset-0 backdrop-blur-xl bg-white/5 rounded-3xl border border-white/20"></div>
+          <div class="relative z-10 flex flex-col items-start gap-3">
+            <div class="w-14 h-14 bg-white/30 backdrop-blur-md rounded-2xl flex items-center justify-center transform group-hover:rotate-[360deg] group-hover:scale-110 transition-all duration-700 shadow-lg icon-glow">
+              <svg class="w-7 h-7 text-white drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+              </svg>
             </div>
-            <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-              <mat-icon class="text-2xl">group</mat-icon>
-            </div>
+            <div class="text-5xl font-extrabold text-white drop-shadow-2xl number-animate">{{ stats.totalTeam }}</div>
+            <div class="text-sm font-semibold text-white/95 tracking-wide uppercase">Total Team</div>
           </div>
+          <div class="absolute bottom-0 right-0 w-32 h-32 bg-white/10 rounded-tl-full transform translate-x-12 translate-y-12 group-hover:scale-150 transition-transform duration-700"></div>
+          <div class="absolute top-0 left-0 w-20 h-20 bg-white/5 rounded-full blur-2xl"></div>
         </div>
       </div>
 
       <!-- Today's User Performance -->
-      <div *ngIf="todayStats.userClientCounts.length > 0" class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-        <div class="bg-gradient-to-r from-indigo-50 to-purple-50 px-6 py-4 border-b border-gray-200">
+      <div *ngIf="todayStats.userClientCounts.length > 0" class="bg-gray-800 rounded-xl shadow-lg border border-gray-700 overflow-hidden">
+        <div class="bg-gradient-to-r from-indigo-900/50 to-purple-900/50 px-6 py-4 border-b border-gray-700">
           <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
-              <mat-icon class="text-indigo-600 text-lg">today</mat-icon>
+            <div class="w-8 h-8 bg-indigo-500/20 rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
             </div>
-            <h3 class="text-lg font-semibold text-gray-900">Today's Client Additions by User</h3>
+            <h3 class="text-lg font-semibold text-white">Today's Client Additions by User</h3>
           </div>
         </div>
         <div class="p-6">
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div *ngFor="let userStat of todayStats.userClientCounts" 
-                 class="bg-gradient-to-br from-gray-50 to-white rounded-lg p-4 border border-gray-200 hover:shadow-md transition-all duration-200">
+                 class="bg-gradient-to-br from-gray-700 to-gray-800 rounded-lg p-4 border border-gray-600 hover:shadow-md hover:border-blue-500/50 transition-all duration-200">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
                   <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
                     {{ userStat.username.charAt(0).toUpperCase() }}
                   </div>
-                  <span class="font-medium text-gray-900">{{ userStat.username }}</span>
+                  <span class="font-medium text-white">{{ userStat.username }}</span>
                 </div>
                 <div class="text-right">
-                  <div class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-bold">
+                  <div class="bg-green-500/20 text-green-300 px-3 py-1 rounded-full text-sm font-bold border border-green-500/30">
                     {{ userStat.count }}
                   </div>
-                  <p class="text-xs text-gray-500 mt-1">client{{ userStat.count > 1 ? 's' : '' }}</p>
+                  <p class="text-xs text-gray-400 mt-1">client{{ userStat.count > 1 ? 's' : '' }}</p>
                 </div>
               </div>
             </div>
@@ -152,34 +195,36 @@
       </div>
 
       <!-- Report 1: Weekly Client Additions Chart -->
-      <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
+      <div class="bg-gray-800 rounded-xl shadow-lg border border-gray-700 overflow-hidden">
+        <div class="bg-gradient-to-r from-blue-900/50 to-indigo-900/50 px-6 py-4 border-b border-gray-700">
           <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div class="flex items-center gap-3">
-              <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                <mat-icon class="text-blue-600 text-lg">show_chart</mat-icon>
+              <div class="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+                </svg>
               </div>
               <div>
-                <h3 class="text-lg font-semibold text-gray-900">Weekly Client Additions</h3>
-                <p class="text-sm text-gray-600">{{ getSelectedWeekSubtitle() }}</p>
+                <h3 class="text-lg font-semibold text-white">Weekly Client Additions</h3>
+                <p class="text-sm text-gray-400">{{ getSelectedWeekSubtitle() }}</p>
               </div>
             </div>
             
             <!-- Select Week Dropdown -->
             <div class="w-48">
-              <label class="block text-xs font-medium text-gray-600 mb-2 uppercase tracking-wide">Select Week</label>
+              <label class="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">Select Week</label>
               <div class="relative">
                 <button type="button"
                         (click)="toggleWeekDropdown()"
-                        class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2.5 text-left text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors shadow-sm"
+                        class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2.5 text-left text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-500 transition-colors shadow-sm"
                         [class.border-blue-500]="isWeekDropdownOpen"
                         [class.ring-2]="isWeekDropdownOpen"
                         [class.ring-blue-500]="isWeekDropdownOpen">
-                  <span class="block truncate text-gray-700">
+                  <span class="block truncate text-white">
                     {{ getSelectedWeekLabel() }}
                   </span>
                   <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                    <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                    <svg class="w-4 h-4 text-gray-300 transition-transform duration-200"
                          [class.rotate-180]="isWeekDropdownOpen"
                          fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -189,47 +234,47 @@
                 
                 <!-- Dropdown Options -->
                 <div *ngIf="isWeekDropdownOpen"
-                     class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                     class="absolute z-50 w-full mt-1 bg-gray-700 border border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                   <button type="button"
                           (click)="selectWeekOption('current')"
-                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
-                          [class.bg-blue-50]="selectedWeekOption === 'current'"
-                          [class.text-blue-600]="selectedWeekOption === 'current'">
+                          class="w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-gray-600 focus:bg-gray-600 focus:outline-none border-b border-gray-600"
+                          [class.bg-blue-600]="selectedWeekOption === 'current'"
+                          [class.text-white]="selectedWeekOption === 'current'">
                     Current Week
                   </button>
                   <button type="button"
                           (click)="selectWeekOption('last1')"
-                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
-                          [class.bg-blue-50]="selectedWeekOption === 'last1'"
-                          [class.text-blue-600]="selectedWeekOption === 'last1'">
+                          class="w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-gray-600 focus:bg-gray-600 focus:outline-none border-b border-gray-600"
+                          [class.bg-blue-600]="selectedWeekOption === 'last1'"
+                          [class.text-white]="selectedWeekOption === 'last1'">
                     Last Week
                   </button>
                   <button type="button"
                           (click)="selectWeekOption('last2')"
-                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
-                          [class.bg-blue-50]="selectedWeekOption === 'last2'"
-                          [class.text-blue-600]="selectedWeekOption === 'last2'">
+                          class="w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-gray-600 focus:bg-gray-600 focus:outline-none border-b border-gray-600"
+                          [class.bg-blue-600]="selectedWeekOption === 'last2'"
+                          [class.text-white]="selectedWeekOption === 'last2'">
                     2 Weeks Ago
                   </button>
                   <button type="button"
                           (click)="selectWeekOption('last3')"
-                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
-                          [class.bg-blue-50]="selectedWeekOption === 'last3'"
-                          [class.text-blue-600]="selectedWeekOption === 'last3'">
+                          class="w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-gray-600 focus:bg-gray-600 focus:outline-none border-b border-gray-600"
+                          [class.bg-blue-600]="selectedWeekOption === 'last3'"
+                          [class.text-white]="selectedWeekOption === 'last3'">
                     3 Weeks Ago
                   </button>
                   <button type="button"
                           (click)="selectWeekOption('last4')"
-                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100"
-                          [class.bg-blue-50]="selectedWeekOption === 'last4'"
-                          [class.text-blue-600]="selectedWeekOption === 'last4'">
+                          class="w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-gray-600 focus:bg-gray-600 focus:outline-none border-b border-gray-600"
+                          [class.bg-blue-600]="selectedWeekOption === 'last4'"
+                          [class.text-white]="selectedWeekOption === 'last4'">
                     4 Weeks Ago
                   </button>
                   <button type="button"
                           (click)="selectWeekOption('custom')"
-                          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
-                          [class.bg-blue-50]="selectedWeekOption === 'custom'"
-                          [class.text-blue-600]="selectedWeekOption === 'custom'">
+                          class="w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-gray-600 focus:bg-gray-600 focus:outline-none border-b border-gray-600 last:border-b-0"
+                          [class.bg-blue-600]="selectedWeekOption === 'custom'"
+                          [class.text-white]="selectedWeekOption === 'custom'">
                     Custom Range
                   </button>
                 </div>
@@ -275,99 +320,112 @@
         
         <div class="p-6">
           <!-- Week Comparison Banner -->
-          <div *ngIf="showComparison" class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-4 mb-6 border border-purple-200">
+          <div *ngIf="showComparison" class="bg-gradient-to-r from-purple-900/30 to-pink-900/30 rounded-lg p-4 mb-6 border border-purple-700/50">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div class="text-center">
-                <p class="text-sm text-gray-600">Selected Week</p>
-                <p class="text-2xl font-bold text-purple-600">{{ getSelectedWeekTotal() }}</p>
+                <p class="text-sm text-gray-400">Selected Week</p>
+                <p class="text-2xl font-bold text-purple-400">{{ getSelectedWeekTotal() }}</p>
               </div>
               <div class="text-center">
-                <p class="text-sm text-gray-600">Previous Week</p>
-                <p class="text-2xl font-bold text-blue-600">{{ getPreviousWeekTotal() }}</p>
+                <p class="text-sm text-gray-400">Previous Week</p>
+                <p class="text-2xl font-bold text-blue-400">{{ getPreviousWeekTotal() }}</p>
               </div>
               <div class="text-center">
                 <div class="flex items-center justify-center gap-2">
-                  <mat-icon [ngClass]="{
-                    'text-green-600': getWeeklyChange() > 0,
-                    'text-red-600': getWeeklyChange() < 0,
-                    'text-gray-600': getWeeklyChange() === 0
-                  }">{{ getComparisonIcon() }}</mat-icon>
+                  <svg class="w-6 h-6" [ngClass]="{
+                    'text-green-400': getWeeklyChange() > 0,
+                    'text-red-400': getWeeklyChange() < 0,
+                    'text-gray-400': getWeeklyChange() === 0
+                  }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path *ngIf="getWeeklyChange() > 0" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    <path *ngIf="getWeeklyChange() < 0" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
+                    <path *ngIf="getWeeklyChange() === 0" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14"></path>
+                  </svg>
                   <p class="text-2xl font-bold" [ngClass]="{
-                    'text-green-600': getWeeklyChange() > 0,
-                    'text-red-600': getWeeklyChange() < 0,
-                    'text-gray-600': getWeeklyChange() === 0
+                    'text-green-400': getWeeklyChange() > 0,
+                    'text-red-400': getWeeklyChange() < 0,
+                    'text-gray-400': getWeeklyChange() === 0
                   }">{{ getWeeklyChange() }}%</p>
                 </div>
-                <p class="text-sm text-gray-600">Change</p>
+                <p class="text-sm text-gray-400">Change</p>
               </div>
             </div>
           </div>
 
           <!-- Weekly Summary Cards -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200">
+            <div class="bg-gradient-to-br from-blue-900/30 to-indigo-900/30 rounded-lg p-4 border border-blue-700/50">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <mat-icon class="text-blue-600">today</mat-icon>
+                <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                  <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
                 </div>
                 <div>
-                  <h3 class="text-2xl font-bold text-blue-600">{{ getSelectedWeekTotal() }}</h3>
-                  <p class="text-sm text-gray-600">{{ getSelectedWeekLabel() }} Total</p>
+                  <h3 class="text-2xl font-bold text-blue-400">{{ getSelectedWeekTotal() }}</h3>
+                  <p class="text-sm text-gray-400">{{ getSelectedWeekLabel() }} Total</p>
                 </div>
               </div>
             </div>
             
-            <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
+            <div class="bg-gradient-to-br from-green-900/30 to-emerald-900/30 rounded-lg p-4 border border-green-700/50">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <mat-icon class="text-green-600">trending_up</mat-icon>
+                <div class="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+                  <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                  </svg>
                 </div>
                 <div>
-                  <h3 class="text-2xl font-bold text-green-600">{{ getSelectedWeekAverage() | number:'1.1-1' }}</h3>
-                  <p class="text-sm text-gray-600">Daily Average</p>
+                  <h3 class="text-2xl font-bold text-green-400">{{ getSelectedWeekAverage() | number:'1.1-1' }}</h3>
+                  <p class="text-sm text-gray-400">Daily Average</p>
                 </div>
               </div>
             </div>
             
-            <div *ngIf="showComparison" class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-4 border border-purple-200">
+            <div *ngIf="showComparison" class="bg-gradient-to-br from-purple-900/30 to-pink-900/30 rounded-lg p-4 border border-purple-700/50">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <mat-icon class="text-purple-600" [ngClass]="{
-                    'text-green-600': getWeeklyChange() > 0,
-                    'text-red-600': getWeeklyChange() < 0
-                  }">{{ getComparisonIcon() }}</mat-icon>
+                <div class="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                  <svg class="w-6 h-6" [ngClass]="{
+                    'text-green-400': getWeeklyChange() > 0,
+                    'text-red-400': getWeeklyChange() < 0,
+                    'text-purple-400': getWeeklyChange() === 0
+                  }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path *ngIf="getWeeklyChange() > 0" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    <path *ngIf="getWeeklyChange() < 0" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
+                    <path *ngIf="getWeeklyChange() === 0" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14"></path>
+                  </svg>
                 </div>
                 <div>
                   <h3 class="text-2xl font-bold" [ngClass]="{
-                    'text-green-600': getWeeklyChange() > 0,
-                    'text-red-600': getWeeklyChange() < 0,
-                    'text-purple-600': getWeeklyChange() === 0
+                    'text-green-400': getWeeklyChange() > 0,
+                    'text-red-400': getWeeklyChange() < 0,
+                    'text-purple-400': getWeeklyChange() === 0
                   }">{{ getWeeklyChange() }}%</h3>
-                  <p class="text-sm text-gray-600">Week Change</p>
+                  <p class="text-sm text-gray-400">Week Change</p>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Weekly Line Chart -->
-          <div class="bg-gray-50 rounded-lg p-6">
+          <div class="bg-gray-700/50 rounded-lg p-6 border border-gray-600">
             <div class="mb-4">
               <canvas #weeklyChart class="w-full h-80" data-chart="weekly" width="600" height="300"></canvas>
             </div>
             
             <!-- Chart Legend -->
-            <div class="flex flex-wrap justify-center gap-6 pt-4 border-t border-gray-200">
+            <div class="flex flex-wrap justify-center gap-6 pt-4 border-t border-gray-600">
               <div class="flex items-center gap-2">
                 <div class="w-4 h-4 bg-blue-500 rounded-full"></div>
-                <span class="text-sm text-gray-600">Today</span>
+                <span class="text-sm text-gray-300">Today</span>
               </div>
               <div class="flex items-center gap-2">
                 <div class="w-4 h-4 bg-green-500 rounded-full"></div>
-                <span class="text-sm text-gray-600">Working Days</span>
+                <span class="text-sm text-gray-300">Working Days</span>
               </div>
               <div class="flex items-center gap-2">
                 <div class="w-4 h-4 bg-red-500 rounded-full"></div>
-                <span class="text-sm text-gray-600">Holiday</span>
+                <span class="text-sm text-gray-300">Holiday</span>
               </div>
             </div>
           </div>
@@ -375,53 +433,60 @@
       </div>
 
       <!-- Report 2: Client Status Report -->
-      <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden" id="client-status-report">
-        <div class="bg-gradient-to-r from-green-50 to-emerald-50 px-6 py-4 border-b border-gray-200">
+      <div class="bg-gray-800 rounded-xl shadow-lg border border-gray-700 overflow-hidden" id="client-status-report">
+        <div class="bg-gradient-to-r from-green-900/50 to-emerald-900/50 px-6 py-4 border-b border-gray-700">
           <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-              <mat-icon class="text-green-600 text-lg">pie_chart</mat-icon>
+            <div class="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path>
+              </svg>
             </div>
             <div>
-              <h3 class="text-lg font-semibold text-gray-900">Client Status Report</h3>
-              <p class="text-sm text-gray-600">Status breakdown: Interested, Not Interested, Hold, Pending, Processing</p>
+              <h3 class="text-lg font-semibold text-white">Client Status Report</h3>
+              <p class="text-sm text-gray-400">Status breakdown: Interested, Not Interested, Hold, Pending, Processing</p>
             </div>
           </div>
         </div>
         
         <div class="p-6">
           <div class="mb-6">
-            <h4 class="text-lg font-semibold text-gray-900 mb-4">Client Status Distribution</h4>
+            <h4 class="text-lg font-semibold text-white mb-4">Client Status Distribution</h4>
             
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
               <!-- Pie Chart -->
               <div class="flex justify-center">
-                <div class="bg-gray-50 rounded-lg p-6">
+                <div class="bg-gray-700/50 rounded-lg p-6 border border-gray-600">
                   <canvas #statusChart class="max-w-full h-auto" data-chart="status" width="400" height="400"></canvas>
                 </div>
               </div>
               
               <!-- Chart Statistics -->
               <div class="space-y-4">
-                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200">
+                <div class="bg-gradient-to-br from-blue-900/30 to-indigo-900/30 rounded-lg p-4 border border-blue-700/50">
                   <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <mat-icon class="text-blue-600">assessment</mat-icon>
+                    <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                      <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                      </svg>
                     </div>
                     <div>
-                      <p class="text-2xl font-bold text-blue-600">{{ getStatusTotal() }}</p>
-                      <p class="text-sm text-gray-600">Total Clients</p>
+                      <p class="text-2xl font-bold text-blue-400">{{ getStatusTotal() }}</p>
+                      <p class="text-sm text-gray-400">Total Clients</p>
                     </div>
                   </div>
                 </div>
                 
-                <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-4 border border-purple-200">
+                <div class="bg-gradient-to-br from-purple-900/30 to-pink-900/30 rounded-lg p-4 border border-purple-700/50">
                   <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                      <mat-icon class="text-purple-600">trending_up</mat-icon>
+                    <div class="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                      <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                      </svg>
                     </div>
                     <div>
-                      <p class="text-2xl font-bold text-purple-600">{{ getHighestStatusPercentage() }}%</p>
-                      <p class="text-sm text-gray-600">Highest Category</p>
+                      <p class="text-2xl font-bold text-purple-400">{{ getHighestStatusPercentage() }}%</p>
+                      <p class="text-sm text-gray-400">Highest Category</p>
                     </div>
                   </div>
                 </div>
@@ -432,15 +497,17 @@
       </div>
 
       <!-- Report 3: Team Performance Report -->
-      <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-        <div class="bg-gradient-to-r from-orange-50 to-yellow-50 px-6 py-4 border-b border-gray-200">
+      <div class="bg-gray-800 rounded-xl shadow-lg border border-gray-700 overflow-hidden">
+        <div class="bg-gradient-to-r from-orange-900/50 to-yellow-900/50 px-6 py-4 border-b border-gray-700">
           <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-              <mat-icon class="text-orange-600 text-lg">group</mat-icon>
+            <div class="w-8 h-8 bg-orange-500/20 rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+              </svg>
             </div>
             <div>
-              <h3 class="text-lg font-semibold text-gray-900">Team Performance Report</h3>
-              <p class="text-sm text-gray-600">Individual team member client addition statistics</p>
+              <h3 class="text-lg font-semibold text-white">Team Performance Report</h3>
+              <p class="text-sm text-gray-400">Individual team member client addition statistics</p>
             </div>
           </div>
         </div>
@@ -448,38 +515,44 @@
         <div class="p-6">
           <!-- Team Stats Overview -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-gradient-to-br from-violet-50 to-purple-50 rounded-lg p-4 border border-violet-200 transform hover:scale-105 transition-transform duration-200" style="animation-delay: 0.1s">
+            <div class="bg-gradient-to-br from-violet-900/30 to-purple-900/30 rounded-lg p-4 border border-violet-700/50 transform hover:scale-105 transition-transform duration-200" style="animation-delay: 0.1s">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-violet-100 rounded-lg flex items-center justify-center">
-                  <mat-icon class="text-violet-600">group</mat-icon>
+                <div class="w-10 h-10 bg-violet-500/20 rounded-lg flex items-center justify-center">
+                  <svg class="w-6 h-6 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                  </svg>
                 </div>
                 <div>
-                  <h3 class="text-2xl font-bold text-violet-600">{{ stats.totalTeam }}</h3>
-                  <p class="text-sm text-gray-600">Total Team Members</p>
+                  <h3 class="text-2xl font-bold text-violet-400">{{ stats.totalTeam }}</h3>
+                  <p class="text-sm text-gray-400">Total Team Members</p>
                 </div>
               </div>
             </div>
             
-            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200 transform hover:scale-105 transition-transform duration-200" style="animation-delay: 0.2s">
+            <div class="bg-gradient-to-br from-blue-900/30 to-indigo-900/30 rounded-lg p-4 border border-blue-700/50 transform hover:scale-105 transition-transform duration-200" style="animation-delay: 0.2s">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <mat-icon class="text-blue-600">add_circle</mat-icon>
+                <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                  <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
                 </div>
                 <div>
-                  <h3 class="text-2xl font-bold text-blue-600">{{ stats.totalClients }}</h3>
-                  <p class="text-sm text-gray-600">Total Clients Added</p>
+                  <h3 class="text-2xl font-bold text-blue-400">{{ stats.totalClients }}</h3>
+                  <p class="text-sm text-gray-400">Total Clients Added</p>
                 </div>
               </div>
             </div>
             
-            <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200 transform hover:scale-105 transition-transform duration-200" style="animation-delay: 0.3s">
+            <div class="bg-gradient-to-br from-green-900/30 to-emerald-900/30 rounded-lg p-4 border border-green-700/50 transform hover:scale-105 transition-transform duration-200" style="animation-delay: 0.3s">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <mat-icon class="text-green-600">trending_up</mat-icon>
+                <div class="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+                  <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                  </svg>
                 </div>
                 <div>
-                  <h3 class="text-2xl font-bold text-green-600">{{ getAverageClientsPerMember() }}</h3>
-                  <p class="text-sm text-gray-600">Avg per Member</p>
+                  <h3 class="text-2xl font-bold text-green-400">{{ getAverageClientsPerMember() }}</h3>
+                  <p class="text-sm text-gray-400">Avg per Member</p>
                 </div>
               </div>
             </div>
@@ -488,23 +561,27 @@
           <!-- Team Performance Chart -->
           <div class="space-y-6">
             <div class="text-center">
-              <h4 class="text-lg font-semibold text-gray-900 mb-2">Team Member Client Additions (Excluding Admin)</h4>
+              <h4 class="text-lg font-semibold text-white mb-2">Team Member Client Additions (Excluding Admin)</h4>
             </div>
             
-            <div class="bg-gray-50 rounded-lg p-6">
+            <div class="bg-gray-700/50 rounded-lg p-6 border border-gray-600">
               <div class="mb-4">
                 <canvas #teamChart class="w-full h-96" data-chart="team" width="800" height="400"></canvas>
               </div>
               
               <!-- Chart Info -->
-              <div class="flex flex-wrap justify-center gap-6 pt-4 border-t border-gray-200">
+              <div class="flex flex-wrap justify-center gap-6 pt-4 border-t border-gray-600">
                 <div class="flex items-center gap-2">
-                  <mat-icon class="text-blue-600">bar_chart</mat-icon>
-                  <span class="text-sm text-gray-600">Horizontal bars show client count per team member</span>
+                  <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                  </svg>
+                  <span class="text-sm text-gray-300">Horizontal bars show client count per team member</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <mat-icon class="text-green-600">trending_up</mat-icon>
-                  <span class="text-sm text-gray-600">Performance comparison across team</span>
+                  <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                  </svg>
+                  <span class="text-sm text-gray-300">Performance comparison across team</span>
                 </div>
               </div>
             </div>

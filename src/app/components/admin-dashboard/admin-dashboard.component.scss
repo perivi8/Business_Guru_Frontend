@@ -1,89 +1,186 @@
-// Modern Page Header
-.page-header {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-  border-radius: var(--radius-2xl);
-  padding: var(--spacing-xl) var(--spacing-2xl);
-  margin-bottom: var(--spacing-xl);
+// Admin Dashboard - Enhanced with Glassmorphism & Smooth Animations
+// Modern glassy effects with polished styling matching regular dashboard
+
+// Glassmorphism Card Effects
+.glass-card {
   position: relative;
-  overflow: hidden;
-  box-shadow: var(--shadow-2xl);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.125);
   
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
-    pointer-events: none;
+  // Enhanced shadow on hover
+  &:hover {
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4), 
+                0 0 0 1px rgba(255, 255, 255, 0.2) inset,
+                0 0 40px rgba(255, 255, 255, 0.1) inset !important;
+    
+    // Smooth glow effect
+    &::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: inherit;
+      background: linear-gradient(45deg, 
+        rgba(255, 255, 255, 0.1), 
+        rgba(255, 255, 255, 0.05));
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 0.7s ease;
+    }
   }
   
+  &:hover::before {
+    opacity: 1;
+  }
+}
+
+// Icon Glow Effect
+.icon-glow {
+  box-shadow: 0 8px 32px rgba(255, 255, 255, 0.15),
+              inset 0 2px 8px rgba(255, 255, 255, 0.2);
+  
+  &:hover {
+    box-shadow: 0 12px 48px rgba(255, 255, 255, 0.3),
+                inset 0 2px 12px rgba(255, 255, 255, 0.3);
+  }
+}
+
+// Smooth Card Entry Animation
+@keyframes cardSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.card-animate {
+  animation: cardSlideIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  opacity: 0;
+}
+
+// Number Counter Animation
+@keyframes numberPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.number-animate {
+  animation: numberPulse 2s ease-in-out infinite;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.3),
+               0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+// Grid Stagger Animation
+.stats-grid {
+  > * {
+    &:nth-child(1) { animation-delay: 0s; }
+    &:nth-child(2) { animation-delay: 0.1s; }
+    &:nth-child(3) { animation-delay: 0.2s; }
+    &:nth-child(4) { animation-delay: 0.3s; }
+    &:nth-child(5) { animation-delay: 0.4s; }
+    &:nth-child(6) { animation-delay: 0.5s; }
+    &:nth-child(7) { animation-delay: 0.6s; }
+    &:nth-child(8) { animation-delay: 0.7s; }
+  }
+}
+
+// Smooth Hover Lift Effect
+.glass-card {
+  transition: all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform, box-shadow;
+  
+  &:hover {
+    transform: translateY(-12px) scale(1.05) rotateX(2deg);
+    transform-style: preserve-3d;
+    perspective: 1000px;
+  }
+  
+  // Shimmer effect on hover
   &::after {
     content: '';
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff);
-    background-size: 300% 100%;
-    animation: gradientShift 6s ease-in-out infinite;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      45deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.1) 50%,
+      transparent 70%
+    );
+    transform: rotate(45deg);
+    transition: all 0.7s ease;
+    opacity: 0;
   }
   
-  .header-content {
-    position: relative;
-    z-index: 2;
+  &:hover::after {
+    opacity: 1;
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(100%) translateY(100%) rotate(45deg);
+  }
+}
+
+// Frosted Glass Background Blur
+.glass-card {
+  background-clip: padding-box;
+  
+  // Inner glow
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.2), 
+      rgba(255, 255, 255, 0.05));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, 
+                  linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .glass-card {
+    &:hover {
+      transform: translateY(-8px) scale(1.03);
+    }
   }
   
-  .header-title {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-lg);
-    
-    .header-icon {
-      font-size: 3rem !important;
-      width: 3rem !important;
-      height: 3rem !important;
-      color: var(--accent);
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: var(--radius-xl);
-      padding: var(--spacing);
-      display: inline-flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      line-height: 1 !important;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      
-      &:hover {
-        transform: scale(1.05) rotate(5deg);
-        background: rgba(255, 255, 255, 0.25);
-      }
-    }
-    
-    .title-text {
-      flex: 1;
-      
-      h1 {
-        font-family: 'Poppins', sans-serif;
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: white;
-        margin: 0 0 var(--spacing-sm) 0;
-        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        letter-spacing: -0.025em;
-      }
-      
-      p {
-        font-size: 1.125rem;
-        color: rgba(255, 255, 255, 0.9);
-        margin: 0;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        line-height: 1.6;
-      }
-    }
+  .number-animate {
+    font-size: 2.5rem;
+  }
+}
+
+// Smooth transitions for all interactive elements
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// Enhanced backdrop blur support
+@supports (backdrop-filter: blur(20px)) or (-webkit-backdrop-filter: blur(20px)) {
+  .glass-card {
+    background-color: rgba(255, 255, 255, 0.05) !important;
   }
 }
 

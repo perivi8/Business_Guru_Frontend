@@ -1,17 +1,17 @@
-<!-- Main Container with Gradient Background -->
-<div class="min-h-screen bg-gradient-body">
+<!-- Main Container with Dark Theme Background -->
+<div class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
   
   <!-- Header Section -->
-  <div class="bg-white shadow-sm border-b border-border-light sticky top-0 z-10">
+  <div class="bg-gray-800 shadow-lg border-b border-gray-700 sticky top-0 z-10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-4">
           <button (click)="goBack()" 
-                  class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+                  class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-300 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors">
             <mat-icon class="text-lg">arrow_back</mat-icon>
             Back to Enquiries
           </button>
-          <h1 class="text-2xl font-bold text-text-primary">Enquiry Details</h1>
+          <h1 class="text-2xl font-bold text-white">Enquiry Details</h1>
         </div>
         <button *ngIf="enquiry" 
                 (click)="editEnquiry()" 
@@ -26,20 +26,20 @@
   <!-- Loading State -->
   <div *ngIf="loading" class="flex flex-col items-center justify-center py-16">
     <mat-spinner diameter="40" class="mb-4"></mat-spinner>
-    <p class="text-text-secondary">Loading enquiry details...</p>
+    <p class="text-gray-300">Loading enquiry details...</p>
   </div>
 
   <!-- Enquiry Details Content -->
   <div *ngIf="!loading && enquiry" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
     
     <!-- Main Info Card -->
-    <div class="bg-white rounded-xl shadow-sm border border-border-light p-6 mb-6">
+    <div class="bg-gray-800 rounded-xl shadow-lg border border-gray-700 p-6 mb-6">
       <div class="flex items-start justify-between mb-6">
         <div>
-          <h2 class="text-2xl font-bold text-text-primary mb-2">
+          <h2 class="text-2xl font-bold text-white mb-2">
             {{ enquiry.owner_name || enquiry.wati_name }}
           </h2>
-          <div class="flex items-center gap-4 text-sm text-text-muted">
+          <div class="flex items-center gap-4 text-sm text-gray-400">
             <span class="flex items-center gap-1">
               <mat-icon class="text-sm">calendar_today</mat-icon>
               {{ enquiry.date | date:'dd/MM/yyyy' }}
@@ -63,23 +63,23 @@
         
         <!-- Owner Name -->
         <div class="space-y-2">
-          <label class="text-sm font-medium text-text-muted">Owner Name</label>
-          <p class="text-base text-text-primary font-medium">
+          <label class="text-sm font-medium text-gray-400">Owner Name</label>
+          <p class="text-base text-white font-medium">
             {{ enquiry.owner_name || enquiry.wati_name || 'N/A' }}
           </p>
         </div>
 
         <!-- User Name -->
         <div *ngIf="enquiry.user_name" class="space-y-2">
-          <label class="text-sm font-medium text-text-muted">User Name</label>
-          <p class="text-base text-text-primary font-medium">
+          <label class="text-sm font-medium text-gray-400">User Name</label>
+          <p class="text-base text-white font-medium">
             {{ enquiry.user_name }}
           </p>
         </div>
 
         <!-- Phone Number -->
         <div class="space-y-2">
-          <label class="text-sm font-medium text-text-muted">Phone Number</label>
+          <label class="text-sm font-medium text-gray-400">Phone Number</label>
           <a [href]="getWhatsAppLink(enquiry.phone_number || enquiry.mobile_number)" 
              target="_blank"
              class="text-base text-green-600 font-medium flex items-center gap-2 hover:text-green-700 hover:underline cursor-pointer transition-colors">
@@ -91,7 +91,7 @@
 
         <!-- Secondary Mobile -->
         <div *ngIf="enquiry.secondary_mobile_number" class="space-y-2">
-          <label class="text-sm font-medium text-text-muted">Secondary Mobile</label>
+          <label class="text-sm font-medium text-gray-400">Secondary Mobile</label>
           <a [href]="getWhatsAppLink(enquiry.secondary_mobile_number)" 
              target="_blank"
              class="text-base text-cyan-600 font-medium flex items-center gap-2 hover:text-cyan-700 hover:underline cursor-pointer transition-colors">
@@ -103,8 +103,8 @@
 
         <!-- Email Address -->
         <div *ngIf="enquiry.email_address" class="space-y-2">
-          <label class="text-sm font-medium text-text-muted">Email Address</label>
-          <p class="text-base text-text-primary font-medium flex items-center gap-2">
+          <label class="text-sm font-medium text-gray-400">Email Address</label>
+          <p class="text-base text-white font-medium flex items-center gap-2">
             <mat-icon class="text-blue-600 text-lg">email</mat-icon>
             {{ enquiry.email_address }}
           </p>
@@ -112,7 +112,7 @@
 
         <!-- GST Status -->
         <div class="space-y-2">
-          <label class="text-sm font-medium text-text-muted">GST Status</label>
+          <label class="text-sm font-medium text-gray-400">GST Status</label>
           <div>
             <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium"
                   [ngClass]="{
@@ -128,8 +128,8 @@
 
         <!-- Business Type -->
         <div *ngIf="enquiry.business_type" class="space-y-2">
-          <label class="text-sm font-medium text-text-muted">Business Type</label>
-          <p class="text-base text-text-primary font-medium flex items-center gap-2">
+          <label class="text-sm font-medium text-gray-400">Business Type</label>
+          <p class="text-base text-white font-medium flex items-center gap-2">
             <mat-icon class="text-purple-600 text-lg">business_center</mat-icon>
             {{ enquiry.business_type }}
           </p>
@@ -137,8 +137,8 @@
 
         <!-- Business Name -->
         <div *ngIf="enquiry.business_name" class="space-y-2">
-          <label class="text-sm font-medium text-text-muted">Business Name</label>
-          <p class="text-base text-text-primary font-medium flex items-center gap-2">
+          <label class="text-sm font-medium text-gray-400">Business Name</label>
+          <p class="text-base text-white font-medium flex items-center gap-2">
             <mat-icon class="text-orange-600 text-lg">business</mat-icon>
             {{ enquiry.business_name }}
           </p>
@@ -146,8 +146,8 @@
 
         <!-- Loan Amount -->
         <div *ngIf="enquiry.loan_amount" class="space-y-2">
-          <label class="text-sm font-medium text-text-muted">Loan Amount</label>
-          <p class="text-base text-text-primary font-medium flex items-center gap-2">
+          <label class="text-sm font-medium text-gray-400">Loan Amount</label>
+          <p class="text-base text-white font-medium flex items-center gap-2">
             <mat-icon class="text-emerald-600 text-lg">payments</mat-icon>
             {{ enquiry.loan_amount }}
           </p>
@@ -155,8 +155,8 @@
 
         <!-- Loan Purpose -->
         <div *ngIf="enquiry.loan_purpose" class="space-y-2">
-          <label class="text-sm font-medium text-text-muted">Loan Purpose</label>
-          <p class="text-base text-text-primary font-medium flex items-center gap-2">
+          <label class="text-sm font-medium text-gray-400">Loan Purpose</label>
+          <p class="text-base text-white font-medium flex items-center gap-2">
             <mat-icon class="text-amber-600 text-lg">description</mat-icon>
             {{ enquiry.loan_purpose }}
           </p>
@@ -164,8 +164,8 @@
 
         <!-- Annual Revenue -->
         <div *ngIf="enquiry.annual_revenue" class="space-y-2">
-          <label class="text-sm font-medium text-text-muted">Annual Revenue</label>
-          <p class="text-base text-text-primary font-medium flex items-center gap-2">
+          <label class="text-sm font-medium text-gray-400">Annual Revenue</label>
+          <p class="text-base text-white font-medium flex items-center gap-2">
             <mat-icon class="text-teal-600 text-lg">attach_money</mat-icon>
             {{ enquiry.annual_revenue }}
           </p>
@@ -173,8 +173,8 @@
 
         <!-- Staff Assigned -->
         <div class="space-y-2">
-          <label class="text-sm font-medium text-text-muted">Assigned Staff</label>
-          <p class="text-base text-text-primary font-medium flex items-center gap-2">
+          <label class="text-sm font-medium text-gray-400">Assigned Staff</label>
+          <p class="text-base text-white font-medium flex items-center gap-2">
             <mat-icon class="text-indigo-600 text-lg">support_agent</mat-icon>
             {{ enquiry.staff || 'Unassigned' }}
           </p>
@@ -184,8 +184,8 @@
     </div>
 
     <!-- Business Document Section -->
-    <div *ngIf="enquiry.business_document_url" class="bg-white rounded-xl shadow-sm border border-border-light p-6 mb-6">
-      <h3 class="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
+    <div *ngIf="enquiry.business_document_url" class="bg-gray-800 rounded-xl shadow-lg border border-gray-700 p-6 mb-6">
+      <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
         <mat-icon class="text-violet-600">folder</mat-icon>
         Business Document
       </h3>
@@ -204,23 +204,23 @@
     </div>
 
     <!-- Additional Comments Section -->
-    <div *ngIf="enquiry.additional_comments" class="bg-white rounded-xl shadow-sm border border-border-light p-6 mb-6">
-      <h3 class="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
-        <mat-icon class="text-blue-600">comment</mat-icon>
+    <div *ngIf="enquiry.additional_comments" class="bg-gray-800 rounded-xl shadow-lg border border-gray-700 p-6 mb-6">
+      <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+        <mat-icon class="text-blue-400">comment</mat-icon>
         Additional Comments
       </h3>
-      <p class="text-base text-text-secondary whitespace-pre-wrap">
+      <p class="text-base text-gray-300 whitespace-pre-wrap">
         {{ enquiry.additional_comments }}
       </p>
     </div>
 
     <!-- Client Information Section -->
-    <div *ngIf="enquiry.client_submitted || enquiry.client_id" class="bg-green-50 rounded-xl shadow-sm border border-green-200 p-6">
-      <h3 class="text-lg font-semibold text-green-800 mb-2 flex items-center gap-2">
-        <mat-icon class="text-green-600">check_circle</mat-icon>
+    <div *ngIf="enquiry.client_submitted || enquiry.client_id" class="bg-green-900/30 rounded-xl shadow-lg border border-green-700 p-6">
+      <h3 class="text-lg font-semibold text-green-400 mb-2 flex items-center gap-2">
+        <mat-icon class="text-green-400">check_circle</mat-icon>
         Client Created
       </h3>
-      <p class="text-sm text-green-700">
+      <p class="text-sm text-green-300">
         This enquiry has been converted to a client.
       </p>
     </div>
@@ -229,15 +229,15 @@
 
   <!-- Error State -->
   <div *ngIf="!loading && !enquiry" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-    <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-      <mat-icon class="text-red-600 text-3xl">error_outline</mat-icon>
+    <div class="w-20 h-20 bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+      <mat-icon class="text-red-400 text-3xl">error_outline</mat-icon>
     </div>
-    <h3 class="text-xl font-semibold text-text-primary mb-2">Enquiry Not Found</h3>
-    <p class="text-text-secondary mb-6">
+    <h3 class="text-xl font-semibold text-white mb-2">Enquiry Not Found</h3>
+    <p class="text-gray-300 mb-6">
       The enquiry you're looking for doesn't exist or has been deleted.
     </p>
-    <button (click)="goBack()" class="btn btn-primary">
-      <mat-icon class="mr-2">arrow_back</mat-icon>
+    <button (click)="goBack()" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2 mx-auto">
+      <mat-icon>arrow_back</mat-icon>
       Back to Enquiries
     </button>
   </div>

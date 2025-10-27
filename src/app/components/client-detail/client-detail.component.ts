@@ -23,6 +23,10 @@ export class ClientDetailComponent implements OnInit {
   updatingLoanStatus = false;
   updatingGatewayStatus: string | null = null;
 
+  // Stepper properties
+  currentStep = 1;
+  totalSteps = 5;
+
   // Custom dropdown properties
   isStatusDropdownOpen = false;
 
@@ -183,6 +187,17 @@ export class ClientDetailComponent implements OnInit {
     return !!(this.client.processed_documents['ie_code_document'] || 
               this.client.processed_documents['ie_code'] ||
               this.client.processed_documents['ie_document']);
+  }
+
+  hasBusinessDocument(): boolean {
+    if (!this.client) return false;
+    // Check all possible locations where business document might exist
+    return !!(
+      this.client.business_document_url || 
+      (this.client.documents && this.client.documents['business_document']) || 
+      (this.client.processed_documents && this.client.processed_documents['business_document']) ||
+      (this.client.documents_original && this.client.documents_original['business_document'])
+    );
   }
 
   getGSTStatus(): string {
@@ -1550,6 +1565,92 @@ export class ClientDetailComponent implements OnInit {
         });
       }
     });
+  }
+
+  // Stepper navigation methods
+  nextStep(): void {
+    if (this.currentStep < this.totalSteps) {
+      this.currentStep++;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  previousStep(): void {
+    if (this.currentStep > 1) {
+      this.currentStep--;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  goToStep(step: number): void {
+    if (step >= 1 && step <= this.totalSteps) {
+      this.currentStep = step;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  getStepTitle(step: number): string {
+    const titles = [
+      'Business & Personal Info',
+      'Financial Information',
+      'Documents & Images',
+      'Payment Gateway',
+      'Loan Status & Feedback'
+    ];
+    return titles[step - 1] || '';
+  }
+
+  // Copy to clipboard method
+  copyToClipboard(text: string, event?: Event): void {
+    // Don't prevent default - allow the link to open
+    if (event) {
+      event.stopPropagation();
+    }
+    
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        this.snackBar.open('GST Number copied to clipboard!', 'Close', {
+          duration: 2000,
+          horizontalPosition: 'center',
+          verticalPosition: 'bottom',
+          panelClass: ['success-snackbar']
+        });
+      }).catch(err => {
+        console.error('Failed to copy text: ', err);
+        this.fallbackCopyToClipboard(text);
+      });
+    } else {
+      this.fallbackCopyToClipboard(text);
+    }
+  }
+
+  // Fallback copy method for older browsers
+  private fallbackCopyToClipboard(text: string): void {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+      document.execCommand('copy');
+      this.snackBar.open('GST Number copied to clipboard!', 'Close', {
+        duration: 2000,
+        horizontalPosition: 'center',
+        verticalPosition: 'bottom',
+        panelClass: ['success-snackbar']
+      });
+    } catch (err) {
+      console.error('Fallback: Failed to copy', err);
+      this.snackBar.open('Failed to copy GST Number', 'Close', {
+        duration: 2000,
+        panelClass: ['error-snackbar']
+      });
+    }
+    
+    document.body.removeChild(textArea);
   }
 
 }
