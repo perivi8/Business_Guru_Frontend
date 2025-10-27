@@ -49,9 +49,9 @@ export class ClientsComponent implements OnInit, OnDestroy {
     { value: 'share signature', label: 'share signature', icon: 'draw' }
   ];
 
-  displayedColumns: string[] = ['serial', 'name', 'business', 'staff', 'status', 'loan_status', 'created', 'comments', 'actions'];
-  userDisplayedColumns: string[] = ['serial', 'name', 'business', 'staff', 'status', 'loan_status', 'created', 'comments', 'actions']; // Include 'comments' for regular users (read-only)
-  adminDisplayedColumns: string[] = ['serial', 'name', 'business', 'staff', 'status', 'loan_status', 'created', 'comments', 'actions'];
+  displayedColumns: string[] = ['serial', 'name', 'business', 'mobile', 'staff', 'status', 'loan_status', 'created', 'comments', 'actions'];
+  userDisplayedColumns: string[] = ['serial', 'name', 'business', 'mobile', 'staff', 'status', 'loan_status', 'created', 'comments', 'actions']; // Include 'comments' for regular users (read-only)
+  adminDisplayedColumns: string[] = ['serial', 'name', 'business', 'mobile', 'staff', 'status', 'loan_status', 'created', 'comments', 'actions'];
 
   constructor(
     private clientService: ClientService,
