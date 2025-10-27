@@ -1,11 +1,11 @@
 <!-- FinGrowth Business Loan Enquiry Form -->
 <div class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
-  <div class="w-full max-w-6xl flex items-center justify-between gap-8">
+  <div class="w-full max-w-6xl flex flex-col lg:flex-row items-center justify-between gap-8">
     
     <!-- Left Side - Content -->
-    <div class="flex-1 text-white">
+    <div class="flex-1 text-white w-full lg:w-auto">
       <!-- Logo -->
-      <div class="flex items-center gap-2 mb-8">
+      <div class="flex items-center justify-center lg:justify-start gap-2 mb-6 md:mb-8">
         <div class="w-8 h-8 bg-teal-400 rounded flex items-center justify-center">
           <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
             <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"></path>
@@ -15,36 +15,36 @@
       </div>
       
       <!-- Main Heading -->
-      <h1 class="text-5xl font-bold leading-tight mb-6">
-        Power Your Business<br>
+      <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-6 text-center lg:text-left">
+        <span class="text-white">Power Your Business</span><br>
         with<br>
         <span class="text-teal-400">Tailored Financial<br>Solutions</span>
       </h1>
       
       <!-- Description -->
-      <p class="text-lg text-gray-300 mb-8 max-w-lg">
+      <p class="text-base md:text-lg text-gray-300 mb-8 max-w-lg text-center lg:text-left">
         Get the capital you need with same-day approvals and competitive rates. 
         Designed for ambitious businesses looking to expand, upgrade, or optimize their operations.
       </p>
       
       <!-- Features -->
-      <div class="grid grid-cols-3 gap-6 mb-8">
+      <div class="grid grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-8">
         <div class="text-center">
-          <div class="text-3xl font-bold mb-1">24h</div>
-          <div class="text-sm text-gray-400">Fast Track Approval</div>
+          <div class="text-xl sm:text-2xl md:text-3xl font-bold mb-1">24h</div>
+          <div class="text-xs sm:text-sm text-gray-400">Fast Track Approval</div>
         </div>
         <div class="text-center">
-          <div class="text-3xl font-bold mb-1">8%*</div>
-          <div class="text-sm text-gray-400">Competitive Rates</div>
+          <div class="text-xl sm:text-2xl md:text-3xl font-bold mb-1">8%*</div>
+          <div class="text-xs sm:text-sm text-gray-400">Competitive Rates</div>
         </div>
         <div class="text-center">
-          <div class="text-3xl font-bold mb-1">₹5 Crore</div>
-          <div class="text-sm text-gray-400">Maximum Funding</div>
+          <div class="text-xl sm:text-2xl md:text-3xl font-bold mb-1">₹5 Crore</div>
+          <div class="text-xs sm:text-sm text-gray-400">Maximum Funding</div>
         </div>
       </div>
       
       <!-- Trust Indicators -->
-      <div class="grid grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
         <div class="flex items-center gap-2">
           <div class="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
             <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -81,8 +81,8 @@
     </div>
     
     <!-- Right Side - Form -->
-    <div *ngIf="!submitted" class="w-full max-w-md">
-      <div class="bg-slate-700 rounded-2xl p-6 shadow-2xl border border-slate-600">
+    <div *ngIf="!submitted" class="w-full max-w-md lg:max-w-md">
+      <div class="bg-slate-700 rounded-2xl p-4 md:p-6 shadow-2xl border border-slate-600">
         <!-- Form Header -->
         <div class="mb-6">
           <h2 class="text-xl font-semibold text-white mb-2">Business Loan Enquiry</h2>
@@ -91,7 +91,7 @@
         
         <form [formGroup]="enquiryForm" (ngSubmit)="onSubmit()" class="space-y-4">
           <!-- Business Name -->
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-300 mb-2">Business Name</label>
               <input 
@@ -111,7 +111,7 @@
           </div>
           
           <!-- Email and Phone -->
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
               <input 
@@ -131,7 +131,7 @@
           </div>
           
           <!-- Loan Amount and Purpose -->
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-300 mb-2">Loan Amount</label>
               <input 
@@ -254,20 +254,20 @@
     </div>
 
     <!-- Success Message -->
-    <div *ngIf="submitted && success" class="w-full max-w-md">
+    <div *ngIf="submitted && success" class="w-full max-w-md lg:max-w-md">
       <div class="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
         <!-- Success Header -->
-        <div class="bg-gradient-to-r from-green-500 to-emerald-600 px-8 py-6 text-white">
-          <div class="flex items-center gap-3">
-            <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-              <mat-icon class="text-3xl">check_circle</mat-icon>
+        <div class="bg-gradient-to-r from-green-500 to-emerald-600 px-4 md:px-8 py-4 md:py-6 text-white">
+          <div class="flex items-center gap-2 md:gap-3">
+            <div class="w-10 h-10 md:w-12 md:h-12 bg-white/20 rounded-full flex items-center justify-center">
+              <mat-icon class="text-2xl md:text-3xl">check_circle</mat-icon>
             </div>
-            <h2 class="text-2xl font-bold">Enquiry Submitted Successfully!</h2>
+            <h2 class="text-lg md:text-2xl font-bold">Enquiry Submitted Successfully!</h2>
           </div>
         </div>
       
       <!-- Success Content -->
-      <div class="p-8 text-center">
+      <div class="p-4 md:p-8 text-center">
         <div class="space-y-4 mb-8">
           <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg class="h-10 w-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -337,19 +337,19 @@
     </div>
 
     <!-- General Error Message -->
-    <div *ngIf="submitted && !success && !mobileExists" class="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
+    <div *ngIf="submitted && !success && !mobileExists" class="w-full max-w-md lg:max-w-md bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
       <!-- Error Header -->
-      <div class="bg-gradient-to-r from-red-500 to-pink-600 px-8 py-6 text-white">
-        <div class="flex items-center gap-3">
-          <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-            <mat-icon class="text-3xl">error</mat-icon>
+      <div class="bg-gradient-to-r from-red-500 to-pink-600 px-4 md:px-8 py-4 md:py-6 text-white">
+        <div class="flex items-center gap-2 md:gap-3">
+          <div class="w-10 h-10 md:w-12 md:h-12 bg-white/20 rounded-full flex items-center justify-center">
+            <mat-icon class="text-2xl md:text-3xl">error</mat-icon>
           </div>
-          <h2 class="text-2xl font-bold">Submission Failed</h2>
+          <h2 class="text-lg md:text-2xl font-bold">Submission Failed</h2>
         </div>
       </div>
       
       <!-- Error Content -->
-      <div class="p-8 text-center">
+      <div class="p-4 md:p-8 text-center">
         <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
           <mat-icon class="text-red-600 text-4xl">error_outline</mat-icon>
         </div>
