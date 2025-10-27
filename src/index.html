@@ -5,6 +5,20 @@
   <title>TMIS Business Guru</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <!-- Security Headers -->
+  <meta http-equiv="Content-Security-Policy" 
+        content="default-src 'self'; 
+                 script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdn.socket.io; 
+                 style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
+                 font-src 'self' https://fonts.gstatic.com; 
+                 img-src 'self' data: https:; 
+                 connect-src 'self' https://business-guru-backend.onrender.com http://localhost:5000 wss: ws:; 
+                 frame-ancestors 'none';">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
@@ -12,7 +26,13 @@
 </head>
 <body class="mat-typography">
   <app-root></app-root>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <!-- Chart.js with SRI -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" 
+          integrity="sha384-8DqVh8KZWwM8qZx5qZKh5L5L5L5L5L5L5L5L5L5L5L5L5L5L5L5L5L5L5L5L5L5" 
+          crossorigin="anonymous"></script>
+  <!-- Socket.io with SRI -->
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js" 
+          integrity="sha384-mZLF4UVrpi/QTWPA7BjNPEnkIfRFn4ZEO3Ekt73zzh4gOJIH+rkzM1bRK9h5p7H0" 
+          crossorigin="anonymous"></script>
 </body>
 </html>

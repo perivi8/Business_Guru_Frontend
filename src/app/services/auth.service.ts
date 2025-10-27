@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
+import { LoggerService } from './logger.service';
 
 export interface User {
   id: string;
@@ -32,7 +33,10 @@ export class AuthService {
   public currentUser: Observable<User | null>;
   private userStatusCheckInterval: any;
 
-  constructor(private http: HttpClient) {
+  constructor(
+    private http: HttpClient,
+    private logger: LoggerService
+  ) {
     // Initialize with stored user data for persistent login
     const storedUser = localStorage.getItem('currentUser');
     const storedToken = localStorage.getItem('token');
@@ -91,10 +95,8 @@ export class AuthService {
   isAuthenticated(): boolean {
     const token = localStorage.getItem('token');
     const user = this.currentUserValue;
-    console.log('Auth check - Token exists:', !!token);
-    console.log('Auth check - User exists:', !!user);
-    console.log('Auth check - Token value:', token);
-    console.log('Auth check - User value:', user);
+    this.logger.debug('Auth check - Token exists:', !!token);
+    this.logger.debug('Auth check - User exists:', !!user);
     return !!token && !!user;
   }
 
@@ -128,16 +130,16 @@ export class AuthService {
       try {
         const user = JSON.parse(storedUser);
         this.currentUserSubject.next(user);
-        console.log('Session restored successfully for user:', user.email);
+        this.logger.debug('Session restored successfully for user:', user.email);
         return true;
       } catch (error) {
-        console.error('Error parsing stored user data:', error);
+        this.logger.error('Error parsing stored user data:', error);
         this.clearSession();
         return false;
       }
     }
     
-    console.log('No valid session found to restore');
+    this.logger.debug('No valid session found to restore');
     return false;
   }
 

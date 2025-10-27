@@ -93,13 +93,13 @@
                 <!-- Admin: Show only Pending User Approvals -->
                 <ng-container *ngIf="isAdmin()">
                   <!-- No pending approvals state for admin -->
-                  <div *ngIf="pendingUsersCount === 0" class="no-notifications">
+                  <div *ngIf="getPendingUsers().length === 0" class="no-notifications">
                     <mat-icon>notifications_none</mat-icon>
                     <p>No pending user approvals</p>
                   </div>
                   
                   <!-- Pending User Approvals (Admin Only) -->
-                  <div *ngIf="pendingUsersCount > 0" class="notification-section">
+                  <div *ngIf="getPendingUsers().length > 0" class="notification-section">
                     <h4>Pending User Approvals</h4>
                     <div *ngFor="let user of getPendingUsers()" 
                          class="notification-item approval-request">

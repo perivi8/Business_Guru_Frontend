@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { LoggerService } from '../../services/logger.service';
 
 @Component({
   selector: 'app-login',
@@ -24,7 +25,8 @@ export class LoginComponent implements OnInit, OnDestroy {
     private formBuilder: FormBuilder,
     private router: Router,
     private route: ActivatedRoute,
-    private authService: AuthService
+    private authService: AuthService,
+    private logger: LoggerService
   ) { }
 
   ngOnInit(): void {
@@ -84,7 +86,7 @@ export class LoginComponent implements OnInit, OnDestroy {
           this.redirectAuthenticatedUser();
         },
         error: (error) => {
-          console.error('Login error:', error);
+          this.logger.error('Login error:', error);
           // Handle different types of errors
           if (error.status === 0) {
             this.error = 'Network error. Please check your connection and try again.';

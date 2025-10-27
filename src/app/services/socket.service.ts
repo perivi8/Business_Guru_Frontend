@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
+import { LoggerService } from './logger.service';
 
 @Injectable({
   providedIn: 'root'
@@ -7,19 +8,19 @@ import { BehaviorSubject, Observable, of } from 'rxjs';
 export class SocketService {
   private connected = new BehaviorSubject<boolean>(false);
   
-  constructor() {
+  constructor(private logger: LoggerService) {
     // Socket.IO completely disabled to prevent connection errors
-    console.log('Socket.IO service disabled - using regular HTTP requests only');
+    this.logger.debug('Socket.IO service disabled - using regular HTTP requests only');
   }
 
   connect(): void {
     // Disabled - no socket connection
-    console.log('Socket connect called but disabled');
+    this.logger.debug('Socket connect called but disabled');
   }
 
   disconnect(): void {
     // Disabled - no socket connection
-    console.log('Socket disconnect called but disabled');
+    this.logger.debug('Socket disconnect called but disabled');
   }
 
   isConnected(): Observable<boolean> {
@@ -28,7 +29,7 @@ export class SocketService {
 
   // All socket methods disabled - returning empty observables
   adminLogin(userId: string, role: string): void {
-    console.log('adminLogin called but disabled');
+    this.logger.debug('adminLogin called but disabled');
   }
 
   onApprovalRequest(): Observable<any> {
@@ -36,7 +37,7 @@ export class SocketService {
   }
 
   sendApprovalResponse(approvalId: string, action: 'approve' | 'reject', reason?: string): void {
-    console.log('sendApprovalResponse called but disabled');
+    this.logger.debug('sendApprovalResponse called but disabled');
   }
 
   onRegistrationResult(): Observable<any> {

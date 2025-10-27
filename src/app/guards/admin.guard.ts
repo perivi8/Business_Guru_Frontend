@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { LoggerService } from '../services/logger.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,10 +10,20 @@ export class AdminGuard implements CanActivate {
 
   constructor(
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private logger: LoggerService
   ) { }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+    // First check if token is expired
+    const token = this.authService.getToken();
+    if (token && this.isTokenExpired(token)) {
+      this.logger.warn('Token expired, logging out');
+      this.authService.logout();
+      this.router.navigate(['/login']);
+      return false;
+    }
+
     if (this.authService.isAdmin()) {
       return true;
     }
@@ -20,5 +31,19 @@ export class AdminGuard implements CanActivate {
     // Not admin so redirect to dashboard
     this.router.navigate(['/dashboard']);
     return false;
+  }
+
+  /**
+   * Check if JWT token is expired
+   */
+  private isTokenExpired(token: string): boolean {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const expirationTime = payload.exp * 1000; // Convert to milliseconds
+      return Date.now() >= expirationTime;
+    } catch (error) {
+      this.logger.error('Error parsing token:', error);
+      return true; // Treat invalid tokens as expired
+    }
   }
 }

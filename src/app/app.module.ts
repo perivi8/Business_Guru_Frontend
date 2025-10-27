@@ -52,8 +52,6 @@ import { EnquiryComponent } from './components/enquiry/enquiry.component';
 import { EnquiryDetailsComponent } from './components/enquiry-details/enquiry-details.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { AdminApprovalPopupComponent } from './components/admin-approval-popup/admin-approval-popup.component';
-import { ChatbotComponent } from './components/chatbot/chatbot.component';
-import { ChatbotFabComponent } from './components/chatbot-fab/chatbot-fab.component';
 import { WhatsappLinkComponent } from './components/whatsapp-link/whatsapp-link.component';
 import { WhatsappPublicComponent } from './components/whatsapp-public/whatsapp-public.component';
 import { WhatsappTestComponent } from './components/whatsapp-test/whatsapp-test.component';
@@ -91,8 +89,6 @@ import { SocketService } from './services/socket.service';
     EnquiryDetailsComponent,
     ForgotPasswordComponent,
     AdminApprovalPopupComponent,
-    ChatbotComponent,
-    ChatbotFabComponent,
     WhatsappLinkComponent,
     WhatsappPublicComponent,
     WhatsappTestComponent,
