@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --configuration=production --output-hashing=all --aot --build-optimizer --optimization --vendor-chunk --common-chunk --extract-licenses --extract-css --source-map=false",
+    "build": "ng build --configuration=production",
     "build:dev": "ng build --configuration=development",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"

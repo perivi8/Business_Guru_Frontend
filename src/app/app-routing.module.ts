@@ -9,10 +9,14 @@ import { ClientsComponent } from './components/clients/clients.component';
 import { ClientDetailComponent } from './components/client-detail/client-detail.component';
 import { NewClientComponent } from './components/new-client/new-client.component';
 import { EditClientComponent } from './components/edit-client/edit-client.component';
+import { ContactUsComponent } from './components/contact-us/contact-us.component';
 import { NotificationsComponent } from './components/notifications/notifications.component';
 import { EnquiryComponent } from './components/enquiry/enquiry.component';
 import { EnquiryDetailsComponent } from './components/enquiry-details/enquiry-details.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
+import { WhatsappLinkComponent } from './components/whatsapp-link/whatsapp-link.component';
+import { WhatsappPublicComponent } from './components/whatsapp-public/whatsapp-public.component';
+import { WhatsappTestComponent } from './components/whatsapp-test/whatsapp-test.component';
 import { PublicEnquiryComponent } from './components/public-enquiry/public-enquiry.component';
 import { AuthGuard } from './guards/auth.guard';
 import { AdminGuard } from './guards/admin.guard';
@@ -71,10 +75,23 @@ const routes: Routes = [
     component: EditClientComponent, 
     canActivate: [AuthGuard] 
   },
+  // Removed contact-us route completely
   { 
     path: 'notifications', 
     component: NotificationsComponent, 
     canActivate: [AuthGuard] 
+  },
+  { 
+    path: 'whatsapp-link', 
+    component: WhatsappLinkComponent 
+  },
+  { 
+    path: 'whatsapp-public', 
+    component: WhatsappPublicComponent 
+  },
+  { 
+    path: 'whatsapp-test', 
+    component: WhatsappTestComponent 
   },
   { 
     path: 'new-enquiry', 

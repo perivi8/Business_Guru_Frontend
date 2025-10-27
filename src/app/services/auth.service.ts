@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { LoggerService } from './logger.service';
 
 export interface User {
   id: string;
@@ -33,10 +32,7 @@ export class AuthService {
   public currentUser: Observable<User | null>;
   private userStatusCheckInterval: any;
 
-  constructor(
-    private http: HttpClient,
-    private logger: LoggerService
-  ) {
+  constructor(private http: HttpClient) {
     // Initialize with stored user data for persistent login
     const storedUser = localStorage.getItem('currentUser');
     const storedToken = localStorage.getItem('token');
@@ -95,29 +91,11 @@ export class AuthService {
   isAuthenticated(): boolean {
     const token = localStorage.getItem('token');
     const user = this.currentUserValue;
-    
-    // Check if token and user exist
-    if (!token || !user) {
-      return false;
-    }
-    
-    // Validate JWT expiration
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      const isExpired = payload.exp && (payload.exp * 1000 < Date.now());
-      
-      if (isExpired) {
-        // Token expired, logout user
-        this.logout();
-        return false;
-      }
-      
-      return true;
-    } catch (error) {
-      // Invalid token format
-      this.logout();
-      return false;
-    }
+    console.log('Auth check - Token exists:', !!token);
+    console.log('Auth check - User exists:', !!user);
+    console.log('Auth check - Token value:', token);
+    console.log('Auth check - User value:', user);
+    return !!token && !!user;
   }
 
   isAdmin(): boolean {
@@ -150,16 +128,16 @@ export class AuthService {
       try {
         const user = JSON.parse(storedUser);
         this.currentUserSubject.next(user);
-        this.logger.log('Session restored successfully for user:', user.email);
+        console.log('Session restored successfully for user:', user.email);
         return true;
       } catch (error) {
-        this.logger.error('Error parsing stored user data:', error);
+        console.error('Error parsing stored user data:', error);
         this.clearSession();
         return false;
       }
     }
     
-    this.logger.log('No valid session found to restore');
+    console.log('No valid session found to restore');
     return false;
   }
 

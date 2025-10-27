@@ -696,15 +696,15 @@ export class NewClientComponent implements OnInit {
     this.clientService.createClient(formData).subscribe({
       next: (response) => {
         this.success = 'Client created successfully!';
-        this.loading = false;
         
         // Sync data back to enquiry if this came from an enquiry
         if (this.enquiryData?.enquiry_id) {
           this.syncClientDataBackToEnquiry(response.client, this.enquiryData.enquiry_id);
         }
         
-        // Redirect immediately to clients page
-        this.router.navigate(['/clients']);
+        setTimeout(() => {
+          this.router.navigate(['/clients']);
+        }, 2000);
       },
       error: (error) => {
         this.error = error.error?.error || 'Failed to create client';

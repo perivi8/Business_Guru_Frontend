@@ -1,17 +1,15 @@
-<!-- Main Container with Dark Theme Background -->
-<div class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+<!-- Main Container with Gradient Background -->
+<div class="min-h-screen bg-gradient-body">
 
   <!-- Main Content Layout -->
   <div class="max-w-7xl mx-auto py-6">
     
     <!-- Horizontal Filters Section -->
-    <div class="bg-gray-800 rounded-xl shadow-lg border border-gray-700 p-6 mb-6">
+    <div class="bg-white rounded-xl shadow-sm border border-border-light p-6 mb-6">
       <!-- Filters Header -->
       <div class="flex items-center justify-between mb-6">
-        <h3 class="text-lg font-semibold text-white flex items-center gap-2">
-          <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
-          </svg>
+        <h3 class="text-lg font-semibold text-text-primary flex items-center gap-2">
+          <mat-icon class="text-primary">filter_list</mat-icon>
           Filters
         </h3>
         <div class="flex items-center gap-3">
@@ -19,18 +17,18 @@
           <div class="hidden md:flex items-center gap-2">
             <button 
               (click)="viewMode = 'table'" 
-              [class]="viewMode === 'table' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'"
+              [class]="viewMode === 'table' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
               class="flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200"
-              title="Table View">
+              matTooltip="Table View">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 6h18m-9 8h9m-9 4h9m-9-8H3m0 4h6"></path>
               </svg>
             </button>
             <button 
               (click)="viewMode = 'card'" 
-              [class]="viewMode === 'card' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'"
+              [class]="viewMode === 'card' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
               class="flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200"
-              title="Card View">
+              matTooltip="Card View">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14-7H5a2 2 0 00-2 2v12a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2z"></path>
               </svg>
@@ -39,7 +37,7 @@
           <button 
             *ngIf="hasActiveFilters()" 
             (click)="clearAllFilters()"
-            class="px-4 py-2 text-sm font-medium text-blue-400 hover:text-blue-300 border border-blue-500 rounded-lg hover:bg-blue-500/10 transition-colors">
+            class="px-4 py-2 text-sm font-medium text-primary hover:text-primary-dark border border-primary rounded-lg hover:bg-primary/5 transition-colors">
             Clear All Filters
           </button>
         </div>
@@ -50,107 +48,87 @@
         
         <!-- Search Filter -->
         <div class="lg:col-span-2">
-          <label class="block text-sm font-medium text-gray-300 mb-2">Search Clients</label>
+          <label class="block text-sm font-medium text-text-primary mb-2">Search Clients</label>
           <div class="relative">
             <input 
               type="text" 
               [(ngModel)]="searchTerm" 
               (input)="onSearchChange()"
               placeholder="Name, business, mobile..."
-              class="w-full pl-10 pr-4 py-2.5 bg-gray-700 border border-gray-600 text-white placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
-            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
+              class="w-full pl-10 pr-4 py-2 border border-border-light rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
+            <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-muted text-lg">search</mat-icon>
           </div>
         </div>
 
         <!-- Status Filter -->
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-            <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
+          <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+            <mat-icon class="text-blue-600 text-lg">info</mat-icon>
             Client Status
           </label>
           <div class="relative">
             <button type="button"
                     (click)="toggleStatusDropdown()"
-                    class="w-full pl-10 pr-10 py-2.5 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-gray-700 text-white hover:border-gray-500 transition-colors text-left flex items-center justify-between">
+                    class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white hover:border-gray-400 transition-colors text-left flex items-center justify-between">
               <span class="truncate">{{ getStatusFilterLabel() }}</span>
-              <svg class="w-5 h-5 text-gray-400 transition-transform" [class.rotate-180]="isStatusDropdownOpen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-              </svg>
+              <mat-icon class="text-gray-400 text-lg transition-transform" [class.rotate-180]="isStatusDropdownOpen">expand_more</mat-icon>
             </button>
-            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"></path>
-            </svg>
+            <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg pointer-events-none">badge</mat-icon>
             
             <!-- Custom Dropdown -->
-            <div *ngIf="isStatusDropdownOpen" class="absolute z-50 w-full mt-1 bg-gray-700 border border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+            <div *ngIf="isStatusDropdownOpen" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
               <button type="button"
                       (click)="selectStatusFilter('all')"
-                      class="w-full text-left px-4 py-3 text-sm text-gray-200 hover:bg-gray-600 transition-colors flex items-center gap-3 border-b border-gray-600"
-                      [class.bg-blue-600]="statusFilter === 'all'"
-                      [class.text-white]="statusFilter === 'all'"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-blue-50 transition-colors flex items-center gap-3 border-b border-gray-100"
+                      [class.bg-blue-100]="statusFilter === 'all'"
+                      [class.text-blue-700]="statusFilter === 'all'"
                       [class.font-semibold]="statusFilter === 'all'">
-                <svg class="w-5 h-5" [class.text-blue-300]="statusFilter === 'all'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
-                </svg>
+                <mat-icon class="text-lg" [class.text-blue-600]="statusFilter === 'all'">list</mat-icon>
                 <span>All Status ({{ getStatusCount('all') }})</span>
               </button>
               <button type="button"
                       (click)="selectStatusFilter('pending')"
-                      class="w-full text-left px-4 py-3 text-sm text-gray-200 hover:bg-gray-600 transition-colors flex items-center gap-3 border-b border-gray-600"
-                      [class.bg-blue-600]="statusFilter === 'pending'"
-                      [class.text-white]="statusFilter === 'pending'"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-blue-50 transition-colors flex items-center gap-3 border-b border-gray-100"
+                      [class.bg-blue-100]="statusFilter === 'pending'"
+                      [class.text-blue-700]="statusFilter === 'pending'"
                       [class.font-semibold]="statusFilter === 'pending'">
-                <svg class="w-5 h-5" [class.text-blue-300]="statusFilter === 'pending'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
+                <mat-icon class="text-lg" [class.text-blue-600]="statusFilter === 'pending'">schedule</mat-icon>
                 <span>Pending ({{ getStatusCount('pending') }})</span>
               </button>
               <button type="button"
                       (click)="selectStatusFilter('interested')"
-                      class="w-full text-left px-4 py-3 text-sm text-gray-200 hover:bg-gray-600 transition-colors flex items-center gap-3 border-b border-gray-600"
-                      [class.bg-blue-600]="statusFilter === 'interested'"
-                      [class.text-white]="statusFilter === 'interested'"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-blue-50 transition-colors flex items-center gap-3 border-b border-gray-100"
+                      [class.bg-blue-100]="statusFilter === 'interested'"
+                      [class.text-blue-700]="statusFilter === 'interested'"
                       [class.font-semibold]="statusFilter === 'interested'">
-                <svg class="w-5 h-5" [class.text-blue-300]="statusFilter === 'interested'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
+                <mat-icon class="text-lg" [class.text-blue-600]="statusFilter === 'interested'">check_circle</mat-icon>
                 <span>Interested ({{ getStatusCount('interested') }})</span>
               </button>
               <button type="button"
                       (click)="selectStatusFilter('not_interested')"
-                      class="w-full text-left px-4 py-3 text-sm text-gray-200 hover:bg-gray-600 transition-colors flex items-center gap-3 border-b border-gray-600"
-                      [class.bg-blue-600]="statusFilter === 'not_interested'"
-                      [class.text-white]="statusFilter === 'not_interested'"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-blue-50 transition-colors flex items-center gap-3 border-b border-gray-100"
+                      [class.bg-blue-100]="statusFilter === 'not_interested'"
+                      [class.text-blue-700]="statusFilter === 'not_interested'"
                       [class.font-semibold]="statusFilter === 'not_interested'">
-                <svg class="w-5 h-5" [class.text-blue-300]="statusFilter === 'not_interested'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
+                <mat-icon class="text-lg" [class.text-blue-600]="statusFilter === 'not_interested'">cancel</mat-icon>
                 <span>Not Interested ({{ getStatusCount('not_interested') }})</span>
               </button>
               <button type="button"
                       (click)="selectStatusFilter('hold')"
-                      class="w-full text-left px-4 py-3 text-sm text-gray-200 hover:bg-gray-600 transition-colors flex items-center gap-3 border-b border-gray-600"
-                      [class.bg-blue-600]="statusFilter === 'hold'"
-                      [class.text-white]="statusFilter === 'hold'"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-blue-50 transition-colors flex items-center gap-3 border-b border-gray-100"
+                      [class.bg-blue-100]="statusFilter === 'hold'"
+                      [class.text-blue-700]="statusFilter === 'hold'"
                       [class.font-semibold]="statusFilter === 'hold'">
-                <svg class="w-5 h-5" [class.text-blue-300]="statusFilter === 'hold'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
+                <mat-icon class="text-lg" [class.text-blue-600]="statusFilter === 'hold'">pause</mat-icon>
                 <span>On Hold ({{ getStatusCount('hold') }})</span>
               </button>
               <button type="button"
                       (click)="selectStatusFilter('processing')"
-                      class="w-full text-left px-4 py-3 text-sm text-gray-200 hover:bg-gray-600 transition-colors flex items-center gap-3 last:border-b-0"
-                      [class.bg-blue-600]="statusFilter === 'processing'"
-                      [class.text-white]="statusFilter === 'processing'"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-blue-50 transition-colors flex items-center gap-3 last:border-b-0"
+                      [class.bg-blue-100]="statusFilter === 'processing'"
+                      [class.text-blue-700]="statusFilter === 'processing'"
                       [class.font-semibold]="statusFilter === 'processing'">
-                <svg class="w-5 h-5" [class.text-blue-300]="statusFilter === 'processing'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                </svg>
+                <mat-icon class="text-lg" [class.text-blue-600]="statusFilter === 'processing'">autorenew</mat-icon>
                 <span>Processing ({{ getStatusCount('processing') }})</span>
               </button>
             </div>
@@ -159,48 +137,38 @@
 
         <!-- Staff Filter -->
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-            <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-            </svg>
+          <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+            <mat-icon class="text-purple-600 text-lg">person</mat-icon>
             Assigned Staff
           </label>
           <div class="relative">
             <button type="button"
                     (click)="toggleStaffDropdown()"
-                    class="w-full pl-10 pr-10 py-2.5 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm bg-gray-700 text-white hover:border-gray-500 transition-colors text-left flex items-center justify-between">
+                    class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm bg-white hover:border-gray-400 transition-colors text-left flex items-center justify-between">
               <span class="truncate">{{ getStaffFilterLabel() }}</span>
-              <svg class="w-5 h-5 text-gray-400 transition-transform" [class.rotate-180]="isStaffDropdownOpen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-              </svg>
+              <mat-icon class="text-gray-400 text-lg transition-transform" [class.rotate-180]="isStaffDropdownOpen">expand_more</mat-icon>
             </button>
-            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83m-1.414 5.658a9 9 0 01-2.167-9.238m7.824 2.167a1 1 0 111.414 1.414m-1.414-1.414L3 3m8.293 8.293l1.414 1.414"></path>
-            </svg>
+            <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg pointer-events-none">support_agent</mat-icon>
             
             <!-- Custom Dropdown -->
-            <div *ngIf="isStaffDropdownOpen" class="absolute z-50 w-full mt-1 bg-gray-700 border border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+            <div *ngIf="isStaffDropdownOpen" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
               <button type="button"
                       (click)="selectStaffFilter('all')"
-                      class="w-full text-left px-4 py-3 text-sm text-gray-200 hover:bg-gray-600 transition-colors flex items-center gap-3 border-b border-gray-600"
-                      [class.bg-purple-600]="staffFilter === 'all'"
-                      [class.text-white]="staffFilter === 'all'"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-purple-50 transition-colors flex items-center gap-3 border-b border-gray-100"
+                      [class.bg-purple-100]="staffFilter === 'all'"
+                      [class.text-purple-700]="staffFilter === 'all'"
                       [class.font-semibold]="staffFilter === 'all'">
-                <svg class="w-5 h-5" [class.text-purple-300]="staffFilter === 'all'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                </svg>
+                <mat-icon class="text-lg" [class.text-purple-600]="staffFilter === 'all'">groups</mat-icon>
                 <span>All Staff ({{ clients.length }})</span>
               </button>
               <button type="button"
                       *ngFor="let staff of uniqueStaffMembers"
                       (click)="selectStaffFilter(staff.email)"
-                      class="w-full text-left px-4 py-3 text-sm text-gray-200 hover:bg-gray-600 transition-colors flex items-center gap-3 border-b border-gray-600 last:border-b-0"
-                      [class.bg-purple-600]="staffFilter === staff.email"
-                      [class.text-white]="staffFilter === staff.email"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-purple-50 transition-colors flex items-center gap-3 border-b border-gray-100 last:border-b-0"
+                      [class.bg-purple-100]="staffFilter === staff.email"
+                      [class.text-purple-700]="staffFilter === staff.email"
                       [class.font-semibold]="staffFilter === staff.email">
-                <svg class="w-5 h-5" [class.text-purple-300]="staffFilter === staff.email" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                </svg>
+                <mat-icon class="text-lg" [class.text-purple-600]="staffFilter === staff.email">person</mat-icon>
                 <span>{{ getStaffNameFromFilter(staff) }} ({{ getStaffCount(staff.email) }})</span>
               </button>
             </div>
@@ -209,49 +177,35 @@
 
         <!-- Sort By Filter -->
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-            <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
-            </svg>
+          <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+            <mat-icon class="text-orange-600 text-lg">sort</mat-icon>
             Sort By
           </label>
           <div class="relative">
             <button type="button"
                     (click)="toggleSortDropdown()"
-                    class="w-full pl-10 pr-10 py-2.5 border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm bg-gray-700 text-white hover:border-gray-500 transition-colors text-left flex items-center justify-between">
+                    class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm bg-white hover:border-gray-400 transition-colors text-left flex items-center justify-between">
               <span class="truncate">{{ getSortOptionLabel() }}</span>
-              <svg class="w-5 h-5 text-gray-400 transition-transform" [class.rotate-180]="isSortDropdownOpen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-              </svg>
+              <mat-icon class="text-gray-400 text-lg transition-transform" [class.rotate-180]="isSortDropdownOpen">expand_more</mat-icon>
             </button>
-            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
-            </svg>
+            <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg pointer-events-none">swap_vert</mat-icon>
             
             <!-- Custom Dropdown -->
-            <div *ngIf="isSortDropdownOpen" class="absolute z-50 w-full mt-1 bg-gray-700 border border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-              <button type="button" (click)="selectSortOption('newest')" class="w-full text-left px-4 py-3 text-sm text-gray-200 hover:bg-gray-600 transition-colors flex items-center gap-3 border-b border-gray-600" [class.bg-orange-600]="sortBy === 'newest'" [class.text-white]="sortBy === 'newest'" [class.font-semibold]="sortBy === 'newest'">
-                <svg class="w-5 h-5" [class.text-orange-300]="sortBy === 'newest'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-                </svg>
+            <div *ngIf="isSortDropdownOpen" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+              <button type="button" (click)="selectSortOption('newest')" class="w-full text-left px-4 py-3 text-sm hover:bg-orange-50 transition-colors flex items-center gap-3 border-b border-gray-100" [class.bg-orange-100]="sortBy === 'newest'" [class.text-orange-700]="sortBy === 'newest'" [class.font-semibold]="sortBy === 'newest'">
+                <mat-icon class="text-lg" [class.text-orange-600]="sortBy === 'newest'">arrow_downward</mat-icon>
                 <span>Newest First</span>
               </button>
-              <button type="button" (click)="selectSortOption('oldest')" class="w-full text-left px-4 py-3 text-sm text-gray-200 hover:bg-gray-600 transition-colors flex items-center gap-3 border-b border-gray-600" [class.bg-orange-600]="sortBy === 'oldest'" [class.text-white]="sortBy === 'oldest'" [class.font-semibold]="sortBy === 'oldest'">
-                <svg class="w-5 h-5" [class.text-orange-300]="sortBy === 'oldest'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
-                </svg>
+              <button type="button" (click)="selectSortOption('oldest')" class="w-full text-left px-4 py-3 text-sm hover:bg-orange-50 transition-colors flex items-center gap-3 border-b border-gray-100" [class.bg-orange-100]="sortBy === 'oldest'" [class.text-orange-700]="sortBy === 'oldest'" [class.font-semibold]="sortBy === 'oldest'">
+                <mat-icon class="text-lg" [class.text-orange-600]="sortBy === 'oldest'">arrow_upward</mat-icon>
                 <span>Oldest First</span>
               </button>
-              <button type="button" (click)="selectSortOption('name_asc')" class="w-full text-left px-4 py-3 text-sm text-gray-200 hover:bg-gray-600 transition-colors flex items-center gap-3 border-b border-gray-600" [class.bg-orange-600]="sortBy === 'name_asc'" [class.text-white]="sortBy === 'name_asc'" [class.font-semibold]="sortBy === 'name_asc'">
-                <svg class="w-5 h-5" [class.text-orange-300]="sortBy === 'name_asc'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"></path>
-                </svg>
+              <button type="button" (click)="selectSortOption('name_asc')" class="w-full text-left px-4 py-3 text-sm hover:bg-orange-50 transition-colors flex items-center gap-3 border-b border-gray-100" [class.bg-orange-100]="sortBy === 'name_asc'" [class.text-orange-700]="sortBy === 'name_asc'" [class.font-semibold]="sortBy === 'name_asc'">
+                <mat-icon class="text-lg" [class.text-orange-600]="sortBy === 'name_asc'">sort_by_alpha</mat-icon>
                 <span>Name A-Z</span>
               </button>
-              <button type="button" (click)="selectSortOption('name_desc')" class="w-full text-left px-4 py-3 text-sm text-gray-200 hover:bg-gray-600 transition-colors flex items-center gap-3 last:border-b-0" [class.bg-orange-600]="sortBy === 'name_desc'" [class.text-white]="sortBy === 'name_desc'" [class.font-semibold]="sortBy === 'name_desc'">
-                <svg class="w-5 h-5" [class.text-orange-300]="sortBy === 'name_desc'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"></path>
-                </svg>
+              <button type="button" (click)="selectSortOption('name_desc')" class="w-full text-left px-4 py-3 text-sm hover:bg-orange-50 transition-colors flex items-center gap-3 last:border-b-0" [class.bg-orange-100]="sortBy === 'name_desc'" [class.text-orange-700]="sortBy === 'name_desc'" [class.font-semibold]="sortBy === 'name_desc'">
+                <mat-icon class="text-lg" [class.text-orange-600]="sortBy === 'name_desc'">sort_by_alpha</mat-icon>
                 <span>Name Z-A</span>
               </button>
             </div>
@@ -263,48 +217,38 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <!-- Comments Filter -->
         <div class="lg:col-span-2">
-          <label class="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-            <svg class="w-5 h-5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
-            </svg>
+          <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+            <mat-icon class="text-teal-600 text-lg">comment</mat-icon>
             Comments
           </label>
           <div class="relative">
             <button type="button"
                     (click)="toggleCommentsDropdown()"
-                    class="w-full pl-10 pr-10 py-2.5 border border-gray-600 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm bg-gray-700 text-white hover:border-gray-500 transition-colors text-left flex items-center justify-between">
+                    class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm bg-white hover:border-gray-400 transition-colors text-left flex items-center justify-between">
               <span class="truncate">{{ getCommentsFilterLabel() }}</span>
-              <svg class="w-5 h-5 text-gray-400 transition-transform" [class.rotate-180]="isCommentsDropdownOpen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-              </svg>
+              <mat-icon class="text-gray-400 text-lg transition-transform" [class.rotate-180]="isCommentsDropdownOpen">expand_more</mat-icon>
             </button>
-            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-            </svg>
+            <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg pointer-events-none">chat_bubble</mat-icon>
             
             <!-- Custom Dropdown -->
-            <div *ngIf="isCommentsDropdownOpen" class="absolute z-50 w-full mt-1 bg-gray-700 border border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+            <div *ngIf="isCommentsDropdownOpen" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
               <button type="button"
                       (click)="selectCommentsFilter('all')"
-                      class="w-full text-left px-4 py-3 text-sm text-gray-200 hover:bg-gray-600 transition-colors flex items-center gap-3 border-b border-gray-600"
-                      [class.bg-teal-600]="commentsFilter === 'all'"
-                      [class.text-white]="commentsFilter === 'all'"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-teal-50 transition-colors flex items-center gap-3 border-b border-gray-100"
+                      [class.bg-teal-100]="commentsFilter === 'all'"
+                      [class.text-teal-700]="commentsFilter === 'all'"
                       [class.font-semibold]="commentsFilter === 'all'">
-                <svg class="w-5 h-5" [class.text-teal-300]="commentsFilter === 'all'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
-                </svg>
+                <mat-icon class="text-lg" [class.text-teal-600]="commentsFilter === 'all'">list</mat-icon>
                 <span>All Comments ({{ getCommentsCount('all') }})</span>
               </button>
               <button type="button"
                       *ngFor="let option of commentOptions"
                       (click)="selectCommentsFilter(option.value)"
-                      class="w-full text-left px-4 py-3 text-sm text-gray-200 hover:bg-gray-600 transition-colors flex items-center gap-3 border-b border-gray-600 last:border-b-0"
-                      [class.bg-teal-600]="commentsFilter === option.value"
-                      [class.text-white]="commentsFilter === option.value"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-teal-50 transition-colors flex items-center gap-3 border-b border-gray-100 last:border-b-0"
+                      [class.bg-teal-100]="commentsFilter === option.value"
+                      [class.text-teal-700]="commentsFilter === option.value"
                       [class.font-semibold]="commentsFilter === option.value">
-                <svg class="w-5 h-5" [class.text-teal-300]="commentsFilter === option.value" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
-                </svg>
+                <mat-icon class="text-lg" [class.text-teal-600]="commentsFilter === option.value">{{ option.icon }}</mat-icon>
                 <span>{{ option.label }} ({{ getCommentsCount(option.value) }})</span>
               </button>
             </div>
@@ -313,91 +257,73 @@
 
         <!-- Loan Status Filter -->
         <div class="lg:col-span-2">
-          <label class="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-            <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path>
-            </svg>
+          <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+            <mat-icon class="text-indigo-600 text-lg">account_balance</mat-icon>
             Loan Status
           </label>
           <div class="relative">
             <button type="button"
                     (click)="toggleLoanStatusDropdown()"
-                    class="w-full pl-10 pr-10 py-2.5 border border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-gray-700 text-white hover:border-gray-500 transition-colors text-left flex items-center justify-between">
+                    class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-white hover:border-gray-400 transition-colors text-left flex items-center justify-between">
               <span class="truncate">{{ getLoanStatusFilterLabel() }}</span>
-              <svg class="w-5 h-5 text-gray-400 transition-transform" [class.rotate-180]="isLoanStatusDropdownOpen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-              </svg>
+              <mat-icon class="text-gray-400 text-lg transition-transform" [class.rotate-180]="isLoanStatusDropdownOpen">expand_more</mat-icon>
             </button>
-            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
-            </svg>
+            <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg pointer-events-none">account_balance_wallet</mat-icon>
             
             <!-- Custom Dropdown -->
-            <div *ngIf="isLoanStatusDropdownOpen" class="absolute z-50 w-full mt-1 bg-gray-700 border border-gray-600 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+            <div *ngIf="isLoanStatusDropdownOpen" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
               <button type="button"
                       (click)="selectLoanStatusFilter('all')"
-                      class="w-full text-left px-4 py-3 text-sm text-gray-200 hover:bg-gray-600 transition-colors flex items-center gap-3 border-b border-gray-600"
-                      [class.bg-indigo-600]="loanStatusFilter === 'all'"
-                      [class.text-white]="loanStatusFilter === 'all'"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-indigo-50 transition-colors flex items-center gap-3 border-b border-gray-100"
+                      [class.bg-indigo-100]="loanStatusFilter === 'all'"
+                      [class.text-indigo-700]="loanStatusFilter === 'all'"
                       [class.font-semibold]="loanStatusFilter === 'all'">
-                <svg class="w-5 h-5" [class.text-indigo-300]="loanStatusFilter === 'all'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
-                </svg>
+                <mat-icon class="text-lg" [class.text-indigo-600]="loanStatusFilter === 'all'">list</mat-icon>
                 <span>All Loan Status ({{ getLoanStatusCount('all') }})</span>
               </button>
               <button type="button"
                       (click)="selectLoanStatusFilter('approved')"
-                      class="w-full text-left px-4 py-3 text-sm text-gray-200 hover:bg-gray-600 transition-colors flex items-center gap-3 border-b border-gray-600"
-                      [class.bg-indigo-600]="loanStatusFilter === 'approved'"
-                      [class.text-white]="loanStatusFilter === 'approved'"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-indigo-50 transition-colors flex items-center gap-3 border-b border-gray-100"
+                      [class.bg-indigo-100]="loanStatusFilter === 'approved'"
+                      [class.text-indigo-700]="loanStatusFilter === 'approved'"
                       [class.font-semibold]="loanStatusFilter === 'approved'">
-                <svg class="w-5 h-5" [class.text-indigo-300]="loanStatusFilter === 'approved'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
+                <mat-icon class="text-lg" [class.text-indigo-600]="loanStatusFilter === 'approved'">check_circle</mat-icon>
                 <span>Approved ({{ getLoanStatusCount('approved') }})</span>
               </button>
               <button type="button"
                       (click)="selectLoanStatusFilter('rejected')"
-                      class="w-full text-left px-4 py-3 text-sm text-gray-200 hover:bg-gray-600 transition-colors flex items-center gap-3 border-b border-gray-600"
-                      [class.bg-indigo-600]="loanStatusFilter === 'rejected'"
-                      [class.text-white]="loanStatusFilter === 'rejected'"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-indigo-50 transition-colors flex items-center gap-3 border-b border-gray-100"
+                      [class.bg-indigo-100]="loanStatusFilter === 'rejected'"
+                      [class.text-indigo-700]="loanStatusFilter === 'rejected'"
                       [class.font-semibold]="loanStatusFilter === 'rejected'">
-                <svg class="w-5 h-5" [class.text-indigo-300]="loanStatusFilter === 'rejected'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
+                <mat-icon class="text-lg" [class.text-indigo-600]="loanStatusFilter === 'rejected'">cancel</mat-icon>
                 <span>Rejected ({{ getLoanStatusCount('rejected') }})</span>
               </button>
               <button type="button"
                       (click)="selectLoanStatusFilter('hold')"
-                      class="w-full text-left px-4 py-3 text-sm text-gray-200 hover:bg-gray-600 transition-colors flex items-center gap-3 border-b border-gray-600"
-                      [class.bg-indigo-600]="loanStatusFilter === 'hold'"
-                      [class.text-white]="loanStatusFilter === 'hold'"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-indigo-50 transition-colors flex items-center gap-3 border-b border-gray-100"
+                      [class.bg-indigo-100]="loanStatusFilter === 'hold'"
+                      [class.text-indigo-700]="loanStatusFilter === 'hold'"
                       [class.font-semibold]="loanStatusFilter === 'hold'">
-                <svg class="w-5 h-5" [class.text-indigo-300]="loanStatusFilter === 'hold'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
+                <mat-icon class="text-lg" [class.text-indigo-600]="loanStatusFilter === 'hold'">pause</mat-icon>
                 <span>Hold ({{ getLoanStatusCount('hold') }})</span>
               </button>
               <button type="button"
                       (click)="selectLoanStatusFilter('processing')"
-                      class="w-full text-left px-4 py-3 text-sm text-gray-200 hover:bg-gray-600 transition-colors flex items-center gap-3 border-b border-gray-600"
-                      [class.bg-indigo-600]="loanStatusFilter === 'processing'"
-                      [class.text-white]="loanStatusFilter === 'processing'"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-indigo-50 transition-colors flex items-center gap-3 border-b border-gray-100"
+                      [class.bg-indigo-100]="loanStatusFilter === 'processing'"
+                      [class.text-indigo-700]="loanStatusFilter === 'processing'"
                       [class.font-semibold]="loanStatusFilter === 'processing'">
-                <svg class="w-5 h-5" [class.text-indigo-300]="loanStatusFilter === 'processing'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                </svg>
+                <mat-icon class="text-lg" [class.text-indigo-600]="loanStatusFilter === 'processing'">autorenew</mat-icon>
                 <span>Processing ({{ getLoanStatusCount('processing') }})</span>
               </button>
               <button type="button"
                       (click)="selectLoanStatusFilter('soon')"
-                      class="w-full text-left px-4 py-3 text-sm text-gray-200 hover:bg-gray-600 transition-colors flex items-center gap-3 last:border-b-0"
-                      [class.bg-indigo-600]="loanStatusFilter === 'soon'"
-                      [class.text-white]="loanStatusFilter === 'soon'"
+                      class="w-full text-left px-4 py-3 text-sm hover:bg-indigo-50 transition-colors flex items-center gap-3 last:border-b-0"
+                      [class.bg-indigo-100]="loanStatusFilter === 'soon'"
+                      [class.text-indigo-700]="loanStatusFilter === 'soon'"
                       [class.font-semibold]="loanStatusFilter === 'soon'">
-                <svg class="w-5 h-5" [class.text-indigo-300]="loanStatusFilter === 'soon'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
+                <mat-icon class="text-lg" [class.text-indigo-600]="loanStatusFilter === 'soon'">schedule</mat-icon>
                 <span>Soon ({{ getLoanStatusCount('soon') }})</span>
               </button>
             </div>
@@ -406,10 +332,10 @@
       </div>
     </div>
     <!-- Results Header -->
-    <div class="bg-gray-800 rounded-xl shadow-lg border border-gray-700 p-4 mb-6">
+    <div class="bg-white rounded-xl shadow-sm border border-border-light p-4 mb-6">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div class="flex items-center gap-4">
-          <h2 class="text-lg font-semibold text-white">
+          <h2 class="text-lg font-semibold text-text-primary">
             Clients ({{ filteredClients.length }})
           </h2>
           
@@ -440,7 +366,7 @@
         <button 
           *ngIf="hasActiveFilters()" 
           (click)="clearAllFilters()"
-          class="px-4 py-2 text-sm font-medium text-red-400 hover:text-red-300 border border-red-500 rounded-lg hover:bg-red-500/10 transition-colors flex items-center gap-2">
+          class="btn btn-outline text-status-error border-status-error hover:bg-status-error hover:text-white flex items-center gap-2 px-3 py-1.5 text-sm">
           <mat-icon class="text-sm">clear_all</mat-icon>
           Clear All
         </button>
@@ -448,9 +374,9 @@
     </div>
 
     <!-- Loading State -->
-    <div *ngIf="loading" class="flex flex-col items-center justify-center py-16 bg-gray-800 rounded-xl">
+    <div *ngIf="loading" class="flex flex-col items-center justify-center py-16">
       <mat-spinner diameter="40" class="mb-4"></mat-spinner>
-      <p class="text-gray-300">Loading clients...</p>
+      <p class="text-text-secondary">Loading clients...</p>
     </div>
 
     <!-- Error State -->
@@ -465,39 +391,39 @@
     </div>
 
     <!-- Empty State -->
-    <div *ngIf="!loading && !error && filteredClients.length === 0" class="text-center py-16 bg-gray-800 rounded-xl">
-      <div class="w-20 h-20 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+    <div *ngIf="!loading && !error && filteredClients.length === 0" class="text-center py-16">
+      <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
         <mat-icon class="text-gray-400 text-3xl">people_outline</mat-icon>
       </div>
-      <h3 class="text-xl font-semibold text-white mb-2">No clients found</h3>
-      <p class="text-gray-300 mb-6 max-w-md mx-auto">
+      <h3 class="text-xl font-semibold text-text-primary mb-2">No clients found</h3>
+      <p class="text-text-secondary mb-6 max-w-md mx-auto">
         <span *ngIf="searchTerm || statusFilter !== 'all' || staffFilter !== 'all'">
           Try adjusting your search criteria or filters to find what you're looking for.
         </span>
       </p>
-      <button routerLink="/new-client" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2 mx-auto">
-        <mat-icon class="text-xl">person_add</mat-icon>
+      <button routerLink="/new-client" class="btn btn-primary">
+        <mat-icon class="mr-2">person_add</mat-icon>
         Add New Client
       </button>
     </div>
 
     <!-- Table View -->
-    <div *ngIf="!loading && !error && filteredClients.length > 0 && viewMode === 'table'" class="bg-gray-800 rounded-xl shadow-lg border border-gray-700 overflow-hidden">
+    <div *ngIf="!loading && !error && filteredClients.length > 0 && viewMode === 'table'" class="bg-white rounded-xl shadow-sm border border-border-light overflow-hidden">
       <div class="overflow-x-auto overflow-y-visible" style="overflow-y: visible !important;">
-        <table mat-table [dataSource]="filteredClients" class="w-full text-xs bg-gray-800">
+        <table mat-table [dataSource]="filteredClients" class="w-full text-xs">
               <!-- Serial Number Column -->
               <ng-container matColumnDef="serial">
-                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-white bg-gray-700 px-4 py-3 text-sm">S.No</th>
-                <td mat-cell *matCellDef="let client; let i = index" class="px-4 py-3 text-sm text-gray-300">{{ getSerialNumber(i) }}</td>
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">S.No</th>
+                <td mat-cell *matCellDef="let client; let i = index" class="px-4 py-3 text-sm text-text-secondary">{{ getSerialNumber(i) }}</td>
               </ng-container>
 
               <!-- Name Column -->
               <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-white bg-gray-700 px-4 py-3 text-sm">Client Name</th>
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Client Name</th>
                 <td mat-cell *matCellDef="let client" 
                     (click)="viewClientDetails(client)" 
-                    class="px-4 py-3 cursor-pointer hover:bg-gray-700 transition-colors">
-                  <div class="font-medium text-white text-sm">
+                    class="px-4 py-3 cursor-pointer hover:bg-surface-alt transition-colors">
+                  <div class="font-medium text-text-primary text-sm">
                     {{ client.legal_name || client.user_name || 'N/A' }}
                   </div>
                 </td>
@@ -505,11 +431,11 @@
 
               <!-- Business Column -->
               <ng-container matColumnDef="business">
-                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-white bg-gray-700 px-4 py-3 text-sm">Business</th>
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Business</th>
                 <td mat-cell *matCellDef="let client" 
                     (click)="viewClientDetails(client)" 
-                    class="px-4 py-3 cursor-pointer hover:bg-gray-700 transition-colors">
-                  <div class="font-medium text-white text-sm">
+                    class="px-4 py-3 cursor-pointer hover:bg-surface-alt transition-colors">
+                  <div class="font-medium text-text-primary text-sm">
                     {{ client.trade_name || client.business_name || client.legal_name || 'N/A' }}
                   </div>
                 </td>
@@ -517,9 +443,9 @@
 
               <!-- Staff Column -->
               <ng-container matColumnDef="staff">
-                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-white bg-gray-700 px-4 py-3 text-sm">Staff</th>
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Staff</th>
                 <td mat-cell *matCellDef="let client" class="px-4 py-3">
-                  <div class="text-gray-300 text-sm">
+                  <div class="text-text-secondary text-sm">
                     {{ client.staff_name || 'Unassigned' }}
                   </div>
                 </td>
@@ -527,7 +453,7 @@
 
               <!-- Status Column -->
               <ng-container matColumnDef="status">
-                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-white bg-gray-700 px-4 py-3 text-sm">Status</th>
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Status</th>
                 <td mat-cell *matCellDef="let client" class="px-4 py-3">
                   <span class="px-2 py-1 text-xs rounded-full font-medium"
                         [ngClass]="{
@@ -545,7 +471,7 @@
 
               <!-- Loan Status Column -->
               <ng-container matColumnDef="loan_status">
-                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-white bg-gray-700 px-4 py-3 text-sm">Loan Status</th>
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Loan Status</th>
                 <td mat-cell *matCellDef="let client" class="px-4 py-3">
                   <span class="px-2 py-1 text-xs rounded-full font-medium bg-blue-100 text-blue-800">
                     {{ getLoanStatus(client) | titlecase }}
@@ -555,15 +481,15 @@
 
               <!-- Created Column -->
               <ng-container matColumnDef="created">
-                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-white bg-gray-700 px-4 py-3 text-sm">Created</th>
-                <td mat-cell *matCellDef="let client" class="px-4 py-3 text-sm text-gray-300">
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Created</th>
+                <td mat-cell *matCellDef="let client" class="px-4 py-3 text-sm text-text-secondary">
                   {{ client.created_at | date:'short' }}
                 </td>
               </ng-container>
 
               <!-- Comments Column -->
               <ng-container matColumnDef="comments">
-                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-white bg-gray-700 px-4 py-3 text-sm">Comments</th>
+                <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Comments</th>
                 <td mat-cell *matCellDef="let client" class="px-4 py-3">
                   <!-- Admin view - custom Tailwind dropdown -->
                   <div *ngIf="isAdmin()" class="relative w-40" style="position: relative; z-index: 10;">
@@ -573,18 +499,18 @@
                       (click)="toggleDropdown(client._id)"
                       [disabled]="isClientUpdating(client._id)"
                       [attr.data-client-id]="client._id"
-                      class="relative w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-left text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      [class.border-blue-500]="isDropdownOpen(client._id)"
+                      class="relative w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-left text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary hover:border-gray-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      [class.border-primary]="isDropdownOpen(client._id)"
                       [class.ring-2]="isDropdownOpen(client._id)"
-                      [class.ring-blue-500]="isDropdownOpen(client._id)">
+                      [class.ring-primary]="isDropdownOpen(client._id)">
                       
-                      <span class="block truncate text-white">
+                      <span class="block truncate text-gray-700">
                         {{ getSelectedCommentLabel(client) }}
                       </span>
                       
                       <!-- Dropdown Arrow -->
                       <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                        <svg class="w-4 h-4 text-gray-300 transition-transform duration-200"
+                        <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
                              [class.rotate-180]="isDropdownOpen(client._id)"
                              fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -602,8 +528,8 @@
                   
                   <!-- Non-admin view - read-only display -->
                   <div *ngIf="!isAdmin()" class="text-sm">
-                    <span *ngIf="client.comments" class="text-white">{{ client.comments }}</span>
-                    <span *ngIf="!client.comments" class="text-gray-400 italic">No comment</span>
+                    <span *ngIf="client.comments" class="text-text-primary">{{ client.comments }}</span>
+                    <span *ngIf="!client.comments" class="text-text-muted italic">No comment</span>
                   </div>
                 </td>
               </ng-container>
@@ -652,9 +578,9 @@
                 </td>
               </ng-container>
 
-              <tr mat-header-row *matHeaderRowDef="getDisplayedColumns()" class="border-b border-gray-700"></tr>
+              <tr mat-header-row *matHeaderRowDef="getDisplayedColumns()" class="border-b border-border-light"></tr>
               <tr mat-row *matRowDef="let row; columns: getDisplayedColumns();" 
-                  class="border-b border-gray-700 hover:bg-gray-700 transition-colors"
+                  class="border-b border-border-light hover:bg-surface-alt transition-colors"
                   [class.bg-green-50]="row.status === 'interested'"
                   [class.bg-red-50]="row.status === 'not_interested'"
                   [class.bg-orange-50]="row.status === 'hold'"
@@ -896,16 +822,16 @@
 <!-- Global Dropdown Menu (Outside Table Structure) -->
 <div *ngIf="openDropdownId" 
      [id]="'dropdown-' + openDropdownId"
-     style="position: absolute; z-index: 30; width: 12rem; background: #374151; border: 1px solid #4b5563; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3); max-height: 15rem; overflow-y: auto;">
+     style="position: absolute; z-index: 30; width: 12rem; background: white; border: 1px solid #d1d5db; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); max-height: 15rem; overflow-y: auto;">
   
   <!-- Options List -->
   <button
     *ngFor="let option of commentOptions"
     type="button"
     (click)="selectCommentFromGlobalDropdown(option.value)"
-    style="width: 100%; text-align: left; padding: 8px 12px; font-size: 14px; border: none; background: transparent; cursor: pointer; border-bottom: 1px solid #4b5563; position: relative;"
+    style="width: 100%; text-align: left; padding: 8px 12px; font-size: 14px; border: none; background: transparent; cursor: pointer; border-bottom: 1px solid #f3f4f6; position: relative;"
     [style.background-color]="getCurrentClientComment() === option.value ? '#3b82f6' : 'transparent'"
-    [style.color]="getCurrentClientComment() === option.value ? 'white' : '#d1d5db'"
+    [style.color]="getCurrentClientComment() === option.value ? 'white' : '#374151'"
     (mouseenter)="onGlobalOptionHover($event, option, true)"
     (mouseleave)="onGlobalOptionHover($event, option, false)">
     

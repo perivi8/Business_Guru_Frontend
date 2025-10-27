@@ -1,162 +1,251 @@
-<!-- Dashboard Container with Dark Theme -->
-<div class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-4 sm:p-6 lg:p-8">
+<!-- Dashboard Container with Responsive Padding -->
+<div class="min-h-screen bg-gradient-body p-4 sm:p-6 lg:p-8">
   <div class="max-w-7xl mx-auto space-y-6 lg:space-y-8">
     
 
-    <!-- Stats Cards Grid - Enhanced Glassy Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 lg:gap-6 stats-grid">
+    <!-- Stats Cards Grid - Responsive Layout -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
       
-      <!-- Total Clients Card - Blue Gradient -->
-      <div class="glass-card group relative overflow-hidden rounded-3xl p-6 transform transition-all duration-700 hover:scale-110 hover:-translate-y-3 cursor-pointer card-animate"
-           style="background: linear-gradient(135deg, rgba(33, 150, 243, 0.95) 0%, rgba(25, 118, 210, 0.95) 100%); box-shadow: 0 20px 60px rgba(33, 150, 243, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);">
-        <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-        <div class="absolute inset-0 backdrop-blur-xl bg-white/5 rounded-3xl border border-white/20"></div>
-        <div class="relative z-10 flex flex-col items-start gap-3">
-          <div class="w-14 h-14 bg-white/30 backdrop-blur-md rounded-2xl flex items-center justify-center transform group-hover:rotate-[360deg] group-hover:scale-110 transition-all duration-700 shadow-lg icon-glow">
-            <svg class="w-7 h-7 text-white drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-            </svg>
+      <!-- Total Clients Card -->
+      <div class="bg-white rounded-xl shadow-lg border border-border-light p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
+        <div class="flex items-center justify-between">
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                <mat-icon class="text-blue-600 text-xl">people</mat-icon>
+              </div>
+              <div>
+                <h3 class="text-2xl sm:text-3xl font-bold text-text-primary font-heading">
+                  {{ stats.totalClients }}
+                </h3>
+                <p class="text-text-secondary text-sm font-medium">Total Clients</p>
+              </div>
+            </div>
           </div>
-          <div class="text-5xl font-extrabold text-white drop-shadow-2xl number-animate">{{ stats.totalClients }}</div>
-          <div class="text-sm font-semibold text-white/95 tracking-wide uppercase">Total Clients</div>
         </div>
-        <div class="absolute bottom-0 right-0 w-32 h-32 bg-white/10 rounded-tl-full transform translate-x-12 translate-y-12 group-hover:scale-150 transition-transform duration-700"></div>
-        <div class="absolute top-0 left-0 w-20 h-20 bg-white/5 rounded-full blur-2xl"></div>
+        <div class="mt-4 pt-4 border-t border-border-light">
+          <div class="flex items-center text-xs text-text-muted">
+            <mat-icon class="text-sm mr-1">trending_up</mat-icon>
+            <span>All registered clients</span>
+          </div>
+        </div>
       </div>
 
-      <!-- Pending Review Card - Purple Gradient -->
-      <div class="glass-card group relative overflow-hidden rounded-3xl p-6 transform transition-all duration-700 hover:scale-110 hover:-translate-y-3 cursor-pointer card-animate"
-           style="background: linear-gradient(135deg, rgba(156, 39, 176, 0.95) 0%, rgba(123, 31, 162, 0.95) 100%); box-shadow: 0 20px 60px rgba(156, 39, 176, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2); animation-delay: 0.1s;">
-        <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-        <div class="absolute inset-0 backdrop-blur-xl bg-white/5 rounded-3xl border border-white/20"></div>
-        <div class="relative z-10 flex flex-col items-start gap-3">
-          <div class="w-14 h-14 bg-white/30 backdrop-blur-md rounded-2xl flex items-center justify-center transform group-hover:rotate-[360deg] group-hover:scale-110 transition-all duration-700 shadow-lg icon-glow">
-            <svg class="w-7 h-7 text-white drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
+      <!-- Today New Clients Card -->
+      <div class="bg-white rounded-xl shadow-lg border border-border-light p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
+        <div class="flex items-center justify-between">
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center group-hover:bg-green-200 transition-colors">
+                <mat-icon class="text-green-600 text-xl">today</mat-icon>
+              </div>
+              <div>
+                <h3 class="text-2xl sm:text-3xl font-bold text-text-primary font-heading">
+                  {{ stats.todayNewClients }}
+                </h3>
+                <p class="text-text-secondary text-sm font-medium">Today New</p>
+              </div>
+            </div>
           </div>
-          <div class="text-5xl font-extrabold text-white drop-shadow-2xl number-animate">{{ stats.pendingClients }}</div>
-          <div class="text-sm font-semibold text-white/95 tracking-wide uppercase">Pending Review</div>
         </div>
-        <div class="absolute bottom-0 right-0 w-32 h-32 bg-white/10 rounded-tl-full transform translate-x-12 translate-y-12 group-hover:scale-150 transition-transform duration-700"></div>
-        <div class="absolute top-0 left-0 w-20 h-20 bg-white/5 rounded-full blur-2xl"></div>
+        <div class="mt-4 pt-4 border-t border-border-light">
+          <div class="flex items-center text-xs text-text-muted">
+            <mat-icon class="text-sm mr-1">calendar_today</mat-icon>
+            <span>New registrations today</span>
+          </div>
+        </div>
       </div>
 
-      <!-- Interested Clients Card - Green Gradient -->
-      <div class="glass-card group relative overflow-hidden rounded-3xl p-6 transform transition-all duration-700 hover:scale-110 hover:-translate-y-3 cursor-pointer card-animate"
-           style="background: linear-gradient(135deg, rgba(0, 255, 8, 0.95) 0%, rgba(45, 101, 48, 0.95) 100%); box-shadow: 0 20px 60px rgba(76, 175, 80, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2); animation-delay: 0.2s;">
-        <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-        <div class="absolute inset-0 backdrop-blur-xl bg-white/5 rounded-3xl border border-white/20"></div>
-        <div class="relative z-10 flex flex-col items-start gap-3">
-          <div class="w-14 h-14 bg-white/30 backdrop-blur-md rounded-2xl flex items-center justify-center transform group-hover:rotate-[360deg] group-hover:scale-110 transition-all duration-700 shadow-lg icon-glow">
-            <svg class="w-7 h-7 text-white drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
+      <!-- Pending Review Card -->
+      <div class="bg-white rounded-xl shadow-lg border border-border-light p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
+        <div class="flex items-center justify-between">
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center group-hover:bg-yellow-200 transition-colors">
+                <mat-icon class="text-yellow-600 text-xl">schedule</mat-icon>
+              </div>
+              <div>
+                <h3 class="text-2xl sm:text-3xl font-bold text-text-primary font-heading">
+                  {{ stats.pendingClients }}
+                </h3>
+                <p class="text-text-secondary text-sm font-medium">Pending Review</p>
+              </div>
+            </div>
           </div>
-          <div class="text-5xl font-extrabold text-white drop-shadow-2xl number-animate">{{ stats.interestedClients }}</div>
-          <div class="text-sm font-semibold text-white/95 tracking-wide uppercase">Interested</div>
         </div>
-        <div class="absolute bottom-0 right-0 w-32 h-32 bg-white/10 rounded-tl-full transform translate-x-12 translate-y-12 group-hover:scale-150 transition-transform duration-700"></div>
-        <div class="absolute top-0 left-0 w-20 h-20 bg-white/5 rounded-full blur-2xl"></div>
+        <div class="mt-4 pt-4 border-t border-border-light">
+          <div class="flex items-center text-xs text-text-muted">
+            <mat-icon class="text-sm mr-1">hourglass_empty</mat-icon>
+            <span>Awaiting review</span>
+          </div>
+        </div>
       </div>
 
-      <!-- On Hold Card - Yellow Gradient -->
-      <div class="glass-card group relative overflow-hidden rounded-3xl p-6 transform transition-all duration-700 hover:scale-110 hover:-translate-y-3 cursor-pointer card-animate"
-           style="background: linear-gradient(135deg, rgba(255, 209, 24, 0.95) 0%, rgba(161, 137, 78, 0.95) 100%); box-shadow: 0 20px 60px rgba(255, 235, 59, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2); animation-delay: 0.3s;">
-        <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-        <div class="absolute inset-0 backdrop-blur-xl bg-white/5 rounded-3xl border border-white/20"></div>
-        <div class="relative z-10 flex flex-col items-start gap-3">
-          <div class="w-14 h-14 bg-white/30 backdrop-blur-md rounded-2xl flex items-center justify-center transform group-hover:rotate-[360deg] group-hover:scale-110 transition-all duration-700 shadow-lg icon-glow">
-            <svg class="w-7 h-7 text-white drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
+      <!-- Interested Clients Card -->
+      <div class="bg-white rounded-xl shadow-lg border border-border-light p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
+        <div class="flex items-center justify-between">
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
+                <mat-icon class="text-emerald-600 text-xl">check_circle</mat-icon>
+              </div>
+              <div>
+                <h3 class="text-2xl sm:text-3xl font-bold text-text-primary font-heading">
+                  {{ stats.interestedClients }}
+                </h3>
+                <p class="text-text-secondary text-sm font-medium">Interested</p>
+              </div>
+            </div>
           </div>
-          <div class="text-5xl font-extrabold text-white drop-shadow-2xl number-animate">{{ stats.onHoldClients }}</div>
-          <div class="text-sm font-semibold text-white/95 tracking-wide uppercase">On Hold</div>
         </div>
-        <div class="absolute bottom-0 right-0 w-32 h-32 bg-white/10 rounded-tl-full transform translate-x-12 translate-y-12 group-hover:scale-150 transition-transform duration-700"></div>
-        <div class="absolute top-0 left-0 w-20 h-20 bg-white/5 rounded-full blur-2xl"></div>
+        <div class="mt-4 pt-4 border-t border-border-light">
+          <div class="flex items-center text-xs text-text-muted">
+            <mat-icon class="text-sm mr-1">thumb_up</mat-icon>
+            <span>Showing interest</span>
+          </div>
+        </div>
       </div>
 
-      <!-- Processing Card - Sky Blue Gradient -->
-      <div class="glass-card group relative overflow-hidden rounded-3xl p-6 transform transition-all duration-700 hover:scale-110 hover:-translate-y-3 cursor-pointer card-animate"
-           style="background: linear-gradient(135deg, rgba(5, 226, 255, 0.95) 0%, rgba(0, 151, 167, 0.95) 100%); box-shadow: 0 20px 60px rgba(0, 188, 212, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2); animation-delay: 0.4s;">
-        <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-        <div class="absolute inset-0 backdrop-blur-xl bg-white/5 rounded-3xl border border-white/20"></div>
-        <div class="relative z-10 flex flex-col items-start gap-3">
-          <div class="w-14 h-14 bg-white/30 backdrop-blur-md rounded-2xl flex items-center justify-center transform group-hover:rotate-[360deg] group-hover:scale-110 transition-all duration-700 shadow-lg icon-glow">
-            <svg class="w-7 h-7 text-white drop-shadow-lg animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-            </svg>
+      <!-- Not Interested Card -->
+      <div class="bg-white rounded-xl shadow-lg border border-border-light p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
+        <div class="flex items-center justify-between">
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center group-hover:bg-red-200 transition-colors">
+                <mat-icon class="text-red-600 text-xl">cancel</mat-icon>
+              </div>
+              <div>
+                <h3 class="text-2xl sm:text-3xl font-bold text-text-primary font-heading">
+                  {{ stats.notInterestedClients }}
+                </h3>
+                <p class="text-text-secondary text-sm font-medium">Not Interested</p>
+              </div>
+            </div>
           </div>
-          <div class="text-5xl font-extrabold text-white drop-shadow-2xl number-animate">{{ stats.processingClients }}</div>
-          <div class="text-sm font-semibold text-white/95 tracking-wide uppercase">Processing</div>
         </div>
-        <div class="absolute bottom-0 right-0 w-32 h-32 bg-white/10 rounded-tl-full transform translate-x-12 translate-y-12 group-hover:scale-150 transition-transform duration-700"></div>
-        <div class="absolute top-0 left-0 w-20 h-20 bg-white/5 rounded-full blur-2xl"></div>
+        <div class="mt-4 pt-4 border-t border-border-light">
+          <div class="flex items-center text-xs text-text-muted">
+            <mat-icon class="text-sm mr-1">thumb_down</mat-icon>
+            <span>Declined services</span>
+          </div>
+        </div>
       </div>
 
-      <!-- Not Interested Card - Red Gradient -->
-      <div class="glass-card group relative overflow-hidden rounded-3xl p-6 transform transition-all duration-700 hover:scale-110 hover:-translate-y-3 cursor-pointer card-animate"
-           style="background: linear-gradient(135deg, rgba(255, 17, 0, 0.95) 0%, rgba(211, 47, 47, 0.95) 100%); box-shadow: 0 20px 60px rgba(244, 67, 54, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2); animation-delay: 0.5s;">
-        <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-        <div class="absolute inset-0 backdrop-blur-xl bg-white/5 rounded-3xl border border-white/20"></div>
-        <div class="relative z-10 flex flex-col items-start gap-3">
-          <div class="w-14 h-14 bg-white/30 backdrop-blur-md rounded-2xl flex items-center justify-center transform group-hover:rotate-[360deg] group-hover:scale-110 transition-all duration-700 shadow-lg icon-glow">
-            <svg class="w-7 h-7 text-white drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
+      <!-- On Hold Card -->
+      <div class="bg-white rounded-xl shadow-lg border border-border-light p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
+        <div class="flex items-center justify-between">
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center group-hover:bg-orange-200 transition-colors">
+                <mat-icon class="text-orange-600 text-xl">pause_circle</mat-icon>
+              </div>
+              <div>
+                <h3 class="text-2xl sm:text-3xl font-bold text-text-primary font-heading">
+                  {{ stats.onHoldClients }}
+                </h3>
+                <p class="text-text-secondary text-sm font-medium">On Hold</p>
+              </div>
+            </div>
           </div>
-          <div class="text-5xl font-extrabold text-white drop-shadow-2xl number-animate">{{ stats.notInterestedClients }}</div>
-          <div class="text-sm font-semibold text-white/95 tracking-wide uppercase">Not Interested</div>
         </div>
-        <div class="absolute bottom-0 right-0 w-32 h-32 bg-white/10 rounded-tl-full transform translate-x-12 translate-y-12 group-hover:scale-150 transition-transform duration-700"></div>
-        <div class="absolute top-0 left-0 w-20 h-20 bg-white/5 rounded-full blur-2xl"></div>
+        <div class="mt-4 pt-4 border-t border-border-light">
+          <div class="flex items-center text-xs text-text-muted">
+            <mat-icon class="text-sm mr-1">pause</mat-icon>
+            <span>Temporarily paused</span>
+          </div>
+        </div>
       </div>
 
+      <!-- Processing Card -->
+      <div class="bg-white rounded-xl shadow-lg border border-border-light p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
+        <div class="flex items-center justify-between">
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center group-hover:bg-purple-200 transition-colors">
+                <mat-icon class="text-purple-600 text-xl">sync</mat-icon>
+              </div>
+              <div>
+                <h3 class="text-2xl sm:text-3xl font-bold text-text-primary font-heading">
+                  {{ stats.processingClients }}
+                </h3>
+                <p class="text-text-secondary text-sm font-medium">Processing</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4 pt-4 border-t border-border-light">
+          <div class="flex items-center text-xs text-text-muted">
+            <mat-icon class="text-sm mr-1">settings</mat-icon>
+            <span>Currently processing</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total Team Card -->
+      <div class="bg-white rounded-xl shadow-lg border border-border-light p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
+        <div class="flex items-center justify-between">
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center group-hover:bg-indigo-200 transition-colors">
+                <mat-icon class="text-indigo-600 text-xl">group</mat-icon>
+              </div>
+              <div>
+                <h3 class="text-2xl sm:text-3xl font-bold text-text-primary font-heading">
+                  {{ stats.totalTeam }}
+                </h3>
+                <p class="text-text-secondary text-sm font-medium">Total Team</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4 pt-4 border-t border-border-light">
+          <div class="flex items-center text-xs text-text-muted">
+            <mat-icon class="text-sm mr-1">business_center</mat-icon>
+            <span>Active team members</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Admin Utilities (only for admins) -->
-    <div *ngIf="currentUser?.role === 'admin'" class="bg-gray-800 rounded-xl shadow-lg border border-gray-700 p-6">
+    <div *ngIf="currentUser?.role === 'admin'" class="bg-white rounded-xl shadow-lg border border-border-light p-6">
       <div class="flex items-center gap-3 mb-6">
-        <div class="w-10 h-10 bg-red-500/20 rounded-lg flex items-center justify-center">
-          <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-          </svg>
+        <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+          <mat-icon class="text-red-600">admin_panel_settings</mat-icon>
         </div>
         <div>
-          <h2 class="text-xl font-bold text-white font-heading">Admin Utilities</h2>
-          <p class="text-gray-400 text-sm">Database management tools</p>
+          <h2 class="text-xl font-bold text-text-primary font-heading">Admin Utilities</h2>
+          <p class="text-text-secondary text-sm">Database management tools</p>
         </div>
       </div>
       
       <div class="flex flex-col sm:flex-row gap-4">
         <button 
+          mat-stroked-button 
+          color="primary" 
           (click)="debugAllUsers()"
-          class="flex-1 sm:flex-none px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
+          class="flex-1 sm:flex-none btn btn-outline hover:bg-primary hover:text-white transition-all duration-200">
+          <mat-icon class="mr-2">bug_report</mat-icon>
           Debug All Users
         </button>
         <button 
+          mat-stroked-button 
+          color="warn" 
           (click)="cleanupRejectedUsers()"
-          class="flex-1 sm:flex-none px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-          </svg>
+          class="flex-1 sm:flex-none btn btn-outline hover:bg-status-error hover:text-white transition-all duration-200">
+          <mat-icon class="mr-2">cleaning_services</mat-icon>
           Cleanup Rejected Users
         </button>
       </div>
     </div>
 
     <!-- Recent Clients Table -->
-    <div class="bg-gray-800 rounded-xl shadow-lg border border-gray-700 overflow-hidden">
-      <div class="p-6 border-b border-gray-700">
+    <div class="bg-white rounded-xl shadow-lg border border-border-light overflow-hidden">
+      <div class="p-6 border-b border-border-light">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h2 class="text-xl font-bold text-white font-heading">Recent Clients</h2>
-            <p class="text-gray-400 text-sm">Latest client registrations and their status</p>
+            <h2 class="text-xl font-bold text-text-primary font-heading">Recent Clients</h2>
+            <p class="text-text-secondary text-sm">Latest client registrations and their status</p>
           </div>
           <button 
             routerLink="/new-client"
@@ -172,19 +261,17 @@
 
       <!-- Loading State -->
       <div *ngIf="loading" class="flex flex-col items-center justify-center py-12 px-6">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
-        <p class="text-gray-400">Loading clients...</p>
+        <mat-spinner diameter="40" class="mb-4"></mat-spinner>
+        <p class="text-text-secondary">Loading clients...</p>
       </div>
 
       <!-- Empty State -->
       <div *ngIf="!loading && clients.length === 0" class="flex flex-col items-center justify-center py-12 px-6 text-center">
-        <div class="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center mb-4">
-          <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
-          </svg>
+        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+          <mat-icon class="text-gray-400 text-2xl">person_add</mat-icon>
         </div>
-        <h3 class="text-lg font-semibold text-white mb-2">No clients yet</h3>
-        <p class="text-gray-400 mb-6 max-w-sm">Start building your client base by adding your first client to the system</p>
+        <h3 class="text-lg font-semibold text-text-primary mb-2">No clients yet</h3>
+        <p class="text-text-secondary mb-6 max-w-sm">Start building your client base by adding your first client to the system</p>
         <button 
           routerLink="/new-client"
           class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2">
@@ -200,176 +287,189 @@
         <!-- Mobile Card View (Hidden on larger screens) -->
         <div class="block lg:hidden space-y-4 p-6">
           <div *ngFor="let client of clients.slice(0, 5); let i = index" 
-               class="bg-gray-700 rounded-lg p-4 border border-gray-600 hover:shadow-md transition-shadow cursor-pointer"
+               class="bg-surface-alt rounded-lg p-4 border border-border-light hover:shadow-md transition-shadow cursor-pointer"
                (click)="viewClientDetails(client)">
             <div class="flex items-start justify-between mb-3">
               <div class="flex-1">
-                <h4 class="font-semibold text-white text-sm">
+                <h4 class="font-semibold text-text-primary text-sm">
                   {{ client.legal_name || client.user_name || 'N/A' }}
                 </h4>
-                <p class="text-gray-400 text-xs mt-1">
+                <p class="text-text-secondary text-xs mt-1">
                   {{ client.trade_name || client.business_name || client.legal_name || 'N/A' }}
                 </p>
               </div>
-              <span class="text-xs text-gray-500">#{{ i + 1 }}</span>
+              <span class="text-xs text-text-muted">#{{ i + 1 }}</span>
             </div>
             
             <div class="flex flex-wrap gap-2 mb-3">
               <span class="status-badge px-2 py-1 text-xs rounded-full font-medium"
                     [ngClass]="{
-                      'bg-green-500/20 text-green-300': client.status === 'interested',
-                      'bg-red-500/20 text-red-300': client.status === 'not_interested',
-                      'bg-yellow-500/20 text-yellow-300': client.status === 'pending',
-                      'bg-orange-500/20 text-orange-300': client.status === 'hold',
-                      'bg-purple-500/20 text-purple-300': client.status === 'processing'
+                      'bg-green-100 text-green-800': client.status === 'interested',
+                      'bg-red-100 text-red-800': client.status === 'not_interested',
+                      'bg-yellow-100 text-yellow-800': client.status === 'pending',
+                      'bg-orange-100 text-orange-800': client.status === 'hold',
+                      'bg-purple-100 text-purple-800': client.status === 'processing'
                     }">
                 {{ client.status | titlecase }}
               </span>
-              <span class="status-badge px-2 py-1 text-xs rounded-full font-medium bg-blue-500/20 text-blue-300">
+              <span class="status-badge px-2 py-1 text-xs rounded-full font-medium bg-blue-100 text-blue-800">
                 {{ getLoanStatus(client) | titlecase }}
               </span>
             </div>
             
-            <div class="flex items-center justify-between text-xs text-gray-500">
+            <div class="flex items-center justify-between text-xs text-text-muted">
               <span>Staff: {{ client.staff_name || 'Unassigned' }}</span>
               <span>{{ client.created_at | date:'short' }}</span>
             </div>
             
-            <div class="flex gap-2 mt-3 pt-3 border-t border-gray-600">
-              <button 
+            <div class="flex gap-2 mt-3 pt-3 border-t border-border-light">
+              <button mat-icon-button 
                       (click)="editClient(client); $event.stopPropagation()" 
-                      class="text-blue-400 hover:bg-blue-500/10 rounded-lg p-2 transition-colors"
-                      title="Edit Client">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                </svg>
+                      class="text-primary hover:bg-primary/10 rounded-lg p-2"
+                      matTooltip="Edit Client">
+                <mat-icon class="text-lg">edit</mat-icon>
               </button>
-              <button 
+              <button mat-icon-button 
                       (click)="openWhatsApp(client); $event.stopPropagation()" 
-                      class="text-green-400 hover:bg-green-500/10 rounded-lg p-2 transition-colors"
-                      title="WhatsApp">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-                </svg>
+                      class="text-green-600 hover:bg-green-50 rounded-lg p-2"
+                      matTooltip="WhatsApp">
+                <mat-icon svgIcon="whatsapp" class="text-lg"></mat-icon>
               </button>
-              <button 
+              <button mat-icon-button 
                       (click)="deleteClient(client); $event.stopPropagation()" 
-                      class="text-red-400 hover:bg-red-500/10 rounded-lg p-2 transition-colors"
-                      title="Delete Client">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                </svg>
+                      class="text-status-error hover:bg-red-50 rounded-lg p-2"
+                      matTooltip="Delete Client">
+                <mat-icon class="text-lg">delete</mat-icon>
               </button>
             </div>
           </div>
         </div>
 
         <!-- Desktop Table View (Hidden on mobile) -->
-        <div class="hidden lg:block overflow-x-auto">
-          <table class="w-full">
-            <thead>
-              <tr class="border-b border-gray-700 bg-gray-750">
-                <th class="text-left font-semibold text-gray-300 px-4 py-3 text-sm">S.No</th>
-                <th class="text-left font-semibold text-gray-300 px-4 py-3 text-sm">Client Name</th>
-                <th class="text-left font-semibold text-gray-300 px-4 py-3 text-sm">Business</th>
-                <th class="text-left font-semibold text-gray-300 px-4 py-3 text-sm">Staff</th>
-                <th class="text-left font-semibold text-gray-300 px-4 py-3 text-sm">Status</th>
-                <th class="text-left font-semibold text-gray-300 px-4 py-3 text-sm">Loan Status</th>
-                <th class="text-left font-semibold text-gray-300 px-4 py-3 text-sm">Created</th>
-                <th class="text-left font-semibold text-gray-300 px-4 py-3 text-sm">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let client of clients.slice(0, 5); let i = index" 
-                  class="border-b border-gray-700 hover:bg-gray-700/50 transition-colors"
-                  [ngClass]="{
-                    'bg-green-500/10': client.status === 'interested',
-                    'bg-red-500/10': client.status === 'not_interested',
-                    'bg-orange-500/10': client.status === 'hold',
-                    'bg-yellow-500/10': client.status === 'pending',
-                    'bg-purple-500/10': client.status === 'processing'
-                  }">
-                <td class="px-4 py-3 text-sm text-gray-400">{{ i + 1 }}</td>
-                <td (click)="viewClientDetails(client)" 
-                    class="px-4 py-3 cursor-pointer hover:bg-gray-700/50 transition-colors">
-                  <div class="font-medium text-white text-sm">
-                    {{ client.legal_name || client.user_name || 'N/A' }}
-                  </div>
-                </td>
-                <td (click)="viewClientDetails(client)" 
-                    class="px-4 py-3 cursor-pointer hover:bg-gray-700/50 transition-colors">
-                  <div class="font-medium text-white text-sm">
-                    {{ client.trade_name || client.business_name || client.legal_name || 'N/A' }}
-                  </div>
-                </td>
-                <td class="px-4 py-3">
-                  <div class="text-gray-400 text-sm">
-                    {{ client.staff_name || 'Unassigned' }}
-                  </div>
-                </td>
-                <td class="px-4 py-3">
-                  <span class="status-badge px-2 py-1 text-xs rounded-full font-medium"
-                        [ngClass]="{
-                          'bg-green-500/20 text-green-300': client.status === 'interested',
-                          'bg-red-500/20 text-red-300': client.status === 'not_interested',
-                          'bg-yellow-500/20 text-yellow-300': client.status === 'pending',
-                          'bg-orange-500/20 text-orange-300': client.status === 'hold',
-                          'bg-purple-500/20 text-purple-300': client.status === 'processing'
-                        }">
-                    {{ client.status | titlecase }}
-                  </span>
-                </td>
-                <td class="px-4 py-3">
-                  <span class="status-badge px-2 py-1 text-xs rounded-full font-medium bg-blue-500/20 text-blue-300">
-                    {{ getLoanStatus(client) | titlecase }}
-                  </span>
-                </td>
-                <td class="px-4 py-3 text-sm text-gray-400">
-                  {{ client.created_at | date:'short' }}
-                </td>
-                <td class="px-4 py-3">
-                  <div class="flex gap-1">
-                    <button 
-                            (click)="editClient(client); $event.stopPropagation()" 
-                            class="text-blue-400 hover:bg-blue-500/10 w-8 h-8 rounded-lg transition-colors flex items-center justify-center"
-                            title="Edit Client">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                      </svg>
-                    </button>
-                    <button 
-                            (click)="openWhatsApp(client); $event.stopPropagation()" 
-                            class="text-green-400 hover:bg-green-500/10 w-8 h-8 rounded-lg transition-colors flex items-center justify-center"
-                            title="WhatsApp">
-                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-                      </svg>
-                    </button>
-                    <button 
-                            (click)="deleteClient(client); $event.stopPropagation()" 
-                            class="text-red-400 hover:bg-red-500/10 w-8 h-8 rounded-lg transition-colors flex items-center justify-center"
-                            title="Delete Client">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                      </svg>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
+        <div class="hidden lg:block">
+          <table mat-table [dataSource]="clients.slice(0, 5)" class="w-full">
+            <!-- Serial Number Column -->
+            <ng-container matColumnDef="serial">
+              <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">S.No</th>
+              <td mat-cell *matCellDef="let client; let i = index" class="px-4 py-3 text-sm text-text-secondary">{{ i + 1 }}</td>
+            </ng-container>
+
+            <!-- Name Column -->
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Client Name</th>
+              <td mat-cell *matCellDef="let client" 
+                  (click)="viewClientDetails(client)" 
+                  class="px-4 py-3 cursor-pointer hover:bg-surface-alt transition-colors">
+                <div class="font-medium text-text-primary text-sm">
+                  {{ client.legal_name || client.user_name || 'N/A' }}
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Business Column -->
+            <ng-container matColumnDef="business">
+              <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Business</th>
+              <td mat-cell *matCellDef="let client" 
+                  (click)="viewClientDetails(client)" 
+                  class="px-4 py-3 cursor-pointer hover:bg-surface-alt transition-colors">
+                <div class="font-medium text-text-primary text-sm">
+                  {{ client.trade_name || client.business_name || client.legal_name || 'N/A' }}
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Staff Column -->
+            <ng-container matColumnDef="staff">
+              <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Staff</th>
+              <td mat-cell *matCellDef="let client" class="px-4 py-3">
+                <div class="text-text-secondary text-sm">
+                  {{ client.staff_name || 'Unassigned' }}
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Status Column -->
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Status</th>
+              <td mat-cell *matCellDef="let client" class="px-4 py-3">
+                <span class="status-badge px-2 py-1 text-xs rounded-full font-medium"
+                      [ngClass]="{
+                        'bg-green-100 text-green-800': client.status === 'interested',
+                        'bg-red-100 text-red-800': client.status === 'not_interested',
+                        'bg-yellow-100 text-yellow-800': client.status === 'pending',
+                        'bg-orange-100 text-orange-800': client.status === 'hold',
+                        'bg-purple-100 text-purple-800': client.status === 'processing'
+                      }">
+                  {{ client.status | titlecase }}
+                </span>
+              </td>
+            </ng-container>
+
+            <!-- Loan Status Column -->
+            <ng-container matColumnDef="loan_status">
+              <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Loan Status</th>
+              <td mat-cell *matCellDef="let client" class="px-4 py-3">
+                <span class="status-badge px-2 py-1 text-xs rounded-full font-medium bg-blue-100 text-blue-800">
+                  {{ getLoanStatus(client) | titlecase }}
+                </span>
+              </td>
+            </ng-container>
+
+            <!-- Created Column -->
+            <ng-container matColumnDef="date">
+              <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Created</th>
+              <td mat-cell *matCellDef="let client" class="px-4 py-3 text-sm text-text-secondary">
+                {{ client.created_at | date:'short' }}
+              </td>
+            </ng-container>
+
+            <!-- Actions Column -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Actions</th>
+              <td mat-cell *matCellDef="let client" class="px-4 py-3">
+                <div class="flex gap-1">
+                  <button mat-icon-button 
+                          (click)="editClient(client); $event.stopPropagation()" 
+                          class="text-primary hover:bg-primary/10 w-8 h-8"
+                          matTooltip="Edit Client">
+                    <mat-icon class="text-lg">edit</mat-icon>
+                  </button>
+                  <button mat-icon-button 
+                          (click)="openWhatsApp(client); $event.stopPropagation()" 
+                          class="text-green-600 hover:bg-green-50 w-8 h-8"
+                          matTooltip="WhatsApp">
+                    <mat-icon svgIcon="whatsapp" class="text-lg"></mat-icon>
+                  </button>
+                  <button mat-icon-button 
+                          (click)="deleteClient(client); $event.stopPropagation()" 
+                          class="text-status-error hover:bg-red-50 w-8 h-8"
+                          matTooltip="Delete Client">
+                    <mat-icon class="text-lg">delete</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="['serial', 'name', 'business', 'staff', 'status', 'loan_status', 'date', 'actions']" class="border-b border-border-light"></tr>
+            <tr mat-row *matRowDef="let row; columns: ['serial', 'name', 'business', 'staff', 'status', 'loan_status', 'date', 'actions'];" 
+                class="border-b border-border-light hover:bg-surface-alt transition-colors"
+                [class.bg-green-50]="row.status === 'interested'"
+                [class.bg-red-50]="row.status === 'not_interested'"
+                [class.bg-orange-50]="row.status === 'hold'"
+                [class.bg-yellow-50]="row.status === 'pending'"
+                [class.bg-purple-50]="row.status === 'processing'"></tr>
           </table>
         </div>
 
         <!-- View All Button -->
-        <div *ngIf="clients.length > 5" class="p-6 border-t border-gray-700 bg-gray-750">
+        <div *ngIf="clients.length > 5" class="p-6 border-t border-border-light bg-surface-alt">
           <div class="flex justify-center">
             <button 
+              mat-stroked-button 
+              color="primary" 
               routerLink="/clients"
-              class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-xl">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-              </svg>
+              class="btn btn-outline flex items-center gap-2 px-6 py-2">
+              <mat-icon class="text-sm">visibility</mat-icon>
               View All Clients ({{ clients.length }})
             </button>
           </div>
