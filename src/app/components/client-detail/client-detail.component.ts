@@ -185,6 +185,13 @@ export class ClientDetailComponent implements OnInit {
               this.client.processed_documents['ie_document']);
   }
 
+  hasBusinessDocument(): boolean {
+    if (!this.client || !this.client.processed_documents) return false;
+    return !!(this.client.processed_documents['business_document'] || 
+              this.client.processed_documents['business_documents'] ||
+              this.client.processed_documents['business_doc']);
+  }
+
   getGSTStatus(): string {
     const gstStatus = this.getClientProperty('gst_status');
     const gstNumber = this.getClientProperty('gst_number');

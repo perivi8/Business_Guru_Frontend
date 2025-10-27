@@ -183,6 +183,10 @@
                   <span class="text-sm font-medium text-text-secondary">IE Document:</span>
                   <span class="text-sm text-text-primary">{{ hasIEDocument() ? 'Yes' : 'No' }}</span>
                 </div>
+                <div class="flex justify-between py-2 border-b border-gray-100">
+                  <span class="text-sm font-medium text-text-secondary">Business Document:</span>
+                  <span class="text-sm text-text-primary">{{ hasBusinessDocument() ? 'Yes' : 'No' }}</span>
+                </div>
                 <div class="flex justify-between py-2">
                   <span class="text-sm font-medium text-text-secondary">Website URL:</span>
                   <span class="text-sm text-text-primary">{{ getWebsiteURL() }}</span>
