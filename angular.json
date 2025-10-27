@@ -34,7 +34,8 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              "public"
             ],
             "styles": [
               "@angular/material/prebuilt-themes/indigo-pink.css",
@@ -65,7 +66,7 @@
               "outputHashing": "all",
               "sourceMap": false,
               "extractCss": true,
-              "baseHref": "/",
+              "baseHref": "./",
               "optimization": {
                 "styles": {
                   "minify": true,
