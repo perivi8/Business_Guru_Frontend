@@ -1179,3 +1179,38 @@ button.flex.flex-col.items-center {
     box-shadow: none !important;
   }
 }
+
+/* ===== NEW TAILWIND STEPPER STYLES ===== */
+
+/* Ensure stepper buttons have no outline */
+button.focus\:outline-none {
+  outline: none !important;
+  
+  &:focus,
+  &:focus-visible,
+  &:active {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+}
+
+/* Smooth transitions for stepper */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Responsive stepper adjustments */
+@media (max-width: 1024px) {
+  /* Mobile stepper takes full width */
+  .grid.grid-cols-5 {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Extra small screens - make stepper more compact */
+  .grid.grid-cols-5 {
+    gap: 0.375rem; /* Smaller gap on mobile */
+  }
+}

@@ -1459,7 +1459,10 @@ export class ClientDetailComponent implements OnInit {
 
   // Stepper methods
   setActiveStep(step: number): void {
+    console.log(`🔄 Switching to step ${step}`);
     this.activeStep = step;
+    // Scroll to top of content when changing steps
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   isStepActive(step: number): boolean {

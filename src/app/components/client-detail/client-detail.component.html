@@ -83,142 +83,295 @@
           </div>
         </div>
         
-        <!-- Right: Stepper -->
-        <div class="flex items-center gap-3 flex-shrink-0">
-          <!-- Step 1 -->
-          <button (click)="setActiveStep(1)" 
-                  class="flex flex-col items-center gap-2 transition-all duration-300 group hover:scale-105 focus:outline-none">
-            <div class="w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 ring-2"
-                 [ngClass]="{
-                   'bg-gradient-to-br from-blue-500 to-indigo-600 shadow-xl ring-blue-300': activeStep === 1,
-                   'bg-white shadow-md ring-gray-200 group-hover:ring-blue-200': activeStep !== 1
-                 }">
-              <svg class="w-7 h-7 transition-all duration-300"
+        <!-- Right: Modern Stepper -->
+        <div class="w-full lg:w-auto mt-4 lg:mt-0">
+          <!-- Desktop: Horizontal Stepper -->
+          <div class="hidden lg:flex items-center justify-center gap-2 bg-white/50 rounded-2xl p-3 shadow-sm">
+            <!-- Step 1: Business Info -->
+            <button (click)="setActiveStep(1)" 
+                    class="flex flex-col items-center gap-1.5 px-3 py-2 rounded-xl transition-all duration-300 group focus:outline-none"
+                    [ngClass]="{
+                      'bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg': activeStep === 1,
+                      'hover:bg-blue-50': activeStep !== 1
+                    }">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300"
                    [ngClass]="{
-                     'text-white': activeStep === 1,
-                     'text-gray-500 group-hover:text-blue-500': activeStep !== 1
-                   }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-              </svg>
-            </div>
-            <span class="text-xs font-bold transition-all duration-300"
-                  [ngClass]="{
-                    'text-blue-600': activeStep === 1,
-                    'text-gray-500 group-hover:text-blue-500': activeStep !== 1
-                  }">Step 1</span>
-          </button>
+                     'bg-white/20': activeStep === 1,
+                     'bg-blue-100': activeStep !== 1
+                   }">
+                <svg class="w-5 h-5 transition-all duration-300"
+                     [ngClass]="{
+                       'text-white': activeStep === 1,
+                       'text-blue-600': activeStep !== 1
+                     }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                </svg>
+              </div>
+              <span class="text-[10px] font-semibold transition-all duration-300"
+                    [ngClass]="{
+                      'text-white': activeStep === 1,
+                      'text-gray-600': activeStep !== 1
+                    }">Business</span>
+            </button>
 
-          <!-- Arrow -->
-          <svg class="w-6 h-6 text-gray-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-          </svg>
+            <!-- Connector -->
+            <div class="h-0.5 w-4 bg-gray-300"></div>
 
-          <!-- Step 2 -->
-          <button (click)="setActiveStep(2)" 
-                  class="flex flex-col items-center gap-2 transition-all duration-300 group hover:scale-105 focus:outline-none">
-            <div class="w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 ring-2"
-                 [ngClass]="{
-                   'bg-gradient-to-br from-green-500 to-emerald-600 shadow-xl ring-green-300': activeStep === 2,
-                   'bg-white shadow-md ring-gray-200 group-hover:ring-green-200': activeStep !== 2
-                 }">
-              <svg class="w-7 h-7 transition-all duration-300"
+            <!-- Step 2: Financial -->
+            <button (click)="setActiveStep(2)" 
+                    class="flex flex-col items-center gap-1.5 px-3 py-2 rounded-xl transition-all duration-300 group focus:outline-none"
+                    [ngClass]="{
+                      'bg-gradient-to-br from-green-500 to-emerald-600 shadow-lg': activeStep === 2,
+                      'hover:bg-green-50': activeStep !== 2
+                    }">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300"
                    [ngClass]="{
-                     'text-white': activeStep === 2,
-                     'text-gray-500 group-hover:text-green-500': activeStep !== 2
-                   }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
-            <span class="text-xs font-bold transition-all duration-300"
-                  [ngClass]="{
-                    'text-green-600': activeStep === 2,
-                    'text-gray-500 group-hover:text-green-500': activeStep !== 2
-                  }">Step 2</span>
-          </button>
+                     'bg-white/20': activeStep === 2,
+                     'bg-green-100': activeStep !== 2
+                   }">
+                <svg class="w-5 h-5 transition-all duration-300"
+                     [ngClass]="{
+                       'text-white': activeStep === 2,
+                       'text-green-600': activeStep !== 2
+                     }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <span class="text-[10px] font-semibold transition-all duration-300"
+                    [ngClass]="{
+                      'text-white': activeStep === 2,
+                      'text-gray-600': activeStep !== 2
+                    }">Financial</span>
+            </button>
 
-          <!-- Arrow -->
-          <svg class="w-6 h-6 text-gray-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-          </svg>
+            <!-- Connector -->
+            <div class="h-0.5 w-4 bg-gray-300"></div>
 
-          <!-- Step 3 -->
-          <button (click)="setActiveStep(3)" 
-                  class="flex flex-col items-center gap-2 transition-all duration-300 group hover:scale-105 focus:outline-none">
-            <div class="w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 ring-2"
-                 [ngClass]="{
-                   'bg-gradient-to-br from-orange-500 to-red-600 shadow-xl ring-orange-300': activeStep === 3,
-                   'bg-white shadow-md ring-gray-200 group-hover:ring-orange-200': activeStep !== 3
-                 }">
-              <svg class="w-7 h-7 transition-all duration-300"
+            <!-- Step 3: Documents -->
+            <button (click)="setActiveStep(3)" 
+                    class="flex flex-col items-center gap-1.5 px-3 py-2 rounded-xl transition-all duration-300 group focus:outline-none"
+                    [ngClass]="{
+                      'bg-gradient-to-br from-orange-500 to-red-600 shadow-lg': activeStep === 3,
+                      'hover:bg-orange-50': activeStep !== 3
+                    }">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300"
                    [ngClass]="{
-                     'text-white': activeStep === 3,
-                     'text-gray-500 group-hover:text-orange-500': activeStep !== 3
-                   }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
-              </svg>
-            </div>
-            <span class="text-xs font-bold transition-all duration-300"
-                  [ngClass]="{
-                    'text-orange-600': activeStep === 3,
-                    'text-gray-500 group-hover:text-orange-500': activeStep !== 3
-                  }">Step 3</span>
-          </button>
+                     'bg-white/20': activeStep === 3,
+                     'bg-orange-100': activeStep !== 3
+                   }">
+                <svg class="w-5 h-5 transition-all duration-300"
+                     [ngClass]="{
+                       'text-white': activeStep === 3,
+                       'text-orange-600': activeStep !== 3
+                     }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                </svg>
+              </div>
+              <span class="text-[10px] font-semibold transition-all duration-300"
+                    [ngClass]="{
+                      'text-white': activeStep === 3,
+                      'text-gray-600': activeStep !== 3
+                    }">Documents</span>
+            </button>
 
-          <!-- Arrow -->
-          <svg class="w-6 h-6 text-gray-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-          </svg>
+            <!-- Connector -->
+            <div class="h-0.5 w-4 bg-gray-300"></div>
 
-          <!-- Step 4 -->
-          <button (click)="setActiveStep(4)" 
-                  class="flex flex-col items-center gap-2 transition-all duration-300 group hover:scale-105 focus:outline-none">
-            <div class="w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 ring-2"
-                 [ngClass]="{
-                   'bg-gradient-to-br from-purple-500 to-pink-600 shadow-xl ring-purple-300': activeStep === 4,
-                   'bg-white shadow-md ring-gray-200 group-hover:ring-purple-200': activeStep !== 4
-                 }">
-              <svg class="w-7 h-7 transition-all duration-300"
+            <!-- Step 4: Payment -->
+            <button (click)="setActiveStep(4)" 
+                    class="flex flex-col items-center gap-1.5 px-3 py-2 rounded-xl transition-all duration-300 group focus:outline-none"
+                    [ngClass]="{
+                      'bg-gradient-to-br from-purple-500 to-pink-600 shadow-lg': activeStep === 4,
+                      'hover:bg-purple-50': activeStep !== 4
+                    }">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300"
                    [ngClass]="{
-                     'text-white': activeStep === 4,
-                     'text-gray-500 group-hover:text-purple-500': activeStep !== 4
-                   }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-              </svg>
-            </div>
-            <span class="text-xs font-bold transition-all duration-300"
-                  [ngClass]="{
-                    'text-purple-600': activeStep === 4,
-                    'text-gray-500 group-hover:text-purple-500': activeStep !== 4
-                  }">Step 4</span>
-          </button>
+                     'bg-white/20': activeStep === 4,
+                     'bg-purple-100': activeStep !== 4
+                   }">
+                <svg class="w-5 h-5 transition-all duration-300"
+                     [ngClass]="{
+                       'text-white': activeStep === 4,
+                       'text-purple-600': activeStep !== 4
+                     }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                </svg>
+              </div>
+              <span class="text-[10px] font-semibold transition-all duration-300"
+                    [ngClass]="{
+                      'text-white': activeStep === 4,
+                      'text-gray-600': activeStep !== 4
+                    }">Payment</span>
+            </button>
 
-          <!-- Arrow -->
-          <svg class="w-6 h-6 text-gray-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-          </svg>
+            <!-- Connector -->
+            <div class="h-0.5 w-4 bg-gray-300"></div>
 
-          <!-- Step 5 -->
-          <button (click)="setActiveStep(5)" 
-                  class="flex flex-col items-center gap-2 transition-all duration-300 group hover:scale-105 focus:outline-none">
-            <div class="w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 ring-2"
-                 [ngClass]="{
-                   'bg-gradient-to-br from-cyan-500 to-blue-600 shadow-xl ring-cyan-300': activeStep === 5,
-                   'bg-white shadow-md ring-gray-200 group-hover:ring-cyan-200': activeStep !== 5
-                 }">
-              <svg class="w-7 h-7 transition-all duration-300"
+            <!-- Step 5: Loan Status -->
+            <button (click)="setActiveStep(5)" 
+                    class="flex flex-col items-center gap-1.5 px-3 py-2 rounded-xl transition-all duration-300 group focus:outline-none"
+                    [ngClass]="{
+                      'bg-gradient-to-br from-cyan-500 to-blue-600 shadow-lg': activeStep === 5,
+                      'hover:bg-cyan-50': activeStep !== 5
+                    }">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300"
                    [ngClass]="{
-                     'text-white': activeStep === 5,
-                     'text-gray-500 group-hover:text-cyan-500': activeStep !== 5
-                   }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-              </svg>
-            </div>
-            <span class="text-xs font-bold transition-all duration-300"
-                  [ngClass]="{
-                    'text-cyan-600': activeStep === 5,
-                    'text-gray-500 group-hover:text-cyan-500': activeStep !== 5
-                  }">Step 5</span>
-          </button>
+                     'bg-white/20': activeStep === 5,
+                     'bg-cyan-100': activeStep !== 5
+                   }">
+                <svg class="w-5 h-5 transition-all duration-300"
+                     [ngClass]="{
+                       'text-white': activeStep === 5,
+                       'text-cyan-600': activeStep !== 5
+                     }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                </svg>
+              </div>
+              <span class="text-[10px] font-semibold transition-all duration-300"
+                    [ngClass]="{
+                      'text-white': activeStep === 5,
+                      'text-gray-600': activeStep !== 5
+                    }">Loan</span>
+            </button>
+          </div>
+
+          <!-- Mobile & Tablet: Grid Stepper -->
+          <div class="grid grid-cols-5 gap-2 lg:hidden">
+            <!-- Step 1 -->
+            <button (click)="setActiveStep(1)" 
+                    class="flex flex-col items-center gap-1 p-2 rounded-lg transition-all duration-300 focus:outline-none"
+                    [ngClass]="{
+                      'bg-gradient-to-br from-blue-500 to-indigo-600 shadow-md': activeStep === 1,
+                      'bg-white/70 hover:bg-blue-50': activeStep !== 1
+                    }">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center"
+                   [ngClass]="{
+                     'bg-white/20': activeStep === 1,
+                     'bg-blue-100': activeStep !== 1
+                   }">
+                <svg class="w-4 h-4"
+                     [ngClass]="{
+                       'text-white': activeStep === 1,
+                       'text-blue-600': activeStep !== 1
+                     }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                </svg>
+              </div>
+              <span class="text-[9px] font-semibold"
+                    [ngClass]="{
+                      'text-white': activeStep === 1,
+                      'text-gray-600': activeStep !== 1
+                    }">Info</span>
+            </button>
+
+            <!-- Step 2 -->
+            <button (click)="setActiveStep(2)" 
+                    class="flex flex-col items-center gap-1 p-2 rounded-lg transition-all duration-300 focus:outline-none"
+                    [ngClass]="{
+                      'bg-gradient-to-br from-green-500 to-emerald-600 shadow-md': activeStep === 2,
+                      'bg-white/70 hover:bg-green-50': activeStep !== 2
+                    }">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center"
+                   [ngClass]="{
+                     'bg-white/20': activeStep === 2,
+                     'bg-green-100': activeStep !== 2
+                   }">
+                <svg class="w-4 h-4"
+                     [ngClass]="{
+                       'text-white': activeStep === 2,
+                       'text-green-600': activeStep !== 2
+                     }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <span class="text-[9px] font-semibold"
+                    [ngClass]="{
+                      'text-white': activeStep === 2,
+                      'text-gray-600': activeStep !== 2
+                    }">Money</span>
+            </button>
+
+            <!-- Step 3 -->
+            <button (click)="setActiveStep(3)" 
+                    class="flex flex-col items-center gap-1 p-2 rounded-lg transition-all duration-300 focus:outline-none"
+                    [ngClass]="{
+                      'bg-gradient-to-br from-orange-500 to-red-600 shadow-md': activeStep === 3,
+                      'bg-white/70 hover:bg-orange-50': activeStep !== 3
+                    }">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center"
+                   [ngClass]="{
+                     'bg-white/20': activeStep === 3,
+                     'bg-orange-100': activeStep !== 3
+                   }">
+                <svg class="w-4 h-4"
+                     [ngClass]="{
+                       'text-white': activeStep === 3,
+                       'text-orange-600': activeStep !== 3
+                     }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                </svg>
+              </div>
+              <span class="text-[9px] font-semibold"
+                    [ngClass]="{
+                      'text-white': activeStep === 3,
+                      'text-gray-600': activeStep !== 3
+                    }">Docs</span>
+            </button>
+
+            <!-- Step 4 -->
+            <button (click)="setActiveStep(4)" 
+                    class="flex flex-col items-center gap-1 p-2 rounded-lg transition-all duration-300 focus:outline-none"
+                    [ngClass]="{
+                      'bg-gradient-to-br from-purple-500 to-pink-600 shadow-md': activeStep === 4,
+                      'bg-white/70 hover:bg-purple-50': activeStep !== 4
+                    }">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center"
+                   [ngClass]="{
+                     'bg-white/20': activeStep === 4,
+                     'bg-purple-100': activeStep !== 4
+                   }">
+                <svg class="w-4 h-4"
+                     [ngClass]="{
+                       'text-white': activeStep === 4,
+                       'text-purple-600': activeStep !== 4
+                     }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                </svg>
+              </div>
+              <span class="text-[9px] font-semibold"
+                    [ngClass]="{
+                      'text-white': activeStep === 4,
+                      'text-gray-600': activeStep !== 4
+                    }">Pay</span>
+            </button>
+
+            <!-- Step 5 -->
+            <button (click)="setActiveStep(5)" 
+                    class="flex flex-col items-center gap-1 p-2 rounded-lg transition-all duration-300 focus:outline-none"
+                    [ngClass]="{
+                      'bg-gradient-to-br from-cyan-500 to-blue-600 shadow-md': activeStep === 5,
+                      'bg-white/70 hover:bg-cyan-50': activeStep !== 5
+                    }">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center"
+                   [ngClass]="{
+                     'bg-white/20': activeStep === 5,
+                     'bg-cyan-100': activeStep !== 5
+                   }">
+                <svg class="w-4 h-4"
+                     [ngClass]="{
+                       'text-white': activeStep === 5,
+                       'text-cyan-600': activeStep !== 5
+                     }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                </svg>
+              </div>
+              <span class="text-[9px] font-semibold"
+                    [ngClass]="{
+                      'text-white': activeStep === 5,
+                      'text-gray-600': activeStep !== 5
+                    }">Loan</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -1021,6 +1174,7 @@
           </div>
         </div>
       </div>
+      </div>
 
       <!-- Step 4: Payment Gateway Information Card -->
       <div *ngIf="isStepActive(4)" class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
@@ -1048,12 +1202,11 @@
             
             <div *ngIf="getPaymentGateways().length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div *ngFor="let gateway of getPaymentGateways()" 
-                   class="group relative bg-gradient-to-br from-white to-gray-50 rounded-xl border-2 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 overflow-hidden"
+                   class="group relative rounded-xl border-2 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 overflow-hidden bg-white"
                    [ngClass]="{
-                     'border-green-200 bg-gradient-to-br from-green-50 to-emerald-50': getPaymentGatewayStatus(gateway) === 'approved',
-                     'border-red-200 bg-gradient-to-br from-red-50 to-rose-50': getPaymentGatewayStatus(gateway) === 'not_approved',
-                     'border-yellow-200 bg-gradient-to-br from-yellow-50 to-amber-50': getPaymentGatewayStatus(gateway) === 'pending',
-                     'border-gray-200': !getPaymentGatewayStatus(gateway)
+                     'border-green-300 !bg-gradient-to-br from-green-50 to-emerald-50': getPaymentGatewayStatus(gateway) === 'approved',
+                     'border-red-300 !bg-gradient-to-br from-red-50 to-rose-50': getPaymentGatewayStatus(gateway) === 'not_approved',
+                     'border-yellow-400 !bg-gradient-to-br from-yellow-50 to-amber-50': getPaymentGatewayStatus(gateway) === 'pending'
                    }">
                 <!-- Status Indicator Bar -->
                 <div class="absolute top-0 left-0 right-0 h-1"
@@ -1068,60 +1221,78 @@
                   <!-- Gateway Header -->
                   <div class="flex items-start justify-between mb-4">
                     <div class="flex items-center gap-3">
-                      <div class="w-12 h-12 rounded-xl flex items-center justify-center shadow-md"
-                           [ngClass]="{
-                             'bg-gradient-to-br from-green-500 to-emerald-600': getPaymentGatewayStatus(gateway) === 'approved',
-                             'bg-gradient-to-br from-red-500 to-rose-600': getPaymentGatewayStatus(gateway) === 'not_approved',
-                             'bg-gradient-to-br from-yellow-500 to-amber-600': getPaymentGatewayStatus(gateway) === 'pending',
-                             'bg-gradient-to-br from-purple-500 to-indigo-600': !getPaymentGatewayStatus(gateway)
-                           }">
-                        <!-- Razorpay Icon -->
-                        <svg *ngIf="gateway.toLowerCase().includes('razorpay')" class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <!-- Gateway Icon with Brand Colors -->
+                      <!-- Razorpay Icon -->
+                      <div *ngIf="gateway.toLowerCase().includes('razorpay')" class="w-12 h-12 rounded-xl flex items-center justify-center shadow-md" style="background: linear-gradient(135deg, #3395ff 0%, #0066cc 100%);">
+                        <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M22.436 0l-11.91 7.773-1.174 4.276 6.625-4.297L11.65 24h4.391l6.395-24zM1.564 0h5.5l-5.5 8.25V0z"/>
                         </svg>
-                        <!-- PayU Icon -->
-                        <svg *ngIf="gateway.toLowerCase().includes('payu')" class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      </div>
+                      <!-- PayU Icon -->
+                      <div *ngIf="gateway.toLowerCase().includes('payu')" class="w-12 h-12 rounded-xl flex items-center justify-center shadow-md" style="background: linear-gradient(135deg, #17b978 0%, #0e8c5a 100%);">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        <!-- Paytm Icon -->
-                        <svg *ngIf="gateway.toLowerCase().includes('paytm')" class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      </div>
+                      <!-- Paytm Icon -->
+                      <div *ngIf="gateway.toLowerCase().includes('paytm')" class="w-12 h-12 rounded-xl flex items-center justify-center shadow-md" style="background: linear-gradient(135deg, #00baf2 0%, #0095c7 100%);">
+                        <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2l-2-4 2-4h2l-2 4 2 4z"/>
                         </svg>
-                        <!-- PhonePe Icon -->
-                        <svg *ngIf="gateway.toLowerCase().includes('phonepe')" class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      </div>
+                      <!-- PhonePe Icon -->
+                      <div *ngIf="gateway.toLowerCase().includes('phonepe')" class="w-12 h-12 rounded-xl flex items-center justify-center shadow-md" style="background: linear-gradient(135deg, #5f259f 0%, #3d1766 100%);">
+                        <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
                         </svg>
-                        <!-- Stripe Icon -->
-                        <svg *ngIf="gateway.toLowerCase().includes('stripe')" class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      </div>
+                      <!-- Stripe Icon -->
+                      <div *ngIf="gateway.toLowerCase().includes('stripe')" class="w-12 h-12 rounded-xl flex items-center justify-center shadow-md" style="background: linear-gradient(135deg, #635bff 0%, #4a42d6 100%);">
+                        <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.594-7.305h.003z"/>
                         </svg>
-                        <!-- CCAvenue Icon -->
-                        <svg *ngIf="gateway.toLowerCase().includes('ccavenue')" class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      </div>
+                      <!-- CCAvenue Icon -->
+                      <div *ngIf="gateway.toLowerCase().includes('ccavenue')" class="w-12 h-12 rounded-xl flex items-center justify-center shadow-md" style="background: linear-gradient(135deg, #ff6b35 0%, #e04e1f 100%);">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
                           <circle cx="12" cy="12" r="2" fill="currentColor"/>
                         </svg>
-                        <!-- Cashfree Icon -->
-                        <svg *ngIf="gateway.toLowerCase().includes('cashfree')" class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      </div>
+                      <!-- Cashfree Icon -->
+                      <div *ngIf="gateway.toLowerCase().includes('cashfree')" class="w-12 h-12 rounded-xl flex items-center justify-center shadow-md" style="background: linear-gradient(135deg, #0d47a1 0%, #083570 100%);">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
-                        </svg>
-                        <!-- Instamojo Icon -->
-                        <svg *ngIf="gateway.toLowerCase().includes('instamojo')" class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M12 2L2 7v10c0 5.55 3.84 10.74 10 12 6.16-1.26 10-6.45 10-12V7l-10-5zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
-                        </svg>
-                        <!-- Default Payment Icon for others -->
-                        <svg *ngIf="!gateway.toLowerCase().includes('razorpay') && 
-                                    !gateway.toLowerCase().includes('payu') && 
-                                    !gateway.toLowerCase().includes('paytm') && 
-                                    !gateway.toLowerCase().includes('phonepe') && 
-                                    !gateway.toLowerCase().includes('stripe') && 
-                                    !gateway.toLowerCase().includes('ccavenue') && 
-                                    !gateway.toLowerCase().includes('cashfree') && 
-                                    !gateway.toLowerCase().includes('instamojo')" 
-                             class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/>
                         </svg>
                       </div>
+                      <!-- Instamojo Icon -->
+                      <div *ngIf="gateway.toLowerCase().includes('instamojo')" class="w-12 h-12 rounded-xl flex items-center justify-center shadow-md" style="background: linear-gradient(135deg, #3d5afe 0%, #2c3fd6 100%);">
+                        <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 2L2 7v10c0 5.55 3.84 10.74 10 12 6.16-1.26 10-6.45 10-12V7l-10-5zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+                        </svg>
+                      </div>
+                      <!-- Easebuzz Icon -->
+                      <div *ngIf="gateway.toLowerCase().includes('easebuzz')" class="w-12 h-12 rounded-xl flex items-center justify-center shadow-md" style="background: linear-gradient(135deg, #ff6f00 0%, #d65500 100%);">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                      </div>
+                      <!-- Default Payment Icon -->
+                      <div *ngIf="!gateway.toLowerCase().includes('razorpay') && 
+                                  !gateway.toLowerCase().includes('payu') && 
+                                  !gateway.toLowerCase().includes('paytm') && 
+                                  !gateway.toLowerCase().includes('phonepe') && 
+                                  !gateway.toLowerCase().includes('stripe') && 
+                                  !gateway.toLowerCase().includes('ccavenue') && 
+                                  !gateway.toLowerCase().includes('cashfree') && 
+                                  !gateway.toLowerCase().includes('instamojo') &&
+                                  !gateway.toLowerCase().includes('easebuzz')" 
+                           class="w-12 h-12 rounded-xl flex items-center justify-center shadow-md bg-gradient-to-br from-purple-500 to-indigo-600">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                      </div>
+                      
                       <div>
                         <h5 class="text-base font-bold text-gray-800 mb-1">{{ gateway }}</h5>
                         <!-- Status Badge for Non-Admin -->

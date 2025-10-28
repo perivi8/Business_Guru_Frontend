@@ -1398,13 +1398,80 @@
                     [checked]="isGatewaySelected(gateway)"
                     (change)="onGatewayChange(gateway, $event.checked)"
                     class="w-full">
-                    <div class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:border-primary transition-colors"
-                         [ngClass]="{'border-primary bg-primary/5': isGatewaySelected(gateway)}">
-                      <div class="w-10 h-10 rounded-lg flex items-center justify-center"
-                           [style.background-color]="getGatewayColor(gateway) + '20'">
-                        <mat-icon class="text-lg" [style.color]="getGatewayColor(gateway)">{{ getGatewayIcon(gateway) }}</mat-icon>
+                    <div class="flex items-center gap-3 p-3 border-2 border-gray-200 rounded-xl hover:border-primary transition-all duration-200 hover:shadow-md"
+                         [ngClass]="{'border-primary bg-primary/5 shadow-md': isGatewaySelected(gateway)}">
+                      <!-- Gateway Icons -->
+                      <!-- Razorpay Icon -->
+                      <div *ngIf="gateway.toLowerCase().includes('razorpay')" class="w-10 h-10 rounded-lg flex items-center justify-center shadow-md" style="background: linear-gradient(135deg, #3395ff 0%, #0066cc 100%);">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M22.436 0l-11.91 7.773-1.174 4.276 6.625-4.297L11.65 24h4.391l6.395-24zM1.564 0h5.5l-5.5 8.25V0z"/>
+                        </svg>
                       </div>
-                      <span class="text-sm font-medium text-gray-800">{{ gateway }}</span>
+                      <!-- PayU Icon -->
+                      <div *ngIf="gateway.toLowerCase().includes('payu')" class="w-10 h-10 rounded-lg flex items-center justify-center shadow-md" style="background: linear-gradient(135deg, #17b978 0%, #0e8c5a 100%);">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                      </div>
+                      <!-- Paytm Icon -->
+                      <div *ngIf="gateway.toLowerCase().includes('paytm')" class="w-10 h-10 rounded-lg flex items-center justify-center shadow-md" style="background: linear-gradient(135deg, #00baf2 0%, #0095c7 100%);">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2l-2-4 2-4h2l-2 4 2 4z"/>
+                        </svg>
+                      </div>
+                      <!-- PhonePe Icon -->
+                      <div *ngIf="gateway.toLowerCase().includes('phonepe')" class="w-10 h-10 rounded-lg flex items-center justify-center shadow-md" style="background: linear-gradient(135deg, #5f259f 0%, #3d1766 100%);">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                        </svg>
+                      </div>
+                      <!-- Stripe Icon -->
+                      <div *ngIf="gateway.toLowerCase().includes('stripe')" class="w-10 h-10 rounded-lg flex items-center justify-center shadow-md" style="background: linear-gradient(135deg, #635bff 0%, #4a42d6 100%);">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.594-7.305h.003z"/>
+                        </svg>
+                      </div>
+                      <!-- CCAvenue Icon -->
+                      <div *ngIf="gateway.toLowerCase().includes('ccavenue')" class="w-10 h-10 rounded-lg flex items-center justify-center shadow-md" style="background: linear-gradient(135deg, #ff6b35 0%, #e04e1f 100%);">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                          <circle cx="12" cy="12" r="2" fill="currentColor"/>
+                        </svg>
+                      </div>
+                      <!-- Cashfree Icon -->
+                      <div *ngIf="gateway.toLowerCase().includes('cashfree')" class="w-10 h-10 rounded-lg flex items-center justify-center shadow-md" style="background: linear-gradient(135deg, #0d47a1 0%, #083570 100%);">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                      </div>
+                      <!-- Instamojo Icon -->
+                      <div *ngIf="gateway.toLowerCase().includes('instamojo')" class="w-10 h-10 rounded-lg flex items-center justify-center shadow-md" style="background: linear-gradient(135deg, #3d5afe 0%, #2c3fd6 100%);">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 2L2 7v10c0 5.55 3.84 10.74 10 12 6.16-1.26 10-6.45 10-12V7l-10-5zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+                        </svg>
+                      </div>
+                      <!-- Easebuzz Icon -->
+                      <div *ngIf="gateway.toLowerCase().includes('easebuzz')" class="w-10 h-10 rounded-lg flex items-center justify-center shadow-md" style="background: linear-gradient(135deg, #ff6f00 0%, #d65500 100%);">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                      </div>
+                      <!-- Default Payment Icon for others -->
+                      <div *ngIf="!gateway.toLowerCase().includes('razorpay') && 
+                                  !gateway.toLowerCase().includes('payu') && 
+                                  !gateway.toLowerCase().includes('paytm') && 
+                                  !gateway.toLowerCase().includes('phonepe') && 
+                                  !gateway.toLowerCase().includes('stripe') && 
+                                  !gateway.toLowerCase().includes('ccavenue') && 
+                                  !gateway.toLowerCase().includes('cashfree') && 
+                                  !gateway.toLowerCase().includes('instamojo') &&
+                                  !gateway.toLowerCase().includes('easebuzz')" 
+                           class="w-10 h-10 rounded-lg flex items-center justify-center shadow-md bg-gradient-to-br from-purple-500 to-indigo-600">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                      </div>
+                      <span class="text-sm font-semibold text-gray-800">{{ gateway }}</span>
                     </div>
                   </mat-checkbox>
                 </div>
