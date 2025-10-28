@@ -26,6 +26,16 @@ export class ClientDetailComponent implements OnInit {
   // Custom dropdown properties
   isStatusDropdownOpen = false;
 
+  // Stepper properties
+  activeStep = 1;
+  steps = [
+    'Business & Personal Info',
+    'Financial Information',
+    'Documents & Images',
+    'Payment Gateway',
+    'Loan Status'
+  ];
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -1444,6 +1454,11 @@ export class ClientDetailComponent implements OnInit {
 
   isLoanStatusUpdating(): boolean {
     return this.updatingLoanStatus;
+  }
+
+  // Stepper methods
+  setActiveStep(step: number): void {
+    this.activeStep = step;
   }
 
   // Custom dropdown methods for status selection

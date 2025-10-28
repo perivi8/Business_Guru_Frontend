@@ -30,17 +30,11 @@ export class AdminApprovalPopupComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    console.log('🚀 AdminApprovalPopup ngOnInit called');
-    
     // Check if user is admin
     const currentUser = this.authService.currentUserValue;
-    console.log('👤 Current user:', currentUser);
     
     if (currentUser && currentUser.role === 'admin') {
-      console.log('✅ User is admin, initializing approval popup');
       this.initializeAdminSocket(currentUser);
-    } else {
-      console.log('❌ User is not admin or not logged in, skipping approval popup');
     }
   }
 
@@ -58,8 +52,6 @@ export class AdminApprovalPopupComponent implements OnInit, OnDestroy {
     // Listen for pending registrations
     this.pendingSubscription = this.adminNotificationService.getPendingRegistrations().subscribe(
       (pendingRegistrations: PendingRegistration[]) => {
-        console.log('🔔 AdminApprovalPopup received pending registrations:', pendingRegistrations.length);
-        
         // Show popup if there are pending registrations
         if (pendingRegistrations.length > 0) {
           // Check if this is a new registration or initial load
@@ -71,13 +63,10 @@ export class AdminApprovalPopupComponent implements OnInit, OnDestroy {
             this.currentRequest = pendingRegistrations[0];
             this.showPopup = true;
             this.processing = false;
-            
-            console.log('🚨 SHOWING POPUP for registration:', this.currentRequest.username, this.currentRequest.email);
           }
         } else {
           // No pending registrations, hide popup if showing
           if (this.showPopup) {
-            console.log('✅ No more pending registrations, hiding popup');
             this.hidePopup();
           }
         }
@@ -93,12 +82,11 @@ export class AdminApprovalPopupComponent implements OnInit, OnDestroy {
     this.processing = true;
     this.adminNotificationService.approveRegistration(this.currentRequest._id).subscribe({
       next: (response) => {
-        console.log('✅ Registration approved successfully');
         this.processing = false;
         this.hidePopup();
       },
       error: (error) => {
-        console.error('❌ Error approving registration:', error);
+        console.error('Error approving registration:', error);
         this.processing = false;
         alert('Error approving registration. Please try again.');
       }
@@ -113,12 +101,11 @@ export class AdminApprovalPopupComponent implements OnInit, OnDestroy {
     this.processing = true;
     this.adminNotificationService.rejectRegistration(this.currentRequest._id, reason).subscribe({
       next: (response) => {
-        console.log('❌ Registration rejected successfully');
         this.processing = false;
         this.hidePopup();
       },
       error: (error) => {
-        console.error('❌ Error rejecting registration:', error);
+        console.error('Error rejecting registration:', error);
         this.processing = false;
         alert('Error rejecting registration. Please try again.');
       }

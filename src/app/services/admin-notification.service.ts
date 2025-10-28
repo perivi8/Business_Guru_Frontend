@@ -34,11 +34,9 @@ export class AdminNotificationService {
     }
 
     this.isPolling = true;
-    console.log('🔄 Starting admin notification polling...');
 
     // Fetch initial data immediately
     this.fetchPendingRegistrations().subscribe(registrations => {
-      console.log('📋 Initial pending registrations:', registrations.length);
       this.pendingRegistrations.next(registrations);
     });
 
@@ -52,20 +50,6 @@ export class AdminNotificationService {
         })
       )
       .subscribe(registrations => {
-        const currentPending = this.pendingRegistrations.value;
-        const currentIds = currentPending.map(r => r._id);
-        const newIds = registrations.map(r => r._id);
-        
-        // Check for new registrations by comparing IDs
-        const hasNewRegistrations = newIds.some(id => !currentIds.includes(id));
-        
-        if (hasNewRegistrations && registrations.length > 0) {
-          console.log('📢 NEW PENDING REGISTRATION DETECTED!', registrations.length, 'total pending');
-          // Find the newest registration (not in current list)
-          const newRegistrations = registrations.filter(r => !currentIds.includes(r._id));
-          console.log('🆕 New registrations:', newRegistrations);
-        }
-        
         this.pendingRegistrations.next(registrations);
       });
   }
@@ -73,7 +57,6 @@ export class AdminNotificationService {
   // Stop polling
   stopPolling(): void {
     this.isPolling = false;
-    console.log('⏹️ Stopped admin notification polling');
   }
 
   // Get pending registrations observable

@@ -1,4 +1,4 @@
 <app-navbar *ngIf="showNavbar"></app-navbar>
 <router-outlet></router-outlet>
-<app-admin-approval-popup></app-admin-approval-popup>
+<app-admin-approval-popup *ngIf="isAdmin"></app-admin-approval-popup>
 

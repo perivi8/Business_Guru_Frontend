@@ -487,8 +487,7 @@
               <ng-container matColumnDef="name">
                 <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-gray-800 bg-gradient-to-r from-gray-50 to-gray-100 px-4 py-3 text-sm">Client Name</th>
                 <td mat-cell *matCellDef="let client" 
-                    (click)="viewClientDetails(client)" 
-                    class="px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors">
+                    class="px-4 py-3 transition-colors">
                   <div class="font-medium text-gray-800 text-sm">
                     {{ client.legal_name || client.user_name || 'N/A' }}
                   </div>
@@ -499,8 +498,7 @@
               <ng-container matColumnDef="business">
                 <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-gray-800 bg-gradient-to-r from-gray-50 to-gray-100 px-4 py-3 text-sm">Business</th>
                 <td mat-cell *matCellDef="let client" 
-                    (click)="viewClientDetails(client)" 
-                    class="px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors">
+                    class="px-4 py-3 transition-colors">
                   <div class="font-medium text-gray-800 text-sm">
                     {{ client.trade_name || client.business_name || client.legal_name || 'N/A' }}
                   </div>
@@ -566,7 +564,7 @@
               <!-- Comments Column -->
               <ng-container matColumnDef="comments">
                 <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Comments</th>
-                <td mat-cell *matCellDef="let client" class="px-4 py-3">
+                <td mat-cell *matCellDef="let client" class="px-4 py-3" (click)="$event.stopPropagation()">
                   <!-- Admin view - custom Tailwind dropdown -->
                   <div *ngIf="isAdmin()" class="relative w-40" style="position: relative; z-index: 10;">
                     <!-- Dropdown Button -->
@@ -613,10 +611,10 @@
               <!-- Actions Column -->
               <ng-container matColumnDef="actions">
                 <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-text-primary bg-surface-alt px-4 py-3 text-sm">Actions</th>
-                <td mat-cell *matCellDef="let client" class="px-4 py-3 relative" (click)="$event.stopPropagation()" style="overflow: visible;">
-                  <div class="flex items-center gap-2">
+                <td mat-cell *matCellDef="let client" class="px-4 py-3 relative" style="overflow: visible;">
+                  <div class="flex items-center gap-2" (click)="$event.stopPropagation()">
                     <!-- Edit Action -->
-                    <button (click)="editClient(client)" 
+                    <button (click)="editClient(client); $event.stopPropagation()" 
                             class="w-9 h-9 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-200 hover:scale-110 group"
                             matTooltip="Edit Client"
                             matTooltipPosition="above">
@@ -624,7 +622,7 @@
                     </button>
                     
                     <!-- WhatsApp Action -->
-                    <button (click)="openWhatsApp(client)" 
+                    <button (click)="openWhatsApp(client); $event.stopPropagation()" 
                             class="w-9 h-9 rounded-lg bg-green-100 hover:bg-green-200 flex items-center justify-center transition-all duration-200 hover:scale-110 group"
                             matTooltip="Open WhatsApp"
                             matTooltipPosition="above">
@@ -634,7 +632,7 @@
                     </button>
                     
                     <!-- Delete Action -->
-                    <button (click)="deleteClient(client)" 
+                    <button (click)="deleteClient(client); $event.stopPropagation()" 
                             class="w-9 h-9 rounded-lg bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-200 hover:scale-110 group"
                             matTooltip="Delete Client"
                             matTooltipPosition="above">
@@ -656,7 +654,8 @@
 
               <tr mat-header-row *matHeaderRowDef="getDisplayedColumns()" class="border-b border-border-light"></tr>
               <tr mat-row *matRowDef="let row; columns: getDisplayedColumns();" 
-                  class="border-b border-border-light transition-colors"
+                  (click)="viewClientDetails(row)"
+                  class="border-b border-border-light transition-colors cursor-pointer hover:shadow-md"
                   [ngClass]="{
                     'row-interested': row.status === 'interested',
                     'row-not-interested': row.status === 'not_interested',

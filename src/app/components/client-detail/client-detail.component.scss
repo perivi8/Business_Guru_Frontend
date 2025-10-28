@@ -990,3 +990,192 @@
 .fast-update-success {
   animation: fastUpdateSuccess 0.3s ease-in-out;
 }
+
+/* ===== ENHANCED HEADER STYLES ===== */
+
+/* Improved header card with modern design */
+.backdrop-blur-xl {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Avatar enhancements */
+.w-16.h-16.bg-gradient-to-br {
+  box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.4);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px 0 rgba(59, 130, 246, 0.5);
+  }
+}
+
+/* Status badge improvements */
+.inline-flex.items-center.rounded-full {
+  text-transform: capitalize;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+}
+
+/* Stepper button hover effects */
+button.group.hover\:scale-105 {
+  &:active {
+    transform: scale(0.98) !important;
+  }
+  
+  &:focus {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  
+  &:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+}
+
+/* Responsive header adjustments */
+@media (max-width: 1200px) {
+  .backdrop-blur-xl.bg-white\/95 {
+    .p-6.flex.items-center.justify-between {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 1.5rem;
+    }
+    
+    /* Stepper wraps on medium screens */
+    .flex.items-center.gap-3.flex-shrink-0 {
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      
+      .w-14.h-14 {
+        width: 3rem;
+        height: 3rem;
+        
+        svg {
+          width: 1.5rem;
+          height: 1.5rem;
+        }
+      }
+      
+      .w-6.h-6 {
+        width: 1rem;
+        height: 1rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .backdrop-blur-xl.bg-white\/95 {
+    border-radius: 1.5rem;
+    
+    .p-6 {
+      padding: 1rem;
+    }
+    
+    .flex.items-start.gap-5 {
+      gap: 1rem;
+    }
+    
+    .w-16.h-16 {
+      width: 3.5rem;
+      height: 3.5rem;
+      
+      svg {
+        width: 1.75rem;
+        height: 1.75rem;
+      }
+    }
+    
+    h1 {
+      font-size: 1.5rem !important;
+    }
+    
+    .inline-flex.items-center.px-4 {
+      padding-left: 0.75rem;
+      padding-right: 0.75rem;
+      font-size: 0.75rem;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .backdrop-blur-xl.bg-white\/95 {
+    .flex.items-start {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    
+    h1 {
+      font-size: 1.25rem !important;
+    }
+    
+    /* Stack stepper vertically on very small screens */
+    .flex.items-center.gap-3.flex-shrink-0 {
+      flex-direction: column;
+      
+      svg.w-6.h-6 {
+        transform: rotate(90deg);
+      }
+    }
+  }
+}
+
+/* Header layout enhancements */
+.p-6.flex.items-center.justify-between {
+  min-height: 120px;
+  
+  @media (max-width: 1200px) {
+    min-height: auto;
+  }
+}
+
+/* Stepper container styling */
+.flex.items-center.gap-3.flex-shrink-0 {
+  padding: 0.5rem;
+  background: rgba(249, 250, 251, 0.5);
+  border-radius: 1rem;
+  
+  @media (max-width: 1200px) {
+    background: transparent;
+    padding: 0;
+  }
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Remove blue box/outline from stepper buttons */
+button.flex.flex-col.items-center {
+  outline: none !important;
+  box-shadow: none !important;
+  
+  &:focus,
+  &:focus-visible,
+  &:active {
+    outline: none !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+}
+
+/* Remove focus outline from all stepper-related elements */
+.flex.items-center.gap-3.flex-shrink-0 button {
+  outline: none !important;
+  
+  &:focus,
+  &:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+}

@@ -2,26 +2,77 @@
 ::ng-deep {
   .mat-mdc-table {
     .mat-mdc-row {
-      transition: background-color 0.2s ease;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
       
       &.row-interested {
-        background-color: #dcfce7 !important;
+        background-color: rgb(240 253 244) !important;
+        border-left: 4px solid rgb(34 197 94) !important;
+        
+        &:hover {
+          background-color: rgb(220 252 231) !important;
+          box-shadow: 0 2px 8px rgba(34, 197, 94, 0.15);
+        }
+        
+        .mat-mdc-cell {
+          background-color: transparent !important;
+        }
       }
       
       &.row-not-interested {
-        background-color: #fee2e2 !important;
+        background-color: rgb(254 242 242) !important;
+        border-left: 4px solid rgb(239 68 68) !important;
+        
+        &:hover {
+          background-color: rgb(254 226 226) !important;
+          box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15);
+        }
+        
+        .mat-mdc-cell {
+          background-color: transparent !important;
+        }
       }
       
       &.row-hold {
-        background-color: #fed7aa !important;
+        background-color: rgb(255 247 237) !important;
+        border-left: 4px solid rgb(249 115 22) !important;
+        
+        &:hover {
+          background-color: rgb(255 237 213) !important;
+          box-shadow: 0 2px 8px rgba(249, 115, 22, 0.15);
+        }
+        
+        .mat-mdc-cell {
+          background-color: transparent !important;
+        }
       }
       
       &.row-pending {
-        background-color: #fef08a !important;
+        background-color: rgb(254 252 232) !important;
+        border-left: 4px solid rgb(234 179 8) !important;
+        
+        &:hover {
+          background-color: rgb(254 249 195) !important;
+          box-shadow: 0 2px 8px rgba(234, 179, 8, 0.15);
+        }
+        
+        .mat-mdc-cell {
+          background-color: transparent !important;
+        }
       }
       
       &.row-processing {
-        background-color: #e9d5ff !important;
+        background-color: rgb(250 245 255) !important;
+        border-left: 4px solid rgb(168 85 247) !important;
+        
+        &:hover {
+          background-color: rgb(243 232 255) !important;
+          box-shadow: 0 2px 8px rgba(168, 85, 247, 0.15);
+        }
+        
+        .mat-mdc-cell {
+          background-color: transparent !important;
+        }
       }
     }
   }

@@ -11,6 +11,12 @@ export class AppComponent implements OnInit {
   title = 'TMIS Business Guru';
   showNavbar = false;
 
+  // Check if current user is admin
+  get isAdmin(): boolean {
+    const user = this.authService.currentUserValue;
+    return user?.role === 'admin';
+  }
+
   constructor(
     private router: Router,
     private authService: AuthService
