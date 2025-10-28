@@ -44,6 +44,9 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   editingEnquiryId: string | null = null;
   originalFormValues: any = null; // Store original values to detect changes
   hasFormChanges = false; // Track if form has been modified
+  private formChangeSubscription: any = null; // Track form change subscription
+  private isDropdownInteraction = false; // Track if user is interacting with dropdowns
+  private originalStaffValue: string | null = null; // Track original staff assignment to lock dropdown
   
   // Duplicate mobile number message tracking
   showDuplicateMessage = false;
@@ -539,6 +542,38 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     
     // Check if this enquiry can be assigned based on sequential rules
     return !this.canAssignStaff(enquiry);
+  }
+
+  /**
+   * Check if staff dropdown should be disabled in edit mode
+   * Returns true if staff has already been assigned (not special forms)
+   */
+  isStaffDropdownDisabledInEditMode(): boolean {
+    // Only disable in edit mode
+    if (!this.isEditMode) {
+      return false;
+    }
+    
+    // Disable if original staff value was set (not a special form)
+    return this.originalStaffValue !== null;
+  }
+
+  /**
+   * Check if comments dropdown should be disabled
+   * Returns true if no staff has been assigned yet
+   */
+  isCommentsDropdownDisabled(): boolean {
+    const staffValue = this.registrationForm.get('staff')?.value;
+    
+    // Disable if no staff is selected or if it's a special form
+    if (!staffValue || staffValue === '' || 
+        staffValue === 'Public Form' || 
+        staffValue === 'WhatsApp Bot' || 
+        staffValue === 'WhatsApp Form') {
+      return true;
+    }
+    
+    return false;
   }
 
   /**
@@ -1344,6 +1379,12 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     // Split mobile number into country code and number
     const { countryCode, number } = this.splitMobileNumber(enquiry.mobile_number);
     
+    // Store original staff value to determine if dropdown should be locked
+    // Only lock if staff is assigned and not a special form
+    const staffValue = enquiry.staff || '';
+    const isSpecialForm = staffValue === 'Public Form' || staffValue === 'WhatsApp Bot' || staffValue === 'WhatsApp Form' || staffValue === '';
+    this.originalStaffValue = isSpecialForm ? null : staffValue;
+    
     // Populate form with enquiry data
     const formValues = {
       date: new Date(enquiry.date),
@@ -1373,12 +1414,25 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     // Store original values for comparison
     this.originalFormValues = { ...formValues };
     
-    // Listen for form changes
-    this.registrationForm.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.checkFormChanges();
-      });
+    // Clean up any existing form change subscription
+    if (this.formChangeSubscription) {
+      this.formChangeSubscription.unsubscribe();
+      this.formChangeSubscription = null;
+    }
+    
+    // Add a longer delay before setting up change listener to prevent immediate detection
+    // This prevents the "unsaved changes" dialog from appearing when just selecting dropdown options
+    setTimeout(() => {
+      // Listen for form changes with debounce to avoid rapid fire changes
+      this.formChangeSubscription = this.registrationForm.valueChanges
+        .pipe(
+          takeUntil(this.destroy$),
+          debounceTime(300) // Wait 300ms after user stops typing/selecting
+        )
+        .subscribe(() => {
+          this.checkFormChanges();
+        });
+    }, 500); // 500ms delay to allow form to fully stabilize
     
     // Scroll to top to show the form
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1391,8 +1445,48 @@ export class EnquiryComponent implements OnInit, OnDestroy {
       return;
     }
     
+    // Skip change detection if user is interacting with dropdowns
+    if (this.isDropdownInteraction) {
+      console.log('Skipping change detection - dropdown interaction in progress');
+      return;
+    }
+    
     const currentValues = this.registrationForm.value;
-    this.hasFormChanges = JSON.stringify(currentValues) !== JSON.stringify(this.originalFormValues);
+    
+    // More intelligent comparison that handles null/undefined/empty string equivalence
+    this.hasFormChanges = this.hasActualFormChanges(currentValues, this.originalFormValues);
+  }
+
+  // Helper method to detect actual meaningful changes
+  private hasActualFormChanges(current: any, original: any): boolean {
+    const currentKeys = Object.keys(current);
+    const originalKeys = Object.keys(original);
+    
+    // Check if any key has a meaningful change
+    const allKeys = new Set([...currentKeys, ...originalKeys]);
+    
+    for (const key of allKeys) {
+      const currentValue = this.normalizeValue(current[key]);
+      const originalValue = this.normalizeValue(original[key]);
+      
+      if (currentValue !== originalValue) {
+        console.log(`Form change detected in field '${key}': '${originalValue}' -> '${currentValue}'`);
+        return true;
+      }
+    }
+    
+    return false;
+  }
+
+  // Normalize values to handle null/undefined/empty string equivalence
+  private normalizeValue(value: any): string {
+    if (value === null || value === undefined || value === '') {
+      return '';
+    }
+    if (typeof value === 'object') {
+      return JSON.stringify(value);
+    }
+    return String(value).trim();
   }
 
   // Delete enquiry method
@@ -1443,13 +1537,28 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     this.editingEnquiryId = null;
     this.hasFormChanges = false;
     this.originalFormValues = null;
+    this.originalStaffValue = null;
+    
+    // Clean up form change subscription
+    if (this.formChangeSubscription) {
+      this.formChangeSubscription.unsubscribe();
+      this.formChangeSubscription = null;
+    }
   }
 
   // Handle clicks on modal backdrop - only close modal if clicking outside modal content
   onModalBackdropClick(event: Event): void {
     const target = event.target as HTMLElement;
-    // Check if click is directly on the backdrop (not on modal content or its children)
-    if (!target.closest('.modal-content')) {
+    
+    // Check if click is on a dropdown option or dropdown container
+    // Dropdowns are positioned absolute with high z-index and contain buttons
+    const isDropdownElement = target.classList.contains('absolute') || 
+                              target.closest('.absolute') !== null ||
+                              (target.tagName === 'BUTTON' && target.getAttribute('type') === 'button') ||
+                              target.closest('button[type="button"]') !== null;
+    
+    // Check if click is directly on the backdrop (not on modal content or its children or dropdown)
+    if (!target.closest('.modal-content') && !isDropdownElement) {
       this.hideAddForm();
     }
   }
@@ -1461,6 +1570,13 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     this.registrationForm.reset();
     this.isEditMode = false;
     this.editingEnquiryId = null;
+    this.originalStaffValue = null;
+    
+    // Clean up form change subscription
+    if (this.formChangeSubscription) {
+      this.formChangeSubscription.unsubscribe();
+      this.formChangeSubscription = null;
+    }
   }
 
   onSubmit(): void {
@@ -1578,7 +1694,14 @@ export class EnquiryComponent implements OnInit, OnDestroy {
             this.editingEnquiryId = null;
             this.hasFormChanges = false;
             this.originalFormValues = null;
+            this.originalStaffValue = null;
             this.registrationForm.reset();
+            
+            // Clean up form change subscription
+            if (this.formChangeSubscription) {
+              this.formChangeSubscription.unsubscribe();
+              this.formChangeSubscription = null;
+            }
             
             this.loadEnquiries();
           },
@@ -1915,15 +2038,26 @@ export class EnquiryComponent implements OnInit, OnDestroy {
       country_code: '+91',
       gst: ''
     });
+    
+    // Clean up form change subscription
+    if (this.formChangeSubscription) {
+      this.formChangeSubscription.unsubscribe();
+      this.formChangeSubscription = null;
+    }
   }
 
   // Custom dropdown methods
   toggleDropdown(dropdownId: string): void {
+    this.isDropdownInteraction = true;
     if (this.openDropdownId === dropdownId) {
       this.openDropdownId = null;
     } else {
       this.openDropdownId = dropdownId;
     }
+    // Reset flag after delay to cover debounce period
+    setTimeout(() => {
+      this.isDropdownInteraction = false;
+    }, 500);
   }
 
   isDropdownOpen(dropdownId: string): boolean {
@@ -1941,42 +2075,96 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   }
 
   selectCountryCode(code: string): void {
+    this.isDropdownInteraction = true;
     this.registrationForm.patchValue({ country_code: code });
     this.closeDropdown();
+    // Manually set hasFormChanges if in edit mode
+    if (this.isEditMode) {
+      this.hasFormChanges = true;
+    }
+    // Reset flag after delay to cover debounce period
+    setTimeout(() => {
+      this.isDropdownInteraction = false;
+    }, 500);
   }
 
   // Business Type dropdown methods
   selectBusinessType(type: string): void {
+    this.isDropdownInteraction = true;
     this.registrationForm.patchValue({ business_type: type });
     this.closeDropdown();
+    // Manually set hasFormChanges if in edit mode
+    if (this.isEditMode) {
+      this.hasFormChanges = true;
+    }
+    // Reset flag after delay to cover debounce period
+    setTimeout(() => {
+      this.isDropdownInteraction = false;
+    }, 500);
   }
 
   // GST dropdown methods
   selectGst(value: string): void {
+    this.isDropdownInteraction = true;
     this.registrationForm.patchValue({ gst: value });
     // Clear GST status if GST is not Yes
     if (value !== 'Yes') {
       this.registrationForm.patchValue({ gst_status: '' });
     }
     this.closeDropdown();
+    // Manually set hasFormChanges if in edit mode
+    if (this.isEditMode) {
+      this.hasFormChanges = true;
+    }
+    // Reset flag after delay to cover debounce period
+    setTimeout(() => {
+      this.isDropdownInteraction = false;
+    }, 500);
   }
 
   // GST Status dropdown methods
   selectGstStatus(status: string): void {
+    this.isDropdownInteraction = true;
     this.registrationForm.patchValue({ gst_status: status });
     this.closeDropdown();
+    // Manually set hasFormChanges if in edit mode
+    if (this.isEditMode) {
+      this.hasFormChanges = true;
+    }
+    // Reset flag after delay to cover debounce period
+    setTimeout(() => {
+      this.isDropdownInteraction = false;
+    }, 500);
   }
 
   // Staff dropdown methods
   selectStaff(staff: string): void {
+    this.isDropdownInteraction = true;
     this.registrationForm.patchValue({ staff: staff });
     this.closeDropdown();
+    // Manually set hasFormChanges if in edit mode
+    if (this.isEditMode) {
+      this.hasFormChanges = true;
+    }
+    // Reset flag after delay to cover debounce period
+    setTimeout(() => {
+      this.isDropdownInteraction = false;
+    }, 500);
   }
 
   // Comments dropdown methods
   selectComment(comment: string): void {
+    this.isDropdownInteraction = true;
     this.registrationForm.patchValue({ comments: comment });
     this.closeDropdown();
+    // Manually set hasFormChanges if in edit mode
+    if (this.isEditMode) {
+      this.hasFormChanges = true;
+    }
+    // Reset flag after delay to cover debounce period
+    setTimeout(() => {
+      this.isDropdownInteraction = false;
+    }, 500);
   }
 
   // Preview business document

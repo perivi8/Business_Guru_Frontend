@@ -1366,22 +1366,34 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 overflow-visible">
               <!-- Staff Assignment -->
               <div class="w-full">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Assign Staff *</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Assign Staff *
+                  <span *ngIf="isStaffDropdownDisabledInEditMode()" class="text-xs text-orange-600 ml-2">
+                    🔒 Staff already assigned
+                  </span>
+                </label>
                 <div class="relative">
                   <button type="button"
-                          (click)="toggleDropdown('staff'); $event.stopPropagation()"
+                          (click)="!isStaffDropdownDisabledInEditMode() && toggleDropdown('staff'); $event.stopPropagation()"
+                          [disabled]="isStaffDropdownDisabledInEditMode()"
                           class="w-full bg-white border border-gray-300 rounded-lg px-3 py-3 text-left text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors"
                           [class.border-blue-500]="isDropdownOpen('staff')"
                           [class.ring-2]="isDropdownOpen('staff')"
-                          [class.ring-blue-500]="isDropdownOpen('staff')">
+                          [class.ring-blue-500]="isDropdownOpen('staff')"
+                          [class.bg-gray-100]="isStaffDropdownDisabledInEditMode()"
+                          [class.cursor-not-allowed]="isStaffDropdownDisabledInEditMode()"
+                          [class.opacity-60]="isStaffDropdownDisabledInEditMode()">
                     <span class="block truncate text-gray-700">
                       {{ registrationForm.get('staff')?.value || 'Select Staff' }}
                     </span>
                     <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                      <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                      <svg *ngIf="!isStaffDropdownDisabledInEditMode()" class="w-4 h-4 text-gray-400 transition-transform duration-200"
                            [class.rotate-180]="isDropdownOpen('staff')"
                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                      <svg *ngIf="isStaffDropdownDisabledInEditMode()" class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
                       </svg>
                     </span>
                   </button>
@@ -1410,22 +1422,34 @@
 
               <!-- Comments (Only show in Edit Mode) -->
               <div class="w-full" *ngIf="isEditMode">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Comments (Optional)</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Comments (Optional)
+                  <span *ngIf="isCommentsDropdownDisabled()" class="text-xs text-red-600 ml-2">
+                    🔒 Assign staff first
+                  </span>
+                </label>
                 <div class="relative">
                   <button type="button"
-                          (click)="toggleDropdown('comments'); $event.stopPropagation()"
+                          (click)="!isCommentsDropdownDisabled() && toggleDropdown('comments'); $event.stopPropagation()"
+                          [disabled]="isCommentsDropdownDisabled()"
                           class="w-full bg-white border border-gray-300 rounded-lg px-3 py-3 text-left text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors"
                           [class.border-blue-500]="isDropdownOpen('comments')"
                           [class.ring-2]="isDropdownOpen('comments')"
-                          [class.ring-blue-500]="isDropdownOpen('comments')">
+                          [class.ring-blue-500]="isDropdownOpen('comments')"
+                          [class.bg-gray-100]="isCommentsDropdownDisabled()"
+                          [class.cursor-not-allowed]="isCommentsDropdownDisabled()"
+                          [class.opacity-60]="isCommentsDropdownDisabled()">
                     <span class="block truncate text-gray-700">
                       {{ registrationForm.get('comments')?.value || 'Select Comment' }}
                     </span>
                     <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                      <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                      <svg *ngIf="!isCommentsDropdownDisabled()" class="w-4 h-4 text-gray-400 transition-transform duration-200"
                            [class.rotate-180]="isDropdownOpen('comments')"
                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                      <svg *ngIf="isCommentsDropdownDisabled()" class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
                       </svg>
                     </span>
                   </button>
