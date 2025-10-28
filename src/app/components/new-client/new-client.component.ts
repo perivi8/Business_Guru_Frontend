@@ -185,7 +185,8 @@ export class NewClientComponent implements OnInit {
       has_business_pan: ['no'],
       number_of_partners: ['', Validators.required], // Number of partners for Partnership
       partnership_deed_document: [''], // Partnership deed document
-      website: ['', Validators.pattern('https?://.+')]
+      website: ['', Validators.pattern('https?://.+')],
+      ie_code_number: [''] // IE Code Number (required when IE document is uploaded)
     });
     
     // Remove all validators initially - they will be set dynamically based on constitution type
@@ -408,6 +409,12 @@ export class NewClientComponent implements OnInit {
         this.step2Form.get('business_pan_document')?.setValue(file.name);
       }
       
+      // Add validation for IE code number when IE document is uploaded
+      if (fieldName === 'ie_code_document') {
+        this.step2Form.get('ie_code_number')?.setValidators([Validators.required]);
+        this.step2Form.get('ie_code_number')?.updateValueAndValidity();
+      }
+      
       // Trigger change detection to update Next button state
       this.step2Form.updateValueAndValidity();
       
@@ -426,6 +433,13 @@ export class NewClientComponent implements OnInit {
       // Clear form validation for business PAN document
       if (fieldName === 'business_pan_document') {
         this.step2Form.get('business_pan_document')?.setValue('');
+      }
+      
+      // Clear IE code number validation and value when IE document is removed
+      if (fieldName === 'ie_code_document') {
+        this.step2Form.get('ie_code_number')?.clearValidators();
+        this.step2Form.get('ie_code_number')?.setValue('');
+        this.step2Form.get('ie_code_number')?.updateValueAndValidity();
       }
       
       // Reset the file input - find all matching inputs and reset them

@@ -1,49 +1,5 @@
 <!-- Main Container with Modern Gradient Background -->
 <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-  <!-- Page Header -->
-  <div class="sticky top-0 z-40">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      <div class="backdrop-blur-xl bg-white/90 rounded-2xl shadow-xl border-b border-gray-200 px-6 py-5">
-        <div class="flex items-center justify-between gap-4">
-          <!-- Left Section: Icon + Title -->
-          <div class="flex items-center gap-4 min-w-0 flex-1">
-            <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
-              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-              </svg>
-            </div>
-            <div class="min-w-0 flex flex-col justify-center">
-              <h1 class="text-xl sm:text-2xl font-bold text-gray-800 truncate leading-tight">
-                Edit Client
-              </h1>
-              <p class="text-gray-600 text-xs sm:text-sm truncate leading-tight mt-0.5">
-                Update client information and details
-              </p>
-            </div>
-          </div>
-          
-          <!-- Right Section: Action Buttons -->
-          <div class="flex items-center gap-2 flex-shrink-0">
-            <button (click)="cancel()" 
-                    class="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-300 transition-all duration-200">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-              <span class="hidden sm:inline">Cancel</span>
-            </button>
-            <button (click)="saveClient()" [disabled]="saving"
-                    class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-md disabled:opacity-50">
-              <div *ngIf="saving" class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-              <svg *ngIf="!saving" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
-              </svg>
-              {{ saving ? 'Saving...' : 'Save Changes' }}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- Loading State -->
   <div *ngIf="loading" class="flex flex-col items-center justify-center min-h-[60vh]">
@@ -53,8 +9,56 @@
 
   <!-- Form Container -->
   <div *ngIf="!loading && client && clientForm" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <!-- Stepper Container -->
+    <div class="backdrop-blur-xl bg-white/90 rounded-2xl shadow-xl border border-white/20 overflow-hidden mb-6">
+      <div class="p-6">
+        <!-- Stepper Header -->
+        <div class="flex items-center justify-between mb-8 overflow-x-auto pb-4">
+          <div *ngFor="let step of steps; let i = index" class="flex items-center" [class.flex-1]="i < steps.length - 1">
+            <!-- Step Circle -->
+            <div class="flex flex-col items-center relative cursor-pointer" (click)="goToStep(i)">
+              <div class="w-12 h-12 rounded-full flex items-center justify-center font-semibold text-sm transition-all duration-300 hover:scale-110"
+                   [ngClass]="{
+                     'bg-blue-600 text-white shadow-lg': i === currentStep,
+                     'bg-green-500 text-white': step.completed && i < currentStep,
+                     'bg-gray-200 text-gray-500 hover:bg-gray-300': i > currentStep
+                   }">
+                <mat-icon *ngIf="step.completed && i < currentStep" class="text-lg">check</mat-icon>
+                <span *ngIf="!step.completed || i >= currentStep">{{ i + 1 }}</span>
+              </div>
+              <div class="mt-2 text-center min-w-[80px]">
+                <div class="text-xs font-semibold" [ngClass]="{
+                  'text-blue-600': i === currentStep,
+                  'text-green-600': step.completed && i < currentStep,
+                  'text-gray-500': i > currentStep
+                }">{{ step.title }}</div>
+                <div class="text-[10px] text-gray-500 mt-0.5 hidden sm:block">{{ step.description }}</div>
+              </div>
+            </div>
+            <!-- Connector Line -->
+            <div *ngIf="i < steps.length - 1" class="flex-1 h-0.5 mx-2 transition-all duration-300"
+                 [ngClass]="{
+                   'bg-green-500': i < currentStep,
+                   'bg-blue-600': i === currentStep,
+                   'bg-gray-200': i >= currentStep
+                 }"></div>
+          </div>
+        </div>
+
+        <!-- Current Step Info -->
+        <div class="text-center mb-6">
+          <h2 class="text-2xl font-bold text-gray-800 flex items-center justify-center gap-2">
+            <mat-icon class="text-blue-600">{{ steps[currentStep].icon }}</mat-icon>
+            {{ steps[currentStep].title }}
+          </h2>
+          <p class="text-gray-600 mt-1">{{ steps[currentStep].description }}</p>
+        </div>
+      </div>
+    </div>
+
     <form [formGroup]="clientForm" class="space-y-6">
-      <!-- Personal Information Section -->
+      <!-- Step 0: Personal Information Section -->
+      <div *ngIf="currentStep === 0">
       <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
         <div class="p-6 border-b border-gray-200">
           <div class="flex items-center gap-3">
@@ -161,10 +165,71 @@
               </div>
             </div>
           </div>
+
+          <!-- Address Information (Merged into Personal Info) -->
+          <div class="mt-8 pt-8 border-t border-gray-200">
+            <div class="flex items-center gap-3 mb-6">
+              <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                <mat-icon class="text-orange-600 text-lg">location_on</mat-icon>
+              </div>
+              <div>
+                <h4 class="text-lg font-semibold text-gray-800">Address Information</h4>
+                <p class="text-sm text-gray-600">Business location and contact address</p>
+              </div>
+            </div>
+
+            <div class="space-y-6">
+              <!-- Complete Address -->
+              <div class="w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Complete Address *</label>
+                <textarea formControlName="address" 
+                          rows="3"
+                          placeholder="Enter complete business address"
+                          class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 hover:border-gray-400 transition-colors resize-none shadow-sm"></textarea>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- District -->
+                <div class="w-full">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">District</label>
+                  <input type="text" 
+                         formControlName="district"
+                         placeholder="Enter district"
+                         class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 hover:border-gray-400 transition-colors shadow-sm">
+                </div>
+
+                <!-- State -->
+                <div class="w-full">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">State</label>
+                  <input type="text" 
+                         formControlName="state"
+                         placeholder="Enter state"
+                         class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 hover:border-gray-400 transition-colors shadow-sm">
+                </div>
+
+                <!-- Pincode -->
+                <div class="w-full">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Pincode</label>
+                  <input type="text" 
+                         formControlName="pincode"
+                         placeholder="Enter 6-digit pincode"
+                         maxlength="6"
+                         class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 hover:border-gray-400 transition-colors shadow-sm"
+                         [class.border-red-500]="clientForm.get('pincode')?.hasError('pattern') && clientForm.get('pincode')?.touched"
+                         [class.focus:ring-red-500]="clientForm.get('pincode')?.hasError('pattern') && clientForm.get('pincode')?.touched">
+                  <div *ngIf="clientForm.get('pincode')?.hasError('pattern') && clientForm.get('pincode')?.touched" class="mt-1 text-sm text-red-600">
+                    Please enter a valid 6-digit pincode
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+      </div>
 
-      <!-- GST Details Section -->
+      <!-- Step 1: GST Details Section -->
+      <div *ngIf="currentStep === 1">
       <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
         <div class="p-6 border-b border-gray-200">
           <div class="flex items-center gap-3">
@@ -206,77 +271,6 @@
                      class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-400 transition-colors shadow-sm">
             </div>
 
-            <!-- IE Code -->
-            <div class="w-full">
-              <label class="block text-sm font-medium text-gray-700 mb-2">IE Code</label>
-              <input type="text" 
-                     formControlName="ie_code"
-                     placeholder="Enter IE code"
-                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-400 transition-colors shadow-sm">
-            </div>
-            
-            <!-- IE Code Status -->
-            <div class="w-full">
-              <label class="block text-sm font-medium text-gray-700 mb-2">IE Code Status</label>
-              <div class="relative">
-                <select formControlName="ie_code_status" 
-                        [disabled]="true"
-                        class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-gray-50 text-gray-500 focus:outline-none cursor-not-allowed shadow-sm">
-                  <option value="Yes" *ngIf="hasExistingDocument('ie_code') || hasExistingDocument('ie_code_document')">Yes</option>
-                  <option value="No" *ngIf="!hasExistingDocument('ie_code') && !hasExistingDocument('ie_code_document')">No</option>
-                </select>
-                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                  <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                  </svg>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- IE Code Document Section -->
-          <div *ngIf="hasExistingDocument('ie_code') || hasExistingDocument('ie_code_document')" class="ie-code-section">
-            <h5>Existing IE Code Document</h5>
-            <div class="existing-document-display">
-              <div class="document-info">
-                <mat-icon>description</mat-icon>
-                <span>{{ getIECodeDocument()?.file_name || 'IE Code Document' }}</span>
-                <small *ngIf="getIECodeDocument()?.file_size">({{ formatFileSize(getIECodeDocument().file_size) }})</small>
-              </div>
-            </div>
-            
-            <h5>Update IE Code Document</h5>
-            <div class="file-upload">
-              <input type="file" id="ie_code_new" (change)="onFileSelected($event, 'ie_code_document')" accept=".pdf,.jpg,.jpeg,.png">
-              <label for="ie_code_new" class="file-label">
-                <mat-icon>upload_file</mat-icon>
-                Upload New IE Code Document
-              </label>
-              <div *ngIf="documents['ie_code_document']" class="file-info">
-                <small>{{ documents['ie_code_document'].name }}</small>
-                <button mat-icon-button color="warn" (click)="removeDocument('ie_code_document')" matTooltip="Remove">
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- IE Code Upload (if not already uploaded) -->
-          <div *ngIf="!hasExistingDocument('ie_code') && !hasExistingDocument('ie_code_document')" class="ie-code-section">
-            <h5>IE Code Document Upload</h5>
-            <div class="file-upload">
-              <input type="file" id="ie_code" (change)="onFileSelected($event, 'ie_code_document')" accept=".pdf,.jpg,.jpeg,.png">
-              <label for="ie_code" class="file-label">
-                <mat-icon>upload_file</mat-icon>
-                Upload IE Code Document
-              </label>
-              <div *ngIf="documents['ie_code_document']" class="file-info">
-                <small>{{ documents['ie_code_document'].name }}</small>
-                <button mat-icon-button color="warn" (click)="removeDocument('ie_code_document')" matTooltip="Remove">
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </div>
-            </div>
           </div>
 
           <!-- Document Uploads -->
@@ -339,70 +333,99 @@
           </div>
         </div>
       </div>
+      </div>
 
-      <!-- Address Information Section -->
+      <!-- Step 2: IE Code Details Section -->
+      <div *ngIf="currentStep === 2">
       <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
         <div class="p-6 border-b border-gray-200">
           <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-              <mat-icon class="text-orange-600 text-lg">location_on</mat-icon>
+            <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
+              <mat-icon class="text-indigo-600 text-lg">qr_code</mat-icon>
             </div>
             <div>
-              <h3 class="text-lg font-semibold text-gray-800">Address Information</h3>
-              <p class="text-sm text-gray-600">Business location and contact address</p>
+              <h3 class="text-lg font-semibold text-gray-800">IE Code Details</h3>
+              <p class="text-sm text-gray-600">Import Export Code information and documentation</p>
             </div>
           </div>
         </div>
         <div class="p-6">
-          <div class="space-y-6">
-            <!-- Complete Address -->
-            <div class="w-full">
-              <label class="block text-sm font-medium text-gray-700 mb-2">Complete Address *</label>
-              <textarea formControlName="address" 
-                        rows="3"
-                        placeholder="Enter complete business address"
-                        class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 hover:border-gray-400 transition-colors resize-none shadow-sm"></textarea>
-            </div>
+          <!-- IE Code Number Field -->
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+              <span>IE Code Number</span>
+              <span *ngIf="hasExistingDocument('ie_code') || hasExistingDocument('ie_code_document') || documents['ie_code_document']" 
+                    class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">Required</span>
+              <span *ngIf="!hasExistingDocument('ie_code') && !hasExistingDocument('ie_code_document') && !documents['ie_code_document']" 
+                    class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Optional</span>
+            </label>
+            <input type="text" 
+                   formControlName="ie_code_number"
+                   placeholder="Enter IE Code Number"
+                   class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400 transition-colors shadow-sm"
+                   [class.border-red-500]="clientForm.get('ie_code_number')?.invalid && clientForm.get('ie_code_number')?.touched">
+            <p *ngIf="clientForm.get('ie_code_number')?.invalid && clientForm.get('ie_code_number')?.touched" 
+               class="text-xs text-red-600 mt-1">
+              IE Code Number is required when IE document is uploaded
+            </p>
+          </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <!-- District -->
-              <div class="w-full">
-                <label class="block text-sm font-medium text-gray-700 mb-2">District</label>
-                <input type="text" 
-                       formControlName="district"
-                       placeholder="Enter district"
-                       class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 hover:border-gray-400 transition-colors shadow-sm">
-              </div>
-
-              <!-- State -->
-              <div class="w-full">
-                <label class="block text-sm font-medium text-gray-700 mb-2">State</label>
-                <input type="text" 
-                       formControlName="state"
-                       placeholder="Enter state"
-                       class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 hover:border-gray-400 transition-colors shadow-sm">
-              </div>
-
-              <!-- Pincode -->
-              <div class="w-full">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Pincode</label>
-                <input type="text" 
-                       formControlName="pincode"
-                       placeholder="Enter 6-digit pincode"
-                       maxlength="6"
-                       class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 hover:border-gray-400 transition-colors shadow-sm"
-                       [class.border-red-500]="clientForm.get('pincode')?.hasError('pattern') && clientForm.get('pincode')?.touched"
-                       [class.focus:ring-red-500]="clientForm.get('pincode')?.hasError('pattern') && clientForm.get('pincode')?.touched">
-                <div *ngIf="clientForm.get('pincode')?.hasError('pattern') && clientForm.get('pincode')?.touched" class="mt-1 text-sm text-red-600">
-                  Please enter a valid 6-digit pincode
+          <!-- IE Code Document Section - If document already exists -->
+          <div *ngIf="hasExistingDocument('ie_code') || hasExistingDocument('ie_code_document')" class="ie-code-section mb-6">
+            <h5 class="text-sm font-semibold text-gray-800 mb-3">Existing IE Code Document</h5>
+            <div class="existing-document-display bg-gray-50 rounded-lg p-4 border border-gray-200">
+              <div class="document-info flex items-center gap-3">
+                <mat-icon class="text-indigo-600">description</mat-icon>
+                <div class="flex-1">
+                  <span class="text-sm font-medium text-gray-800">{{ getIECodeDocument()?.file_name || 'IE Code Document' }}</span>
+                  <small *ngIf="getIECodeDocument()?.file_size" class="text-xs text-gray-500 block">({{ formatFileSize(getIECodeDocument().file_size) }})</small>
                 </div>
+              </div>
+            </div>
+            
+            <h5 class="text-sm font-semibold text-gray-800 mb-3 mt-4">Update IE Code Document</h5>
+            <p class="text-xs text-amber-600 mb-3">⚠️ Uploading a new document will reset the IE Code Number. Please enter the new IE Code Number above.</p>
+            <div class="file-upload">
+              <input type="file" id="ie_code_new" (change)="onFileSelected($event, 'ie_code_document')" accept=".pdf,.jpg,.jpeg,.png" class="hidden">
+              <label for="ie_code_new" class="file-label cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-colors border border-indigo-200">
+                <mat-icon>upload_file</mat-icon>
+                Upload New IE Code Document
+              </label>
+              <div *ngIf="documents['ie_code_document']" class="file-info mt-3 flex items-center gap-2 bg-green-50 p-3 rounded-lg border border-green-200">
+                <mat-icon class="text-green-600">check_circle</mat-icon>
+                <small class="flex-1 text-sm text-green-800 font-medium">{{ documents['ie_code_document'].name }}</small>
+                <button mat-icon-button color="warn" (click)="removeDocument('ie_code_document')" matTooltip="Remove" class="flex-shrink-0">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- IE Code Upload (if not already uploaded) -->
+          <div *ngIf="!hasExistingDocument('ie_code') && !hasExistingDocument('ie_code_document')" class="ie-code-section">
+            <h5 class="text-sm font-semibold text-gray-800 mb-3">IE Code Document Upload</h5>
+            <p class="text-xs text-gray-600 mb-3">Upload IE Code document if available. IE Code Number will be required after upload.</p>
+            <div class="file-upload">
+              <input type="file" id="ie_code" (change)="onFileSelected($event, 'ie_code_document')" accept=".pdf,.jpg,.jpeg,.png" class="hidden">
+              <label for="ie_code" class="file-label cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-colors border border-indigo-200">
+                <mat-icon>upload_file</mat-icon>
+                Upload IE Code Document
+              </label>
+              <div *ngIf="documents['ie_code_document']" class="file-info mt-3 flex items-center gap-2 bg-green-50 p-3 rounded-lg border border-green-200">
+                <mat-icon class="text-green-600">check_circle</mat-icon>
+                <small class="flex-1 text-sm text-green-800 font-medium">{{ documents['ie_code_document'].name }}</small>
+                <button mat-icon-button color="warn" (click)="removeDocument('ie_code_document')" matTooltip="Remove" class="flex-shrink-0">
+                  <mat-icon>delete</mat-icon>
+                </button>
               </div>
             </div>
           </div>
         </div>
       </div>
+      </div>
 
-      <!-- Business Information Section -->
+      <!-- Step 3: Business Information Section -->
+      <div *ngIf="currentStep === 3">
       <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
         <div class="p-6 border-b border-gray-200">
           <div class="flex items-center gap-3">
@@ -555,75 +578,72 @@
               </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <!-- Business PAN Details Section -->
-      <div *ngIf="(clientForm.get('constitution_type')?.value === 'Proprietorship' || clientForm.get('constitution_type')?.value === 'Partnership' || clientForm.get('constitution_type')?.value === 'Private Limited') && (clientForm.get('has_business_pan')?.value === 'yes' || hasExistingDocument('business_pan_document'))" 
-           class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
-        <div class="p-6 border-b border-gray-200">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
-              <mat-icon class="text-indigo-600 text-lg">credit_card</mat-icon>
-            </div>
-            <div>
-              <h3 class="text-lg font-semibold text-gray-800">Business PAN Details</h3>
-              <p class="text-sm text-gray-600">Business PAN card information and documentation</p>
-            </div>
-          </div>
-        </div>
-        <div class="p-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <!-- Business PAN Name -->
-            <div class="w-full">
-              <label class="block text-sm font-medium text-gray-700 mb-2">Business PAN Name</label>
-              <input type="text" 
-                     formControlName="business_pan_name"
-                     placeholder="Enter business PAN name"
-                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400 transition-colors shadow-sm">
+          <!-- Business PAN Details (Merged into Business) -->
+          <div *ngIf="(clientForm.get('constitution_type')?.value === 'Proprietorship' || clientForm.get('constitution_type')?.value === 'Partnership' || clientForm.get('constitution_type')?.value === 'Private Limited') && (clientForm.get('has_business_pan')?.value === 'yes' || hasExistingDocument('business_pan_document'))" class="mt-8 pt-8 border-t border-gray-200">
+            <div class="flex items-center gap-3 mb-6">
+              <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
+                <mat-icon class="text-indigo-600 text-lg">credit_card</mat-icon>
+              </div>
+              <div>
+                <h4 class="text-lg font-semibold text-gray-800">Business PAN Details</h4>
+                <p class="text-sm text-gray-600">Business PAN card information and documentation</p>
+              </div>
             </div>
 
-            <!-- Business PAN Date -->
-            <div class="w-full">
-              <label class="block text-sm font-medium text-gray-700 mb-2">Business PAN Date</label>
-              <input type="date" 
-                     formControlName="business_pan_date"
-                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400 transition-colors shadow-sm">
-            </div>
-          </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <!-- Business PAN Name -->
+              <div class="w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Business PAN Name</label>
+                <input type="text" 
+                       formControlName="business_pan_name"
+                       placeholder="Enter business PAN name"
+                       class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400 transition-colors shadow-sm">
+              </div>
 
-          <div class="space-y-3">
-            <label class="text-sm font-medium text-gray-800">Business PAN Document</label>
-            <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors"
-                 [ngClass]="{'border-green-500 bg-green-50': documents['business_pan_document']}">
-              <input type="file" (change)="onFileSelected($event, 'business_pan_document')" accept=".pdf,.jpg,.jpeg,.png" 
-                     class="hidden" id="business_pan_document">
-              <label for="business_pan_document" class="cursor-pointer">
-                <mat-icon class="text-3xl mb-2" [ngClass]="{'text-green-600': documents['business_pan_document'], 'text-gray-400': !documents['business_pan_document']}">{{ documents['business_pan_document'] ? 'check_circle' : 'cloud_upload' }}</mat-icon>
-                <p class="text-sm" *ngIf="!documents['business_pan_document']">Upload Business PAN Document (PDF, JPG, PNG)</p>
-                <div *ngIf="documents['business_pan_document']" class="flex items-center justify-between">
-                  <span class="text-sm font-medium">{{ documents['business_pan_document'].name }}</span>
-                  <button type="button" (click)="removeDocument('business_pan_document')" class="text-red-600 hover:text-red-800">
-                    <mat-icon>delete</mat-icon>
-                  </button>
-                </div>
-              </label>
+              <!-- Business PAN Date -->
+              <div class="w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Business PAN Date</label>
+                <input type="date" 
+                       formControlName="business_pan_date"
+                       class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 hover:border-gray-400 transition-colors shadow-sm">
+              </div>
             </div>
-            <div *ngIf="existingDocuments['business_pan_document']" class="flex items-center justify-between p-2 bg-blue-50 rounded">
-              <small class="text-blue-800">
-                {{ existingDocuments['business_pan_document'].file_name }} 
-                ({{ formatFileSize(existingDocuments['business_pan_document'].file_size) }})
-              </small>
-              <button (click)="downloadDocument('business_pan_document')" class="text-blue-600 hover:text-blue-800">
-                <mat-icon>download</mat-icon>
-              </button>
+
+            <div class="space-y-3">
+              <label class="text-sm font-medium text-gray-800">Business PAN Document</label>
+              <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors"
+                   [ngClass]="{'border-green-500 bg-green-50': documents['business_pan_document']}">
+                <input type="file" (change)="onFileSelected($event, 'business_pan_document')" accept=".pdf,.jpg,.jpeg,.png" 
+                       class="hidden" id="business_pan_document">
+                <label for="business_pan_document" class="cursor-pointer">
+                  <mat-icon class="text-3xl mb-2" [ngClass]="{'text-green-600': documents['business_pan_document'], 'text-gray-400': !documents['business_pan_document']}">{{ documents['business_pan_document'] ? 'check_circle' : 'cloud_upload' }}</mat-icon>
+                  <p class="text-sm" *ngIf="!documents['business_pan_document']">Upload Business PAN Document (PDF, JPG, PNG)</p>
+                  <div *ngIf="documents['business_pan_document']" class="flex items-center justify-between">
+                    <span class="text-sm font-medium">{{ documents['business_pan_document'].name }}</span>
+                    <button type="button" (click)="removeDocument('business_pan_document')" class="text-red-600 hover:text-red-800">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </label>
+              </div>
+              <div *ngIf="existingDocuments['business_pan_document']" class="flex items-center justify-between p-2 bg-blue-50 rounded">
+                <small class="text-blue-800">
+                  {{ existingDocuments['business_pan_document'].file_name }} 
+                  ({{ formatFileSize(existingDocuments['business_pan_document'].file_size) }})
+                </small>
+                <button (click)="downloadDocument('business_pan_document')" class="text-blue-600 hover:text-blue-800">
+                  <mat-icon>download</mat-icon>
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
+      </div>
 
-      <!-- Owner Details Section -->
-      <div *ngIf="clientForm.get('constitution_type')?.value === 'Private Limited' || (clientForm.get('constitution_type')?.value === 'Proprietorship' && (clientForm.get('has_business_pan')?.value === 'yes' || hasExistingDocument('owner_aadhar') || hasExistingDocument('owner_pan')))"
+      <!-- Step 4: Owner Details Section -->
+      <div *ngIf="currentStep === 4 && (clientForm.get('constitution_type')?.value === 'Private Limited' || (clientForm.get('constitution_type')?.value === 'Proprietorship' && (clientForm.get('has_business_pan')?.value === 'yes' || hasExistingDocument('owner_aadhar') || hasExistingDocument('owner_pan'))))"
            class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
         <div class="p-6 border-b border-gray-200">
           <div class="flex items-center gap-3">
@@ -713,113 +733,110 @@
               </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <!-- Partnership Details Section -->
-      <div *ngIf="clientForm.get('constitution_type')?.value === 'Partnership'" class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
-        <div class="p-6 border-b border-gray-200">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
-              <mat-icon class="text-amber-600 text-lg">group</mat-icon>
-            </div>
-            <div>
-              <h3 class="text-lg font-semibold text-gray-800">Partnership Details</h3>
-              <p class="text-sm text-gray-600">Partner information and documentation</p>
-            </div>
-          </div>
-        </div>
-        <div class="p-6">
-          <div class="mb-6">
-            <!-- Number of Partners -->
-            <div class="w-full md:w-1/2">
-              <label class="block text-sm font-medium text-gray-700 mb-2">Number of Partners</label>
-              <input type="number" 
-                     formControlName="number_of_partners"
-                     min="2" 
-                     max="10"
-                     placeholder="Enter number of partners"
-                     class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 hover:border-gray-400 transition-colors shadow-sm">
-            </div>
-          </div>
-
-          <div class="space-y-8">
-            <div *ngFor="let i of getPartnerArray(); let idx = index" class="p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <h4 class="text-base font-semibold text-gray-800 mb-4">{{ idx === 0 ? 'Managing Partner' : 'Partner ' + (idx + 1) }}</h4>
-              
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <!-- Partner Name -->
-                <div class="w-full">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Partner Name</label>
-                  <input type="text" 
-                         [formControlName]="'partner_name_' + idx"
-                         placeholder="Enter partner name"
-                         class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 hover:border-gray-400 transition-colors shadow-sm">
-                </div>
-
-                <!-- Partner Date of Birth -->
-                <div class="w-full">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Partner Date of Birth</label>
-                  <input type="date" 
-                         [formControlName]="'partner_dob_' + idx"
-                         class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 hover:border-gray-400 transition-colors shadow-sm">
-                </div>
+          <!-- Partnership Details (Merged into Owner Details) -->
+          <div *ngIf="clientForm.get('constitution_type')?.value === 'Partnership'" class="mt-8 pt-8 border-t border-gray-200">
+            <div class="flex items-center gap-3 mb-6">
+              <div class="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+                <mat-icon class="text-amber-600 text-lg">group</mat-icon>
               </div>
+              <div>
+                <h4 class="text-lg font-semibold text-gray-800">Partnership Details</h4>
+                <p class="text-sm text-gray-600">Partner information and documentation</p>
+              </div>
+            </div>
 
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-3">
-                  <label class="text-sm font-medium text-gray-800">Partner Aadhar Card</label>
-                  <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors"
-                       [ngClass]="{'border-green-500 bg-green-50': documents['partner_aadhar_' + idx]}">
-                    <input type="file" (change)="onFileSelected($event, 'partner_aadhar_' + idx)" accept=".pdf,.jpg,.jpeg,.png" 
-                           class="hidden" [id]="'partner_aadhar_' + idx">
-                    <label [for]="'partner_aadhar_' + idx" class="cursor-pointer">
-                      <mat-icon class="text-3xl mb-2" [ngClass]="{'text-green-600': documents['partner_aadhar_' + idx], 'text-gray-400': !documents['partner_aadhar_' + idx]}">{{ documents['partner_aadhar_' + idx] ? 'check_circle' : 'cloud_upload' }}</mat-icon>
-                      <p class="text-sm" *ngIf="!documents['partner_aadhar_' + idx]">Upload Partner Aadhar Card (PDF, JPG, PNG)</p>
-                      <div *ngIf="documents['partner_aadhar_' + idx]" class="flex items-center justify-between">
-                        <span class="text-sm font-medium">{{ documents['partner_aadhar_' + idx].name }}</span>
-                        <button type="button" (click)="removeDocument('partner_aadhar_' + idx)" class="text-red-600 hover:text-red-800">
-                          <mat-icon>delete</mat-icon>
-                        </button>
-                      </div>
-                    </label>
+            <div class="mb-6">
+              <!-- Number of Partners -->
+              <div class="w-full md:w-1/2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Number of Partners</label>
+                <input type="number" 
+                       formControlName="number_of_partners"
+                       min="2" 
+                       max="10"
+                       placeholder="Enter number of partners"
+                       class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 hover:border-gray-400 transition-colors shadow-sm">
+              </div>
+            </div>
+
+            <div class="space-y-8">
+              <div *ngFor="let i of getPartnerArray(); let idx = index" class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <h4 class="text-base font-semibold text-gray-800 mb-4">{{ idx === 0 ? 'Managing Partner' : 'Partner ' + (idx + 1) }}</h4>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <!-- Partner Name -->
+                  <div class="w-full">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Partner Name</label>
+                    <input type="text" 
+                           [formControlName]="'partner_name_' + idx"
+                           placeholder="Enter partner name"
+                           class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 hover:border-gray-400 transition-colors shadow-sm">
                   </div>
-                  <div *ngIf="getExistingPartnerDocument('aadhar', idx)" class="flex items-center justify-between p-2 bg-blue-50 rounded">
-                    <small class="text-blue-800">
-                      {{ getExistingPartnerDocument('aadhar', idx).file_name }} 
-                      ({{ formatFileSize(getExistingPartnerDocument('aadhar', idx).file_size) }})
-                    </small>
-                    <button (click)="downloadPartnerDocument('aadhar', idx)" class="text-blue-600 hover:text-blue-800">
-                      <mat-icon>download</mat-icon>
-                    </button>
+
+                  <!-- Partner Date of Birth -->
+                  <div class="w-full">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Partner Date of Birth</label>
+                    <input type="date" 
+                           [formControlName]="'partner_dob_' + idx"
+                           class="w-full px-3 py-3 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 hover:border-gray-400 transition-colors shadow-sm">
                   </div>
                 </div>
 
-                <div class="space-y-3">
-                  <label class="text-sm font-medium text-gray-800">Partner PAN Card</label>
-                  <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors"
-                       [ngClass]="{'border-green-500 bg-green-50': documents['partner_pan_' + idx]}">
-                    <input type="file" (change)="onFileSelected($event, 'partner_pan_' + idx)" accept=".pdf,.jpg,.jpeg,.png" 
-                           class="hidden" [id]="'partner_pan_' + idx">
-                    <label [for]="'partner_pan_' + idx" class="cursor-pointer">
-                      <mat-icon class="text-3xl mb-2" [ngClass]="{'text-green-600': documents['partner_pan_' + idx], 'text-gray-400': !documents['partner_pan_' + idx]}">{{ documents['partner_pan_' + idx] ? 'check_circle' : 'cloud_upload' }}</mat-icon>
-                      <p class="text-sm" *ngIf="!documents['partner_pan_' + idx]">Upload Partner PAN Card (PDF, JPG, PNG)</p>
-                      <div *ngIf="documents['partner_pan_' + idx]" class="flex items-center justify-between">
-                        <span class="text-sm font-medium">{{ documents['partner_pan_' + idx].name }}</span>
-                        <button type="button" (click)="removeDocument('partner_pan_' + idx)" class="text-red-600 hover:text-red-800">
-                          <mat-icon>delete</mat-icon>
-                        </button>
-                      </div>
-                    </label>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="space-y-3">
+                    <label class="text-sm font-medium text-gray-800">Partner Aadhar Card</label>
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors"
+                         [ngClass]="{'border-green-500 bg-green-50': documents['partner_aadhar_' + idx]}">
+                      <input type="file" (change)="onFileSelected($event, 'partner_aadhar_' + idx)" accept=".pdf,.jpg,.jpeg,.png" 
+                             class="hidden" [id]="'partner_aadhar_' + idx">
+                      <label [for]="'partner_aadhar_' + idx" class="cursor-pointer">
+                        <mat-icon class="text-3xl mb-2" [ngClass]="{'text-green-600': documents['partner_aadhar_' + idx], 'text-gray-400': !documents['partner_aadhar_' + idx]}">{{ documents['partner_aadhar_' + idx] ? 'check_circle' : 'cloud_upload' }}</mat-icon>
+                        <p class="text-sm" *ngIf="!documents['partner_aadhar_' + idx]">Upload Partner Aadhar Card (PDF, JPG, PNG)</p>
+                        <div *ngIf="documents['partner_aadhar_' + idx]" class="flex items-center justify-between">
+                          <span class="text-sm font-medium">{{ documents['partner_aadhar_' + idx].name }}</span>
+                          <button type="button" (click)="removeDocument('partner_aadhar_' + idx)" class="text-red-600 hover:text-red-800">
+                            <mat-icon>delete</mat-icon>
+                          </button>
+                        </div>
+                      </label>
+                    </div>
+                    <div *ngIf="getExistingPartnerDocument('aadhar', idx)" class="flex items-center justify-between p-2 bg-blue-50 rounded">
+                      <small class="text-blue-800">
+                        {{ getExistingPartnerDocument('aadhar', idx).file_name }} 
+                        ({{ formatFileSize(getExistingPartnerDocument('aadhar', idx).file_size) }})
+                      </small>
+                      <button (click)="downloadPartnerDocument('aadhar', idx)" class="text-blue-600 hover:text-blue-800">
+                        <mat-icon>download</mat-icon>
+                      </button>
+                    </div>
                   </div>
-                  <div *ngIf="getExistingPartnerDocument('pan', idx)" class="flex items-center justify-between p-2 bg-blue-50 rounded">
-                    <small class="text-blue-800">
-                      {{ getExistingPartnerDocument('pan', idx).file_name }} 
-                      ({{ formatFileSize(getExistingPartnerDocument('pan', idx).file_size) }})
-                    </small>
-                    <button (click)="downloadPartnerDocument('pan', idx)" class="text-blue-600 hover:text-blue-800">
-                      <mat-icon>download</mat-icon>
-                    </button>
+
+                  <div class="space-y-3">
+                    <label class="text-sm font-medium text-gray-800">Partner PAN Card</label>
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors"
+                         [ngClass]="{'border-green-500 bg-green-50': documents['partner_pan_' + idx]}">
+                      <input type="file" (change)="onFileSelected($event, 'partner_pan_' + idx)" accept=".pdf,.jpg,.jpeg,.png" 
+                             class="hidden" [id]="'partner_pan_' + idx">
+                      <label [for]="'partner_pan_' + idx" class="cursor-pointer">
+                        <mat-icon class="text-3xl mb-2" [ngClass]="{'text-green-600': documents['partner_pan_' + idx], 'text-gray-400': !documents['partner_pan_' + idx]}">{{ documents['partner_pan_' + idx] ? 'check_circle' : 'cloud_upload' }}</mat-icon>
+                        <p class="text-sm" *ngIf="!documents['partner_pan_' + idx]">Upload Partner PAN Card (PDF, JPG, PNG)</p>
+                        <div *ngIf="documents['partner_pan_' + idx]" class="flex items-center justify-between">
+                          <span class="text-sm font-medium">{{ documents['partner_pan_' + idx].name }}</span>
+                          <button type="button" (click)="removeDocument('partner_pan_' + idx)" class="text-red-600 hover:text-red-800">
+                            <mat-icon>delete</mat-icon>
+                          </button>
+                        </div>
+                      </label>
+                    </div>
+                    <div *ngIf="getExistingPartnerDocument('pan', idx)" class="flex items-center justify-between p-2 bg-blue-50 rounded">
+                      <small class="text-blue-800">
+                        {{ getExistingPartnerDocument('pan', idx).file_name }} 
+                        ({{ formatFileSize(getExistingPartnerDocument('pan', idx).file_size) }})
+                      </small>
+                      <button (click)="downloadPartnerDocument('pan', idx)" class="text-blue-600 hover:text-blue-800">
+                        <mat-icon>download</mat-icon>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -828,7 +845,8 @@
         </div>
       </div>
 
-      <!-- Financial Information Section -->
+      <!-- Step 5: Financial Information Section -->
+      <div *ngIf="currentStep === 5">
       <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
         <div class="p-6 border-b border-gray-200">
           <div class="flex items-center gap-3">
@@ -905,8 +923,10 @@
           </div>
         </div>
       </div>
+      </div>
 
-      <!-- Bank Information Section -->
+      <!-- Step 6: Bank Information Section -->
+      <div *ngIf="currentStep === 6">
       <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
         <div class="p-6 border-b border-gray-200">
           <div class="flex items-center gap-3">
@@ -1212,8 +1232,10 @@
 
         </div>
       </div>
+      </div>
 
-      <!-- Upload Signature Section -->
+      <!-- Step 7: Upload Signature Section -->
+      <div *ngIf="currentStep === 7">
       <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
         <div class="p-6 border-b border-gray-200">
           <div class="flex items-center gap-3">
@@ -1223,42 +1245,132 @@
               </svg>
             </div>
             <div>
-              <h3 class="text-lg font-semibold text-gray-800">Upload Signature</h3>
-              <p class="text-sm text-gray-600">Upload authorized signature for verification</p>
+              <h3 class="text-lg font-semibold text-gray-800">Additional Documents</h3>
+              <p class="text-sm text-gray-600">Upload signature, product images, and user photos</p>
             </div>
           </div>
         </div>
         <div class="p-6">
-          <div class="space-y-3">
-            <label class="text-sm font-medium text-gray-800">Signature Upload</label>
-            <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors"
-                 [ngClass]="{'border-green-500 bg-green-50': documents['signature']}">
-              <input type="file" id="signature" (change)="onFileSelected($event, 'signature')" accept=".jpg,.jpeg,.png" class="hidden">
-              <label for="signature" class="cursor-pointer">
-                <mat-icon class="text-3xl mb-2" [ngClass]="{'text-green-600': documents['signature'], 'text-gray-400': !documents['signature']}">{{ documents['signature'] ? 'check_circle' : 'upload_file' }}</mat-icon>
-                <p class="text-sm" *ngIf="!documents['signature']">Upload Signature (JPG, PNG)</p>
-                <div *ngIf="documents['signature']" class="flex items-center justify-between">
-                  <span class="text-sm font-medium">{{ documents['signature'].name }}</span>
-                  <button type="button" (click)="removeDocument('signature')" class="text-red-600 hover:text-red-800" matTooltip="Remove">
-                    <mat-icon>delete</mat-icon>
-                  </button>
-                </div>
-              </label>
+          <!-- Signature Upload -->
+          <div class="mb-8">
+            <h4 class="text-base font-semibold text-gray-800 mb-4">Signature</h4>
+            <div class="space-y-3">
+              <label class="text-sm font-medium text-gray-800">Signature Upload</label>
+              <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors"
+                   [ngClass]="{'border-green-500 bg-green-50': documents['signature']}">
+                <input type="file" id="signature" (change)="onFileSelected($event, 'signature')" accept=".jpg,.jpeg,.png" class="hidden">
+                <label for="signature" class="cursor-pointer">
+                  <mat-icon class="text-3xl mb-2" [ngClass]="{'text-green-600': documents['signature'], 'text-gray-400': !documents['signature']}">{{ documents['signature'] ? 'check_circle' : 'upload_file' }}</mat-icon>
+                  <p class="text-sm" *ngIf="!documents['signature']">Upload Signature (JPG, PNG)</p>
+                  <div *ngIf="documents['signature']" class="flex items-center justify-between">
+                    <span class="text-sm font-medium">{{ documents['signature'].name }}</span>
+                    <button type="button" (click)="removeDocument('signature')" class="text-red-600 hover:text-red-800" matTooltip="Remove">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </label>
+              </div>
+              <div *ngIf="existingDocuments['signature']" class="flex items-center justify-between p-2 bg-blue-50 rounded">
+                <small class="text-blue-800">
+                  {{ existingDocuments['signature'].file_name }} 
+                  ({{ formatFileSize(existingDocuments['signature'].file_size) }})
+                </small>
+                <button (click)="downloadDocument('signature')" class="text-blue-600 hover:text-blue-800">
+                  <mat-icon>download</mat-icon>
+                </button>
+              </div>
             </div>
-            <div *ngIf="existingDocuments['signature']" class="flex items-center justify-between p-2 bg-blue-50 rounded">
-              <small class="text-blue-800">
-                {{ existingDocuments['signature'].file_name }} 
-                ({{ formatFileSize(existingDocuments['signature'].file_size) }})
-              </small>
-              <button (click)="downloadDocument('signature')" class="text-blue-600 hover:text-blue-800">
-                <mat-icon>download</mat-icon>
-              </button>
+          </div>
+
+          <!-- Product Images Upload -->
+          <div class="mb-8">
+            <h4 class="text-base font-semibold text-gray-800 mb-2">Product Images (Optional)</h4>
+            <p class="text-sm text-gray-600 mb-4">Upload 1 to 10 product images</p>
+            <div class="space-y-3">
+              <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors">
+                <input type="file" id="product_images" (change)="onMultipleFilesSelected($event, 'product_images')" accept=".jpg,.jpeg,.png" multiple class="hidden">
+                <label for="product_images" class="cursor-pointer">
+                  <mat-icon class="text-3xl mb-2 text-gray-400">add_photo_alternate</mat-icon>
+                  <p class="text-sm">Upload Product Images (JPG, PNG) - Max 10</p>
+                  <p class="text-xs text-gray-500 mt-1">Selected: {{ getProductImagesCount() }} / 10</p>
+                </label>
+              </div>
+              
+              <!-- Display uploaded product images -->
+              <div *ngIf="productImages && productImages.length > 0" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mt-4">
+                <div *ngFor="let image of productImages; let i = index" class="relative group">
+                  <img [src]="getImagePreview(image)" class="w-full h-24 object-cover rounded-lg border border-gray-300">
+                  <button type="button" (click)="removeProductImage(i)" 
+                          class="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <mat-icon class="text-sm">close</mat-icon>
+                  </button>
+                  <p class="text-xs text-gray-600 mt-1 truncate">{{ image.name }}</p>
+                </div>
+              </div>
+
+              <!-- Display existing product images -->
+              <div *ngIf="existingProductImages && existingProductImages.length > 0" class="mt-4">
+                <p class="text-sm font-medium text-gray-700 mb-2">Existing Product Images</p>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                  <div *ngFor="let image of existingProductImages; let i = index" class="relative group">
+                    <img [src]="image.url" class="w-full h-24 object-cover rounded-lg border border-gray-300">
+                    <button type="button" (click)="deleteExistingProductImage(i)" 
+                            class="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <mat-icon class="text-sm">delete</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- User Photos Upload -->
+          <div class="mb-8">
+            <h4 class="text-base font-semibold text-gray-800 mb-2">User Photos (Optional)</h4>
+            <p class="text-sm text-gray-600 mb-4">Upload 1 to 10 user photos</p>
+            <div class="space-y-3">
+              <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors">
+                <input type="file" id="user_photos" (change)="onMultipleFilesSelected($event, 'user_photos')" accept=".jpg,.jpeg,.png" multiple class="hidden">
+                <label for="user_photos" class="cursor-pointer">
+                  <mat-icon class="text-3xl mb-2 text-gray-400">person_add_alt</mat-icon>
+                  <p class="text-sm">Upload User Photos (JPG, PNG) - Max 10</p>
+                  <p class="text-xs text-gray-500 mt-1">Selected: {{ getUserPhotosCount() }} / 10</p>
+                </label>
+              </div>
+              
+              <!-- Display uploaded user photos -->
+              <div *ngIf="userPhotos && userPhotos.length > 0" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mt-4">
+                <div *ngFor="let photo of userPhotos; let i = index" class="relative group">
+                  <img [src]="getImagePreview(photo)" class="w-full h-24 object-cover rounded-lg border border-gray-300">
+                  <button type="button" (click)="removeUserPhoto(i)" 
+                          class="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <mat-icon class="text-sm">close</mat-icon>
+                  </button>
+                  <p class="text-xs text-gray-600 mt-1 truncate">{{ photo.name }}</p>
+                </div>
+              </div>
+
+              <!-- Display existing user photos -->
+              <div *ngIf="existingUserPhotos && existingUserPhotos.length > 0" class="mt-4">
+                <p class="text-sm font-medium text-gray-700 mb-2">Existing User Photos</p>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                  <div *ngFor="let photo of existingUserPhotos; let i = index" class="relative group">
+                    <img [src]="photo.url" class="w-full h-24 object-cover rounded-lg border border-gray-300">
+                    <button type="button" (click)="deleteExistingUserPhoto(i)" 
+                            class="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <mat-icon class="text-sm">delete</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
+      </div>
 
-      <!-- Payment Gateway Section -->
+      <!-- Step 8: Payment Gateway Section -->
+      <div *ngIf="currentStep === 8">
       <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
         <div class="p-6 border-b border-gray-200">
           <div class="flex items-center gap-3">
@@ -1416,6 +1528,40 @@
             </div>
           </div>
         </div>
+      </div>
+      </div>
+
+      <!-- Navigation Buttons -->
+      <div class="flex items-center justify-between mt-8 p-6 bg-white rounded-2xl shadow-xl border border-gray-200">
+        <button type="button" 
+                (click)="previousStep()" 
+                [disabled]="currentStep === 0"
+                class="flex items-center gap-2 px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+          <mat-icon>arrow_back</mat-icon>
+          Previous
+        </button>
+
+        <div class="text-center">
+          <span class="text-sm font-semibold text-gray-600">Step {{ currentStep + 1 }} of {{ totalSteps }}</span>
+        </div>
+
+        <button type="button" 
+                *ngIf="currentStep < totalSteps - 1"
+                (click)="nextStep()" 
+                class="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-md">
+          Next
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+
+        <button type="button" 
+                *ngIf="currentStep === totalSteps - 1"
+                (click)="saveClient()" 
+                [disabled]="saving"
+                class="flex items-center gap-2 px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-all duration-200 shadow-md disabled:opacity-50">
+          <div *ngIf="saving" class="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+          <mat-icon *ngIf="!saving">save</mat-icon>
+          {{ saving ? 'Saving...' : 'Save Changes' }}
+        </button>
       </div>
 
     </form>

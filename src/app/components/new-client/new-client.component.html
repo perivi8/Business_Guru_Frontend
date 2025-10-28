@@ -1136,6 +1136,24 @@
                     </div>
                   </label>
                 </div>
+                
+                <!-- IE Code Number Input (shown when IE document is uploaded) -->
+                <div *ngIf="uploadedFiles['ie_code_document']" class="mt-4">
+                  <label class="text-sm font-medium text-text-secondary flex items-center gap-2 mb-2">
+                    <span>IE Code Number</span>
+                    <span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">Required</span>
+                  </label>
+                  <input 
+                    type="text" 
+                    formControlName="ie_code_number"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    placeholder="Enter IE Code Number"
+                    [ngClass]="{'border-red-500': step2Form.get('ie_code_number')?.invalid && step2Form.get('ie_code_number')?.touched}">
+                  <p *ngIf="step2Form.get('ie_code_number')?.invalid && step2Form.get('ie_code_number')?.touched" 
+                     class="text-xs text-red-600 mt-1">
+                    IE Code Number is required when IE document is uploaded
+                  </p>
+                </div>
               </div>
             </div>
 

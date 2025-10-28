@@ -35,37 +35,37 @@ export class EditClientComponent implements OnInit {
   
   // Step management properties
   currentStep = 0;
-  totalSteps = 8;
+  totalSteps = 9;
   
   steps = [
     {
       title: 'Personal Info',
-      description: 'Basic personal information',
+      description: 'Personal & address details',
       icon: 'person',
       completed: false
     },
     {
       title: 'GST Details',
-      description: 'GST and registration details',
+      description: 'GST and registration',
       icon: 'receipt',
       completed: false
     },
     {
-      title: 'Address',
-      description: 'Address information',
-      icon: 'location_on',
+      title: 'IE Code',
+      description: 'IE Code details',
+      icon: 'qr_code',
       completed: false
     },
     {
       title: 'Business',
-      description: 'Business information',
+      description: 'Business & PAN details',
       icon: 'business',
       completed: false
     },
     {
-      title: 'Partnership',
-      description: 'Partnership details',
-      icon: 'group',
+      title: 'Owner Details',
+      description: 'Owner & partnership info',
+      icon: 'person_outline',
       completed: false
     },
     {
@@ -81,9 +81,15 @@ export class EditClientComponent implements OnInit {
       completed: false
     },
     {
-      title: 'Documents',
-      description: 'Upload documents',
-      icon: 'upload_file',
+      title: 'Signature',
+      description: 'Upload signature',
+      icon: 'edit',
+      completed: false
+    },
+    {
+      title: 'Payment Gateway',
+      description: 'Payment configuration',
+      icon: 'payment',
       completed: false
     }
   ];
@@ -102,6 +108,14 @@ export class EditClientComponent implements OnInit {
 
   partnerNames: string[] = [];
   partnerDobs: string[] = [];
+
+  // Product Images and User Photos
+  productImages: File[] = [];
+  userPhotos: File[] = [];
+  existingProductImages: any[] = [];
+  existingUserPhotos: any[] = [];
+  productImagesToDelete: string[] = [];
+  userPhotosToDelete: string[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -170,6 +184,7 @@ export class EditClientComponent implements OnInit {
       gst_status: [''],
       business_pan: ['', Validators.pattern('^[A-Z]{5}[0-9]{4}[A-Z]{1}$')],
       ie_code: [''],
+      ie_code_number: [''],
       ie_code_status: [''],
       website: ['', Validators.pattern('https?://.+')],
       business_url: [''],
@@ -248,6 +263,12 @@ export class EditClientComponent implements OnInit {
         console.log('existingDocuments set to:', this.existingDocuments);
         console.log('existingDocuments keys:', Object.keys(this.existingDocuments));
         
+        // Load existing product images and user photos
+        this.existingProductImages = (response.client as any).product_images || [];
+        this.existingUserPhotos = (response.client as any).user_photos || [];
+        console.log('Loaded product images:', this.existingProductImages.length);
+        console.log('Loaded user photos:', this.existingUserPhotos.length);
+        
         // Check for partner-specific document keys
         console.log('Checking for partner document keys:');
         for (let i = 0; i < 10; i++) {
@@ -316,6 +337,7 @@ export class EditClientComponent implements OnInit {
       gst_status: client.gst_status || '',
       business_pan: client.business_pan || '',
       ie_code: client.ie_code || '',
+      ie_code_number: (client as any).ie_code_number || '',
       ie_code_status: ieCodeStatus,
       website: client.website || '',
       business_url: client.business_url || '',
@@ -403,6 +425,13 @@ export class EditClientComponent implements OnInit {
     console.log('Form company_email:', this.clientForm.get('company_email')?.value);
     console.log('Form optional_mobile_number:', this.clientForm.get('optional_mobile_number')?.value);
     console.log('=== END DEBUGGING ===');
+    
+    // Set IE code number validation if IE document exists
+    if (this.hasExistingDocument('ie_code') || this.hasExistingDocument('ie_code_document')) {
+      this.clientForm.get('ie_code_number')?.setValidators([Validators.required]);
+      this.clientForm.get('ie_code_number')?.updateValueAndValidity();
+      console.log('IE code number validation set to required (existing document found)');
+    }
   }
 
   private populatePartnerData(client: Client): void {
@@ -756,30 +785,38 @@ export class EditClientComponent implements OnInit {
     console.log('registration_number from form:', formValue.registration_number);
     console.log('company_email from form:', formValue.company_email);
     console.log('optional_mobile_number from form:', formValue.optional_mobile_number);
+    console.log('ie_code_number from form:', formValue.ie_code_number);
     
     // Fields that should always be included, even if empty
-    const alwaysIncludeFields = ['account_name', 'registration_number', 'company_email', 'optional_mobile_number'];
+    const alwaysIncludeFields = ['account_name', 'registration_number', 'company_email', 'optional_mobile_number', 'ie_code_number'];
     
     Object.keys(formValue).forEach(key => {
       const value = formValue[key];
-      const shouldInclude = value !== null && value !== undefined && value !== '' || alwaysIncludeFields.includes(key);
+      const shouldInclude = (value !== null && value !== undefined && value !== '') || alwaysIncludeFields.includes(key);
       
       if (shouldInclude) {
         // Debug the specific fields we're tracking
-        if (key === 'registration_number' || key === 'company_email' || key === 'optional_mobile_number' || key === 'account_name') {
-          console.log(`Adding to FormData - ${key}: ${value}`);
+        if (key === 'registration_number' || key === 'company_email' || key === 'optional_mobile_number' || key === 'account_name' || key === 'ie_code_number') {
+          console.log(`✅ Adding to FormData - ${key}: "${value}" (type: ${typeof value})`);
         }
         
         // For nested objects, stringify them
         if (typeof value === 'object' && value !== null) {
           formData.append(key, JSON.stringify(value));
         } else {
-          formData.append(key, value ? value.toString() : '');
+          // Always convert to string, even if empty (for alwaysIncludeFields)
+          const stringValue = value !== null && value !== undefined ? value.toString() : '';
+          formData.append(key, stringValue);
+          
+          // Extra logging for ie_code_number
+          if (key === 'ie_code_number') {
+            console.log(`🔍 IE Code Number - Original: "${value}", Converted: "${stringValue}"`);
+          }
         }
       } else {
         // Log when fields are empty/null/undefined and not in always include list
-        if (key === 'registration_number' || key === 'company_email' || key === 'optional_mobile_number' || key === 'account_name') {
-          console.log(`NOT adding to FormData - ${key}: ${value} (empty/null/undefined)`);
+        if (key === 'registration_number' || key === 'company_email' || key === 'optional_mobile_number' || key === 'account_name' || key === 'ie_code_number') {
+          console.log(`❌ NOT adding to FormData - ${key}: ${value} (empty/null/undefined)`);
         }
       }
     });
@@ -799,6 +836,33 @@ export class EditClientComponent implements OnInit {
       }
     });
 
+    // Add product images
+    if (this.productImages && this.productImages.length > 0) {
+      this.productImages.forEach((image, index) => {
+        formData.append('product_images', image);
+      });
+      console.log('Added product images:', this.productImages.length);
+    }
+
+    // Add user photos
+    if (this.userPhotos && this.userPhotos.length > 0) {
+      this.userPhotos.forEach((photo, index) => {
+        formData.append('user_photos', photo);
+      });
+      console.log('Added user photos:', this.userPhotos.length);
+    }
+
+    // Add images to delete
+    if (this.productImagesToDelete && this.productImagesToDelete.length > 0) {
+      formData.append('delete_product_images', JSON.stringify(this.productImagesToDelete));
+      console.log('Product images to delete:', this.productImagesToDelete);
+    }
+
+    if (this.userPhotosToDelete && this.userPhotosToDelete.length > 0) {
+      formData.append('delete_user_photos', JSON.stringify(this.userPhotosToDelete));
+      console.log('User photos to delete:', this.userPhotosToDelete);
+    }
+
     // Add deleted documents
     if (this.deletedDocuments && this.deletedDocuments.length > 0) {
       this.deletedDocuments.forEach(docType => {
@@ -812,6 +876,8 @@ export class EditClientComponent implements OnInit {
     this.clientService.updateClientDetails(this.clientId, formData).subscribe({
       next: (response: any) => {
         this.saving = false;
+        
+        console.log('✅ Client update response:', response);
         
         // Check if this was a comment update and handle WhatsApp status
         const isCommentUpdate = formValue.comments !== undefined;
@@ -838,9 +904,9 @@ export class EditClientComponent implements OnInit {
           }
         }
         
-        // Navigate back to client detail page with reload flag
+        // Navigate back to client detail page with reload flag and timestamp to force refresh
         this.router.navigate(['/client-detail', this.clientId], { 
-          queryParams: { reload: true } 
+          queryParams: { reload: true, t: new Date().getTime() } 
         });
       },
       error: (error) => {
@@ -1193,28 +1259,30 @@ export class EditClientComponent implements OnInit {
   isStepValid(stepIndex: number): boolean {
     // Validate each step based on required fields
     switch (stepIndex) {
-      case 0: // Personal Info
+      case 0: // Personal Info & Address
         return (this.clientForm.get('legal_name')?.valid ?? false) && 
-               (this.clientForm.get('mobile_number')?.valid ?? false);
+               (this.clientForm.get('mobile_number')?.valid ?? false) &&
+               (this.clientForm.get('address')?.valid ?? false);
       case 1: // GST Details
         return true; // Optional fields
-      case 2: // Address
-        return this.clientForm.get('address')?.valid ?? false;
-      case 3: // Business
+      case 2: // IE Code
+        return true; // Optional fields
+      case 3: // Business & Business PAN
         return this.clientForm.get('constitution_type')?.valid ?? false;
-      case 4: // Partnership
+      case 4: // Owner Details & Partnership
         const constitutionType = this.clientForm.get('constitution_type')?.value;
         if (constitutionType === 'Partnership') {
           return this.clientForm.get('number_of_partners')?.valid ?? false;
         }
         return true;
       case 5: // Financial
-        return this.clientForm.get('required_loan_amount')?.valid ?? false;
+        return true; // Optional fields
       case 6: // Banking
-        return (this.clientForm.get('bank_name')?.valid ?? false) && 
-               (this.clientForm.get('account_number')?.valid ?? false);
-      case 7: // Documents
-        return true; // Optional files
+        return true; // Optional fields
+      case 7: // Signature
+        return true; // Optional file
+      case 8: // Payment Gateway
+        return true; // Optional selection
       default:
         return true;
     }
@@ -1381,6 +1449,16 @@ export class EditClientComponent implements OnInit {
 
       this.documents[documentType] = file;
       console.log(`File selected for ${documentType}:`, file.name);
+      
+      // Handle IE code document upload
+      if (documentType === 'ie_code_document') {
+        // Reset IE code number and make it required
+        this.clientForm.get('ie_code_number')?.setValue('');
+        this.clientForm.get('ie_code_number')?.setValidators([Validators.required]);
+        this.clientForm.get('ie_code_number')?.updateValueAndValidity();
+        
+        this.snackBar.open('Please enter the IE Code Number for the uploaded document', 'Close', { duration: 4000 });
+      }
     }
   }
 
@@ -1392,6 +1470,16 @@ export class EditClientComponent implements OnInit {
       fileInput.value = '';
     }
     console.log(`Document removed: ${documentType}`);
+    
+    // Handle IE code document removal
+    if (documentType === 'ie_code_document') {
+      // Check if there's no existing IE document
+      if (!this.hasExistingDocument('ie_code') && !this.hasExistingDocument('ie_code_document')) {
+        // Clear validators if no existing document
+        this.clientForm.get('ie_code_number')?.clearValidators();
+        this.clientForm.get('ie_code_number')?.updateValueAndValidity();
+      }
+    }
   }
 
   downloadDocument(documentType: string): void {
@@ -1422,6 +1510,104 @@ export class EditClientComponent implements OnInit {
         this.snackBar.open('Failed to download document', 'Close', { duration: 3000 });
       }
     });
+  }
+
+  // Handle multiple file selection for product images and user photos
+  onMultipleFilesSelected(event: any, type: 'product_images' | 'user_photos'): void {
+    const files: FileList = event.target.files;
+    if (!files || files.length === 0) return;
+
+    const maxFiles = 10;
+    const currentArray = type === 'product_images' ? this.productImages : this.userPhotos;
+    const existingArray = type === 'product_images' ? this.existingProductImages : this.existingUserPhotos;
+    
+    const totalCount = currentArray.length + existingArray.length;
+    const availableSlots = maxFiles - totalCount;
+
+    if (availableSlots <= 0) {
+      this.snackBar.open(`Maximum ${maxFiles} ${type === 'product_images' ? 'product images' : 'user photos'} allowed`, 'Close', { duration: 3000 });
+      return;
+    }
+
+    const filesToAdd = Math.min(files.length, availableSlots);
+    const newFiles: File[] = [];
+
+    for (let i = 0; i < filesToAdd; i++) {
+      const file = files[i];
+      // Validate file type
+      if (!file.type.match(/image\/(jpeg|jpg|png)/)) {
+        this.snackBar.open('Only JPG and PNG images are allowed', 'Close', { duration: 3000 });
+        continue;
+      }
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        this.snackBar.open(`${file.name} is too large. Maximum size is 5MB`, 'Close', { duration: 3000 });
+        continue;
+      }
+      newFiles.push(file);
+    }
+
+    if (type === 'product_images') {
+      this.productImages = [...this.productImages, ...newFiles];
+    } else {
+      this.userPhotos = [...this.userPhotos, ...newFiles];
+    }
+
+    if (filesToAdd < files.length) {
+      this.snackBar.open(`Only ${filesToAdd} files added. Maximum ${maxFiles} files allowed`, 'Close', { duration: 3000 });
+    } else {
+      this.snackBar.open(`${newFiles.length} file(s) added successfully`, 'Close', { duration: 2000 });
+    }
+
+    // Reset input
+    event.target.value = '';
+  }
+
+  // Get product images count
+  getProductImagesCount(): number {
+    return this.productImages.length + this.existingProductImages.length;
+  }
+
+  // Get user photos count
+  getUserPhotosCount(): number {
+    return this.userPhotos.length + this.existingUserPhotos.length;
+  }
+
+  // Get image preview URL
+  getImagePreview(file: File): string {
+    return URL.createObjectURL(file);
+  }
+
+  // Remove product image
+  removeProductImage(index: number): void {
+    this.productImages.splice(index, 1);
+    this.snackBar.open('Image removed', 'Close', { duration: 2000 });
+  }
+
+  // Remove user photo
+  removeUserPhoto(index: number): void {
+    this.userPhotos.splice(index, 1);
+    this.snackBar.open('Photo removed', 'Close', { duration: 2000 });
+  }
+
+  // Delete existing product image
+  deleteExistingProductImage(index: number): void {
+    const image = this.existingProductImages[index];
+    if (image && image.public_id) {
+      this.productImagesToDelete.push(image.public_id);
+    }
+    this.existingProductImages.splice(index, 1);
+    this.snackBar.open('Image marked for deletion', 'Close', { duration: 2000 });
+  }
+
+  // Delete existing user photo
+  deleteExistingUserPhoto(index: number): void {
+    const photo = this.existingUserPhotos[index];
+    if (photo && photo.public_id) {
+      this.userPhotosToDelete.push(photo.public_id);
+    }
+    this.existingUserPhotos.splice(index, 1);
+    this.snackBar.open('Photo marked for deletion', 'Close', { duration: 2000 });
   }
 
   // Close dropdowns when clicking outside

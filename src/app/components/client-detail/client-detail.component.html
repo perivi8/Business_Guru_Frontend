@@ -226,7 +226,7 @@
     <!-- Main Content -->
     <div class="space-y-6">
       <!-- Step 1: Business Information and Personal Information -->
-      <div *ngIf="activeStep === 1" class="grid grid-cols-1 gap-6">
+      <div *ngIf="isStepActive(1)" class="grid grid-cols-1 gap-6">
         <!-- Business Information Card -->
         <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
           <div class="p-6 border-b border-gray-200">
@@ -470,8 +470,8 @@
                       </svg>
                     </div>
                     <div class="flex-1 min-w-0">
-                      <p class="text-xs font-medium text-gray-500">IE Document</p>
-                      <p class="text-sm font-semibold text-gray-800 break-words">{{ hasIEDocument() ? 'Yes' : 'No' }}</p>
+                      <p class="text-xs font-medium text-gray-500">IE Code</p>
+                      <p class="text-sm font-semibold text-gray-800 break-words">{{ getIECodeDisplay() }}</p>
                     </div>
                   </div>
                   <div class="flex items-start gap-3 py-2">
@@ -494,6 +494,39 @@
                     <div class="flex-1 min-w-0">
                       <p class="text-xs font-medium text-gray-500">Website URL</p>
                       <p class="text-sm font-semibold text-gray-800 break-words">{{ getWebsiteURL() }}</p>
+                    </div>
+                  </div>
+                  <div class="flex items-start gap-3 py-2">
+                    <div class="w-9 h-9 bg-indigo-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                      </svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-xs font-medium text-gray-500">Signature</p>
+                      <p class="text-sm font-semibold text-gray-800 break-words">{{ hasSignature() ? 'Yes' : 'No' }}</p>
+                    </div>
+                  </div>
+                  <div class="flex items-start gap-3 py-2">
+                    <div class="w-9 h-9 bg-pink-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <svg class="w-5 h-5 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                      </svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-xs font-medium text-gray-500">Product Images</p>
+                      <p class="text-sm font-semibold text-gray-800 break-words">{{ hasProductImages() ? 'Yes' : 'No' }}</p>
+                    </div>
+                  </div>
+                  <div class="flex items-start gap-3 py-2">
+                    <div class="w-9 h-9 bg-cyan-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <svg class="w-5 h-5 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                      </svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-xs font-medium text-gray-500">User Photos</p>
+                      <p class="text-sm font-semibold text-gray-800 break-words">{{ hasUserPhotos() ? 'Yes' : 'No' }}</p>
                     </div>
                   </div>
                 </div>
@@ -589,7 +622,7 @@
       </div>
 
       <!-- Step 2: Financial Information -->
-      <div *ngIf="activeStep === 2" class="grid grid-cols-1 gap-6">
+      <div *ngIf="isStepActive(2)" class="grid grid-cols-1 gap-6">
         <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
           <div class="p-6 border-b border-gray-200">
             <div class="flex items-center gap-3">
@@ -787,19 +820,72 @@
       </div>
 
       <!-- Step 3: Documents & Images -->
-      <div *ngIf="activeStep === 3 && getDocumentKeys().length > 0" class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
-        <div class="p-6 border-b border-gray-200">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-              <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
-              </svg>
+      <div *ngIf="isStepActive(3)" class="space-y-6">
+        
+        <!-- Product Images Section -->
+        <div *ngIf="hasProductImages()" class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+          <div class="p-6 border-b border-gray-200">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-pink-100 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800">Product Images ({{ getProductImagesCount() }})</h3>
             </div>
-            <h3 class="text-lg font-semibold text-gray-800">Documents & Images</h3>
+          </div>
+          <div class="p-6">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+              <div *ngFor="let image of getProductImages()" class="relative group">
+                <img [src]="image.url" [alt]="image.file_name" class="w-full h-32 object-cover rounded-lg border border-gray-300 hover:shadow-lg transition-shadow cursor-pointer"
+                     (click)="viewImage(image.url)">
+                <div class="absolute bottom-2 left-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded truncate opacity-0 group-hover:opacity-100 transition-opacity">
+                  {{ image.file_name }}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="p-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+        <!-- User Photos Section -->
+        <div *ngIf="hasUserPhotos()" class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+          <div class="p-6 border-b border-gray-200">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-cyan-100 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800">User Photos ({{ getUserPhotosCount() }})</h3>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+              <div *ngFor="let photo of getUserPhotos()" class="relative group">
+                <img [src]="photo.url" [alt]="photo.file_name" class="w-full h-32 object-cover rounded-lg border border-gray-300 hover:shadow-lg transition-shadow cursor-pointer"
+                     (click)="viewImage(photo.url)">
+                <div class="absolute bottom-2 left-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded truncate opacity-0 group-hover:opacity-100 transition-opacity">
+                  {{ photo.file_name }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Other Documents Section -->
+        <div *ngIf="getDocumentKeys().length > 0" class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+          <div class="p-6 border-b border-gray-200">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800">Other Documents</h3>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div *ngFor="let docType of getDocumentKeys()" class="bg-gray-50 rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
               <div class="flex items-start gap-3">
                 <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
@@ -937,7 +1023,7 @@
       </div>
 
       <!-- Step 4: Payment Gateway Information Card -->
-      <div *ngIf="activeStep === 4" class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+      <div *ngIf="isStepActive(4)" class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
         <div class="p-6 border-b border-gray-200">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-lg flex items-center justify-center">
@@ -1107,7 +1193,9 @@
       </div>
 
       <!-- Step 5: Loan Status -->
-      <div *ngIf="activeStep === 5" class="grid grid-cols-1 gap-6">
+      <div *ngIf="isStepActive(5)" class="grid grid-cols-1 gap-6">
+
+
         <!-- Loan Status Card -->
         <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
           <div class="p-6 border-b border-gray-200">

@@ -30,6 +30,7 @@ export interface Client {
   business_pan: string;
   gst_number?: string;
   ie_code: string;
+  ie_code_number?: string;
   new_current_account?: string;
   website: string;
   business_url?: string;

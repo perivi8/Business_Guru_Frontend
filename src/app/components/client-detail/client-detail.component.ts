@@ -27,7 +27,7 @@ export class ClientDetailComponent implements OnInit {
   isStatusDropdownOpen = false;
 
   // Stepper properties
-  activeStep = 1;
+  activeStep: number = 1;
   steps = [
     'Business & Personal Info',
     'Financial Information',
@@ -35,6 +35,7 @@ export class ClientDetailComponent implements OnInit {
     'Payment Gateway',
     'Loan Status'
   ];
+  maxSteps = 5;
 
   constructor(
     private route: ActivatedRoute,
@@ -1461,6 +1462,10 @@ export class ClientDetailComponent implements OnInit {
     this.activeStep = step;
   }
 
+  isStepActive(step: number): boolean {
+    return this.activeStep === step;
+  }
+
   // Custom dropdown methods for status selection
   toggleStatusDropdown(): void {
     this.isStatusDropdownOpen = !this.isStatusDropdownOpen;
@@ -1572,6 +1577,91 @@ export class ClientDetailComponent implements OnInit {
         });
       }
     });
+  }
+
+  // IE Code display method
+  getIECodeDisplay(): string {
+    const ieCodeNumber = this.getClientProperty('ie_code_number');
+    const hasIEDocument = this.hasExistingDocument('ie_code') || this.hasExistingDocument('ie_code_document');
+    
+    if (ieCodeNumber) {
+      return `Yes (${ieCodeNumber})`;
+    } else if (hasIEDocument) {
+      return 'Yes';
+    } else {
+      return 'No';
+    }
+  }
+  
+  // Helper method to check if IE document exists
+  hasExistingDocument(docType: string): boolean {
+    if (!this.client) return false;
+    
+    // Check in processed_documents (legacy format)
+    if (this.client.processed_documents && this.client.processed_documents[docType]) {
+      return true;
+    }
+    
+    // Check in documents (new format)
+    if (this.client.documents && this.client.documents[docType]) {
+      return true;
+    }
+    
+    return false;
+  }
+
+  // Signature check method
+  hasSignature(): boolean {
+    if (!this.client) return false;
+    const signature = (this.client as any).signature || (this.client as any).signature_url;
+    return !!signature;
+  }
+
+  // Product Images methods
+  hasProductImages(): boolean {
+    if (!this.client) return false;
+    const productImages = (this.client as any).product_images;
+    return Array.isArray(productImages) && productImages.length > 0;
+  }
+
+  getProductImagesCount(): number {
+    if (!this.client) return 0;
+    const productImages = (this.client as any).product_images;
+    return Array.isArray(productImages) ? productImages.length : 0;
+  }
+
+  getProductImages(): any[] {
+    if (!this.client) return [];
+    const productImages = (this.client as any).product_images;
+    return Array.isArray(productImages) ? productImages : [];
+  }
+
+  // User Photos methods
+  hasUserPhotos(): boolean {
+    if (!this.client) return false;
+    const userPhotos = (this.client as any).user_photos;
+    return Array.isArray(userPhotos) && userPhotos.length > 0;
+  }
+
+  getUserPhotosCount(): number {
+    if (!this.client) return 0;
+    const userPhotos = (this.client as any).user_photos;
+    return Array.isArray(userPhotos) ? userPhotos.length : 0;
+  }
+
+  getUserPhotos(): any[] {
+    if (!this.client) return [];
+    const userPhotos = (this.client as any).user_photos;
+    return Array.isArray(userPhotos) ? userPhotos : [];
+  }
+
+  // View image in new tab
+  viewImage(imageUrl: string): void {
+    if (!imageUrl) {
+      this.snackBar.open('Image URL not available', 'Close', { duration: 3000 });
+      return;
+    }
+    window.open(imageUrl, '_blank');
   }
 
 }
