@@ -1749,7 +1749,7 @@ export class ClientDetailComponent implements OnInit {
         
         // Redirect to GST portal after a short delay
         setTimeout(() => {
-          const gstPortalUrl = 'https://services.gst.gov.in/services/login';
+          const gstPortalUrl = 'https://services.gst.gov.in/services/searchtp';
           window.open(gstPortalUrl, '_blank');
         }, 500);
       }).catch(err => {
@@ -1777,7 +1777,7 @@ export class ClientDetailComponent implements OnInit {
       
       // Redirect to GST portal after a short delay
       setTimeout(() => {
-        const gstPortalUrl = 'https://services.gst.gov.in/services/login';
+        const gstPortalUrl = 'https://services.gst.gov.in/services/searchtp';
         window.open(gstPortalUrl, '_blank');
       }, 500);
     } catch (err) {
