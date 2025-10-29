@@ -20,7 +20,7 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   filteredEnquiries: Enquiry[] = [];
   displayedColumns: string[] = [
     'sno', 'date', 'owner_name', 'phone_number',
-    'gst', 'business_name', 'business_document', 'staff', 'comments', 'shortlist', 'actions'
+    'gst', 'business_name', 'business_document', 'staff', 'suggested_staff', 'comments', 'shortlist', 'actions'
   ];
   
   staffMembers: User[] = [];
@@ -487,6 +487,73 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     }
     
     return regularStaffMembers[0] || null;
+  }
+
+  /**
+   * Get suggested staff member for an enquiry
+   * Returns the next staff in round-robin if actions are unlocked
+   */
+  getSuggestedStaff(enquiry: Enquiry): string {
+    // Only show suggestion if actions are unlocked
+    if (this.areActionsLocked(enquiry)) {
+      return '-';
+    }
+    
+    // Don't show suggestion if staff is already assigned (not special forms)
+    if (enquiry.staff && 
+        enquiry.staff !== 'Public Form' && 
+        enquiry.staff !== 'WhatsApp Form' && 
+        enquiry.staff !== 'WhatsApp Bot' && 
+        enquiry.staff !== 'WhatsApp Web') {
+      return '-';
+    }
+    
+    // Get the next staff member in round-robin
+    const nextStaff = this.getNextStaffMember();
+    return nextStaff || '-';
+  }
+
+  /**
+   * Check if action buttons should be locked for an enquiry
+   * Locks actions until staff is assigned to all previous enquiries
+   */
+  areActionsLocked(enquiry: Enquiry): boolean {
+    // Never lock actions for enquiries that already have staff assigned (not special forms)
+    if (enquiry.staff && 
+        enquiry.staff !== 'Public Form' && 
+        enquiry.staff !== 'WhatsApp Form' && 
+        enquiry.staff !== 'WhatsApp Bot' && 
+        enquiry.staff !== 'WhatsApp Web') {
+      return false;
+    }
+    
+    // Get all enquiries sorted by date (oldest first)
+    const sortedEnquiries = [...this.enquiries].sort((a, b) => {
+      const dateA = new Date(a.date).getTime();
+      const dateB = new Date(b.date).getTime();
+      return dateA - dateB;
+    });
+    
+    // Find the index of current enquiry
+    const currentIndex = sortedEnquiries.findIndex(e => e._id === enquiry._id);
+    
+    // Check if there are any previous enquiries without staff assigned
+    for (let i = 0; i < currentIndex; i++) {
+      const prevEnquiry = sortedEnquiries[i];
+      const hasStaffAssigned = prevEnquiry.staff && 
+                               prevEnquiry.staff !== 'Public Form' && 
+                               prevEnquiry.staff !== 'WhatsApp Form' && 
+                               prevEnquiry.staff !== 'WhatsApp Bot' && 
+                               prevEnquiry.staff !== 'WhatsApp Web';
+      
+      // If any previous enquiry doesn't have staff assigned, lock this one
+      if (!hasStaffAssigned) {
+        return true;
+      }
+    }
+    
+    // All previous enquiries have staff assigned, so unlock this one
+    return false;
   }
 
   /**

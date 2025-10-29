@@ -13,6 +13,7 @@ export class EnquiryDetailsComponent implements OnInit {
   enquiry: Enquiry | null = null;
   loading = false;
   enquiryId: string | null = null;
+  allEnquiries: Enquiry[] = []; // Store all enquiries for locking logic
 
   constructor(
     private route: ActivatedRoute,
@@ -41,6 +42,7 @@ export class EnquiryDetailsComponent implements OnInit {
     this.enquiryService.getAllEnquiries().subscribe({
       next: (enquiries) => {
         console.log('All enquiries loaded:', enquiries.length);
+        this.allEnquiries = enquiries; // Store all enquiries for locking logic
         const foundEnquiry = enquiries.find(e => e._id === this.enquiryId);
         
         if (foundEnquiry) {
@@ -71,8 +73,61 @@ export class EnquiryDetailsComponent implements OnInit {
     this.router.navigate(['/enquiry']);
   }
 
+  /**
+   * Check if edit action should be locked
+   * Locks edit until staff is assigned to all previous enquiries
+   */
+  isEditLocked(): boolean {
+    if (!this.enquiry) return true;
+    
+    // Never lock edit for enquiries that already have staff assigned (not special forms)
+    if (this.enquiry.staff && 
+        this.enquiry.staff !== 'Public Form' && 
+        this.enquiry.staff !== 'WhatsApp Form' && 
+        this.enquiry.staff !== 'WhatsApp Bot' && 
+        this.enquiry.staff !== 'WhatsApp Web') {
+      return false;
+    }
+    
+    // Get all enquiries sorted by date (oldest first)
+    const sortedEnquiries = [...this.allEnquiries].sort((a, b) => {
+      const dateA = new Date(a.date).getTime();
+      const dateB = new Date(b.date).getTime();
+      return dateA - dateB;
+    });
+    
+    // Find the index of current enquiry
+    const currentIndex = sortedEnquiries.findIndex(e => e._id === this.enquiry?._id);
+    
+    // Check if there are any previous enquiries without staff assigned
+    for (let i = 0; i < currentIndex; i++) {
+      const prevEnquiry = sortedEnquiries[i];
+      const hasStaffAssigned = prevEnquiry.staff && 
+                               prevEnquiry.staff !== 'Public Form' && 
+                               prevEnquiry.staff !== 'WhatsApp Form' && 
+                               prevEnquiry.staff !== 'WhatsApp Bot' && 
+                               prevEnquiry.staff !== 'WhatsApp Web';
+      
+      // If any previous enquiry doesn't have staff assigned, lock this one
+      if (!hasStaffAssigned) {
+        return true;
+      }
+    }
+    
+    // All previous enquiries have staff assigned, so unlock this one
+    return false;
+  }
+
   editEnquiry(): void {
     if (this.enquiry && this.enquiry._id) {
+      // Check if edit is locked
+      if (this.isEditLocked()) {
+        this.snackBar.open('Please assign staff to older enquiries first', 'Close', { 
+          duration: 3000 
+        });
+        return;
+      }
+      
       // Navigate back to enquiry page and trigger edit mode
       this.router.navigate(['/enquiry'], { 
         queryParams: { edit: this.enquiry._id } 
