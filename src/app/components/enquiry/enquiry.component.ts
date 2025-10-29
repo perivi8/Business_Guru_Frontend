@@ -423,6 +423,20 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Get staff members for edit mode dropdown (excludes Public Form)
+   * Used in edit-enquiry staff assignment dropdown
+   */
+  getStaffMembersForEdit(): string[] {
+    // Filter out Public Form from uniqueStaffMembers
+    return this.uniqueStaffMembers.filter(staff => 
+      staff !== 'Public Form' && 
+      staff !== 'WhatsApp Form' && 
+      staff !== 'WhatsApp Bot' && 
+      staff !== 'WhatsApp Web'
+    );
+  }
+
+  /**
    * Get regular staff members (excluding admins) for round-robin assignment
    * Excludes: Admin role, Public Form, WhatsApp Web, WhatsApp Bot, WhatsApp Form
    */

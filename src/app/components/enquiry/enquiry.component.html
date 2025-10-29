@@ -1446,10 +1446,13 @@
                       Select Staff
                     </button>
                     <button type="button"
-                            *ngFor="let staff of uniqueStaffMembers"
+                            *ngFor="let staff of getStaffMembersForEdit()"
                             (click)="shouldBlockStaffSelection(staff) ? null : selectStaff(staff)"
                             [disabled]="shouldBlockStaffSelection(staff)"
-                            class="w-full text-left px-3 py-2 text-sm focus:outline-none border-b border-gray-100 last:border-b-0 flex items-center justify-between"
+                            class="w-full text-left px-3 py-2 text-sm focus:outline-none flex items-center justify-between"
+                            [class.border-b]="!isNextStaffInRoundRobin(staff)"
+                            [class.border-gray-100]="!isNextStaffInRoundRobin(staff)"
+                            [class.last:border-b-0]="!isNextStaffInRoundRobin(staff)"
                             [class.bg-blue-50]="registrationForm.get('staff')?.value === staff"
                             [class.text-blue-600]="registrationForm.get('staff')?.value === staff"
                             [class.bg-gradient-to-r]="isNextStaffInRoundRobin(staff)"
