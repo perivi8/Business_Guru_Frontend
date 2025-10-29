@@ -1667,4 +1667,125 @@ export class ClientDetailComponent implements OnInit {
     window.open(imageUrl, '_blank');
   }
 
+  // Open WhatsApp chat with mobile number
+  openWhatsApp(mobileNumber: string | null | undefined): void {
+    if (!mobileNumber || mobileNumber === 'N/A') {
+      this.snackBar.open('Mobile number not available', 'Close', { duration: 3000 });
+      return;
+    }
+
+    // Remove any non-digit characters from the mobile number
+    const cleanNumber = mobileNumber.replace(/\D/g, '');
+    
+    if (cleanNumber.length < 10) {
+      this.snackBar.open('Invalid mobile number', 'Close', { duration: 3000 });
+      return;
+    }
+
+    // Format for WhatsApp (add country code if not present)
+    let whatsappNumber = cleanNumber;
+    if (!cleanNumber.startsWith('91') && cleanNumber.length === 10) {
+      whatsappNumber = '91' + cleanNumber; // Add India country code
+    }
+
+    // Open WhatsApp Web
+    const whatsappUrl = `https://wa.me/${whatsappNumber}`;
+    window.open(whatsappUrl, '_blank');
+    this.snackBar.open('Opening WhatsApp...', 'Close', { duration: 2000 });
+  }
+
+  // Open email in Gmail
+  openEmailInGmail(email: string | null | undefined): void {
+    if (!email || email === 'N/A') {
+      this.snackBar.open('Email address not available', 'Close', { duration: 3000 });
+      return;
+    }
+
+    // Open Gmail compose with the email address
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}`;
+    window.open(gmailUrl, '_blank');
+    this.snackBar.open('Opening Gmail...', 'Close', { duration: 2000 });
+  }
+
+  // Open address in Google Maps
+  openAddressInGoogleMaps(): void {
+    if (!this.client) {
+      this.snackBar.open('Client information not available', 'Close', { duration: 3000 });
+      return;
+    }
+
+    // Build full address from available fields
+    const addressParts = [
+      this.client.address,
+      this.client.district,
+      this.client.state,
+      this.client.pincode
+    ].filter(part => part && part !== 'N/A');
+
+    if (addressParts.length === 0) {
+      this.snackBar.open('Address not available', 'Close', { duration: 3000 });
+      return;
+    }
+
+    const fullAddress = addressParts.join(', ');
+    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`;
+    window.open(mapsUrl, '_blank');
+    this.snackBar.open('Opening Google Maps...', 'Close', { duration: 2000 });
+  }
+
+  // Copy GST number and redirect to GST portal
+  copyAndRedirectToGST(): void {
+    const gstNumber = this.getClientProperty('registration_number');
+    
+    if (!gstNumber || gstNumber === 'N/A') {
+      this.snackBar.open('GST Registration Number not available', 'Close', { duration: 3000 });
+      return;
+    }
+
+    // Copy to clipboard
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(gstNumber).then(() => {
+        this.snackBar.open('GST Number copied to clipboard!', 'Close', { duration: 2000 });
+        
+        // Redirect to GST portal after a short delay
+        setTimeout(() => {
+          const gstPortalUrl = 'https://services.gst.gov.in/services/login';
+          window.open(gstPortalUrl, '_blank');
+        }, 500);
+      }).catch(err => {
+        console.error('Failed to copy GST number:', err);
+        this.fallbackCopyGST(gstNumber);
+      });
+    } else {
+      // Fallback for older browsers
+      this.fallbackCopyGST(gstNumber);
+    }
+  }
+
+  // Fallback method to copy GST number for older browsers
+  private fallbackCopyGST(gstNumber: string): void {
+    const textArea = document.createElement('textarea');
+    textArea.value = gstNumber;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.select();
+    
+    try {
+      document.execCommand('copy');
+      this.snackBar.open('GST Number copied to clipboard!', 'Close', { duration: 2000 });
+      
+      // Redirect to GST portal after a short delay
+      setTimeout(() => {
+        const gstPortalUrl = 'https://services.gst.gov.in/services/login';
+        window.open(gstPortalUrl, '_blank');
+      }, 500);
+    } catch (err) {
+      console.error('Failed to copy GST number:', err);
+      this.snackBar.open('Failed to copy GST number', 'Close', { duration: 3000 });
+    } finally {
+      document.body.removeChild(textArea);
+    }
+  }
+
 }

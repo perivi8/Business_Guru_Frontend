@@ -34,7 +34,11 @@ export class TeamComponent implements OnInit {
   loadUsers(): void {
     this.userService.getUsers().subscribe({
       next: (response) => {
-        this.users = response.users;
+        // Sort users: admin first, then manager, then user
+        this.users = response.users.sort((a, b) => {
+          const roleOrder: { [key: string]: number } = { admin: 1, manager: 2, user: 3 };
+          return (roleOrder[a.role] || 999) - (roleOrder[b.role] || 999);
+        });
         this.loading = false;
       },
       error: (error) => {

@@ -152,6 +152,9 @@ export class NewClientComponent implements OnInit {
     this.loadStaffMembers();
     this.filteredBankNames = [];
     this.loadEnquiryData();
+    
+    // Initialize districts for default state (Tamil Nadu)
+    this.onStateChange('Tamil Nadu');
   }
 
   initializeForms(): void {
@@ -161,7 +164,7 @@ export class NewClientComponent implements OnInit {
       legal_name: ['', Validators.required],
       address: ['', Validators.required],
       district: ['', Validators.required],
-      state: ['', Validators.required],
+      state: ['Tamil Nadu', Validators.required], // Default to Tamil Nadu
       pincode: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]],
       trade_name: ['', Validators.required],
       user_email: ['', [Validators.email]], // Made optional
@@ -204,7 +207,7 @@ export class NewClientComponent implements OnInit {
       bank_type: ['Current', Validators.required], // Default to Current account type
       transaction_months: [6, Validators.required],
       total_credit_amount: ['', Validators.required],
-      new_current_account: ['', Validators.required],
+      new_current_account: ['no', Validators.required], // Default to 'no'
       // New bank details fields (conditional)
       new_bank_account_number: [''],
       new_ifsc_code: [''],
@@ -542,6 +545,8 @@ export class NewClientComponent implements OnInit {
   nextStep(): void {
     if (this.canProceedToNextStep()) {
       this.currentStep++;
+      // Scroll to top of the page when moving to next step
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       this.markFormGroupTouched(this.getCurrentStepForm());
     }
@@ -550,7 +555,7 @@ export class NewClientComponent implements OnInit {
   canProceedToNextStep(): boolean {
     switch (this.currentStep) {
       case 0:
-        return this.step1Form.valid && !!this.uploadedFiles['gst_document'];
+        return this.step1Form.valid && !!this.uploadedFiles['gst_document'] && !!this.uploadedFiles['msme_document'];
       case 1:
         return this.step2Form.valid && this.validateStep2Documents();
       case 2:
@@ -635,6 +640,8 @@ export class NewClientComponent implements OnInit {
   previousStep(): void {
     if (this.currentStep > 0) {
       this.currentStep--;
+      // Scroll to top of the page when moving to previous step
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
@@ -709,6 +716,7 @@ export class NewClientComponent implements OnInit {
 
     this.clientService.createClient(formData).subscribe({
       next: (response) => {
+        this.loading = false;
         this.success = 'Client created successfully!';
         
         // Sync data back to enquiry if this came from an enquiry
@@ -717,8 +725,8 @@ export class NewClientComponent implements OnInit {
         }
         
         setTimeout(() => {
-          this.router.navigate(['/clients']);
-        }, 2000);
+          this.router.navigate(['/dashboard']);
+        }, 1500);
       },
       error: (error) => {
         this.error = error.error?.error || 'Failed to create client';

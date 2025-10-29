@@ -7,6 +7,8 @@ import { AuthService } from '../../services/auth.service';
 import { UserService, User } from '../../services/user.service';
 import { ClientDetailsDialogComponent } from '../client-details-dialog/client-details-dialog.component';
 import { ConfirmDeleteDialogComponent } from '../confirm-delete-dialog/confirm-delete-dialog.component';
+import { Subject, timer } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-clients',
@@ -30,6 +32,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
   applyUpdatedClientsFilter: Date | null = null;
   updatingClientId: string | null = null;
   viewMode: 'table' | 'card' = 'table';
+  private destroy$ = new Subject<void>();
 
   // Custom dropdown state management
   openDropdownId: string | null = null;
@@ -76,6 +79,25 @@ export class ClientsComponent implements OnInit, OnDestroy {
         this.refreshClientData(clientId);
       }
     });
+    
+    // Auto-refresh clients every 30 seconds
+    timer(30000, 30000)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        // Silently refresh without showing loading indicator
+        this.clientService.getClients().subscribe({
+          next: (response) => {
+            if (response && response.clients) {
+              this.clients = response.clients;
+              this.applySpecialFilters();
+              this.applyFilters();
+            }
+          },
+          error: (error) => {
+            console.error('Auto-refresh failed:', error);
+          }
+        });
+      });
   }
 
   checkMobileView(): void {
@@ -651,15 +673,28 @@ export class ClientsComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
+        // Store original data for rollback in case of error
+        const originalClients = [...this.clients];
+        const originalFilteredClients = [...this.filteredClients];
+        
+        // Optimistic deletion - remove immediately from UI
+        this.clients = this.clients.filter(c => c._id !== client._id);
+        this.filteredClients = this.filteredClients.filter(c => c._id !== client._id);
+        
+        // Show immediate success feedback
+        this.snackBar.open('Client deleted successfully', 'Close', {
+          duration: 2000
+        });
+        
+        // Make API call in background
         this.clientService.deleteClient(client._id).subscribe({
           next: () => {
-            this.clients = this.clients.filter(c => c._id !== client._id);
-            this.filteredClients = this.filteredClients.filter(c => c._id !== client._id);
-            this.snackBar.open('Client deleted successfully', 'Close', {
-              duration: 3000
-            });
+            // Already removed from UI, nothing more to do
           },
           error: (error) => {
+            // Rollback on error - restore the client
+            this.clients = originalClients;
+            this.filteredClients = originalFilteredClients;
             this.snackBar.open('Failed to delete client', 'Close', {
               duration: 3000
             });
@@ -1062,6 +1097,10 @@ export class ClientsComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     // Clean up scroll listeners when component is destroyed
     this.removeScrollListeners();
+    
+    // Clean up auto-refresh subscription
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   // Handle window resize to switch view mode on mobile

@@ -20,7 +20,7 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   filteredEnquiries: Enquiry[] = [];
   displayedColumns: string[] = [
     'sno', 'date', 'owner_name', 'phone_number',
-    'gst', 'business_name', 'business_document', 'staff', 'suggested_staff', 'comments', 'shortlist', 'actions'
+    'gst', 'business_name', 'staff', 'suggested_staff', 'comments', 'shortlist', 'actions'
   ];
   
   staffMembers: User[] = [];
@@ -195,9 +195,19 @@ export class EnquiryComponent implements OnInit, OnDestroy {
       this.checkExistingClients();
     });
     
-    // Set up debouncing for business nature updates (3 seconds delay)
+    // Auto-refresh enquiries every 30 seconds to show new submissions from public form
+    timer(30000, 30000)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        // Only refresh if not currently editing to avoid disrupting user
+        if (!this.showRegistrationForm) {
+          this.loadEnquiries();
+        }
+      });
+    
+    // Set up debouncing for business nature updates (1 second delay)
     this.businessNatureDebounce.pipe(
-      debounceTime(3000),
+      debounceTime(1000),
       takeUntil(this.destroy$),
       switchMap(({enquiry, value}) => {
         // Update the local value immediately for UI feedback
@@ -218,9 +228,9 @@ export class EnquiryComponent implements OnInit, OnDestroy {
       }
     });
     
-    // Set up debouncing for additional comments updates (3 seconds delay)
+    // Set up debouncing for additional comments updates (1 second delay)
     this.additionalCommentsDebounce.pipe(
-      debounceTime(3000),
+      debounceTime(1000),
       takeUntil(this.destroy$),
       switchMap(({enquiry, value}) => {
         // Update the local value immediately for UI feedback
@@ -241,9 +251,9 @@ export class EnquiryComponent implements OnInit, OnDestroy {
       }
     });
     
-    // Set up debouncing for secondary mobile updates (3 seconds delay)
+    // Set up debouncing for secondary mobile updates (1 second delay)
     this.secondaryMobileDebounce.pipe(
-      debounceTime(3000),
+      debounceTime(1000),
       takeUntil(this.destroy$),
       switchMap(({enquiry, value}) => {
         // Update the local value immediately for UI feedback
@@ -906,7 +916,12 @@ export class EnquiryComponent implements OnInit, OnDestroy {
               const index = this.enquiries.findIndex(e => e._id === enquiry._id);
               if (index !== -1) {
                 this.enquiries[index] = { ...this.enquiries[index], ...updatedEnquiry };
-                this.applyFilters();
+              }
+              
+              // Update in filtered list without reordering
+              const filteredIndex = this.filteredEnquiries.findIndex(e => e._id === enquiry._id);
+              if (filteredIndex !== -1) {
+                this.filteredEnquiries[filteredIndex] = { ...this.filteredEnquiries[filteredIndex], ...updatedEnquiry };
               }
               
               // Show success message and redirect
@@ -939,7 +954,12 @@ export class EnquiryComponent implements OnInit, OnDestroy {
             const index = this.enquiries.findIndex(e => e._id === enquiry._id);
             if (index !== -1) {
               this.enquiries[index] = { ...this.enquiries[index], ...updatedEnquiry };
-              this.applyFilters();
+            }
+            
+            // Update in filtered list without reordering
+            const filteredIndex = this.filteredEnquiries.findIndex(e => e._id === enquiry._id);
+            if (filteredIndex !== -1) {
+              this.filteredEnquiries[filteredIndex] = { ...this.filteredEnquiries[filteredIndex], ...updatedEnquiry };
             }
             
             // Show appropriate notification based on WhatsApp status
@@ -1545,8 +1565,12 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     this.originalStaffValue = isSpecialForm ? null : staffValue;
     
     // Populate form with enquiry data
+    // Format date for HTML date input (YYYY-MM-DD)
+    const enquiryDate = new Date(enquiry.date);
+    const formattedDate = enquiryDate.toISOString().split('T')[0];
+    
     const formValues = {
-      date: new Date(enquiry.date),
+      date: formattedDate,
       wati_name: enquiry.wati_name || '',
       owner_name: enquiry.owner_name || '',
       user_name: enquiry.user_name || '',
@@ -1806,77 +1830,86 @@ export class EnquiryComponent implements OnInit, OnDestroy {
       console.log('📤 Form errors:', this.registrationForm.errors);
 
       if (this.isEditMode && this.editingEnquiryId) {
-        // Show loading indicator
-        this.loading = true;
+        // Optimistic update - close form immediately
+        this.showRegistrationForm = false;
+        this.isEditMode = false;
+        const editingId = this.editingEnquiryId;
+        this.editingEnquiryId = null;
+        this.hasFormChanges = false;
+        this.originalFormValues = null;
+        this.originalStaffValue = null;
         
-        this.enquiryService.updateEnquiry(this.editingEnquiryId, formData)
+        // Show immediate success feedback
+        this.snackBar.open('Enquiry updated successfully!', 'Close', { 
+          duration: 2000,
+          panelClass: ['success-snackbar']
+        });
+        
+        // Clean up form change subscription
+        if (this.formChangeSubscription) {
+          this.formChangeSubscription.unsubscribe();
+          this.formChangeSubscription = null;
+        }
+        
+        // Reset form
+        this.registrationForm.reset();
+        
+        // Make API call in background
+        this.enquiryService.updateEnquiry(editingId, formData)
           .pipe(takeUntil(this.destroy$))
           .subscribe({
-          next: (updatedEnquiry: any) => {
-            this.loading = false; // Hide loading indicator
-            let message = 'Enquiry updated successfully!';
-            let panelClass = ['success-snackbar'];
+          next: (response: any) => {
+            // Extract the updated enquiry from response (handle different response structures)
+            const updatedEnquiry = response.enquiry || response.data || response;
             
-            // Add WhatsApp status to notification
+            // Update the specific enquiry in place without reordering
+            const index = this.enquiries.findIndex(e => e._id === editingId);
+            if (index !== -1) {
+              // Preserve the original date and sno
+              const originalDate = this.enquiries[index].date;
+              const originalSno = this.enquiries[index].sno;
+              this.enquiries[index] = { ...updatedEnquiry, date: originalDate, sno: originalSno };
+            }
+            
+            // Update in filtered list without reordering
+            const filteredIndex = this.filteredEnquiries.findIndex(e => e._id === editingId);
+            if (filteredIndex !== -1) {
+              // Preserve the original date and sno
+              const originalDate = this.filteredEnquiries[filteredIndex].date;
+              const originalSno = this.filteredEnquiries[filteredIndex].sno;
+              this.filteredEnquiries[filteredIndex] = { ...updatedEnquiry, date: originalDate, sno: originalSno };
+            }
+            
+            // Trigger change detection by creating new array references
+            this.enquiries = [...this.enquiries];
+            this.filteredEnquiries = [...this.filteredEnquiries];
+            
+            // Show WhatsApp status notification if available
             if (updatedEnquiry.whatsapp_sent === true) {
-              message += ' 📱 WhatsApp status message sent!';
-              // Show additional notification if available
-              if (updatedEnquiry.whatsapp_notification) {
-                this.snackBar.open(updatedEnquiry.whatsapp_notification, 'Close', { 
-                  duration: 10000,
-                  panelClass: ['success-snackbar']
-                });
-              }
-            } else if (updatedEnquiry.whatsapp_sent === false) {
-              // Show specific error message if available
+              this.snackBar.open('📱 WhatsApp status message sent!', 'Close', { 
+                duration: 3000,
+                panelClass: ['success-snackbar']
+              });
+            } else if (updatedEnquiry.whatsapp_error) {
               const whatsappError = updatedEnquiry.whatsapp_error || 'WhatsApp message failed to send';
-              message += ` ⚠️ ${whatsappError}`;
-              panelClass = ['error-snackbar'];
-              
-              // Show quota exceeded notification if applicable
-              if (updatedEnquiry.whatsapp_notification) {
-                this.snackBar.open(updatedEnquiry.whatsapp_notification, 'Close', { 
-                  duration: 15000,
-                  panelClass: ['warning-snackbar']
-                });
-              }
+              this.snackBar.open(`⚠️ ${whatsappError}`, 'Close', { 
+                duration: 5000,
+                panelClass: ['warning-snackbar']
+              });
             }
-            
-            this.snackBar.open(message, 'Close', { 
-              duration: 5000,
-              panelClass: panelClass
-            });
-            
-            // Close the edit form after successful update
-            this.showRegistrationForm = false;
-            this.isEditMode = false;
-            this.editingEnquiryId = null;
-            this.hasFormChanges = false;
-            this.originalFormValues = null;
-            this.originalStaffValue = null;
-            this.registrationForm.reset();
-            
-            // Clean up form change subscription
-            if (this.formChangeSubscription) {
-              this.formChangeSubscription.unsubscribe();
-              this.formChangeSubscription = null;
-            }
-            
-            this.loadEnquiries();
           },
           error: (error) => {
-            this.loading = false; // Hide loading indicator on error
             console.error('Error updating enquiry:', error);
-            console.error('Error response body:', error.error);
-            console.error('Error status:', error.status);
-            console.error('Error message:', error.message);
             
             let errorMessage = 'Error updating enquiry';
             if (error.error && error.error.error) {
               errorMessage = error.error.error;
             }
             
-            this.snackBar.open(errorMessage, 'Close', { duration: 5000 });
+            this.snackBar.open(errorMessage, 'Close', { 
+              duration: 5000,
+              panelClass: ['error-snackbar']
+            });
           }
         });
       } else {
