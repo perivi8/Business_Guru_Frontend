@@ -1,78 +1,68 @@
-// Approved Clients Component Styles
-.btn {
-  @apply font-medium rounded-lg transition-all duration-200 flex items-center justify-center;
-}
-
-.btn-primary {
-  @apply bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-blue-800;
-}
-
-.btn-outline {
-  @apply border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400;
-}
+// Approved Clients Component Styles - Pure Tailwind CSS
 
 // Custom scrollbar for table
 .overflow-x-auto::-webkit-scrollbar {
-  height: 6px;
+  height: 8px;
 }
 
 .overflow-x-auto::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 3px;
+  @apply bg-gray-100 rounded;
 }
 
 .overflow-x-auto::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
+  @apply bg-gray-300 rounded hover:bg-gray-400;
 }
 
-.overflow-x-auto::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+// Smooth transitions for modal
+.fixed.inset-0 {
+  animation: fadeIn 0.2s ease-in-out;
 }
 
-// Animation for loading spinner
-@keyframes pulse {
-  0%, 100% {
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
     opacity: 1;
   }
-  50% {
-    opacity: 0.5;
+}
+
+// Modal animation
+.inline-block {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
   }
 }
 
-.animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+// Gradient text support
+.bg-clip-text {
+  -webkit-background-clip: text;
+  background-clip: text;
 }
 
-// Hover effects for client cards
-.group:hover .group-hover\:text-green-600 {
-  color: #059669;
+// Custom focus ring colors
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
 }
 
-.group:hover .group-hover\:text-green-500 {
-  color: #10b981;
+// Smooth hover transitions
+button,
+a {
+  transition: all 0.2s ease-in-out;
 }
 
-// Custom focus styles
-.focus\:ring-green-500:focus {
-  --tw-ring-color: #10b981;
-}
-
-// Responsive adjustments
-@media (max-width: 768px) {
-  .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-3 {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
-  }
-}
-
-@media (min-width: 768px) {
-  .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-3 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (min-width: 1024px) {
-  .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-3 {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
+// Table row hover effect
+tbody tr {
+  transition: background-color 0.15s ease-in-out;
 }

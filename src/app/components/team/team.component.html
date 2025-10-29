@@ -76,31 +76,31 @@
           </div>
 
           <!-- Team Members List -->
-          <div class="space-y-3">
+          <div class="space-y-2">
             <div *ngFor="let user of users; let i = index" 
-                 class="group relative bg-white rounded-xl border-l-4 border-gray-200 hover:border-indigo-500 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden">
+                 class="group relative bg-white rounded-lg border-l-4 border-gray-200 hover:border-indigo-500 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden">
               
               <!-- Gradient Background on Hover -->
               <div class="absolute inset-0 bg-gradient-to-r from-indigo-50/0 to-purple-50/0 group-hover:from-indigo-50/40 group-hover:to-purple-50/20 transition-all duration-300"></div>
               
               <!-- List Item Content -->
-              <div class="relative z-10 p-5 sm:p-6">
+              <div class="relative z-10 p-3 sm:p-4">
                 <div class="flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-6">
                   
                   <!-- Left Section: Avatar & User Info -->
-                  <div class="flex items-center gap-4 flex-1 min-w-0">
+                  <div class="flex items-center gap-3 flex-1 min-w-0">
                     <!-- Serial Number -->
-                    <div class="hidden sm:flex flex-shrink-0 w-10 h-10 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg items-center justify-center">
-                      <span class="text-sm font-bold text-gray-600">{{ i + 1 }}</span>
+                    <div class="hidden sm:flex flex-shrink-0 w-8 h-8 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg items-center justify-center">
+                      <span class="text-xs font-bold text-gray-600">{{ i + 1 }}</span>
                     </div>
                     
                     <!-- Avatar with Status -->
                     <div class="flex-shrink-0 relative">
-                      <div class="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-105 transition-all duration-300">
-                        <mat-icon class="!text-2xl sm:!text-3xl text-white">account_circle</mat-icon>
+                      <div class="w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600 rounded-lg flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-105 transition-all duration-300">
+                        <mat-icon class="!text-xl sm:!text-2xl text-white">account_circle</mat-icon>
                       </div>
                       <!-- Status Indicator -->
-                      <div class="absolute -bottom-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 border-white shadow-sm"
+                      <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border-2 border-white shadow-sm"
                            [ngClass]="{
                              'bg-green-500': user.status !== 'paused',
                              'bg-red-500': user.status === 'paused'
@@ -109,11 +109,11 @@
                     
                     <!-- User Details -->
                     <div class="flex-1 min-w-0">
-                      <h3 class="font-bold text-gray-900 text-base sm:text-lg mb-1 truncate group-hover:text-indigo-600 transition-colors">
+                      <h3 class="font-bold text-gray-900 text-sm sm:text-base mb-0.5 truncate group-hover:text-indigo-600 transition-colors">
                         {{ user.username }}
                       </h3>
-                      <p class="text-xs sm:text-sm text-gray-600 truncate font-medium flex items-center gap-1.5">
-                        <mat-icon class="!text-base text-gray-400">email</mat-icon>
+                      <p class="text-xs text-gray-600 truncate font-medium flex items-center gap-1">
+                        <mat-icon class="!text-sm text-gray-400">email</mat-icon>
                         {{ user.email }}
                       </p>
                     </div>
@@ -122,7 +122,7 @@
                   <!-- Middle Section: Role & Status Badges -->
                   <div class="flex items-center gap-2 flex-wrap lg:flex-nowrap">
                     <!-- Role Badge -->
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide shadow-sm"
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wide shadow-sm"
                           [ngClass]="{
                             'bg-gradient-to-r from-purple-500 to-pink-500 text-white': user.role === 'admin',
                             'bg-gradient-to-r from-blue-500 to-indigo-500 text-white': user.role === 'user',
@@ -136,14 +136,14 @@
                     
                     <!-- Paused Badge -->
                     <span *ngIf="user.status === 'paused'" 
-                          class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-lg text-xs font-bold uppercase tracking-wide shadow-sm animate-pulse">
+                          class="inline-flex items-center gap-1 px-2.5 py-1 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-lg text-xs font-bold uppercase tracking-wide shadow-sm animate-pulse">
                       <mat-icon class="!text-sm">pause_circle</mat-icon>
                       Paused
                     </span>
                     
                     <!-- Join Date -->
-                    <div class="hidden xl:flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 text-gray-600 rounded-lg text-xs font-medium">
-                      <mat-icon class="!text-base text-indigo-500">event</mat-icon>
+                    <div class="hidden xl:flex items-center gap-1 px-2.5 py-1 bg-gray-50 text-gray-600 rounded-lg text-xs font-medium">
+                      <mat-icon class="!text-sm text-indigo-500">event</mat-icon>
                       <span>{{ user.created_at | date:'mediumDate' }}</span>
                     </div>
                   </div>
@@ -157,33 +157,33 @@
                       <button *ngIf="user.status !== 'paused'" 
                               mat-icon-button 
                               (click)="pauseUser(user)" 
-                              class="!w-9 !h-9 sm:!w-10 sm:!h-10 !rounded-lg bg-orange-50 text-orange-600 hover:bg-orange-100 hover:scale-110 transition-all duration-200 shadow-sm hover:shadow-md"
+                              class="!w-8 !h-8 !rounded-lg bg-orange-50 text-orange-600 hover:bg-orange-100 hover:scale-110 transition-all duration-200 shadow-sm hover:shadow-md"
                               matTooltip="Pause User">
-                        <mat-icon class="!text-lg sm:!text-xl">pause_circle</mat-icon>
+                        <mat-icon class="!text-base">pause_circle</mat-icon>
                       </button>
                       
                       <button *ngIf="user.status === 'paused'" 
                               mat-icon-button 
                               (click)="resumeUser(user)" 
-                              class="!w-9 !h-9 sm:!w-10 sm:!h-10 !rounded-lg bg-green-50 text-green-600 hover:bg-green-100 hover:scale-110 transition-all duration-200 shadow-sm hover:shadow-md"
+                              class="!w-8 !h-8 !rounded-lg bg-green-50 text-green-600 hover:bg-green-100 hover:scale-110 transition-all duration-200 shadow-sm hover:shadow-md"
                               matTooltip="Resume User">
-                        <mat-icon class="!text-lg sm:!text-xl">play_circle</mat-icon>
+                        <mat-icon class="!text-base">play_circle</mat-icon>
                       </button>
                       
                       <!-- Delete Button -->
                       <button mat-icon-button 
                               (click)="deleteUser(user)" 
-                              class="!w-9 !h-9 sm:!w-10 sm:!h-10 !rounded-lg bg-red-50 text-red-600 hover:bg-red-100 hover:scale-110 transition-all duration-200 shadow-sm hover:shadow-md"
+                              class="!w-8 !h-8 !rounded-lg bg-red-50 text-red-600 hover:bg-red-100 hover:scale-110 transition-all duration-200 shadow-sm hover:shadow-md"
                               matTooltip="Delete User">
-                        <mat-icon class="!text-lg sm:!text-xl">delete</mat-icon>
+                        <mat-icon class="!text-base">delete</mat-icon>
                       </button>
                     </div>
                   </div>
                 </div>
                 
                 <!-- Mobile Join Date -->
-                <div class="xl:hidden flex items-center gap-1.5 mt-3 pt-3 border-t border-gray-100 text-xs text-gray-600">
-                  <mat-icon class="!text-base text-indigo-500">event</mat-icon>
+                <div class="xl:hidden flex items-center gap-1 mt-2 pt-2 border-t border-gray-100 text-xs text-gray-600">
+                  <mat-icon class="!text-sm text-indigo-500">event</mat-icon>
                   <span class="font-medium">Joined {{ user.created_at | date:'mediumDate' }}</span>
                 </div>
               </div>

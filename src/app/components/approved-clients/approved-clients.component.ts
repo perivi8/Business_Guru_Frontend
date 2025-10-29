@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { ClientService, Client } from '../../services/client.service';
-import { MatDialog } from '@angular/material/dialog';
-import { TransactionDialogComponent } from '../transaction/transaction-dialog.component';
 import { Router } from '@angular/router';
 
 export interface Transaction {
@@ -24,10 +22,21 @@ export class ApprovedClientsComponent implements OnInit {
   clientTransactions: Transaction[] = [];
   loading = false;
   error: string | null = null;
+  showTransactionModal = false;
+  isEditMode = false;
+  showDeleteConfirmation = false;
+  transactionToDelete: Transaction | null = null;
+  newTransaction: Transaction = {
+    id: '',
+    date: '',
+    orderId: '',
+    amount: 0,
+    clientId: '',
+    clientName: ''
+  };
 
   constructor(
     private clientService: ClientService,
-    private dialog: MatDialog,
     private router: Router
   ) {}
 
@@ -108,18 +117,99 @@ export class ApprovedClientsComponent implements OnInit {
   // Add a new transaction for the selected client
   addTransaction(): void {
     if (this.selectedClient) {
-      const dialogRef = this.dialog.open(TransactionDialogComponent, {
-        width: '600px',
-        data: { client: this.selectedClient }
-      });
-
-      dialogRef.afterClosed().subscribe(result => {
-        if (result) {
-          // Refresh transactions after adding new one
-          this.loadClientTransactions(this.selectedClient!._id);
-        }
-      });
+      this.showTransactionModal = true;
+      this.newTransaction = {
+        id: this.generateTransactionId(),
+        date: new Date().toISOString(),
+        orderId: '',
+        amount: 0,
+        clientId: this.selectedClient._id,
+        clientName: this.getClientDisplayName(this.selectedClient)
+      };
     }
+  }
+
+  // Close transaction modal
+  closeTransactionModal(): void {
+    this.showTransactionModal = false;
+    this.isEditMode = false;
+    this.resetTransactionForm();
+  }
+
+  // Save transaction
+  saveTransaction(): void {
+    if (this.isEditMode) {
+      this.updateTransaction();
+    } else {
+      if (this.selectedClient && this.newTransaction.orderId && this.newTransaction.amount > 0) {
+        const transactions = this.getClientTransactions(this.selectedClient._id);
+        transactions.push(this.newTransaction);
+        localStorage.setItem(`transactions_${this.selectedClient._id}`, JSON.stringify(transactions));
+        this.loadClientTransactions(this.selectedClient._id);
+        this.closeTransactionModal();
+      }
+    }
+  }
+
+  // Reset transaction form
+  resetTransactionForm(): void {
+    this.newTransaction = {
+      id: '',
+      date: '',
+      orderId: '',
+      amount: 0,
+      clientId: '',
+      clientName: ''
+    };
+  }
+
+  // Generate unique transaction ID
+  generateTransactionId(): string {
+    return 'TXN-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+  }
+
+  // Edit transaction
+  editTransaction(transaction: Transaction): void {
+    this.isEditMode = true;
+    this.showTransactionModal = true;
+    this.newTransaction = { ...transaction };
+  }
+
+  // Update transaction
+  updateTransaction(): void {
+    if (this.selectedClient && this.newTransaction.orderId && this.newTransaction.amount > 0) {
+      const transactions = this.getClientTransactions(this.selectedClient._id);
+      const index = transactions.findIndex(t => t.id === this.newTransaction.id);
+      if (index !== -1) {
+        transactions[index] = { ...this.newTransaction };
+        localStorage.setItem(`transactions_${this.selectedClient._id}`, JSON.stringify(transactions));
+        this.loadClientTransactions(this.selectedClient._id);
+        this.closeTransactionModal();
+      }
+    }
+  }
+
+  // Delete transaction (show confirmation)
+  deleteTransaction(transaction: Transaction): void {
+    this.transactionToDelete = transaction;
+    this.showDeleteConfirmation = true;
+  }
+
+  // Confirm delete transaction
+  confirmDeleteTransaction(): void {
+    if (this.selectedClient && this.transactionToDelete) {
+      const transactions = this.getClientTransactions(this.selectedClient._id);
+      const filteredTransactions = transactions.filter(t => t.id !== this.transactionToDelete!.id);
+      localStorage.setItem(`transactions_${this.selectedClient._id}`, JSON.stringify(filteredTransactions));
+      this.loadClientTransactions(this.selectedClient._id);
+      this.closeDeleteConfirmation();
+    }
+  }
+
+  // Close delete confirmation
+  closeDeleteConfirmation(): void {
+    this.showDeleteConfirmation = false;
+    this.transactionToDelete = null;
   }
 
   // Clear the selected client
