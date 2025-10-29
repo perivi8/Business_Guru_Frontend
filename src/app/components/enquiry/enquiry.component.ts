@@ -1297,7 +1297,15 @@ export class EnquiryComponent implements OnInit, OnDestroy {
 
   // Get status color for enquiry comments
   getStatusColor(comment: string): string {
-    if (this.interestComments.includes(comment)) {
+    // Light blue for "Will share doc"
+    if (comment === 'Will share Doc') {
+      return '#60a5fa'; // Light blue (blue-400)
+    }
+    // Darker blue for "Doc shared (yet to verify)"
+    else if (comment === 'Doc Shared(Yet to Verify)') {
+      return '#2563eb'; // Darker blue (blue-600)
+    }
+    else if (this.interestComments.includes(comment)) {
       return '#4caf50'; // Green
     } else if (this.notInterestedComments.includes(comment)) {
       return '#f44336'; // Red
@@ -1319,7 +1327,15 @@ export class EnquiryComponent implements OnInit, OnDestroy {
 
     const comment = enquiry.comments;
     
-    if (this.interestComments.includes(comment)) {
+    // Light blue for "Will share doc"
+    if (comment === 'Will share Doc') {
+      return 'bg-blue-50 hover:bg-blue-100 border-l-4 border-l-blue-400';
+    }
+    // Darker blue for "Doc shared (yet to verify)"
+    else if (comment === 'Doc Shared(Yet to Verify)') {
+      return 'bg-blue-100 hover:bg-blue-200 border-l-4 border-l-blue-600';
+    }
+    else if (this.interestComments.includes(comment)) {
       return 'bg-green-50 hover:bg-green-100 border-l-4 border-l-green-500';
     } else if (this.notInterestedComments.includes(comment) || 
                this.noGstComments.includes(comment) || 
@@ -1343,7 +1359,15 @@ export class EnquiryComponent implements OnInit, OnDestroy {
 
     const comment = enquiry.comments;
     
-    if (this.interestComments.includes(comment)) {
+    // Light blue for "Will share doc"
+    if (comment === 'Will share Doc') {
+      return 'bg-blue-50/60 border-blue-400 hover:bg-blue-100/70';
+    }
+    // Darker blue for "Doc shared (yet to verify)"
+    else if (comment === 'Doc Shared(Yet to Verify)') {
+      return 'bg-blue-100/60 border-blue-600 hover:bg-blue-200/70';
+    }
+    else if (this.interestComments.includes(comment)) {
       return 'bg-green-50/60 border-green-500 hover:bg-green-100/70';
     } else if (this.notInterestedComments.includes(comment) || 
                this.noGstComments.includes(comment) || 

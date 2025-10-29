@@ -6,12 +6,12 @@
       cursor: pointer;
       
       &.row-interested {
-        background-color: rgb(240 253 244) !important;
+        background-color: rgb(187 247 208) !important; // More intense green (green-200)
         border-left: 4px solid rgb(34 197 94) !important;
         
         &:hover {
-          background-color: rgb(220 252 231) !important;
-          box-shadow: 0 2px 8px rgba(34, 197, 94, 0.15);
+          background-color: rgb(134 239 172) !important; // green-300
+          box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);
         }
         
         .mat-mdc-cell {
@@ -20,12 +20,12 @@
       }
       
       &.row-not-interested {
-        background-color: rgb(254 242 242) !important;
+        background-color: rgb(254 202 202) !important; // More intense red (red-200)
         border-left: 4px solid rgb(239 68 68) !important;
         
         &:hover {
-          background-color: rgb(254 226 226) !important;
-          box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15);
+          background-color: rgb(252 165 165) !important; // red-300
+          box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
         }
         
         .mat-mdc-cell {
@@ -34,12 +34,12 @@
       }
       
       &.row-hold {
-        background-color: rgb(255 247 237) !important;
+        background-color: rgb(254 215 170) !important; // More intense orange (orange-200)
         border-left: 4px solid rgb(249 115 22) !important;
         
         &:hover {
-          background-color: rgb(255 237 213) !important;
-          box-shadow: 0 2px 8px rgba(249, 115, 22, 0.15);
+          background-color: rgb(253 186 116) !important; // orange-300
+          box-shadow: 0 4px 12px rgba(249, 115, 22, 0.25);
         }
         
         .mat-mdc-cell {
@@ -48,12 +48,12 @@
       }
       
       &.row-pending {
-        background-color: rgb(254 252 232) !important;
+        background-color: rgb(254 240 138) !important; // More intense yellow (yellow-200)
         border-left: 4px solid rgb(234 179 8) !important;
         
         &:hover {
-          background-color: rgb(254 249 195) !important;
-          box-shadow: 0 2px 8px rgba(234, 179, 8, 0.15);
+          background-color: rgb(253 224 71) !important; // yellow-300
+          box-shadow: 0 4px 12px rgba(234, 179, 8, 0.25);
         }
         
         .mat-mdc-cell {
@@ -62,12 +62,12 @@
       }
       
       &.row-processing {
-        background-color: rgb(250 245 255) !important;
+        background-color: rgb(233 213 255) !important; // More intense purple (purple-200)
         border-left: 4px solid rgb(168 85 247) !important;
         
         &:hover {
-          background-color: rgb(243 232 255) !important;
-          box-shadow: 0 2px 8px rgba(168, 85, 247, 0.15);
+          background-color: rgb(216 180 254) !important; // purple-300
+          box-shadow: 0 4px 12px rgba(168, 85, 247, 0.25);
         }
         
         .mat-mdc-cell {
