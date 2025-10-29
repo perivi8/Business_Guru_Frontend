@@ -18,10 +18,16 @@ import { takeUntil, switchMap, debounceTime } from 'rxjs/operators';
 export class EnquiryComponent implements OnInit, OnDestroy {
   enquiries: Enquiry[] = [];
   filteredEnquiries: Enquiry[] = [];
+  paginatedEnquiries: Enquiry[] = []; // Paginated data for display
   displayedColumns: string[] = [
     'sno', 'date', 'owner_name', 'phone_number',
     'gst', 'business_name', 'staff', 'suggested_staff', 'comments', 'shortlist', 'actions'
   ];
+  
+  // Pagination properties
+  currentPage = 1;
+  pageSize = 50;
+  totalPages = 0;
   
   staffMembers: User[] = [];
   uniqueStaffMembers: string[] = [];
@@ -162,6 +168,9 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   isInterestDropdownOpen = false;
   isShortlistDropdownOpen = false;
   isSortDropdownOpen = false;
+  
+  // Expose Math to template
+  Math = Math;
 
   constructor(
     private fb: FormBuilder,
@@ -1247,6 +1256,82 @@ export class EnquiryComponent implements OnInit, OnDestroy {
       ...enquiry,
       sno: index + 1
     }));
+    
+    // Update pagination
+    this.updatePagination();
+  }
+  
+  updatePagination(): void {
+    // Calculate total pages
+    this.totalPages = Math.ceil(this.filteredEnquiries.length / this.pageSize);
+    
+    // Reset to page 1 if current page exceeds total pages
+    if (this.currentPage > this.totalPages && this.totalPages > 0) {
+      this.currentPage = 1;
+    }
+    
+    // Get paginated data
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    this.paginatedEnquiries = this.filteredEnquiries.slice(startIndex, endIndex);
+  }
+  
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.updatePagination();
+    }
+  }
+  
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updatePagination();
+    }
+  }
+  
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePagination();
+    }
+  }
+  
+  getPageNumbers(): number[] {
+    const pages: number[] = [];
+    const maxPagesToShow = 5;
+    
+    if (this.totalPages <= maxPagesToShow) {
+      // Show all pages if total is less than max
+      for (let i = 1; i <= this.totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Show pages around current page
+      let startPage = Math.max(1, this.currentPage - 2);
+      let endPage = Math.min(this.totalPages, this.currentPage + 2);
+      
+      // Adjust if at the beginning or end
+      if (this.currentPage <= 3) {
+        endPage = maxPagesToShow;
+      } else if (this.currentPage >= this.totalPages - 2) {
+        startPage = this.totalPages - maxPagesToShow + 1;
+      }
+      
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+    }
+    
+    return pages;
+  }
+  
+  getSerialNumber(index: number): number {
+    return (this.currentPage - 1) * this.pageSize + index + 1;
+  }
+  
+  getMaxDisplayed(): number {
+    return Math.min(this.currentPage * this.pageSize, this.filteredEnquiries.length);
   }
 
   applySorting(enquiries: Enquiry[]): Enquiry[] {
@@ -1418,11 +1503,6 @@ export class EnquiryComponent implements OnInit, OnDestroy {
       case 'unknown': return 'Unknown';
       default: return 'All';
     }
-  }
-
-  // Get serial number for display
-  getSerialNumber(index: number): number {
-    return index + 1;
   }
 
   // Get status icon for enquiry comments

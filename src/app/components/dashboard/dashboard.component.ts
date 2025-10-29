@@ -12,7 +12,14 @@ import { UserService } from '../../services/user.service';
 export class DashboardComponent implements OnInit {
   currentUser: User | null = null;
   clients: Client[] = [];
+  paginatedClients: Client[] = []; // Paginated data for display
   loading = true;
+  
+  // Pagination properties
+  currentPage = 1;
+  pageSize = 10;
+  totalPages = 0;
+  
   stats = {
     totalClients: 0,
     todayNewClients: 0,
@@ -51,6 +58,7 @@ export class DashboardComponent implements OnInit {
       next: (response) => {
         this.clients = response.clients || [];
         this.calculateStats();
+        this.updatePagination();
         this.loading = false;
       },
       error: (error) => {
@@ -70,6 +78,7 @@ export class DashboardComponent implements OnInit {
         // Set empty array to prevent undefined issues
         this.clients = [];
         this.calculateStats();
+        this.updatePagination();
         this.loading = false;
       }
     });
@@ -218,6 +227,7 @@ export class DashboardComponent implements OnInit {
         next: () => {
           this.clients = this.clients.filter(c => c._id !== client._id);
           this.calculateStats();
+          this.updatePagination();
           alert('Client deleted successfully');
         },
         error: (error) => {
@@ -238,6 +248,7 @@ export class DashboardComponent implements OnInit {
             this.clients[clientIndex] = response.client;
             // Recalculate stats since loan status might have changed
             this.calculateStats();
+            this.updatePagination();
           }
           
           console.log('Client data refreshed in dashboard for ID:', clientId);
@@ -249,5 +260,78 @@ export class DashboardComponent implements OnInit {
         this.loadClients();
       }
     });
+  }
+
+  updatePagination(): void {
+    // Calculate total pages
+    this.totalPages = Math.ceil(this.clients.length / this.pageSize);
+    
+    // Reset to page 1 if current page exceeds total pages
+    if (this.currentPage > this.totalPages && this.totalPages > 0) {
+      this.currentPage = 1;
+    }
+    
+    // Get paginated data
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    this.paginatedClients = this.clients.slice(startIndex, endIndex);
+  }
+  
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.updatePagination();
+    }
+  }
+  
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updatePagination();
+    }
+  }
+  
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePagination();
+    }
+  }
+  
+  getPageNumbers(): number[] {
+    const pages: number[] = [];
+    const maxPagesToShow = 5;
+    
+    if (this.totalPages <= maxPagesToShow) {
+      // Show all pages if total is less than max
+      for (let i = 1; i <= this.totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Show pages around current page
+      let startPage = Math.max(1, this.currentPage - 2);
+      let endPage = Math.min(this.totalPages, this.currentPage + 2);
+      
+      // Adjust if at the beginning or end
+      if (this.currentPage <= 3) {
+        endPage = maxPagesToShow;
+      } else if (this.currentPage >= this.totalPages - 2) {
+        startPage = this.totalPages - maxPagesToShow + 1;
+      }
+      
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+    }
+    
+    return pages;
+  }
+  
+  getSerialNumber(index: number): number {
+    return (this.currentPage - 1) * this.pageSize + index + 1;
+  }
+  
+  getMaxDisplayed(): number {
+    return Math.min(this.currentPage * this.pageSize, this.clients.length);
   }
 }

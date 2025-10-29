@@ -18,10 +18,17 @@ import { takeUntil } from 'rxjs/operators';
 export class ClientsComponent implements OnInit, OnDestroy {
   clients: Client[] = [];
   filteredClients: Client[] = [];
+  paginatedClients: Client[] = []; // Paginated data for display
   users: User[] = [];
   uniqueStaffMembers: any[] = [];
   loading = true;
   error = '';
+  
+  // Pagination properties
+  currentPage = 1;
+  pageSize = 50;
+  totalPages = 0;
+  
   searchTerm = '';
   statusFilter = 'all';
   staffFilter = 'all';
@@ -298,6 +305,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
     });
     
     this.applySorting();
+    this.updatePagination();
   }
 
   applySorting(): void {
@@ -323,6 +331,79 @@ export class ClientsComponent implements OnInit, OnDestroy {
           return 0;
       }
     });
+  }
+
+  updatePagination(): void {
+    // Calculate total pages
+    this.totalPages = Math.ceil(this.filteredClients.length / this.pageSize);
+    
+    // Reset to page 1 if current page exceeds total pages
+    if (this.currentPage > this.totalPages && this.totalPages > 0) {
+      this.currentPage = 1;
+    }
+    
+    // Get paginated data
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    this.paginatedClients = this.filteredClients.slice(startIndex, endIndex);
+  }
+  
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.updatePagination();
+    }
+  }
+  
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updatePagination();
+    }
+  }
+  
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePagination();
+    }
+  }
+  
+  getPageNumbers(): number[] {
+    const pages: number[] = [];
+    const maxPagesToShow = 5;
+    
+    if (this.totalPages <= maxPagesToShow) {
+      // Show all pages if total is less than max
+      for (let i = 1; i <= this.totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Show pages around current page
+      let startPage = Math.max(1, this.currentPage - 2);
+      let endPage = Math.min(this.totalPages, this.currentPage + 2);
+      
+      // Adjust if at the beginning or end
+      if (this.currentPage <= 3) {
+        endPage = maxPagesToShow;
+      } else if (this.currentPage >= this.totalPages - 2) {
+        startPage = this.totalPages - maxPagesToShow + 1;
+      }
+      
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+    }
+    
+    return pages;
+  }
+  
+  getSerialNumber(index: number): number {
+    return (this.currentPage - 1) * this.pageSize + index + 1;
+  }
+  
+  getMaxDisplayed(): number {
+    return Math.min(this.currentPage * this.pageSize, this.filteredClients.length);
   }
 
   onSearchChange(): void {
@@ -625,10 +706,6 @@ export class ClientsComponent implements OnInit, OnDestroy {
   getDisplayedColumns(): string[] {
     // Include 'comments' column for both admin and regular users
     return this.isAdmin() ? this.adminDisplayedColumns : this.userDisplayedColumns;
-  }
-
-  getSerialNumber(index: number): number {
-    return index + 1;
   }
 
   editClient(client: Client): void {
