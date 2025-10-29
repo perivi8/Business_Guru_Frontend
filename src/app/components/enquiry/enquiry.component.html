@@ -1579,3 +1579,36 @@
       </div>
     </div>
   </div>
+
+  <!-- Delete Enquiry Confirmation Dialog -->
+  <div *ngIf="showDeleteDialog" class="delete-modal-overlay" (click)="cancelDelete()">
+    <div class="delete-modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-icon">
+        <mat-icon>delete_forever</mat-icon>
+      </div>
+      <h2>Delete Enquiry</h2>
+      <div class="enquiry-name-display">
+        <mat-icon>person</mat-icon>
+        <span>{{ selectedEnquiryForDelete?.wati_name }}</span>
+      </div>
+      <p class="warning-message">Are you sure you want to delete this enquiry?</p>
+      <div class="warning-list">
+        <div class="warning-item">
+          <mat-icon>close</mat-icon>
+          <span>Enquiry will be permanently removed</span>
+        </div>
+        <div class="warning-item">
+          <mat-icon>close</mat-icon>
+          <span>This action cannot be undone</span>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="cancel-button" (click)="cancelDelete()" [disabled]="isDeleting">Cancel</button>
+        <button class="delete-button" (click)="confirmDelete()" [disabled]="isDeleting">
+          <mat-spinner *ngIf="isDeleting" diameter="18"></mat-spinner>
+          <mat-icon *ngIf="!isDeleting">delete_forever</mat-icon>
+          <span>{{ isDeleting ? 'Deleting...' : 'Delete' }}</span>
+        </button>
+      </div>
+    </div>
+  </div>

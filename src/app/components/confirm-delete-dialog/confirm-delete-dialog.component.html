@@ -1,83 +1,46 @@
-<!-- Modern Confirm Delete Dialog -->
-<div class="w-full max-w-md mx-auto">
+<div class="delete-modal-content">
+  <!-- Warning Icon -->
+  <div class="modal-icon">
+    <mat-icon>warning</mat-icon>
+  </div>
   
-  <!-- Dialog Header -->
-  <div class="bg-gradient-to-r from-red-500 to-pink-600 px-6 py-4 rounded-t-2xl">
-    <div class="flex items-center gap-4">
-      <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center animate-pulse">
-        <mat-icon class="text-white text-2xl">warning</mat-icon>
-      </div>
-      <div class="text-white">
-        <h2 class="text-xl font-bold">Confirm Deletion</h2>
-        <p class="text-red-100 text-sm">This action requires confirmation</p>
-      </div>
+  <!-- Title -->
+  <h2>Delete Client</h2>
+  
+  <!-- Client Name -->
+  <div class="client-name-display">
+    <mat-icon>person</mat-icon>
+    <span>{{ data.name }}</span>
+  </div>
+  
+  <!-- Warning Message -->
+  <p class="warning-message">Are you sure you want to delete this client?</p>
+  
+  <!-- Warning List -->
+  <div class="warning-list">
+    <div class="warning-item">
+      <mat-icon>close</mat-icon>
+      <span>All client data will be permanently removed</span>
+    </div>
+    <div class="warning-item">
+      <mat-icon>close</mat-icon>
+      <span>All associated documents will be deleted</span>
+    </div>
+    <div class="warning-item">
+      <mat-icon>close</mat-icon>
+      <span>This action cannot be undone</span>
     </div>
   </div>
-
-  <!-- Dialog Content -->
-  <div class="bg-white px-6 py-6 space-y-6">
-    
-    <!-- Question Section -->
-    <div class="flex items-center gap-3 p-4 bg-orange-50 border border-orange-200 rounded-lg">
-      <mat-icon class="text-orange-600 text-xl">help_outline</mat-icon>
-      <span class="text-gray-800 font-medium">Are you sure you want to delete this client?</span>
-    </div>
-    
-    <!-- Client Info Card -->
-    <div class="bg-gradient-to-br from-gray-50 to-white p-4 rounded-xl border border-gray-200 shadow-sm">
-      <div class="flex items-center gap-4">
-        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg">
-          <mat-icon class="text-white">person</mat-icon>
-        </div>
-        <div>
-          <div class="font-semibold text-gray-900 text-lg">{{ data.name }}</div>
-          <div class="text-gray-500 text-sm">Client Record</div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Warning Section -->
-    <div class="bg-red-50 border border-red-200 rounded-xl p-4">
-      <div class="flex items-center gap-3 mb-3">
-        <mat-icon class="text-red-600 text-xl">error</mat-icon>
-        <span class="font-semibold text-red-800">Permanent Action Warning</span>
-      </div>
-      <div class="space-y-2">
-        <div class="flex items-center gap-3 text-red-700">
-          <mat-icon class="text-red-500 text-sm">close</mat-icon>
-          <span class="text-sm">All client data will be permanently removed</span>
-        </div>
-        <div class="flex items-center gap-3 text-red-700">
-          <mat-icon class="text-red-500 text-sm">close</mat-icon>
-          <span class="text-sm">All associated documents will be deleted</span>
-        </div>
-        <div class="flex items-center gap-3 text-red-700">
-          <mat-icon class="text-red-500 text-sm">close</mat-icon>
-          <span class="text-sm">This action cannot be undone</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Dialog Actions -->
-  <div class="bg-gray-50 px-6 py-4 rounded-b-2xl border-t border-gray-200">
-    <div class="flex gap-3 justify-end">
-      <button mat-stroked-button 
-              (click)="onCancel()" 
-              [disabled]="isLoading"
-              class="border-2 border-gray-300 text-gray-700 hover:bg-gray-100 disabled:opacity-50 px-6 py-2 rounded-lg transition-all duration-200 flex items-center gap-2">
-        <mat-icon class="text-lg">close</mat-icon>
-        Cancel
-      </button>
-      
-      <button mat-raised-button 
-              (click)="onConfirm()" 
-              [disabled]="isLoading"
-              class="bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white disabled:opacity-50 disabled:cursor-not-allowed px-6 py-2 rounded-lg transition-all duration-200 transform hover:scale-105 disabled:transform-none flex items-center gap-2 min-w-[160px] justify-center">
-        <mat-spinner *ngIf="isLoading" diameter="20" class="mr-1"></mat-spinner>
-        <mat-icon *ngIf="!isLoading" class="text-lg">delete_forever</mat-icon>
-        <span>{{ isLoading ? 'Deleting...' : 'Delete Permanently' }}</span>
-      </button>
-    </div>
+  
+  <!-- Action Buttons -->
+  <div class="modal-actions">
+    <button class="cancel-button" (click)="onCancel()" [disabled]="isLoading">
+      Cancel
+    </button>
+    <button class="delete-button" (click)="onConfirm()" [disabled]="isLoading">
+      <mat-spinner *ngIf="isLoading" diameter="18"></mat-spinner>
+      <mat-icon *ngIf="!isLoading">delete_forever</mat-icon>
+      <span>{{ isLoading ? 'Deleting...' : 'Delete' }}</span>
+    </button>
   </div>
 </div>

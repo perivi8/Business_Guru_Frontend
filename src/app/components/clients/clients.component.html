@@ -959,3 +959,36 @@
     <span class="text-gray-700">Mark Processing</span>
   </button>
 </div>
+
+<!-- Status Update Confirmation Dialog -->
+<div *ngIf="showStatusUpdateDialog" class="status-update-modal-overlay" (click)="cancelStatusUpdate()">
+  <div class="status-update-modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-icon">
+      <mat-icon>edit_note</mat-icon>
+    </div>
+    <h2>Update Client Status</h2>
+    <div class="client-name-display">
+      <mat-icon>person</mat-icon>
+      <span>{{ selectedClientForStatus?.legal_name || selectedClientForStatus?.user_name }}</span>
+    </div>
+    <div class="status-badge-display">
+      <span class="status-label">New Status:</span>
+      <span class="status-value" [ngClass]="{
+        'status-interested': selectedStatus === 'interested',
+        'status-not-interested': selectedStatus === 'not_interested',
+        'status-pending': selectedStatus === 'pending',
+        'status-hold': selectedStatus === 'hold',
+        'status-processing': selectedStatus === 'processing'
+      }">{{ selectedStatus | titlecase }}</span>
+    </div>
+    <p class="confirmation-message">Are you sure you want to update the status for this client?</p>
+    <div class="modal-actions">
+      <button class="cancel-button" (click)="cancelStatusUpdate()" [disabled]="isUpdatingStatus">Cancel</button>
+      <button class="update-button" (click)="confirmStatusUpdate()" [disabled]="isUpdatingStatus">
+        <mat-spinner *ngIf="isUpdatingStatus" diameter="18"></mat-spinner>
+        <mat-icon *ngIf="!isUpdatingStatus">check_circle</mat-icon>
+        <span>{{ isUpdatingStatus ? 'Updating...' : 'Update Status' }}</span>
+      </button>
+    </div>
+  </div>
+</div>

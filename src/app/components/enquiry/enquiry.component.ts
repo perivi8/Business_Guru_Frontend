@@ -28,6 +28,7 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   registrationForm: FormGroup;
   showRegistrationForm = false;
   loading = false;
+  isBackgroundRefresh = false; // Track if this is a background refresh
   searchTerm = '';
   
   // Filter and Sort Properties
@@ -50,6 +51,11 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   
   // Duplicate mobile number message tracking
   showDuplicateMessage = false;
+
+  // Delete confirmation dialog
+  showDeleteDialog = false;
+  selectedEnquiryForDelete: Enquiry | null = null;
+  isDeleting = false;
 
   // Cleanup subject for subscriptions
   private destroy$ = new Subject<void>();
@@ -201,7 +207,7 @@ export class EnquiryComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         // Only refresh if not currently editing to avoid disrupting user
         if (!this.showRegistrationForm) {
-          this.loadEnquiries();
+          this.loadEnquiries(true); // Pass true for silent background refresh
         }
       });
     
@@ -318,8 +324,13 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     return form;
   }
 
-  loadEnquiries(): void {
-    this.loading = true;
+  loadEnquiries(isBackgroundRefresh: boolean = false): void {
+    // Only show loading indicator if this is not a background refresh
+    if (!isBackgroundRefresh) {
+      this.loading = true;
+    }
+    this.isBackgroundRefresh = isBackgroundRefresh;
+    
     this.enquiryService.getAllEnquiries()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -331,11 +342,16 @@ export class EnquiryComponent implements OnInit, OnDestroy {
           this.extractUniqueStaffMembers();
           this.applyFilters();
           this.loading = false;
+          this.isBackgroundRefresh = false;
         },
         error: (error) => {
           console.error('Error loading enquiries:', error);
-          this.snackBar.open('Error loading enquiries', 'Close', { duration: 3000 });
+          // Only show error snackbar if this is not a background refresh
+          if (!isBackgroundRefresh) {
+            this.snackBar.open('Error loading enquiries', 'Close', { duration: 3000 });
+          }
           this.loading = false;
+          this.isBackgroundRefresh = false;
         }
       });
   }
@@ -1674,31 +1690,50 @@ export class EnquiryComponent implements OnInit, OnDestroy {
 
   // Delete enquiry method
   deleteEnquiry(enquiry: Enquiry): void {
-    if (confirm(`Are you sure you want to delete the enquiry for ${enquiry.wati_name}?`)) {
-      if (enquiry._id) {
-        this.enquiryService.deleteEnquiry(enquiry._id)
-          .pipe(takeUntil(this.destroy$))
-          .subscribe({
-            next: () => {
-              // Remove from local arrays
-              this.enquiries = this.enquiries.filter(e => e._id !== enquiry._id);
-              this.applyFilters();
-              
-              this.snackBar.open('Enquiry deleted successfully', 'Close', {
-                duration: 3000,
-                panelClass: ['success-snackbar']
-              });
-            },
-            error: (error) => {
-              console.error('Error deleting enquiry:', error);
-              this.snackBar.open('Error deleting enquiry', 'Close', {
-                duration: 3000,
-                panelClass: ['error-snackbar']
-              });
-            }
-          });
-      }
+    this.selectedEnquiryForDelete = enquiry;
+    this.showDeleteDialog = true;
+  }
+
+  confirmDelete(): void {
+    if (!this.selectedEnquiryForDelete || !this.selectedEnquiryForDelete._id) {
+      return;
     }
+
+    this.isDeleting = true;
+    this.enquiryService.deleteEnquiry(this.selectedEnquiryForDelete._id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          // Remove from local arrays
+          this.enquiries = this.enquiries.filter(e => e._id !== this.selectedEnquiryForDelete!._id);
+          this.applyFilters();
+          
+          this.isDeleting = false;
+          this.showDeleteDialog = false;
+          this.selectedEnquiryForDelete = null;
+          
+          this.snackBar.open('Enquiry deleted successfully', 'Close', {
+            duration: 3000,
+            panelClass: ['success-snackbar']
+          });
+        },
+        error: (error) => {
+          console.error('Error deleting enquiry:', error);
+          this.isDeleting = false;
+          this.showDeleteDialog = false;
+          this.selectedEnquiryForDelete = null;
+          
+          this.snackBar.open('Error deleting enquiry', 'Close', {
+            duration: 3000,
+            panelClass: ['error-snackbar']
+          });
+        }
+      });
+  }
+
+  cancelDelete(): void {
+    this.showDeleteDialog = false;
+    this.selectedEnquiryForDelete = null;
   }
 
   hideAddForm(): void {

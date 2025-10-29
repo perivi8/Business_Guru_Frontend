@@ -14,6 +14,17 @@ export class TeamComponent implements OnInit {
   error = '';
   currentUser: any;
   isAdmin = false;
+  
+  // Dialog states
+  showDeleteDialog = false;
+  showPauseDialog = false;
+  showResumeDialog = false;
+  selectedUser: User | null = null;
+  
+  // Loading states
+  isDeleting = false;
+  isPausing = false;
+  isResuming = false;
 
   constructor(
     private userService: UserService,
@@ -53,20 +64,33 @@ export class TeamComponent implements OnInit {
       return;
     }
 
-    const confirmDelete = confirm(`Are you sure you want to delete ${user.username}? This action cannot be undone.`);
+    this.showDeleteDialog = true;
+    this.selectedUser = user;
+  }
+
+  confirmDelete(): void {
+    if (!this.selectedUser) return;
     
-    if (confirmDelete) {
-      this.authService.deleteUser(user._id).subscribe({
-        next: (response) => {
-          // Remove user from local array
-          this.users = this.users.filter(u => u._id !== user._id);
-          alert(`${user.username} has been deleted successfully.`);
-        },
-        error: (error) => {
-          alert(`Failed to delete user: ${error.error?.error || 'Unknown error'}`);
-        }
-      });
-    }
+    this.isDeleting = true;
+    this.authService.deleteUser(this.selectedUser._id).subscribe({
+      next: (response) => {
+        // Remove user from local array
+        this.users = this.users.filter(u => u._id !== this.selectedUser!._id);
+        this.isDeleting = false;
+        this.showDeleteDialog = false;
+        this.selectedUser = null;
+      },
+      error: (error) => {
+        this.isDeleting = false;
+        this.showDeleteDialog = false;
+        this.selectedUser = null;
+      }
+    });
+  }
+
+  cancelDelete(): void {
+    this.showDeleteDialog = false;
+    this.selectedUser = null;
   }
 
   pauseUser(user: User): void {
@@ -74,23 +98,36 @@ export class TeamComponent implements OnInit {
       return;
     }
 
-    const confirmPause = confirm(`Are you sure you want to pause ${user.username}? They will not appear in staff selection dropdowns.`);
+    this.showPauseDialog = true;
+    this.selectedUser = user;
+  }
+
+  confirmPause(): void {
+    if (!this.selectedUser) return;
     
-    if (confirmPause) {
-      this.authService.pauseUser(user._id).subscribe({
-        next: (response) => {
-          // Update user status in local array
-          const userIndex = this.users.findIndex(u => u._id === user._id);
-          if (userIndex !== -1) {
-            this.users[userIndex] = {...this.users[userIndex], status: 'paused'};
-          }
-          alert(`${user.username} has been paused successfully.`);
-        },
-        error: (error) => {
-          alert(`Failed to pause user: ${error.error?.error || 'Unknown error'}`);
+    this.isPausing = true;
+    this.authService.pauseUser(this.selectedUser._id).subscribe({
+      next: (response) => {
+        // Update user status in local array
+        const userIndex = this.users.findIndex(u => u._id === this.selectedUser!._id);
+        if (userIndex !== -1) {
+          this.users[userIndex] = {...this.users[userIndex], status: 'paused'};
         }
-      });
-    }
+        this.isPausing = false;
+        this.showPauseDialog = false;
+        this.selectedUser = null;
+      },
+      error: (error) => {
+        this.isPausing = false;
+        this.showPauseDialog = false;
+        this.selectedUser = null;
+      }
+    });
+  }
+
+  cancelPause(): void {
+    this.showPauseDialog = false;
+    this.selectedUser = null;
   }
 
   resumeUser(user: User): void {
@@ -98,23 +135,36 @@ export class TeamComponent implements OnInit {
       return;
     }
 
-    const confirmResume = confirm(`Are you sure you want to resume ${user.username}? They will appear in staff selection dropdowns again.`);
+    this.showResumeDialog = true;
+    this.selectedUser = user;
+  }
+
+  confirmResume(): void {
+    if (!this.selectedUser) return;
     
-    if (confirmResume) {
-      this.authService.resumeUser(user._id).subscribe({
-        next: (response) => {
-          // Update user status in local array
-          const userIndex = this.users.findIndex(u => u._id === user._id);
-          if (userIndex !== -1) {
-            this.users[userIndex] = {...this.users[userIndex], status: 'active'};
-          }
-          alert(`${user.username} has been resumed successfully.`);
-        },
-        error: (error) => {
-          alert(`Failed to resume user: ${error.error?.error || 'Unknown error'}`);
+    this.isResuming = true;
+    this.authService.resumeUser(this.selectedUser._id).subscribe({
+      next: (response) => {
+        // Update user status in local array
+        const userIndex = this.users.findIndex(u => u._id === this.selectedUser!._id);
+        if (userIndex !== -1) {
+          this.users[userIndex] = {...this.users[userIndex], status: 'active'};
         }
-      });
-    }
+        this.isResuming = false;
+        this.showResumeDialog = false;
+        this.selectedUser = null;
+      },
+      error: (error) => {
+        this.isResuming = false;
+        this.showResumeDialog = false;
+        this.selectedUser = null;
+      }
+    });
+  }
+
+  cancelResume(): void {
+    this.showResumeDialog = false;
+    this.selectedUser = null;
   }
 
   goBack(): void {

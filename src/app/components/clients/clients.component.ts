@@ -33,6 +33,13 @@ export class ClientsComponent implements OnInit, OnDestroy {
   updatingClientId: string | null = null;
   viewMode: 'table' | 'card' = 'table';
   private destroy$ = new Subject<void>();
+  
+  // Status update dialog
+  showStatusUpdateDialog = false;
+  selectedClientForStatus: Client | null = null;
+  selectedStatus: string = '';
+  statusFeedback: string = '';
+  isUpdatingStatus = false;
 
   // Custom dropdown state management
   openDropdownId: string | null = null;
@@ -641,28 +648,54 @@ export class ClientsComponent implements OnInit, OnDestroy {
   }
 
   updateClientStatus(client: Client, status: string): void {
-    const feedback = prompt(`Enter feedback for ${client.legal_name || client.user_name}:`);
-    if (feedback !== null) {
-      // Set loading state for this specific client
-      this.updatingClientId = client._id;
-      
-      this.clientService.updateClientStatus(client._id, status, feedback).subscribe({
-        next: () => {
-          client.status = status;
-          client.feedback = feedback;
-          this.updatingClientId = null; // Clear loading state
-          this.snackBar.open('Client status updated successfully', 'Close', {
-            duration: 3000
-          });
-        },
-        error: (error) => {
-          this.updatingClientId = null; // Clear loading state on error
-          this.snackBar.open('Failed to update client status', 'Close', {
-            duration: 3000
-          });
-        }
-      });
+    this.selectedClientForStatus = client;
+    this.selectedStatus = status;
+    this.statusFeedback = '';
+    this.showStatusUpdateDialog = true;
+  }
+
+  confirmStatusUpdate(): void {
+    if (!this.selectedClientForStatus) {
+      return;
     }
+
+    this.isUpdatingStatus = true;
+    this.updatingClientId = this.selectedClientForStatus._id;
+    
+    this.clientService.updateClientStatus(
+      this.selectedClientForStatus._id, 
+      this.selectedStatus, 
+      '' // Empty feedback
+    ).subscribe({
+      next: () => {
+        if (this.selectedClientForStatus) {
+          this.selectedClientForStatus.status = this.selectedStatus;
+        }
+        this.updatingClientId = null;
+        this.isUpdatingStatus = false;
+        this.showStatusUpdateDialog = false;
+        this.selectedClientForStatus = null;
+        this.snackBar.open('Client status updated successfully', 'Close', {
+          duration: 3000
+        });
+      },
+      error: (error) => {
+        this.updatingClientId = null;
+        this.isUpdatingStatus = false;
+        this.showStatusUpdateDialog = false;
+        this.selectedClientForStatus = null;
+        this.snackBar.open('Failed to update client status', 'Close', {
+          duration: 3000
+        });
+      }
+    });
+  }
+
+  cancelStatusUpdate(): void {
+    this.showStatusUpdateDialog = false;
+    this.selectedClientForStatus = null;
+    this.selectedStatus = '';
+    this.statusFeedback = '';
   }
 
   deleteClient(client: Client): void {

@@ -1,76 +1,73 @@
 <!-- Modern Transaction Management Page -->
-<div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Page Header -->
-    <div class="mb-8">
-      <div class="flex items-center gap-4 mb-4">
-        <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-lg">
-          <mat-icon class="text-white text-2xl">account_balance</mat-icon>
-        </div>
-        <div>
-          <h1 class="text-3xl font-bold text-gray-900">Transaction Management</h1>
-          <p class="text-gray-600">Manage transactions for approved clients</p>
-        </div>
-      </div>
-    </div>
-
+<div class="transaction-page">
+  <div class="page-container">
     <!-- Loading State -->
-    <div *ngIf="loading" class="flex flex-col items-center justify-center py-12">
-      <mat-spinner diameter="40" class="mb-4"></mat-spinner>
-      <p class="text-gray-600 font-medium">Loading approved clients...</p>
+    <div *ngIf="loading" class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Loading approved clients...</p>
     </div>
 
     <!-- No Clients State -->
-    <div *ngIf="!loading && approvedClients.length === 0" class="flex flex-col items-center justify-center py-16">
-      <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6">
-        <mat-icon class="text-gray-400 text-6xl">verified_user</mat-icon>
+    <div *ngIf="!loading && approvedClients.length === 0" class="empty-state">
+      <div class="empty-icon">
+        <mat-icon>verified_user</mat-icon>
       </div>
-      <h3 class="text-xl font-semibold text-gray-900 mb-2">No Approved Clients Found</h3>
-      <p class="text-gray-600 text-center max-w-md">There are currently no clients with approved loan status. Approved clients will appear here for transaction management.</p>
+      <h3>No Approved Clients Found</h3>
+      <p>There are currently no clients with approved loan status. Approved clients will appear here for transaction management.</p>
     </div>
 
-    <!-- Approved Clients Grid -->
-    <div *ngIf="!loading && approvedClients.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div *ngFor="let client of approvedClients" 
-           class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group"
-           (click)="navigateToApprovedClients()">
-        <div class="p-6">
-          <!-- Client Header -->
-          <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-3">
-              <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                {{ getClientInitial(client) }}
-              </div>
-              <div class="flex-1">
-                <h3 class="font-bold text-gray-900 text-lg group-hover:text-green-600 transition-colors">{{ getClientDisplayName(client) }}</h3>
-                <p class="text-sm text-gray-600">{{ getClientBusinessName(client) }}</p>
-              </div>
+    <!-- Approved Clients List -->
+    <div *ngIf="!loading && approvedClients.length > 0" class="clients-list-container">
+      <div class="list-header">
+        <h2>Approved Clients ({{ approvedClients.length }})</h2>
+      </div>
+      
+      <div class="clients-list">
+        <div *ngFor="let client of approvedClients" 
+             class="client-list-item"
+             (click)="navigateToApprovedClients()">
+          
+          <!-- Client Avatar -->
+          <div class="client-avatar">
+            <div class="avatar-circle" [style.background]="getAvatarColor(client)">
+              {{ getClientInitial(client) }}
             </div>
-            <mat-icon class="text-gray-400 group-hover:text-green-500 transition-colors">chevron_right</mat-icon>
           </div>
 
-          <!-- Approved Status -->
-          <div class="flex items-center gap-2 mb-4">
-            <mat-icon class="text-green-500 text-sm">verified</mat-icon>
-            <span class="text-sm text-green-600 font-medium">Approved</span>
+          <!-- Client Info -->
+          <div class="client-info">
+            <div class="client-name-row">
+              <div class="client-name">{{ getClientDisplayName(client) }}</div>
+              <div class="client-status">
+                <mat-icon>verified</mat-icon>
+                <span>Approved</span>
+              </div>
+            </div>
+            <div class="client-business">{{ getClientBusinessName(client) }}</div>
           </div>
 
-          <!-- Transaction Summary -->
-          <div class="grid grid-cols-2 gap-4">
-            <div class="bg-blue-50 rounded-lg p-3 border border-blue-200">
-              <div class="flex items-center gap-2 mb-1">
-                <mat-icon class="text-blue-500 text-sm">receipt</mat-icon>
-                <span class="text-xs text-gray-600">Transactions</span>
+          <!-- Transaction Stats -->
+          <div class="transaction-stats">
+            <div class="stat-item">
+              <mat-icon>receipt</mat-icon>
+              <div class="stat-content">
+                <span class="stat-label">Transactions</span>
+                <span class="stat-value">{{ getTotalTransactionCount(client._id) }}</span>
               </div>
-              <p class="text-2xl font-bold text-blue-600">{{ getTotalTransactionCount(client._id) }}</p>
             </div>
-            <div class="bg-green-50 rounded-lg p-3 border border-green-200">
-              <div class="flex items-center gap-2 mb-1">
-                <mat-icon class="text-green-500 text-sm">currency_rupee</mat-icon>
-                <span class="text-xs text-gray-600">Total Amount</span>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <mat-icon>currency_rupee</mat-icon>
+              <div class="stat-content">
+                <span class="stat-label">Total Amount</span>
+                <span class="stat-value">₹{{ getTotalTransactionAmount(client._id) }}</span>
               </div>
-              <p class="text-2xl font-bold text-green-600">₹{{ getTotalTransactionAmount(client._id) }}</p>
             </div>
+          </div>
+
+          <!-- Action Arrow -->
+          <div class="client-action">
+            <mat-icon>chevron_right</mat-icon>
           </div>
         </div>
       </div>

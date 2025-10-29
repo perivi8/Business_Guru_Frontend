@@ -46,6 +46,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   showBackButton = false;
   currentRoute = '';
   isMobileMenuOpen = false;
+  showLogoutModal = false;
 
   // Routes that should show back button
   private backButtonRoutes = [
@@ -1086,5 +1087,65 @@ export class NavbarComponent implements OnInit, OnDestroy {
   // Get pending users count
   get pendingUsersCount(): number {
     return this.pendingUsers.length;
+  }
+
+  // Color mapping for each letter A-Z (26 unique colors) for profile avatars
+  private letterColors: { [key: string]: string } = {
+    'A': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', // Purple
+    'B': 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', // Pink-Red
+    'C': 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', // Blue
+    'D': 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', // Green-Cyan
+    'E': 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', // Pink-Yellow
+    'F': 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)', // Cyan-Purple
+    'G': 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)', // Mint-Pink
+    'H': 'linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%)', // Orange-Pink
+    'I': 'linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)', // Pink-Blue
+    'J': 'linear-gradient(135deg, #fdcbf1 0%, #e6dee9 100%)', // Light Pink
+    'K': 'linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)', // Light Blue
+    'L': 'linear-gradient(135deg, #d299c2 0%, #fef9d7 100%)', // Purple-Yellow
+    'M': 'linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)', // Cyan-Blue
+    'N': 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)', // Yellow-Orange
+    'O': 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)', // Peach
+    'P': 'linear-gradient(135deg, #ff6e7f 0%, #bfe9ff 100%)', // Red-Blue
+    'Q': 'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)', // Purple-Blue
+    'R': 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', // Magenta
+    'S': 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', // Sky Blue
+    'T': 'linear-gradient(135deg, #c471f5 0%, #fa71cd 100%)', // Purple-Pink
+    'U': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', // Indigo
+    'V': 'linear-gradient(135deg, #f77062 0%, #fe5196 100%)', // Coral-Pink
+    'W': 'linear-gradient(135deg, #fccb90 0%, #d57eeb 100%)', // Orange-Purple
+    'X': 'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)', // Lavender
+    'Y': 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)', // Cream-Peach
+    'Z': 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)'  // Aqua-Pink
+  };
+
+  // Get user initial for avatar
+  getUserInitial(): string {
+    if (this.currentUser && this.currentUser.username) {
+      return this.currentUser.username.charAt(0).toUpperCase();
+    }
+    return 'U';
+  }
+
+  // Get avatar color based on username first letter
+  getAvatarColor(): string {
+    const initial = this.getUserInitial();
+    return this.letterColors[initial] || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+  }
+
+  // Show logout confirmation modal
+  showLogoutConfirmation(): void {
+    this.showLogoutModal = true;
+  }
+
+  // Cancel logout and close modal
+  cancelLogout(): void {
+    this.showLogoutModal = false;
+  }
+
+  // Confirm logout and proceed
+  confirmLogout(): void {
+    this.showLogoutModal = false;
+    this.logout();
   }
 }
