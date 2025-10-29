@@ -28,14 +28,14 @@ export class AppComponent implements OnInit {
     
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
-        // Hide navbar on login and register pages
-        this.showNavbar = !['/login', '/register'].includes(event.url) && this.authService.isAuthenticated();
+        // Hide navbar on login, register, and forgot-password pages
+        this.showNavbar = !['/login', '/register', '/forgot-password'].includes(event.url) && this.authService.isAuthenticated();
         
         // Scroll to top on route navigation
         window.scrollTo(0, 0);
         
         // Handle automatic redirection for authenticated users
-        if (this.authService.isAuthenticated() && ['/login', '/register'].includes(event.url)) {
+        if (this.authService.isAuthenticated() && ['/login', '/register', '/forgot-password'].includes(event.url)) {
           const user = this.authService.currentUserValue;
           if (user?.role === 'admin') {
             this.router.navigate(['/admin-dashboard']);

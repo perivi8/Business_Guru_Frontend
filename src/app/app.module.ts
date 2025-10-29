@@ -56,6 +56,7 @@ import { WhatsappLinkComponent } from './components/whatsapp-link/whatsapp-link.
 import { WhatsappPublicComponent } from './components/whatsapp-public/whatsapp-public.component';
 import { WhatsappTestComponent } from './components/whatsapp-test/whatsapp-test.component';
 import { PublicEnquiryComponent } from './components/public-enquiry/public-enquiry.component';
+import { EnquiryExistsComponent } from './components/enquiry-exists/enquiry-exists.component';
 
 // Transaction Components
 import { TransactionComponent } from './components/transaction/transaction.component';
@@ -93,6 +94,7 @@ import { SocketService } from './services/socket.service';
     WhatsappPublicComponent,
     WhatsappTestComponent,
     PublicEnquiryComponent,
+    EnquiryExistsComponent,
     TransactionComponent,
     TransactionDialogComponent,
     ApprovedClientsComponent

@@ -255,12 +255,14 @@
 
     <!-- Success Message -->
     <div *ngIf="submitted && success" class="w-full max-w-md lg:max-w-md">
-      <div class="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
+      <div class="bg-slate-700 rounded-2xl shadow-2xl border border-slate-600 overflow-hidden">
         <!-- Success Header -->
-        <div class="bg-gradient-to-r from-green-500 to-emerald-600 px-4 md:px-8 py-4 md:py-6 text-white">
+        <div class="bg-gradient-to-r from-teal-400 to-blue-500 px-4 md:px-8 py-4 md:py-6 text-white">
           <div class="flex items-center gap-2 md:gap-3">
             <div class="w-10 h-10 md:w-12 md:h-12 bg-white/20 rounded-full flex items-center justify-center">
-              <mat-icon class="text-2xl md:text-3xl">check_circle</mat-icon>
+              <svg class="h-6 w-6 md:h-8 md:w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
             </div>
             <h2 class="text-lg md:text-2xl font-bold">Enquiry Submitted Successfully!</h2>
           </div>
@@ -269,66 +271,81 @@
       <!-- Success Content -->
       <div class="p-4 md:p-8 text-center">
         <div class="space-y-4 mb-8">
-          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg class="h-10 w-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="w-16 h-16 bg-teal-400/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="h-10 w-10 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
           </div>
-          <h3 class="text-xl font-semibold text-gray-900">Thank you for choosing Business GURU!</h3>
-          <p class="text-gray-600">Our team will contact you within 24 hours.</p>
-          <p class="text-gray-600 font-medium">Thank you!</p>
+          <h3 class="text-xl font-semibold text-white">Thank you for choosing Business GURU!</h3>
+          <p class="text-gray-300">Our team will contact you within 24 hours.</p>
+          <p class="text-gray-300 font-medium">Thank you!</p>
         </div>
         
-        <button 
-          (click)="closeWindow()" 
-          class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
-          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
-          Close
-        </button>
+        <div class="flex flex-col gap-3">
+          <button 
+            (click)="openWhatsApp()" 
+            class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+            </svg>
+            Contact us on WhatsApp
+          </button>
+          <button 
+            (click)="resetForm()" 
+            class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-teal-400 to-blue-500 hover:from-teal-500 hover:to-blue-600 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to Form
+          </button>
+        </div>
       </div>
     </div>
 
-    <!-- Mobile Number Already Exists Modal -->
-    <div *ngIf="submitted && !success && mobileExists" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden">
-        <!-- Header -->
-        <div class="bg-gradient-to-r from-red-500 to-orange-500 text-white px-6 py-4 text-center">
-          <div class="flex items-center justify-center gap-2">
-            <mat-icon class="text-xl">warning</mat-icon>
-            <span class="font-semibold text-lg">Mobile Number Already Registered</span>
+
+    <!-- Mobile Number Already Exists Message -->
+    <div *ngIf="submitted && !success && mobileExists" class="w-full max-w-md lg:max-w-md">
+      <div class="bg-slate-700 rounded-2xl shadow-2xl border border-slate-600 overflow-hidden">
+        <!-- Warning Header -->
+        <div class="bg-gradient-to-r from-orange-400 to-red-500 px-4 md:px-8 py-4 md:py-6 text-white">
+          <div class="flex items-center gap-2 md:gap-3">
+            <div class="w-10 h-10 md:w-12 md:h-12 bg-white/20 rounded-full flex items-center justify-center">
+              <svg class="h-6 w-6 md:h-8 md:w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+              </svg>
+            </div>
+            <h2 class="text-lg md:text-2xl font-bold">Mobile Number Already Registered</h2>
           </div>
         </div>
-        
-        <!-- Content -->
-        <div class="p-8 text-center bg-white">
-          <!-- Icon -->
-          <div class="mb-6">
-            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto">
-              <mat-icon class="text-3xl text-red-500">error_outline</mat-icon>
+      
+        <!-- Warning Content -->
+        <div class="p-4 md:p-8 text-center">
+          <div class="space-y-4 mb-8">
+            <div class="w-16 h-16 bg-orange-400/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="h-10 w-10 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+              </svg>
             </div>
+            <h3 class="text-xl font-semibold text-white">Mobile number already registered</h3>
+            <p class="text-gray-300">Try to register with another mobile number or our team will contact you in 24 hours.</p>
+            <p class="text-gray-300 font-medium">Thank You!</p>
           </div>
           
-          <!-- Message Text -->
-          <div class="mb-6">
-            <h3 class="text-xl font-bold text-gray-900 mb-4">Mobile number already registered.</h3>
-            <p class="text-gray-700 text-base mb-4">Try to register with another mobile number or our team will contact you in 24 hours.</p>
-            <p class="text-lg font-semibold text-gray-900">Thank You!</p>
-          </div>
-          
-          <!-- Action Buttons -->
-          <div class="space-y-3">
+          <div class="flex flex-col gap-3">
             <button 
               (click)="resetForm()" 
-              class="w-full px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2">
-              <mat-icon class="text-lg">refresh</mat-icon>
+              class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-teal-400 to-blue-500 hover:from-teal-500 hover:to-blue-600 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
               Try with Different Number
             </button>
             <button 
               (click)="openWhatsApp()" 
-              class="w-full px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors duration-200 flex items-center justify-center gap-2">
-              <mat-icon class="text-lg">chat</mat-icon>
+              class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+              </svg>
               Contact us on WhatsApp
             </button>
           </div>
@@ -337,46 +354,50 @@
     </div>
 
     <!-- General Error Message -->
-    <div *ngIf="submitted && !success && !mobileExists" class="w-full max-w-md lg:max-w-md bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
-      <!-- Error Header -->
-      <div class="bg-gradient-to-r from-red-500 to-pink-600 px-4 md:px-8 py-4 md:py-6 text-white">
-        <div class="flex items-center gap-2 md:gap-3">
-          <div class="w-10 h-10 md:w-12 md:h-12 bg-white/20 rounded-full flex items-center justify-center">
-            <mat-icon class="text-2xl md:text-3xl">error</mat-icon>
+    <div *ngIf="submitted && !success && !mobileExists" class="w-full max-w-md lg:max-w-md">
+      <div class="bg-slate-700 rounded-2xl shadow-2xl border border-slate-600 overflow-hidden">
+        <!-- Error Header -->
+        <div class="bg-gradient-to-r from-red-500 to-pink-600 px-4 md:px-8 py-4 md:py-6 text-white">
+          <div class="flex items-center gap-2 md:gap-3">
+            <div class="w-10 h-10 md:w-12 md:h-12 bg-white/20 rounded-full flex items-center justify-center">
+              <svg class="h-6 w-6 md:h-8 md:w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </div>
+            <h2 class="text-lg md:text-2xl font-bold">Submission Failed</h2>
           </div>
-          <h2 class="text-lg md:text-2xl font-bold">Submission Failed</h2>
-        </div>
-      </div>
-      
-      <!-- Error Content -->
-      <div class="p-4 md:p-8 text-center">
-        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <mat-icon class="text-red-600 text-4xl">error_outline</mat-icon>
         </div>
         
-        <div class="space-y-4 mb-8">
-          <p class="text-lg font-semibold text-gray-900">Sorry, there was an error submitting your enquiry.</p>
-          <p class="text-gray-600">Please try again later.</p>
-        </div>
-        
-        <!-- Error Action Buttons -->
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <button 
-            (click)="resetForm()" 
-            class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
-            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-            </svg>
-            Try Again
-          </button>
-          <button 
-            (click)="closeWindow()" 
-            class="inline-flex items-center justify-center gap-2 border-2 border-gray-400 text-gray-600 hover:bg-gray-50 hover:border-gray-500 font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105">
-            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-            Close
-          </button>
+        <!-- Error Content -->
+        <div class="p-4 md:p-8 text-center">
+          <div class="space-y-4 mb-8">
+            <div class="w-16 h-16 bg-red-400/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="h-10 w-10 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-white">Sorry, there was an error</h3>
+            <p class="text-gray-300">Please try again later.</p>
+          </div>
+          
+          <div class="flex flex-col gap-3">
+            <button 
+              (click)="resetForm()" 
+              class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-teal-400 to-blue-500 hover:from-teal-500 hover:to-blue-600 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
+              Try Again
+            </button>
+            <button 
+              (click)="closeWindow()" 
+              class="inline-flex items-center justify-center gap-2 bg-slate-600 hover:bg-slate-500 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+              Close
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -18,6 +18,7 @@ import { WhatsappLinkComponent } from './components/whatsapp-link/whatsapp-link.
 import { WhatsappPublicComponent } from './components/whatsapp-public/whatsapp-public.component';
 import { WhatsappTestComponent } from './components/whatsapp-test/whatsapp-test.component';
 import { PublicEnquiryComponent } from './components/public-enquiry/public-enquiry.component';
+import { EnquiryExistsComponent } from './components/enquiry-exists/enquiry-exists.component';
 import { AuthGuard } from './guards/auth.guard';
 import { AdminGuard } from './guards/admin.guard';
 
@@ -96,6 +97,10 @@ const routes: Routes = [
   { 
     path: 'new-enquiry', 
     component: PublicEnquiryComponent 
+  },
+  { 
+    path: 'enquiry-exists', 
+    component: EnquiryExistsComponent 
   },
   // Add the transaction route for admin users
   { 

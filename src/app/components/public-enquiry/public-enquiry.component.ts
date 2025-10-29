@@ -1,6 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -24,7 +25,10 @@ export class PublicEnquiryComponent implements OnInit, OnDestroy {
 
   constructor(
     private fb: FormBuilder,
-    private http: HttpClient
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone,
+    private router: Router
   ) {
     this.enquiryForm = this.createForm();
   }
@@ -246,26 +250,29 @@ export class PublicEnquiryComponent implements OnInit, OnDestroy {
             },
             error: (error) => {
               console.error('Error submitting enquiry:', error);
+              console.error('Error status:', error.status);
+              console.error('Error response:', error.error);
               this.submitting = false;
               
-              // Check if mobile number already exists
-              if (error.status === 409 && error.error?.error === 'mobile_exists') {
-                this.mobileExists = true;
-                this.submitted = true;
-                this.success = false;
+              // Check if mobile number already exists - check multiple possible error formats
+              const isMobileExists = error.status === 409 || 
+                                     error.error?.error === 'mobile_exists' ||
+                                     error.error?.message?.includes('already exists') ||
+                                     error.error?.message?.includes('Mobile number already registered');
+              
+              if (isMobileExists) {
+                console.log('Mobile number already exists - redirecting to enquiry-exists page');
                 
-                // Check WhatsApp sending status
-                this.whatsappSent = error.error?.whatsapp_sent || false;
-                this.whatsappError = error.error?.whatsapp_error || '';
-                
-                if (this.whatsappSent) {
-                  console.log('WhatsApp message sent automatically to existing user');
-                } else if (this.whatsappError) {
-                  console.log('WhatsApp message failed:', this.whatsappError);
-                }
+                // Navigate to the enquiry-exists page
+                this.router.navigate(['/enquiry-exists']);
               } else {
-                this.submitted = true;
-                this.success = false;
+                console.log('General error - showing error message');
+                this.ngZone.run(() => {
+                  this.submitted = true;
+                  this.success = false;
+                  this.mobileExists = false;
+                  this.submitting = false;
+                });
               }
             }
           });
@@ -288,6 +295,8 @@ export class PublicEnquiryComponent implements OnInit, OnDestroy {
     this.mobileExists = false;
     this.whatsappSent = false;
     this.whatsappError = '';
+    this.selectedFile = null;
+    this.businessDocumentUrl = '';
   }
 
   openWhatsApp(): void {
