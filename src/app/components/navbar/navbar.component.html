@@ -1,5 +1,5 @@
 <!-- Modern Navbar with Tailwind CSS -->
-<nav class="bg-gradient-to-r from-primary to-primary-dark shadow-lg border-b border-primary-light fixed top-0 left-0 right-0 z-50">
+<nav class="bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-700 shadow-2xl border-b border-white/20 fixed top-0 left-0 right-0 z-50 backdrop-blur-lg">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16">
       <!-- Left Section: Back Button + Brand -->
@@ -262,7 +262,7 @@
   <!-- Mobile Navigation Menu - Outside Container -->
   <div *ngIf="isMobileMenuOpen && currentUser" 
        [@slideInOut]
-       class="md:hidden mobile-menu bg-gradient-to-r from-primary to-primary-dark border-t border-white/10 w-full shadow-lg">
+       class="md:hidden mobile-menu bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-700 border-t border-white/10 w-full shadow-lg">
     <div class="max-w-7xl mx-auto px-4 py-3 space-y-2">
       <!-- Admin Mobile Navigation -->
       <ng-container *ngIf="isAdmin()">
