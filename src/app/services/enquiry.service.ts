@@ -221,4 +221,17 @@ export class EnquiryService {
       })
     );
   }
+
+  // Round-robin staff assignment
+  getNextStaffRoundRobin(): Observable<any> {
+    const roundRobinUrl = `${this.apiUrl}/next-staff-round-robin`;
+    return this.http.get<any>(roundRobinUrl, { 
+      headers: this.getHeaders() 
+    }).pipe(
+      catchError((error: any) => {
+        console.error('Error getting next staff for round-robin:', error);
+        return throwError(() => error);
+      })
+    );
+  }
 }

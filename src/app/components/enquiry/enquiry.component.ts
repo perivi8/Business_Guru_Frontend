@@ -46,7 +46,7 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   hasFormChanges = false; // Track if form has been modified
   private formChangeSubscription: any = null; // Track form change subscription
   private isDropdownInteraction = false; // Track if user is interacting with dropdowns
-  private originalStaffValue: string | null = null; // Track original staff assignment to lock dropdown
+  originalStaffValue: string | null = null; // Track original staff assignment to lock dropdown (public for template access)
   
   // Duplicate mobile number message tracking
   showDuplicateMessage = false;
@@ -367,17 +367,17 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   extractUniqueStaffMembers(): void {
     const staffSet = new Set<string>();
     
-    // Add staff from enquiries
+    // Add staff from enquiries (exclude Admin)
     this.enquiries.forEach(enquiry => {
-      if (enquiry.staff) {
+      if (enquiry.staff && enquiry.staff !== 'Admin') {
         staffSet.add(enquiry.staff);
       }
     });
     
-    // Add staff from staff members list
+    // Add staff from staff members list (exclude Admin role users)
     this.staffMembers.forEach(staff => {
       const staffName = staff.username || staff.email;
-      if (staffName) {
+      if (staffName && staffName !== 'Admin' && staff.role !== 'admin') {
         staffSet.add(staffName);
       }
     });
@@ -385,8 +385,8 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     // Convert to array and sort with priority order
     const staffArray = Array.from(staffSet);
     
-    // Define priority staff members (shown at top)
-    const priorityStaff = ['Public Form', 'Admin'];
+    // Define priority staff members (shown at top) - removed Admin
+    const priorityStaff = ['Public Form'];
     
     // Separate priority and regular staff
     const priority: string[] = [];
@@ -424,22 +424,29 @@ export class EnquiryComponent implements OnInit, OnDestroy {
 
   /**
    * Get regular staff members (excluding admins) for round-robin assignment
+   * Excludes: Admin role, Public Form, WhatsApp Web, WhatsApp Bot, WhatsApp Form
    */
   getRegularStaffMembers(): string[] {
     // Get only regular staff members (role: 'user', exclude admins)
     const regularStaffMembers = this.staffMembers
       .filter(staff => staff.role === 'user') // Only regular staff, not admins
       .map(staff => staff.username || staff.email)
-      .filter(name => name && name !== 'Public Form' && name !== 'WhatsApp Bot' && name !== 'WhatsApp Form');
+      .filter(name => name && 
+              name !== 'Admin' && 
+              name !== 'Public Form' && 
+              name !== 'WhatsApp Web' && 
+              name !== 'WhatsApp Bot' && 
+              name !== 'WhatsApp Form');
     
-    // Sort staff members alphabetically to ensure consistent order
-    return regularStaffMembers.sort();
+    // Sort staff members alphabetically (case-insensitive) to ensure consistent order
+    return regularStaffMembers.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
   }
 
   /**
    * Get the next staff member in round-robin sequence
    * This implements the round-robin logic where staff are assigned in order:
-   * perivi, dinesh, perivi, dinesh, etc. (only regular staff, not admins)
+   * Staff members are sorted alphabetically and assigned based on who has the least assignments
+   * Excludes: Admin, Public Form, WhatsApp Web
    */
   getNextStaffMember(): string | null {
     const regularStaffMembers = this.getRegularStaffMembers();
@@ -448,17 +455,38 @@ export class EnquiryComponent implements OnInit, OnDestroy {
       return null;
     }
     
-    // Count how many enquiries have real staff assigned (not special forms)
-    const assignedEnquiries = this.enquiries.filter(enquiry => 
-      enquiry.staff && 
-      enquiry.staff !== 'Public Form' && 
-      enquiry.staff !== 'WhatsApp Bot' && 
-      enquiry.staff !== 'WhatsApp Form'
-    );
+    // Count assignments for each staff member
+    const staffAssignmentCount: { [key: string]: number } = {};
     
-    // Determine the next staff member based on round-robin sequence
-    const nextIndex = assignedEnquiries.length % regularStaffMembers.length;
-    return regularStaffMembers[nextIndex] || null;
+    // Initialize counts for all staff members
+    regularStaffMembers.forEach(staff => {
+      staffAssignmentCount[staff] = 0;
+    });
+    
+    // Count how many enquiries have been assigned to each staff member (not special forms)
+    this.enquiries.forEach(enquiry => {
+      if (enquiry.staff && 
+          enquiry.staff !== 'Public Form' && 
+          enquiry.staff !== 'WhatsApp Bot' && 
+          enquiry.staff !== 'WhatsApp Form' &&
+          enquiry.staff !== 'WhatsApp Web' &&
+          enquiry.staff !== 'Admin' &&
+          staffAssignmentCount.hasOwnProperty(enquiry.staff)) {
+        staffAssignmentCount[enquiry.staff]++;
+      }
+    });
+    
+    // Find staff member with minimum assignments
+    // If there's a tie, alphabetical order determines priority (already sorted)
+    let minAssignments = Math.min(...Object.values(staffAssignmentCount));
+    
+    for (const staff of regularStaffMembers) {
+      if (staffAssignmentCount[staff] === minAssignments) {
+        return staff;
+      }
+    }
+    
+    return regularStaffMembers[0] || null;
   }
 
   /**
@@ -1295,8 +1323,34 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Get display comment - filter out default form comments
+  getDisplayComment(comment: string | null | undefined): string {
+    // If no comment or empty, return 'No Comments'
+    if (!comment || comment.trim() === '') {
+      return 'No Comments';
+    }
+    
+    // Filter out default FinGrowth form comments
+    const defaultComments = [
+      'New Enquiry - FinGrowth Form',
+      'New Public Enquiry',
+      'New Enquiry'
+    ];
+    
+    if (defaultComments.includes(comment)) {
+      return 'No Comments';
+    }
+    
+    return comment;
+  }
+
   // Get status color for enquiry comments
   getStatusColor(comment: string): string {
+    // If it's 'No Comments', return gray
+    if (comment === 'No Comments') {
+      return '#9ca3af'; // Gray-400
+    }
+    
     // Light blue for "Will share doc"
     if (comment === 'Will share Doc') {
       return '#60a5fa'; // Light blue (blue-400)
@@ -2174,6 +2228,67 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.isDropdownInteraction = false;
     }, 500);
+  }
+
+  /**
+   * Check if a staff member is the next in round-robin sequence
+   * Used to highlight the suggested staff in the dropdown
+   */
+  isNextStaffInRoundRobin(staff: string): boolean {
+    // Only apply round-robin logic when editing enquiries from special forms
+    if (!this.isEditMode) {
+      return false;
+    }
+    
+    // Check if original staff was a special form
+    const isFromSpecialForm = this.originalStaffValue === 'Public Form' || 
+                              this.originalStaffValue === 'WhatsApp Form' || 
+                              this.originalStaffValue === 'WhatsApp Bot' || 
+                              this.originalStaffValue === 'WhatsApp Web' || 
+                              !this.originalStaffValue;
+    
+    if (!isFromSpecialForm) {
+      return false;
+    }
+    
+    // Get the next staff member in round-robin
+    const nextStaff = this.getNextStaffMember();
+    
+    return staff === nextStaff;
+  }
+
+  /**
+   * Check if staff selection should be blocked (disabled)
+   * Blocks all staff except the next one in round-robin sequence
+   */
+  shouldBlockStaffSelection(staff: string): boolean {
+    // Only block when editing enquiries from special forms
+    if (!this.isEditMode) {
+      return false;
+    }
+    
+    // Check if original staff was a special form
+    const isFromSpecialForm = this.originalStaffValue === 'Public Form' || 
+                              this.originalStaffValue === 'WhatsApp Form' || 
+                              this.originalStaffValue === 'WhatsApp Bot' || 
+                              this.originalStaffValue === 'WhatsApp Web' || 
+                              !this.originalStaffValue;
+    
+    if (!isFromSpecialForm) {
+      return false;
+    }
+    
+    // Don't block special forms (Public Form, WhatsApp Form, etc.)
+    if (staff === 'Public Form' || staff === 'WhatsApp Form' || 
+        staff === 'WhatsApp Bot' || staff === 'WhatsApp Web' || staff === 'Admin') {
+      return false;
+    }
+    
+    // Get the next staff member in round-robin
+    const nextStaff = this.getNextStaffMember();
+    
+    // Block if this is NOT the next staff member
+    return staff !== nextStaff;
   }
 
   // Comments dropdown methods

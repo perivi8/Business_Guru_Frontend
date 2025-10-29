@@ -657,10 +657,10 @@
                 <th mat-header-cell *matHeaderCellDef class="text-left font-semibold text-gray-800 bg-gradient-to-r from-gray-50 to-gray-100 px-4 py-3 text-sm">Comments</th>
                 <td mat-cell *matCellDef="let enquiry" class="px-4 py-3">
                   <span class="inline-block px-3 py-1 text-xs rounded-full font-medium whitespace-nowrap truncate max-w-[150px]"
-                        [style.background-color]="getStatusColor(enquiry.comments)"
+                        [style.background-color]="getStatusColor(getDisplayComment(enquiry.comments))"
                         [style.color]="'white'"
-                        [title]="enquiry.comments || 'No Comment'">
-                    {{ enquiry.comments || 'No Comment' }}
+                        [title]="getDisplayComment(enquiry.comments)">
+                    {{ getDisplayComment(enquiry.comments) }}
                   </span>
                 </td>
               </ng-container>
@@ -1411,11 +1411,38 @@
                     </button>
                     <button type="button"
                             *ngFor="let staff of uniqueStaffMembers"
-                            (click)="selectStaff(staff)"
-                            class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
+                            (click)="shouldBlockStaffSelection(staff) ? null : selectStaff(staff)"
+                            [disabled]="shouldBlockStaffSelection(staff)"
+                            class="w-full text-left px-3 py-2 text-sm focus:outline-none border-b border-gray-100 last:border-b-0 flex items-center justify-between"
                             [class.bg-blue-50]="registrationForm.get('staff')?.value === staff"
-                            [class.text-blue-600]="registrationForm.get('staff')?.value === staff">
-                      {{ staff }}
+                            [class.text-blue-600]="registrationForm.get('staff')?.value === staff"
+                            [class.bg-gradient-to-r]="isNextStaffInRoundRobin(staff)"
+                            [class.from-green-50]="isNextStaffInRoundRobin(staff)"
+                            [class.to-emerald-50]="isNextStaffInRoundRobin(staff)"
+                            [class.border-l-4]="isNextStaffInRoundRobin(staff)"
+                            [class.border-green-500]="isNextStaffInRoundRobin(staff)"
+                            [class.font-semibold]="isNextStaffInRoundRobin(staff)"
+                            [class.text-green-700]="isNextStaffInRoundRobin(staff)"
+                            [class.hover:bg-green-100]="isNextStaffInRoundRobin(staff) && !shouldBlockStaffSelection(staff)"
+                            [class.bg-gray-100]="shouldBlockStaffSelection(staff)"
+                            [class.text-gray-400]="shouldBlockStaffSelection(staff)"
+                            [class.cursor-not-allowed]="shouldBlockStaffSelection(staff)"
+                            [class.opacity-50]="shouldBlockStaffSelection(staff)"
+                            [class.hover:bg-gray-50]="!shouldBlockStaffSelection(staff) && !isNextStaffInRoundRobin(staff)">
+                      <span class="flex items-center gap-2">
+                        <svg *ngIf="isNextStaffInRoundRobin(staff)" class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        {{ staff }}
+                      </span>
+                      <span *ngIf="isNextStaffInRoundRobin(staff)" class="text-xs bg-green-200 text-green-800 px-2 py-0.5 rounded-full">
+                        Next
+                      </span>
+                      <span *ngIf="shouldBlockStaffSelection(staff)" class="text-xs">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                        </svg>
+                      </span>
                     </button>
                   </div>
                 </div>
