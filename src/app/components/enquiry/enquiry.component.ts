@@ -210,8 +210,8 @@ export class EnquiryComponent implements OnInit, OnDestroy {
       this.checkExistingClients();
     });
     
-    // Auto-refresh enquiries every 30 seconds to show new submissions from public form
-    timer(30000, 30000)
+    // Auto-refresh enquiries every 5 seconds to show new submissions from public form
+    timer(5000, 5000)
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
         // Only refresh if not currently editing to avoid disrupting user

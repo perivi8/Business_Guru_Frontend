@@ -1,19 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService, User } from '../../services/auth.service';
 import { ClientService, Client } from '../../services/client.service';
 import { UserService } from '../../services/user.service';
+import { Subject, timer } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   currentUser: User | null = null;
   clients: Client[] = [];
   paginatedClients: Client[] = []; // Paginated data for display
   loading = true;
+  private destroy$ = new Subject<void>();
   
   // Pagination properties
   currentPage = 1;
@@ -50,6 +53,25 @@ export class DashboardComponent implements OnInit {
         this.refreshClientData(clientId);
       }
     });
+    
+    // Auto-refresh recent clients every 5 seconds
+    timer(5000, 5000)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        // Silently refresh without showing loading indicator
+        this.clientService.getMyClients().subscribe({
+          next: (response) => {
+            if (response && response.clients) {
+              this.clients = response.clients;
+              this.calculateStats();
+              this.updatePagination();
+            }
+          },
+          error: (error) => {
+            console.error('Auto-refresh failed:', error);
+          }
+        });
+      });
   }
 
   loadClients(): void {
@@ -333,5 +355,10 @@ export class DashboardComponent implements OnInit {
   
   getMaxDisplayed(): number {
     return Math.min(this.currentPage * this.pageSize, this.clients.length);
+  }
+  
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

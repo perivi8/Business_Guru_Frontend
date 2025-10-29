@@ -94,8 +94,8 @@ export class ClientsComponent implements OnInit, OnDestroy {
       }
     });
     
-    // Auto-refresh clients every 30 seconds
-    timer(30000, 30000)
+    // Auto-refresh clients every 5 seconds
+    timer(5000, 5000)
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
         // Silently refresh without showing loading indicator
