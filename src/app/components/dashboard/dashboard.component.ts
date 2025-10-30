@@ -54,8 +54,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
     });
     
-    // Auto-refresh recent clients every 5 seconds
-    timer(5000, 5000)
+    // Auto-refresh recent clients every 1 second
+    timer(1000, 1000)
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
         // Silently refresh without showing loading indicator
