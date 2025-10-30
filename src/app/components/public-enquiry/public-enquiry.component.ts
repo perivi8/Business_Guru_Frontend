@@ -22,6 +22,7 @@ export class PublicEnquiryComponent implements OnInit, OnDestroy {
   selectedFile: File | null = null;
   fileUploading = false;
   businessDocumentUrl = '';
+  loanAmountInWords = '';
 
   constructor(
     private fb: FormBuilder,
@@ -40,11 +41,11 @@ export class PublicEnquiryComponent implements OnInit, OnDestroy {
 
   createForm(): FormGroup {
     return this.fb.group({
-      business_name: ['', [Validators.required]],
-      owner_name: ['', [Validators.required]],
+      business_name: ['', [Validators.required, Validators.minLength(3)]],
+      owner_name: ['', [Validators.required, Validators.minLength(3)]],
       email_address: ['', [Validators.required, Validators.email]],
-      phone_number: ['', [Validators.required]],
-      loan_amount: ['', [Validators.required]],
+      phone_number: ['', [Validators.required, this.mobileValidator.bind(this)]],
+      loan_amount: ['', [Validators.required, this.loanAmountValidator.bind(this)]],
       loan_purpose: ['', [Validators.required]],
       loan_purpose_other: [''],
       annual_revenue: ['', [Validators.required]]
@@ -97,6 +98,78 @@ export class PublicEnquiryComponent implements OnInit, OnDestroy {
     return null;
   }
 
+  // Custom validator for loan amount: must be between 500000 and 50000000
+  loanAmountValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) {
+      return null; // Let required validator handle empty values
+    }
+    
+    const amount = parseFloat(control.value.toString().replace(/,/g, ''));
+    
+    if (isNaN(amount)) {
+      return { invalidAmount: true };
+    }
+    
+    if (amount < 500000) {
+      return { minAmount: { requiredMin: 500000, actualAmount: amount } };
+    }
+    
+    if (amount > 50000000) {
+      return { maxAmount: { requiredMax: 50000000, actualAmount: amount } };
+    }
+    
+    return null;
+  }
+
+  // Convert number to Indian currency words
+  convertToIndianCurrency(amount: number): string {
+    if (!amount || amount === 0) {
+      return '';
+    }
+
+    const crore = Math.floor(amount / 10000000);
+    const lakh = Math.floor((amount % 10000000) / 100000);
+    const thousand = Math.floor((amount % 100000) / 1000);
+    const hundred = Math.floor((amount % 1000) / 100);
+    const remainder = amount % 100;
+
+    let result = '';
+
+    if (crore > 0) {
+      result += crore + (crore === 1 ? ' Crore ' : ' Crores ');
+    }
+
+    if (lakh > 0) {
+      result += lakh + (lakh === 1 ? ' Lakh ' : ' Lakhs ');
+    }
+
+    if (thousand > 0) {
+      result += thousand + ' Thousand ';
+    }
+
+    if (hundred > 0) {
+      result += hundred + ' Hundred ';
+    }
+
+    if (remainder > 0) {
+      result += remainder + (remainder === 1 ? ' Rupee' : ' Rupees');
+    }
+
+    return result.trim();
+  }
+
+  // Handle loan amount input change
+  onLoanAmountChange(event: any): void {
+    const value = event.target.value;
+    const amount = parseFloat(value);
+    
+    if (!isNaN(amount) && amount > 0) {
+      this.loanAmountInWords = this.convertToIndianCurrency(amount);
+    } else {
+      this.loanAmountInWords = '';
+    }
+  }
+
   // Handle loan purpose change to show/hide custom input
   onLoanPurposeChange(event: any): void {
     const selectedValue = event.target.value;
@@ -126,22 +199,54 @@ export class PublicEnquiryComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Allow only digits for mobile input, prevent 0 as first digit
+  // Allow only digits for mobile input, prevent + symbol, auto-handle country codes
   onMobileKeyPress(event: KeyboardEvent): void {
     const char = String.fromCharCode(event.which);
-    const currentValue = (event.target as HTMLInputElement).value;
+    const input = event.target as HTMLInputElement;
+    const currentValue = input.value;
     
-    // Allow only digits
+    // Prevent + symbol
+    if (char === '+') {
+      event.preventDefault();
+      return;
+    }
+    
+    // Allow only digits (0-9)
     if (!/^\d$/.test(char)) {
       event.preventDefault();
       return;
     }
     
-    // Prevent 0 as first digit
-    if (currentValue.length === 0 && char === '0') {
+    // If current value is already 10 or more digits, keep only last 9 and add new digit
+    if (currentValue.length >= 10) {
       event.preventDefault();
+      const newValue = currentValue.slice(-9) + char; // Keep last 9 digits + new digit = 10 digits
+      input.value = newValue;
+      this.enquiryForm.patchValue({ phone_number: newValue });
       return;
     }
+  }
+
+  // Handle paste event to prevent country codes and invalid formats
+  onMobilePaste(event: ClipboardEvent): void {
+    event.preventDefault();
+    const pastedText = event.clipboardData?.getData('text') || '';
+    
+    // Remove all non-digit characters (including +, spaces, hyphens, country codes)
+    let cleanedNumber = pastedText.replace(/\D/g, '');
+    
+    // If more than 10 digits, take only the last 10 digits
+    // This handles cases like 919876543210 -> 9876543210
+    if (cleanedNumber.length > 10) {
+      cleanedNumber = cleanedNumber.slice(-10);
+    }
+    
+    // Update the input value
+    const input = event.target as HTMLInputElement;
+    input.value = cleanedNumber;
+    
+    // Trigger form control update
+    this.enquiryForm.patchValue({ phone_number: cleanedNumber });
   }
 
   // Handle file selection

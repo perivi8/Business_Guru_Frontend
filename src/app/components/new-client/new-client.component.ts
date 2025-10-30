@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ClientService } from '../../services/client.service';
+import { EnquiryTransferService } from '../../services/enquiry-transfer.service';
 import { UserService, User } from '../../services/user.service';
 import { EnquiryService } from '../../services/enquiry.service';
 
@@ -144,6 +145,7 @@ export class NewClientComponent implements OnInit {
     private clientService: ClientService,
     private userService: UserService,
     private enquiryService: EnquiryService,
+    private enquiryTransferService: EnquiryTransferService,
     private snackBar: MatSnackBar
   ) { }
 
@@ -247,11 +249,11 @@ export class NewClientComponent implements OnInit {
   }
 
   loadEnquiryData(): void {
-    // Check if there's enquiry data in session storage
-    const enquiryDataStr = sessionStorage.getItem('enquiry_data_for_client');
-    if (enquiryDataStr) {
+    // Check if there's enquiry data from service
+    const enquiryData = this.enquiryTransferService.getAndClearEnquiryData();
+    if (enquiryData) {
       try {
-        this.enquiryData = JSON.parse(enquiryDataStr);
+        this.enquiryData = enquiryData;
         console.log('Loaded enquiry data:', this.enquiryData);
         
         // Show success message about data loading
@@ -260,16 +262,15 @@ export class NewClientComponent implements OnInit {
         // Pre-fill the forms with enquiry data
         this.prefillFormsWithEnquiryData();
         
-        // Clear the session storage after loading
-        sessionStorage.removeItem('enquiry_data_for_client');
+        // Data already cleared by getAndClearEnquiryData()
         
         // Clear success message after 5 seconds
         setTimeout(() => {
           this.success = '';
         }, 5000);
       } catch (error) {
-        console.error('Error parsing enquiry data:', error);
-        sessionStorage.removeItem('enquiry_data_for_client');
+        console.error('Error loading enquiry data:', error);
+        this.enquiryTransferService.clearEnquiryData();
         this.error = 'Failed to load enquiry data. Please fill the form manually.';
         setTimeout(() => {
           this.error = '';

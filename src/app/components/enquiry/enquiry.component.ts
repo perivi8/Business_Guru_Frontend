@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, ActivatedRoute } from '@angular/router';
 import { EnquiryService } from '../../services/enquiry.service';
+import { EnquiryTransferService } from '../../services/enquiry-transfer.service';
 import { ClientService } from '../../services/client.service';
 import { UserService, User } from '../../services/user.service';
 import { Enquiry, COMMENT_OPTIONS } from '../../models/enquiry.interface';
@@ -180,7 +181,8 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     private snackBar: MatSnackBar,
     private dialog: MatDialog,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private enquiryTransferService: EnquiryTransferService
   ) {
     this.registrationForm = this.createRegistrationForm();
   }
@@ -929,7 +931,7 @@ export class EnquiryComponent implements OnInit, OnDestroy {
         verified_date: new Date().toISOString()
       };
       
-      sessionStorage.setItem('enquiry_data_for_client', JSON.stringify(enquiryData));
+      this.enquiryTransferService.setEnquiryData(enquiryData);
       
       // Update the comment first, then redirect
       if (enquiry._id) {
@@ -1521,7 +1523,12 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   }
 
   // Get display comment - filter out default form comments
-  getDisplayComment(comment: string | null | undefined): string {
+  getDisplayComment(comment: string | null | undefined, staff?: string): string {
+    // If staff is "Public Form", return "-" instead of "No Comments"
+    if (staff === 'Public Form') {
+      return '-';
+    }
+
     // If no comment or empty, return 'No Comments'
     if (!comment || comment.trim() === '') {
       return 'No Comments';
@@ -1543,6 +1550,11 @@ export class EnquiryComponent implements OnInit, OnDestroy {
 
   // Get status color for enquiry comments
   getStatusColor(comment: string): string {
+    // If it's '-' (Public Form with no comments), return light gray
+    if (comment === '-') {
+      return '#d1d5db'; // Gray-300 (lighter gray for "-")
+    }
+
     // If it's 'No Comments', return gray
     if (comment === 'No Comments') {
       return '#9ca3af'; // Gray-400
@@ -1571,6 +1583,11 @@ export class EnquiryComponent implements OnInit, OnDestroy {
 
   // Get row color class based on comment status and GST status
   getRowColorClass(enquiry: any): string {
+    // Check if staff is "Public Form" - always show white background
+    if (enquiry.staff === 'Public Form') {
+      return 'bg-white hover:bg-gray-50 border-l-4 border-l-gray-300';
+    }
+
     // First check for GST Cancelled status
     if (enquiry.gst === 'Yes' && enquiry.gst_status === 'Cancel') {
       return 'bg-red-50 hover:bg-red-100 border-l-4 border-l-red-500';
@@ -1597,12 +1614,18 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     } else if (this.unknownComments.includes(comment)) {
       return 'bg-gray-50 hover:bg-gray-100 border-l-4 border-l-gray-400';
     } else {
-      return 'bg-white hover:bg-gray-50 border-l-4 border-l-gray-300';
+      // Default: if staff is assigned (not Public Form) and no specific comment, show gray
+      return 'bg-gray-50 hover:bg-gray-100 border-l-4 border-l-gray-400';
     }
   }
 
   // Get card color class based on comment status and GST status
   getCardColorClass(enquiry: any): string {
+    // Check if staff is "Public Form" - always show white background
+    if (enquiry.staff === 'Public Form') {
+      return 'bg-white border-gray-300 hover:bg-gray-50';
+    }
+
     // First check for GST Cancelled status
     if (enquiry.gst === 'Yes' && enquiry.gst_status === 'Cancel') {
       return 'bg-red-50/60 border-red-500 hover:bg-red-100/70';
@@ -1629,7 +1652,8 @@ export class EnquiryComponent implements OnInit, OnDestroy {
     } else if (this.unknownComments.includes(comment)) {
       return 'bg-gray-50/60 border-gray-400 hover:bg-gray-100/70';
     } else {
-      return 'bg-white border-gray-300 hover:bg-gray-50';
+      // Default: if staff is assigned (not Public Form) and no specific comment, show gray
+      return 'bg-gray-50/60 border-gray-400 hover:bg-gray-100/70';
     }
   }
 

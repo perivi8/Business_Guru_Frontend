@@ -9,7 +9,6 @@ import { ClientsComponent } from './components/clients/clients.component';
 import { ClientDetailComponent } from './components/client-detail/client-detail.component';
 import { NewClientComponent } from './components/new-client/new-client.component';
 import { EditClientComponent } from './components/edit-client/edit-client.component';
-import { ContactUsComponent } from './components/contact-us/contact-us.component';
 import { NotificationsComponent } from './components/notifications/notifications.component';
 import { EnquiryComponent } from './components/enquiry/enquiry.component';
 import { EnquiryDetailsComponent } from './components/enquiry-details/enquiry-details.component';

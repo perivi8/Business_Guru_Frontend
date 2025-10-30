@@ -41,7 +41,6 @@ import { AdminDashboardComponent } from './components/admin-dashboard/admin-dash
 import { TeamComponent } from './components/team/team.component';
 import { ClientsComponent } from './components/clients/clients.component';
 import { NewClientComponent } from './components/new-client/new-client.component';
-import { ContactUsComponent } from './components/contact-us/contact-us.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { ClientDetailsDialogComponent } from './components/client-details-dialog/client-details-dialog.component';
 import { ConfirmDeleteDialogComponent } from './components/confirm-delete-dialog/confirm-delete-dialog.component';
@@ -79,7 +78,6 @@ import { SocketService } from './services/socket.service';
     TeamComponent,
     ClientsComponent,
     NewClientComponent,
-    ContactUsComponent,
     NavbarComponent,
     ClientDetailsDialogComponent,
     ConfirmDeleteDialogComponent,

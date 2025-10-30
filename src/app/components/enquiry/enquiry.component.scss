@@ -41,11 +41,11 @@
       }
       
       &.bg-white {
-        background-color: rgb(243 244 246) !important; // More intense white/gray (gray-100)
+        background-color: rgb(255 255 255) !important; // Pure white for Public Form
         border-left: 4px solid rgb(209 213 219) !important;
         
         &:hover {
-          background-color: rgb(229 231 235) !important; // gray-200
+          background-color: rgb(249 250 251) !important; // Very light gray on hover (gray-50)
         }
       }
       
@@ -988,11 +988,11 @@
         }
         
         &.bg-white {
-          background-color: rgb(243 244 246) !important; // More intense white/gray (gray-100)
+          background-color: rgb(255 255 255) !important; // Pure white for Public Form
           border-left: 4px solid rgb(209 213 219) !important;
           
           &:hover {
-            background-color: rgb(229 231 235) !important; // gray-200
+            background-color: rgb(249 250 251) !important; // Very light gray on hover (gray-50)
           }
         }
         
