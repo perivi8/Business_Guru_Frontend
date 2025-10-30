@@ -502,7 +502,7 @@ export class EditClientComponent implements OnInit {
     
     // Check each section for changes
     // Section 0: Personal Info
-    if (this.hasFieldChanged(['legal_name', 'trade_name', 'user_name', 'user_email', 'company_email', 'mobile_number', 'optional_mobile_number', 'address', 'district', 'state', 'pincode'])) {
+    if (this.hasFieldChanged(['legal_name', 'trade_name', 'user_name', 'user_email', 'company_email', 'mobile_number', 'optional_mobile_number', 'address', 'district', 'state', 'pincode', 'website'])) {
       this.sectionChanged[0] = true;
     }
     
@@ -527,7 +527,7 @@ export class EditClientComponent implements OnInit {
     // Section 3: Business
     let section3Changed = false;
     
-    if (this.hasFieldChanged(['business_name', 'business_type', 'constitution_type', 'has_business_pan', 'business_pan', 'business_pan_name', 'business_pan_date', 'website', 'business_url'])) {
+    if (this.hasFieldChanged(['business_name', 'business_type', 'constitution_type', 'has_business_pan', 'business_pan', 'business_pan_name', 'business_pan_date', 'business_url'])) {
       section3Changed = true;
     }
     // Check for business document uploads

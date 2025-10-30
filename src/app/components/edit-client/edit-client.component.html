@@ -580,44 +580,8 @@
             </div>
           </div>
 
-          <!-- Business Document Upload Section -->
-          <div class="mt-6 pt-6 border-t border-gray-200">
-            <div class="mb-4">
-              <h4 class="text-base font-semibold text-gray-800 mb-2">Business Document</h4>
-              <p class="text-sm text-gray-600">Upload business registration certificate, incorporation certificate, or other business documents</p>
-            </div>
-            
-            <div class="space-y-3">
-              <label class="text-sm font-medium text-gray-800">Business Document</label>
-              <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors"
-                   [ngClass]="{'border-green-500 bg-green-50': documents['business_document']}">
-                <input type="file" (change)="onFileSelected($event, 'business_document')" accept=".pdf,.jpg,.jpeg,.png" 
-                       class="hidden" id="business_document">
-                <label for="business_document" class="cursor-pointer">
-                  <mat-icon class="text-3xl mb-2" [ngClass]="{'text-green-600': documents['business_document'], 'text-gray-400': !documents['business_document']}">{{ documents['business_document'] ? 'check_circle' : 'cloud_upload' }}</mat-icon>
-                  <p class="text-sm" *ngIf="!documents['business_document']">Upload Business Document (PDF, JPG, PNG)</p>
-                  <div *ngIf="documents['business_document']" class="flex items-center justify-between">
-                    <span class="text-sm font-medium">{{ documents['business_document'].name }}</span>
-                    <button type="button" (click)="removeDocument('business_document')" class="text-red-600 hover:text-red-800">
-                      <mat-icon>delete</mat-icon>
-                    </button>
-                  </div>
-                </label>
-              </div>
-              <div *ngIf="existingDocuments['business_document']" class="flex items-center justify-between p-2 bg-blue-50 rounded">
-                <small class="text-blue-800">
-                  {{ existingDocuments['business_document'].file_name }} 
-                  ({{ formatFileSize(existingDocuments['business_document'].file_size) }})
-                </small>
-                <button (click)="downloadDocument('business_document')" class="text-blue-600 hover:text-blue-800">
-                  <mat-icon>download</mat-icon>
-                </button>
-              </div>
-            </div>
-          </div>
-
           <!-- Business PAN Details (Merged into Business) -->
-          <div *ngIf="(clientForm.get('constitution_type')?.value === 'Proprietorship' || clientForm.get('constitution_type')?.value === 'Partnership' || clientForm.get('constitution_type')?.value === 'Private Limited') && clientForm.get('has_business_pan')?.value === 'yes'" class="mt-8 pt-8 border-t border-gray-200">
+          <div *ngIf="(clientForm.get('constitution_type')?.value === 'Proprietorship' || clientForm.get('constitution_type')?.value === 'Partnership' || clientForm.get('constitution_type')?.value === 'Private Limited') && clientForm.get('has_business_pan')?.value === 'yes'" class="mt-6 pt-6 border-t border-gray-200">
             <div class="flex items-center gap-3 mb-6">
               <div class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
                 <mat-icon class="text-indigo-600 text-lg">credit_card</mat-icon>
@@ -689,6 +653,42 @@
                   ({{ formatFileSize(existingDocuments['business_pan_document'].file_size) }})
                 </small>
                 <button (click)="downloadDocument('business_pan_document')" class="text-blue-600 hover:text-blue-800">
+                  <mat-icon>download</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Business Document Upload Section -->
+          <div class="mt-6 pt-6 border-t border-gray-200">
+            <div class="mb-4">
+              <h4 class="text-base font-semibold text-gray-800 mb-2">Business Document</h4>
+              <p class="text-sm text-gray-600">Upload business registration certificate, incorporation certificate, or other business documents</p>
+            </div>
+            
+            <div class="space-y-3">
+              <label class="text-sm font-medium text-gray-800">Business Document</label>
+              <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary transition-colors"
+                   [ngClass]="{'border-green-500 bg-green-50': documents['business_document']}">
+                <input type="file" (change)="onFileSelected($event, 'business_document')" accept=".pdf,.jpg,.jpeg,.png" 
+                       class="hidden" id="business_document">
+                <label for="business_document" class="cursor-pointer">
+                  <mat-icon class="text-3xl mb-2" [ngClass]="{'text-green-600': documents['business_document'], 'text-gray-400': !documents['business_document']}">{{ documents['business_document'] ? 'check_circle' : 'cloud_upload' }}</mat-icon>
+                  <p class="text-sm" *ngIf="!documents['business_document']">Upload Business Document (PDF, JPG, PNG)</p>
+                  <div *ngIf="documents['business_document']" class="flex items-center justify-between">
+                    <span class="text-sm font-medium">{{ documents['business_document'].name }}</span>
+                    <button type="button" (click)="removeDocument('business_document')" class="text-red-600 hover:text-red-800">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </label>
+              </div>
+              <div *ngIf="existingDocuments['business_document']" class="flex items-center justify-between p-2 bg-blue-50 rounded">
+                <small class="text-blue-800">
+                  {{ existingDocuments['business_document'].file_name }} 
+                  ({{ formatFileSize(existingDocuments['business_document'].file_size) }})
+                </small>
+                <button (click)="downloadDocument('business_document')" class="text-blue-600 hover:text-blue-800">
                   <mat-icon>download</mat-icon>
                 </button>
               </div>

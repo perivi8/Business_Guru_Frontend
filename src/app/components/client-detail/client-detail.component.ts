@@ -1729,8 +1729,22 @@ export class ClientDetailComponent implements OnInit {
   // Signature check method
   hasSignature(): boolean {
     if (!this.client) return false;
+    
+    // Check for signature field or signature_url
     const signature = (this.client as any).signature || (this.client as any).signature_url;
-    return !!signature;
+    if (signature) return true;
+    
+    // Check for signature document in documents (new format)
+    if (this.client.documents && this.client.documents['signature']) {
+      return true;
+    }
+    
+    // Check for signature document in processed_documents (legacy format)
+    if (this.client.processed_documents && this.client.processed_documents['signature']) {
+      return true;
+    }
+    
+    return false;
   }
 
   // Product Images methods
