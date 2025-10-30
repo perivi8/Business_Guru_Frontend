@@ -12,6 +12,7 @@ import { Enquiry } from '../../models/enquiry.interface';
 export class EnquiryDetailsComponent implements OnInit {
   enquiry: Enquiry | null = null;
   loading = false;
+  isLoading = true; // Track initial data loading state
   enquiryId: string | null = null;
   allEnquiries: Enquiry[] = []; // Store all enquiries for locking logic
 
@@ -36,6 +37,7 @@ export class EnquiryDetailsComponent implements OnInit {
     if (!this.enquiryId) return;
     
     this.loading = true;
+    this.isLoading = true;
     console.log('Loading enquiry with ID:', this.enquiryId);
     
     // First, try to get all enquiries and find the one we need
@@ -49,10 +51,12 @@ export class EnquiryDetailsComponent implements OnInit {
           console.log('Enquiry found:', foundEnquiry);
           this.enquiry = foundEnquiry;
           this.loading = false;
+          this.isLoading = false;
         } else {
           console.error('Enquiry not found in list');
           this.snackBar.open('Enquiry not found', 'Close', { duration: 3000 });
           this.loading = false;
+          this.isLoading = false;
           setTimeout(() => {
             this.router.navigate(['/enquiry']);
           }, 1500);
@@ -62,6 +66,7 @@ export class EnquiryDetailsComponent implements OnInit {
         console.error('Error loading enquiries:', error);
         this.snackBar.open('Error loading enquiry details', 'Close', { duration: 3000 });
         this.loading = false;
+        this.isLoading = false;
         setTimeout(() => {
           this.router.navigate(['/enquiry']);
         }, 1500);

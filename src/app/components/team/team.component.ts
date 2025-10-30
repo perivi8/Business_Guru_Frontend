@@ -11,6 +11,7 @@ import { MatDialog } from '@angular/material/dialog';
 export class TeamComponent implements OnInit {
   users: User[] = [];
   loading = true;
+  isLoading = true; // Track initial data loading state
   error = '';
   currentUser: any;
   isAdmin = false;
@@ -43,6 +44,7 @@ export class TeamComponent implements OnInit {
   }
 
   loadUsers(): void {
+    this.isLoading = true;
     this.userService.getUsers().subscribe({
       next: (response) => {
         // Sort users: admin first, then manager, then user
@@ -51,10 +53,12 @@ export class TeamComponent implements OnInit {
           return (roleOrder[a.role] || 999) - (roleOrder[b.role] || 999);
         });
         this.loading = false;
+        this.isLoading = false;
       },
       error: (error) => {
         this.error = 'Failed to load team members';
         this.loading = false;
+        this.isLoading = false;
       }
     });
   }

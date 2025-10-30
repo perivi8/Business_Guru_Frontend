@@ -1,0 +1,48 @@
+<div class="delete-progress-container">
+  <div class="progress-content">
+    <!-- Circular Progress -->
+    <div class="circular-progress">
+      <svg class="progress-ring" width="200" height="200">
+        <circle
+          class="progress-ring-circle-bg"
+          stroke="#e5e7eb"
+          stroke-width="12"
+          fill="transparent"
+          r="90"
+          cx="100"
+          cy="100"
+        />
+        <circle
+          class="progress-ring-circle"
+          stroke="url(#gradient)"
+          stroke-width="12"
+          fill="transparent"
+          r="90"
+          cx="100"
+          cy="100"
+          [style.stroke-dasharray]="565.48"
+          [style.stroke-dashoffset]="565.48 - (565.48 * progress) / 100"
+        />
+        <defs>
+          <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#dc2626;stop-opacity:1" />
+          </linearGradient>
+        </defs>
+      </svg>
+      
+      <!-- Progress Text -->
+      <div class="progress-text">
+        <div class="progress-number">{{ progress }}%</div>
+        <div class="progress-label">Deleting</div>
+      </div>
+    </div>
+    
+    <!-- Client Name -->
+    <div class="client-info">
+      <mat-icon class="delete-icon">delete_forever</mat-icon>
+      <h3 class="client-name">{{ data.clientName }}</h3>
+      <p class="delete-message">Please wait while we delete this client...</p>
+    </div>
+  </div>
+</div>

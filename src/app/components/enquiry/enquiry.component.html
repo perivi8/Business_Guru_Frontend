@@ -483,7 +483,7 @@
         </div>
 
         <!-- Empty State -->
-        <div *ngIf="!loading && filteredEnquiries.length === 0" class="text-center py-16">
+        <div *ngIf="!isLoading && !loading && filteredEnquiries.length === 0" class="text-center py-16">
           <div class="w-24 h-24 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg class="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -503,8 +503,30 @@
           </button>
         </div>
 
+        <!-- Loading Skeleton -->
+        <div *ngIf="isLoading" class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden p-6">
+          <div class="animate-pulse space-y-4">
+            <!-- Skeleton Header -->
+            <div class="flex items-center justify-between mb-6">
+              <div class="h-6 bg-gray-300 rounded w-48"></div>
+              <div class="h-10 bg-gray-300 rounded w-32"></div>
+            </div>
+            <!-- Skeleton Table Rows -->
+            <div class="space-y-3">
+              <div *ngFor="let item of [1,2,3,4,5,6,7,8]" class="flex items-center space-x-4 p-4 bg-gray-100 rounded-lg">
+                <div class="h-4 bg-gray-300 rounded w-12"></div>
+                <div class="h-4 bg-gray-300 rounded w-24"></div>
+                <div class="h-4 bg-gray-300 rounded flex-1"></div>
+                <div class="h-4 bg-gray-300 rounded w-32"></div>
+                <div class="h-4 bg-gray-300 rounded w-24"></div>
+                <div class="h-4 bg-gray-300 rounded w-20"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Table View -->
-        <div *ngIf="!loading && filteredEnquiries.length > 0 && viewMode === 'table'" class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+        <div *ngIf="!isLoading && !loading && filteredEnquiries.length > 0 && viewMode === 'table'" class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
           <div class="overflow-x-auto">
             <table mat-table [dataSource]="paginatedEnquiries" class="w-full text-xs">
               <!-- Serial Number Column -->
@@ -803,7 +825,7 @@
         </div>
 
         <!-- Card View - 3 Column Grid -->
-        <div *ngIf="!loading && filteredEnquiries.length > 0 && viewMode === 'card'">
+        <div *ngIf="!isLoading && !loading && filteredEnquiries.length > 0 && viewMode === 'card'">
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
           <div *ngFor="let enquiry of paginatedEnquiries; let i = index" 
                class="rounded-2xl shadow-lg border-2 overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer group"

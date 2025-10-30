@@ -1,0 +1,147 @@
+.delete-progress-container {
+  padding: 40px 30px;
+  text-align: center;
+  background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+  border-radius: 16px;
+  min-width: 400px;
+}
+
+.progress-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+}
+
+.circular-progress {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-ring {
+  transform: rotate(-90deg);
+  filter: drop-shadow(0 4px 6px rgba(239, 68, 68, 0.2));
+}
+
+.progress-ring-circle-bg {
+  transition: stroke-dashoffset 0.1s linear;
+}
+
+.progress-ring-circle {
+  transition: stroke-dashoffset 0.01s linear;
+  stroke-linecap: round;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.4));
+  }
+  50% {
+    filter: drop-shadow(0 0 16px rgba(239, 68, 68, 0.6));
+  }
+}
+
+.progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.progress-number {
+  font-size: 48px;
+  font-weight: 700;
+  color: #ef4444;
+  line-height: 1;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  text-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+}
+
+.progress-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.client-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.delete-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  color: #ef4444;
+  animation: shake 0.5s ease-in-out infinite;
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+
+.client-name {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.delete-message {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+  font-weight: 400;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .delete-progress-container {
+    min-width: 300px;
+    padding: 30px 20px;
+  }
+
+  .circular-progress {
+    width: 160px;
+    height: 160px;
+  }
+
+  .progress-ring {
+    width: 160px;
+    height: 160px;
+  }
+
+  .progress-number {
+    font-size: 36px;
+  }
+
+  .client-name {
+    font-size: 18px;
+    max-width: 250px;
+  }
+}

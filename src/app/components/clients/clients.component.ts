@@ -7,6 +7,7 @@ import { AuthService } from '../../services/auth.service';
 import { UserService, User } from '../../services/user.service';
 import { ClientDetailsDialogComponent } from '../client-details-dialog/client-details-dialog.component';
 import { ConfirmDeleteDialogComponent } from '../confirm-delete-dialog/confirm-delete-dialog.component';
+import { DeleteProgressDialogComponent } from '../delete-progress-dialog/delete-progress-dialog.component';
 import { Subject, timer } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -22,6 +23,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
   users: User[] = [];
   uniqueStaffMembers: any[] = [];
   loading = false; // Removed loading state for instant display
+  isLoading = true; // Track initial data loading state
   error = '';
   
   // Pagination properties
@@ -205,7 +207,10 @@ export class ClientsComponent implements OnInit, OnDestroy {
     console.log('=== FRONTEND CLIENT LOADING DEBUG ===');
     console.log('Starting client load process... Attempt:', retryCount + 1);
     
-    // No loading state - instant display
+    // Show loading indicator only on initial load
+    if (retryCount === 0) {
+      this.isLoading = true;
+    }
     this.error = '';
     
     this.clientService.getClients().subscribe({
@@ -244,6 +249,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
           this.filteredClients = [];
         }
         
+        this.isLoading = false;
         console.log('Client loading completed successfully');
       },
       error: (error) => {
@@ -282,6 +288,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
         
         this.clients = [];
         this.filteredClients = [];
+        this.isLoading = false;
         console.log('Client loading failed with error:', this.error);
         
         // Show retry button for failed requests
@@ -820,35 +827,47 @@ export class ClientsComponent implements OnInit, OnDestroy {
   }
 
   deleteClient(client: Client): void {
-    const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, {
+    const confirmDialogRef = this.dialog.open(ConfirmDeleteDialogComponent, {
       width: '400px',
       data: { name: client.legal_name || client.user_name || 'this client' }
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    confirmDialogRef.afterClosed().subscribe(result => {
       if (result) {
+        // Open progress dialog with circular loader
+        const progressDialogRef = this.dialog.open(DeleteProgressDialogComponent, {
+          width: '500px',
+          disableClose: true,
+          data: { clientName: client.legal_name || client.user_name || 'this client' }
+        });
+        
         // Store original data for rollback in case of error
         const originalClients = [...this.clients];
         const originalFilteredClients = [...this.filteredClients];
         
-        // Optimistic deletion - remove immediately from UI
-        this.clients = this.clients.filter(c => c._id !== client._id);
-        this.filteredClients = this.filteredClients.filter(c => c._id !== client._id);
-        
-        // Show immediate success feedback
-        this.snackBar.open('Client deleted successfully', 'Close', {
-          duration: 2000
-        });
-        
-        // Make API call in background
+        // Make API call to delete client
         this.clientService.deleteClient(client._id).subscribe({
           next: () => {
-            // Already removed from UI, nothing more to do
+            // Wait for progress to complete (at least 1 second)
+            setTimeout(() => {
+              // Close progress dialog
+              progressDialogRef.componentInstance.complete();
+              
+              // Remove from UI after successful deletion
+              this.clients = this.clients.filter(c => c._id !== client._id);
+              this.filteredClients = this.filteredClients.filter(c => c._id !== client._id);
+              
+              // Show success message
+              this.snackBar.open('Client deleted successfully', 'Close', {
+                duration: 2000
+              });
+            }, 1000);
           },
           error: (error) => {
-            // Rollback on error - restore the client
-            this.clients = originalClients;
-            this.filteredClients = originalFilteredClients;
+            // Close progress dialog immediately on error
+            progressDialogRef.close();
+            
+            // Show error message
             this.snackBar.open('Failed to delete client', 'Close', {
               duration: 3000
             });

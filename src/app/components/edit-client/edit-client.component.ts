@@ -15,6 +15,7 @@ export class EditClientComponent implements OnInit {
   clientId: string;
   client: Client | null = null;
   loading = false;
+  isLoading = true; // Track initial data loading state
   saving = false;
   documents: { [key: string]: File } = {};
   existingDocuments: { [key: string]: any } = {};
@@ -37,10 +38,26 @@ export class EditClientComponent implements OnInit {
   currentStep = 0;
   totalSteps = 9;
   
+  // Track changes per section
+  sectionChanged: { [key: number]: boolean } = {
+    0: false, // Personal Info
+    1: false, // GST Details
+    2: false, // IE Code
+    3: false, // Business
+    4: false, // Owner Details
+    5: false, // Financial
+    6: false, // Banking
+    7: false, // Signature
+    8: false  // Payment Gateway
+  };
+  
+  // Store original form values for comparison
+  originalFormValues: any = {};
+  
   steps = [
     {
       title: 'Personal Info',
-      description: 'Personal & address details',
+      description: 'Personal & address',
       icon: 'person',
       completed: false
     },
@@ -155,6 +172,17 @@ export class EditClientComponent implements OnInit {
       this.partnerNames[i] = '';
       this.partnerDobs[i] = '';
     }
+    
+    // Check for step query parameter to navigate to specific step
+    this.route.queryParams.subscribe(params => {
+      if (params['step'] !== undefined) {
+        const stepNumber = parseInt(params['step'], 10);
+        if (!isNaN(stepNumber) && stepNumber >= 0 && stepNumber < this.totalSteps) {
+          this.currentStep = stepNumber;
+          console.log(`Navigated to step ${stepNumber} from query parameter`);
+        }
+      }
+    });
   }
 
   private initForm(): FormGroup {
@@ -254,6 +282,7 @@ export class EditClientComponent implements OnInit {
 
   private loadClientDetails(): void {
     this.loading = true;
+    this.isLoading = true;
     this.clientService.getClientDetails(this.clientId).subscribe({
       next: (response) => {
         this.client = response.client;
@@ -295,10 +324,12 @@ export class EditClientComponent implements OnInit {
         });
         this.populateForm(response.client);
         this.loading = false;
+        this.isLoading = false;
       },
       error: (error) => {
         this.snackBar.open('Error loading client details', 'Close', { duration: 3000 });
         this.loading = false;
+        this.isLoading = false;
         this.router.navigate(['/clients']);
       }
     });
@@ -311,7 +342,22 @@ export class EditClientComponent implements OnInit {
     // Determine Business PAN status based on existing documents and constitution type
     const hasBusinessPanDocument = this.hasExistingDocument('business_pan_document');
     const isPrivateLimited = client.constitution_type === 'Private Limited';
-    const hasBusinessPan = isPrivateLimited ? 'yes' : (client.has_business_pan || (hasBusinessPanDocument ? 'yes' : ''));
+    
+    // Determine has_business_pan value
+    let hasBusinessPan = '';
+    if (isPrivateLimited) {
+      hasBusinessPan = 'yes';
+    } else if (client.has_business_pan !== null && client.has_business_pan !== undefined && client.has_business_pan !== '') {
+      // Prioritize the actual has_business_pan value from the database
+      const panValue = String(client.has_business_pan).toLowerCase();
+      hasBusinessPan = (panValue === 'yes' || panValue === 'true') ? 'yes' : 'no';
+    } else {
+      // Fallback: Check if client has Business PAN data (name, date, or document)
+      const hasBusinessPanData = client.business_pan_name || client.business_pan_date || hasBusinessPanDocument;
+      if (hasBusinessPanData) {
+        hasBusinessPan = 'yes';
+      }
+    }
     
     // Set IE Code status based on document existence
     const ieCodeStatus = this.getIECodeDocument() ? 'Yes' : 'No';
@@ -432,6 +478,309 @@ export class EditClientComponent implements OnInit {
       this.clientForm.get('ie_code_number')?.updateValueAndValidity();
       console.log('IE code number validation set to required (existing document found)');
     }
+    
+    // Store original form values for change tracking
+    this.originalFormValues = { 
+      ...this.clientForm.value,
+      payment_gateways: [...this.selectedPaymentGateways] // Store a copy of payment gateways
+    };
+    
+    // Subscribe to form changes to track section modifications
+    this.clientForm.valueChanges.subscribe(() => {
+      this.trackSectionChanges();
+    });
+  }
+  
+  // Track which sections have been modified
+  trackSectionChanges(): void {
+    const currentValues = this.clientForm.value;
+    
+    // Reset all section changes
+    Object.keys(this.sectionChanged).forEach(key => {
+      this.sectionChanged[parseInt(key)] = false;
+    });
+    
+    // Check each section for changes
+    // Section 0: Personal Info
+    if (this.hasFieldChanged(['legal_name', 'trade_name', 'user_name', 'user_email', 'company_email', 'mobile_number', 'optional_mobile_number', 'address', 'district', 'state', 'pincode'])) {
+      this.sectionChanged[0] = true;
+    }
+    
+    // Section 1: GST Details
+    if (this.hasFieldChanged(['registration_number', 'gst_legal_name', 'gst_trade_name', 'gst_number', 'gst_status'])) {
+      this.sectionChanged[1] = true;
+    }
+    // Check for GST and MSME document uploads
+    if (this.documents['gst_document'] || this.documents['msme_document']) {
+      this.sectionChanged[1] = true;
+    }
+    
+    // Section 2: IE Code
+    if (this.hasFieldChanged(['ie_code', 'ie_code_number', 'ie_code_status'])) {
+      this.sectionChanged[2] = true;
+    }
+    // Check for IE Code document upload
+    if (this.documents['ie_code_document'] || this.documents['ie_code']) {
+      this.sectionChanged[2] = true;
+    }
+    
+    // Section 3: Business
+    let section3Changed = false;
+    
+    if (this.hasFieldChanged(['business_name', 'business_type', 'constitution_type', 'has_business_pan', 'business_pan', 'business_pan_name', 'business_pan_date', 'website', 'business_url'])) {
+      section3Changed = true;
+    }
+    // Check for business document uploads
+    if (this.documents['business_document'] || this.documents['business_pan_document']) {
+      section3Changed = true;
+    }
+    
+    // Special validation for Business PAN
+    const hasBusinessPan = currentValues['has_business_pan'];
+    const hasBusinessPanChanged = this.hasFieldChanged(['has_business_pan']);
+    
+    if (hasBusinessPan === 'yes') {
+      const businessPan = currentValues['business_pan'];
+      const businessPanName = currentValues['business_pan_name'];
+      const businessPanDate = currentValues['business_pan_date'];
+      
+      // Check if Business PAN fields have changed
+      const businessPanFieldsChanged = this.hasFieldChanged(['business_pan', 'business_pan_name', 'business_pan_date']);
+      
+      // If has_business_pan itself changed (e.g., from "no" to "yes"), show button immediately
+      if (hasBusinessPanChanged) {
+        this.sectionChanged[3] = section3Changed;
+      }
+      // If Business PAN fields changed, require all 3 to be filled
+      else if (businessPanFieldsChanged) {
+        if (businessPan && businessPanName && businessPanDate) {
+          this.sectionChanged[3] = true;
+        } else {
+          this.sectionChanged[3] = false;
+        }
+      } else {
+        // If only other fields changed (not Business PAN fields), show button normally
+        this.sectionChanged[3] = section3Changed;
+      }
+    } else {
+      // For non-Business PAN cases or when Business PAN is "no", use normal logic
+      this.sectionChanged[3] = section3Changed;
+    }
+    
+    // Section 4: Owner Details
+    const ownerFields = ['owner_name', 'owner_dob', 'number_of_partners'];
+    // Add partner fields dynamically
+    for (let i = 0; i < 10; i++) {
+      ownerFields.push(`partner_name_${i}`, `partner_dob_${i}`);
+    }
+    if (this.hasFieldChanged(ownerFields)) {
+      this.sectionChanged[4] = true;
+    }
+    // Check for owner document uploads
+    if (this.documents['owner_aadhar'] || this.documents['owner_pan']) {
+      this.sectionChanged[4] = true;
+    }
+    // Also check for partner document uploads
+    for (let i = 0; i < 10; i++) {
+      if (this.documents[`partner_aadhar_${i}`] || this.documents[`partner_pan_${i}`]) {
+        this.sectionChanged[4] = true;
+        break;
+      }
+    }
+    
+    // Section 5: Financial
+    if (this.hasFieldChanged(['required_loan_amount', 'loan_purpose', 'repayment_period', 'monthly_income', 'existing_loans', 'transaction_done_by_client', 'total_credit_amount', 'average_monthly_balance', 'transaction_months'])) {
+      this.sectionChanged[5] = true;
+    }
+    // Check for document uploads in financial section
+    if (this.documents['msme_certificate'] || this.documents['udyam_certificate']) {
+      this.sectionChanged[5] = true;
+    }
+    
+    // Section 6: Banking
+    if (this.hasFieldChanged(['bank_name', 'account_name', 'account_number', 'ifsc_code', 'bank_type', 'new_current_account', 'new_bank_account_number', 'new_ifsc_code', 'new_account_name', 'new_bank_name', 'new_business_account'])) {
+      this.sectionChanged[6] = true;
+    }
+    // Check for bank statement uploads
+    for (let i = 0; i < 6; i++) {
+      if (this.documents[`bank_statement_${i}`]) {
+        this.sectionChanged[6] = true;
+        break;
+      }
+    }
+    
+    // Section 7: Signature - check if new signature file uploaded or images/photos changed
+    if (this.documents['signature']) {
+      this.sectionChanged[7] = true;
+    }
+    // Check for product images and user photos
+    if (this.productImages.length > 0 || this.userPhotos.length > 0 || 
+        this.productImagesToDelete.length > 0 || this.userPhotosToDelete.length > 0) {
+      this.sectionChanged[7] = true;
+    }
+    
+    // Section 8: Payment Gateway - check if payment gateways changed from original
+    const originalGateways = this.originalFormValues.payment_gateways || [];
+    const currentGateways = this.selectedPaymentGateways || [];
+    
+    // Compare arrays - check if they're different
+    const gatewaysChanged = JSON.stringify(originalGateways.sort()) !== JSON.stringify(currentGateways.sort());
+    if (gatewaysChanged) {
+      this.sectionChanged[8] = true;
+    }
+  }
+  
+  // Helper method to check if specific fields have changed
+  hasFieldChanged(fields: string[]): boolean {
+    const currentValues = this.clientForm.value;
+    return fields.some(field => {
+      const current = currentValues[field];
+      const original = this.originalFormValues[field];
+      return current !== original;
+    });
+  }
+  
+  // Save changes for a specific section
+  saveSectionChanges(sectionIndex: number): void {
+    this.saving = true;
+    
+    const formData = new FormData();
+    
+    // Get raw form value (includes disabled fields)
+    const formValue = this.clientForm.getRawValue();
+    
+    // Fields that should always be included, even if empty
+    const alwaysIncludeFields = ['account_name', 'registration_number', 'company_email', 'optional_mobile_number', 'ie_code_number'];
+    
+    // If Business PAN is "no", explicitly include Business PAN fields as empty to clear them in backend
+    if (formValue.has_business_pan === 'no') {
+      alwaysIncludeFields.push('business_pan', 'business_pan_name', 'business_pan_date');
+    }
+    
+    // Add all form fields using the same logic as saveClient()
+    Object.keys(formValue).forEach(key => {
+      const value = formValue[key];
+      const shouldInclude = (value !== null && value !== undefined && value !== '') || alwaysIncludeFields.includes(key);
+      
+      if (shouldInclude) {
+        // For nested objects, stringify them
+        if (typeof value === 'object' && value !== null) {
+          formData.append(key, JSON.stringify(value));
+        } else {
+          // Always convert to string, even if empty (for alwaysIncludeFields)
+          const stringValue = value !== null && value !== undefined ? value.toString() : '';
+          formData.append(key, stringValue);
+        }
+      }
+    });
+    
+    // Add payment gateways
+    if (this.selectedPaymentGateways && this.selectedPaymentGateways.length > 0) {
+      formData.append('payment_gateways', JSON.stringify(this.selectedPaymentGateways));
+    }
+    
+    // Add uploaded documents
+    Object.keys(this.documents).forEach(key => {
+      if (this.documents[key]) {
+        formData.append(key, this.documents[key]);
+      }
+    });
+    
+    // Add product images
+    if (this.productImages && this.productImages.length > 0) {
+      this.productImages.forEach((image, index) => {
+        formData.append('product_images', image);
+      });
+    }
+    
+    // Add user photos
+    if (this.userPhotos && this.userPhotos.length > 0) {
+      this.userPhotos.forEach((photo, index) => {
+        formData.append('user_photos', photo);
+      });
+    }
+    
+    // Add images to delete
+    if (this.productImagesToDelete && this.productImagesToDelete.length > 0) {
+      formData.append('delete_product_images', JSON.stringify(this.productImagesToDelete));
+    }
+    
+    if (this.userPhotosToDelete && this.userPhotosToDelete.length > 0) {
+      formData.append('delete_user_photos', JSON.stringify(this.userPhotosToDelete));
+    }
+    
+    // Add deleted documents
+    if (this.deletedDocuments && this.deletedDocuments.length > 0) {
+      this.deletedDocuments.forEach(docType => {
+        formData.append('deleted_documents[]', docType);
+      });
+    }
+    
+    // Add partner data
+    if (this.partnerNames && this.partnerNames.length > 0) {
+      this.partnerNames.forEach((name, index) => {
+        if (name) {
+          formData.append(`partner_name_${index}`, name);
+        }
+      });
+    }
+    
+    if (this.partnerDobs && this.partnerDobs.length > 0) {
+      this.partnerDobs.forEach((dob, index) => {
+        if (dob) {
+          formData.append(`partner_dob_${index}`, dob);
+        }
+      });
+    }
+    
+    console.log('Saving section:', sectionIndex, this.steps[sectionIndex].title);
+    console.log('FormData entries:');
+    const formDataEntries: any = {};
+    formData.forEach((value, key) => {
+      formDataEntries[key] = value;
+      console.log(`${key}:`, value, `(type: ${typeof value})`);
+    });
+    console.log('Total FormData fields:', Object.keys(formDataEntries).length);
+    
+    this.clientService.updateClientDetails(this.clientId, formData).subscribe({
+      next: (response) => {
+        this.saving = false;
+        this.sectionChanged[sectionIndex] = false;
+        
+        // Update original values to current values
+        this.originalFormValues = { 
+          ...this.clientForm.value,
+          payment_gateways: [...this.selectedPaymentGateways] // Update payment gateways in original values
+        };
+        
+        // Clear uploaded documents for this save
+        this.documents = {};
+        this.productImages = [];
+        this.userPhotos = [];
+        this.productImagesToDelete = [];
+        this.userPhotosToDelete = [];
+        this.deletedDocuments = [];
+        
+        this.snackBar.open(`${this.steps[sectionIndex].title} saved successfully!`, 'Close', {
+          duration: 3000,
+          panelClass: ['success-snackbar']
+        });
+        
+        // Reload client data to get updated information
+        this.loadClientDetails();
+      },
+      error: (error) => {
+        this.saving = false;
+        console.error('Error saving section:', error);
+        console.error('Error details:', error.error);
+        
+        const errorMessage = error.error?.error || error.error?.message || error.message || 'Unknown error';
+        this.snackBar.open('Error saving changes: ' + errorMessage, 'Close', {
+          duration: 5000,
+          panelClass: ['error-snackbar']
+        });
+      }
+    });
   }
 
   private populatePartnerData(client: Client): void {
@@ -905,7 +1254,7 @@ export class EditClientComponent implements OnInit {
         }
         
         // Navigate back to client detail page with reload flag and timestamp to force refresh
-        this.router.navigate(['/client-detail', this.clientId], { 
+        this.router.navigate(['/clients', this.clientId], { 
           queryParams: { reload: true, t: new Date().getTime() } 
         });
       },
@@ -1229,6 +1578,9 @@ export class EditClientComponent implements OnInit {
       }
     }
     console.log('Updated payment gateways:', this.selectedPaymentGateways);
+    
+    // Track section changes when payment gateways are modified
+    this.trackSectionChanges();
   }
 
   getSelectedGateways(): string[] {
@@ -1361,6 +1713,38 @@ export class EditClientComponent implements OnInit {
   selectBusinessPan(value: string): void {
     this.clientForm.patchValue({ has_business_pan: value });
     this.isBusinessPanDropdownOpen = false;
+    
+    // Add validators when Business PAN is "yes"
+    if (value === 'yes') {
+      this.clientForm.get('business_pan')?.setValidators([Validators.required, Validators.pattern('^[A-Z]{5}[0-9]{4}[A-Z]{1}$')]);
+      this.clientForm.get('business_pan_name')?.setValidators([Validators.required]);
+      this.clientForm.get('business_pan_date')?.setValidators([Validators.required]);
+    } else {
+      // Remove required validators and clear values when Business PAN is "no"
+      this.clientForm.get('business_pan')?.setValidators([Validators.pattern('^[A-Z]{5}[0-9]{4}[A-Z]{1}$')]);
+      this.clientForm.get('business_pan_name')?.clearValidators();
+      this.clientForm.get('business_pan_date')?.clearValidators();
+      
+      // Clear Business PAN field values when selecting "no"
+      this.clientForm.patchValue({
+        business_pan: '',
+        business_pan_name: '',
+        business_pan_date: ''
+      });
+      
+      // Remove Business PAN document if it exists
+      if (this.documents['business_pan_document']) {
+        delete this.documents['business_pan_document'];
+      }
+    }
+    
+    // Update validity
+    this.clientForm.get('business_pan')?.updateValueAndValidity();
+    this.clientForm.get('business_pan_name')?.updateValueAndValidity();
+    this.clientForm.get('business_pan_date')?.updateValueAndValidity();
+    
+    // Track section changes
+    this.trackSectionChanges();
   }
 
   getConstitutionLabel(value: string): string {
@@ -1447,6 +1831,16 @@ export class EditClientComponent implements OnInit {
         return;
       }
 
+      // If there's an existing document, mark it for deletion and remove from existingDocuments
+      if (this.existingDocuments[documentType]) {
+        if (!this.deletedDocuments.includes(documentType)) {
+          this.deletedDocuments.push(documentType);
+          console.log(`Marked existing document for deletion: ${documentType}`);
+        }
+        // Remove from existingDocuments to prevent showing old document in UI
+        delete this.existingDocuments[documentType];
+      }
+
       this.documents[documentType] = file;
       console.log(`File selected for ${documentType}:`, file.name);
       
@@ -1459,6 +1853,9 @@ export class EditClientComponent implements OnInit {
         
         this.snackBar.open('Please enter the IE Code Number for the uploaded document', 'Close', { duration: 4000 });
       }
+      
+      // Track section changes when documents are uploaded
+      this.trackSectionChanges();
     }
   }
 
@@ -1480,6 +1877,9 @@ export class EditClientComponent implements OnInit {
         this.clientForm.get('ie_code_number')?.updateValueAndValidity();
       }
     }
+    
+    // Track section changes when documents are removed
+    this.trackSectionChanges();
   }
 
   downloadDocument(documentType: string): void {
@@ -1561,6 +1961,9 @@ export class EditClientComponent implements OnInit {
 
     // Reset input
     event.target.value = '';
+    
+    // Track section changes when images/photos are added
+    this.trackSectionChanges();
   }
 
   // Get product images count
@@ -1582,12 +1985,14 @@ export class EditClientComponent implements OnInit {
   removeProductImage(index: number): void {
     this.productImages.splice(index, 1);
     this.snackBar.open('Image removed', 'Close', { duration: 2000 });
+    this.trackSectionChanges();
   }
 
   // Remove user photo
   removeUserPhoto(index: number): void {
     this.userPhotos.splice(index, 1);
     this.snackBar.open('Photo removed', 'Close', { duration: 2000 });
+    this.trackSectionChanges();
   }
 
   // Delete existing product image
@@ -1598,6 +2003,7 @@ export class EditClientComponent implements OnInit {
     }
     this.existingProductImages.splice(index, 1);
     this.snackBar.open('Image marked for deletion', 'Close', { duration: 2000 });
+    this.trackSectionChanges();
   }
 
   // Delete existing user photo
@@ -1608,6 +2014,7 @@ export class EditClientComponent implements OnInit {
     }
     this.existingUserPhotos.splice(index, 1);
     this.snackBar.open('Photo marked for deletion', 'Close', { duration: 2000 });
+    this.trackSectionChanges();
   }
 
   // Close dropdowns when clicking outside

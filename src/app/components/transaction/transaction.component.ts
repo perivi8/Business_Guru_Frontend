@@ -21,6 +21,7 @@ export class TransactionComponent implements OnInit {
   totalTransactions = 0;
   totalAmount = 0;
   loading = false;
+  isLoading = true; // Track initial data loading state
 
   // Color mapping for each letter A-Z (26 unique colors)
   private letterColors: { [key: string]: string } = {
@@ -64,6 +65,7 @@ export class TransactionComponent implements OnInit {
   // Load approved clients and calculate totals
   loadApprovedClientsData(): void {
     this.loading = true;
+    this.isLoading = true;
     
     this.clientService.getClients().subscribe({
       next: (response) => {
@@ -75,10 +77,12 @@ export class TransactionComponent implements OnInit {
         // Calculate totals
         this.calculateTotals();
         this.loading = false;
+        this.isLoading = false;
       },
       error: (error) => {
         console.error('Error loading clients:', error);
         this.loading = false;
+        this.isLoading = false;
       }
     });
   }

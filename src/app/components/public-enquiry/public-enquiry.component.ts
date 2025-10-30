@@ -98,15 +98,22 @@ export class PublicEnquiryComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  // Custom validator for loan amount: must be a valid number
+  // Custom validator for loan amount: must be a valid integer
   loanAmountValidator(control: AbstractControl): ValidationErrors | null {
     if (!control.value) {
       return null; // Let required validator handle empty values
     }
     
-    const amount = parseFloat(control.value.toString().replace(/,/g, ''));
+    const value = control.value.toString();
     
-    if (isNaN(amount)) {
+    // Check if it contains only digits
+    if (!/^\d+$/.test(value)) {
+      return { invalidAmount: true };
+    }
+    
+    const amount = parseInt(value, 10);
+    
+    if (isNaN(amount) || amount <= 0) {
       return { invalidAmount: true };
     }
     
@@ -150,10 +157,30 @@ export class PublicEnquiryComponent implements OnInit, OnDestroy {
     return result.trim();
   }
 
+  // Allow only digits for loan amount input
+  onLoanAmountKeyPress(event: KeyboardEvent): void {
+    const char = String.fromCharCode(event.which);
+    
+    // Allow only digits (0-9)
+    if (!/^[0-9]$/.test(char)) {
+      event.preventDefault();
+    }
+  }
+
   // Handle loan amount input change
   onLoanAmountChange(event: any): void {
-    const value = event.target.value;
-    const amount = parseFloat(value);
+    let value = event.target.value;
+    
+    // Remove any non-digit characters
+    value = value.replace(/\D/g, '');
+    
+    // Update the input value
+    event.target.value = value;
+    
+    // Update form control
+    this.enquiryForm.patchValue({ loan_amount: value });
+    
+    const amount = parseInt(value, 10);
     
     if (!isNaN(amount) && amount > 0) {
       this.loanAmountInWords = this.convertToIndianCurrency(amount);

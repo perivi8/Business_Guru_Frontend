@@ -16,6 +16,7 @@ import { catchError, throwError } from 'rxjs';
 export class ClientDetailComponent implements OnInit {
   client: Client | null = null;
   loading = true;
+  isLoading = true; // Track initial data loading state
   saving = false;
   error = '';
   isEditing = false;
@@ -52,11 +53,13 @@ export class ClientDetailComponent implements OnInit {
       const clientId = params.get('id');
       if (clientId) {
         this.loading = true;
+        this.isLoading = true;
         this.error = '';
         this.loadClientDetails(clientId);
       } else {
         this.error = 'Client ID not found';
         this.loading = false;
+        this.isLoading = false;
       }
     });
     
@@ -90,14 +93,35 @@ export class ClientDetailComponent implements OnInit {
       next: (response) => {
         this.client = response.client;
         this.loading = false;
+        this.isLoading = false;
         
         // Ensure UI is updated after data reload
         console.log('Client details reloaded:', {
           payment_gateways_status: (this.client as any).payment_gateways_status,
           loan_status: (this.client as any).loan_status,
           business_document: this.client?.business_document_url,
-          documents: this.client?.documents
+          documents: this.client?.documents,
+          processed_documents: this.client?.processed_documents
         });
+        
+        // Log partner documents specifically to help debug
+        console.log('Partner documents in client.documents:');
+        if (this.client?.documents) {
+          Object.keys(this.client.documents).forEach(key => {
+            if (key.includes('partner')) {
+              console.log(`  ${key}:`, this.client!.documents![key]);
+            }
+          });
+        }
+        
+        console.log('Partner documents in processed_documents:');
+        if (this.client?.processed_documents) {
+          Object.keys(this.client.processed_documents).forEach(key => {
+            if (key.includes('partner')) {
+              console.log(`  ${key}:`, this.client!.processed_documents![key]);
+            }
+          });
+        }
         
         // Force change detection to ensure UI updates
         setTimeout(() => {
@@ -107,6 +131,7 @@ export class ClientDetailComponent implements OnInit {
       error: (error) => {
         this.error = 'Failed to load client details';
         this.loading = false;
+        this.isLoading = false;
         console.error('Error loading client details:', error);
       }
     });
@@ -225,43 +250,102 @@ export class ClientDetailComponent implements OnInit {
     return website;
   }
 
-  getDocumentKeys(): string[] {
-    const keys: string[] = [];
+  // Helper method to normalize partner document keys
+  private normalizeDocumentKey(key: string): string {
+    // Normalize partner_aadhar_0, partner_0_aadhar, partner_aadhar_1, etc. to partner_aadhar_0, partner_aadhar_1
+    // More comprehensive regex to match all partner document key variations
+    const partnerAadharMatch = key.match(/partner[_\d]*aadhar[_\d]*/i);
+    const partnerPanMatch = key.match(/partner[_\d]*pan[_\d]*/i);
     
-    // Get keys from processed_documents (legacy format)
-    if (this.client && this.client.processed_documents) {
-      keys.push(...Object.keys(this.client.processed_documents));
+    if (partnerAadharMatch) {
+      // Extract the number from the key
+      const numMatch = key.match(/\d+/);
+      const num = numMatch ? numMatch[0] : '0';
+      return `partner_aadhar_${num}`;
+    }
+    if (partnerPanMatch) {
+      // Extract the number from the key
+      const numMatch = key.match(/\d+/);
+      const num = numMatch ? numMatch[0] : '0';
+      return `partner_pan_${num}`;
+    }
+    return key;
+  }
+
+  // Helper method to find document in client.documents or processed_documents by checking all key variations
+  private findDocumentByKey(docType: string, source: 'documents' | 'processed_documents'): any {
+    const targetObject = source === 'documents' ? this.client?.documents : this.client?.processed_documents;
+    if (!targetObject) return null;
+    
+    // First try exact match
+    if (targetObject[docType]) {
+      return targetObject[docType];
     }
     
-    // Get keys from documents (new format from client creation)
+    // If it's a partner document, try to find by normalized key
+    const normalized = this.normalizeDocumentKey(docType);
+    if (normalized !== docType) {
+      // Try to find any key that normalizes to the same value
+      for (const key of Object.keys(targetObject)) {
+        if (this.normalizeDocumentKey(key) === normalized) {
+          return targetObject[key];
+        }
+      }
+    }
+    
+    return null;
+  }
+
+  getDocumentKeys(): string[] {
+    const normalizedKeys = new Map<string, string>(); // Map normalized key to actual key
+    
+    // Prioritize documents (new format) over processed_documents (legacy format)
+    // First, get keys from documents (new format from client creation/update)
     if (this.client && this.client.documents) {
       const documentKeys = Object.keys(this.client.documents).filter(key => 
         this.client!.documents![key] && 
         (typeof this.client!.documents![key] === 'object' || typeof this.client!.documents![key] === 'string')
       );
-      keys.push(...documentKeys);
+      documentKeys.forEach(key => {
+        const normalized = this.normalizeDocumentKey(key);
+        // Always use the key from documents (most recent)
+        // This will overwrite any previous key with the same normalized form
+        normalizedKeys.set(normalized, key);
+      });
+    }
+    
+    // Then, get keys from processed_documents (legacy format) only if not already in documents
+    if (this.client && this.client.processed_documents) {
+      Object.keys(this.client.processed_documents).forEach(key => {
+        const normalized = this.normalizeDocumentKey(key);
+        // Only add if not already present in documents (new format takes priority)
+        if (!normalizedKeys.has(normalized)) {
+          normalizedKeys.set(normalized, key);
+        }
+      });
     }
     
     // Add business document if it exists in any format
+    const businessDocNormalized = 'business_document';
     if (this.client && (this.client.business_document_url || 
                         (this.client.documents && this.client.documents['business_document']) || 
                         (this.client.processed_documents && this.client.processed_documents['business_document']))) {
-      // Only add if not already added
-      if (!keys.includes('business_document')) {
-        keys.push('business_document');
+      // Only add if not already in the map
+      if (!normalizedKeys.has(businessDocNormalized)) {
+        normalizedKeys.set(businessDocNormalized, 'business_document');
       }
     }
     
-    // Remove duplicates and return
-    return [...new Set(keys)];
+    // Return only the unique keys (one per normalized form)
+    return Array.from(normalizedKeys.values());
   }
 
   getDocumentFileName(docType: string): string {
     // Handle business document
     if (docType === 'business_document') {
       // Check documents (new format from client creation) first
-      if (this.client?.documents && this.client.documents[docType]) {
-        const doc = this.client.documents[docType];
+      const doc = this.findDocumentByKey(docType, 'documents');
+      if (doc) {
         if (typeof doc === 'object' && doc.original_filename) {
           return doc.original_filename;
         } else if (typeof doc === 'string') {
@@ -274,11 +358,12 @@ export class ClientDetailComponent implements OnInit {
         return `${docType}.pdf`;
       }
       // Check processed_documents (legacy format)
-      else if (this.client?.processed_documents?.[docType]) {
-        return this.client.processed_documents[docType].file_name;
+      const processedDoc = this.findDocumentByKey(docType, 'processed_documents');
+      if (processedDoc) {
+        return processedDoc.file_name;
       }
       // Fallback to old business_document_url
-      else if (this.client?.business_document_url) {
+      if (this.client?.business_document_url) {
         // Extract filename from URL or use default
         const url = this.client.business_document_url;
         const urlParts = url.split('/');
@@ -287,26 +372,47 @@ export class ClientDetailComponent implements OnInit {
       }
     }
     
-    // Check processed_documents first (legacy format)
-    if (this.client?.processed_documents?.[docType]) {
-      return this.client.processed_documents[docType].file_name;
-    }
-    
-    // Check documents (new format from client creation)
-    if (this.client?.documents?.[docType]) {
-      const doc = this.client.documents[docType];
-      if (typeof doc === 'object' && doc.original_filename) {
-        return doc.original_filename;
+    // Check documents (new format) FIRST - prioritize updated documents
+    const doc = this.findDocumentByKey(docType, 'documents');
+    if (doc) {
+      console.log(`Getting filename for ${docType} from client.documents:`, doc);
+      
+      if (typeof doc === 'object') {
+        // Try multiple possible property names
+        if (doc.original_filename) {
+          console.log(`Found original_filename: ${doc.original_filename}`);
+          return doc.original_filename;
+        } else if (doc.file_name) {
+          console.log(`Found file_name: ${doc.file_name}`);
+          return doc.file_name;
+        } else if (doc.filename) {
+          console.log(`Found filename: ${doc.filename}`);
+          return doc.filename;
+        } else if (doc.name) {
+          console.log(`Found name: ${doc.name}`);
+          return doc.name;
+        }
+        console.log(`Document object has no filename property, available keys:`, Object.keys(doc));
       } else if (typeof doc === 'string') {
         // Extract filename from URL
         const urlParts = doc.split('/');
         const filename = urlParts[urlParts.length - 1].split('?')[0];
+        console.log(`Extracted filename from URL: ${filename}`);
         return filename || `${docType}.pdf`;
       }
       // Fallback to document type name
+      console.log(`No filename found in document object, using fallback: ${docType}.pdf`);
       return `${docType}.pdf`;
     }
     
+    // Check processed_documents (legacy format) as fallback
+    const processedDoc = this.findDocumentByKey(docType, 'processed_documents');
+    if (processedDoc) {
+      console.log(`Getting filename for ${docType} from processed_documents:`, processedDoc.file_name);
+      return processedDoc.file_name;
+    }
+    
+    console.log(`No filename found for ${docType}, returning Unknown`);
     return 'Unknown';
   }
 
@@ -314,33 +420,31 @@ export class ClientDetailComponent implements OnInit {
     // Handle business document
     if (docType === 'business_document') {
       // Check documents (new format from client creation) first
-      if (this.client?.documents?.[docType]) {
-        const doc = this.client.documents[docType];
-        if (typeof doc === 'object' && doc.bytes) {
-          return doc.bytes;
-        }
+      const doc = this.findDocumentByKey(docType, 'documents');
+      if (doc && typeof doc === 'object' && doc.bytes) {
+        return doc.bytes;
       }
       // Check processed_documents (legacy format)
-      else if (this.client?.processed_documents?.[docType]) {
-        return this.client.processed_documents[docType].file_size;
+      const processedDoc = this.findDocumentByKey(docType, 'processed_documents');
+      if (processedDoc) {
+        return processedDoc.file_size;
       }
       // Fallback to old business_document_url - return 0 as we don't have size info from URL
-      else if (this.client?.business_document_url) {
+      if (this.client?.business_document_url) {
         return 0;
       }
     }
     
-    // Check processed_documents first (legacy format)
-    if (this.client?.processed_documents?.[docType]) {
-      return this.client.processed_documents[docType].file_size;
+    // Check documents (new format) FIRST - prioritize updated documents
+    const doc = this.findDocumentByKey(docType, 'documents');
+    if (doc && typeof doc === 'object' && doc.bytes) {
+      return doc.bytes;
     }
     
-    // Check documents (new format from client creation)
-    if (this.client?.documents?.[docType]) {
-      const doc = this.client.documents[docType];
-      if (typeof doc === 'object' && doc.bytes) {
-        return doc.bytes;
-      }
+    // Check processed_documents (legacy format) as fallback
+    const processedDoc = this.findDocumentByKey(docType, 'processed_documents');
+    if (processedDoc) {
+      return processedDoc.file_size;
     }
     
     return 0;
@@ -538,9 +642,12 @@ export class ClientDetailComponent implements OnInit {
       }
     }
     
-    // Check if document has direct URL (new format)
-    if (this.client.documents?.[docType]) {
-      const doc = this.client.documents[docType];
+    // Check if document has direct URL (new format) - PRIORITIZE THIS
+    // Use findDocumentByKey to handle key variations (e.g., partner_aadhar_0 vs partner_0_aadhar)
+    const doc = this.findDocumentByKey(docType, 'documents');
+    if (doc) {
+      console.log(`📄 Checking document in client.documents for ${docType}:`, doc);
+      
       if (typeof doc === 'object' && doc.url) {
         console.log(`📄 Opening document directly from URL: ${doc.url}`);
         // Force refresh by adding a timestamp to bypass cache
@@ -553,10 +660,16 @@ export class ClientDetailComponent implements OnInit {
         const urlWithTimestamp = `${doc}?t=${new Date().getTime()}`;
         window.open(urlWithTimestamp, '_blank');
         return;
+      } else {
+        console.log(`📄 Document exists in client.documents but no direct URL found, will use service-based preview`);
       }
+    } else {
+      console.log(`📄 Document not found in client.documents for ${docType}, checking processed_documents`);
     }
     
-    // Fallback to service-based preview (legacy format)
+    // Only use service-based preview if document is NOT in client.documents (to avoid showing old documents)
+    // If document exists in client.documents but has no URL, we should still try to get it from the backend
+    // but the backend should prioritize client.documents over processed_documents
     const loadingSnackBar = this.snackBar.open('Loading preview...', 'Cancel', { duration: 10000 });
     
     this.clientService.previewDocument(this.client._id, docType).subscribe({
@@ -1786,6 +1899,29 @@ export class ClientDetailComponent implements OnInit {
     } finally {
       document.body.removeChild(textArea);
     }
+  }
+
+  // Navigate to edit client page
+  editClient(): void {
+    if (!this.client || !this.client._id) {
+      this.snackBar.open('Client information not available', 'Close', { duration: 3000 });
+      return;
+    }
+    
+    this.router.navigate(['/clients', this.client._id, 'edit']);
+  }
+
+  // Navigate to edit client page with Payment Gateway step active (for admins only)
+  editEnquiry(): void {
+    if (!this.client || !this.client._id) {
+      this.snackBar.open('Client information not available', 'Close', { duration: 3000 });
+      return;
+    }
+    
+    // Navigate to edit-client page with step parameter to show Payment Gateway step (step 8)
+    this.router.navigate(['/clients', this.client._id, 'edit'], {
+      queryParams: { step: 8 }
+    });
   }
 
 }

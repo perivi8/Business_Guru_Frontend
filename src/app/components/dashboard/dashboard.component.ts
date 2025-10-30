@@ -16,6 +16,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   clients: Client[] = [];
   paginatedClients: Client[] = []; // Paginated data for display
   loading = false; // Removed loading state for instant display
+  isLoading = true; // Track initial data loading state
   private destroy$ = new Subject<void>();
   
   // Pagination properties
@@ -64,12 +65,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   loadClients(): void {
+    // Show loading indicator on initial load
+    this.isLoading = true;
+    
     // Use getMyClients instead of getClients to show only clients created by current user
     this.clientService.getMyClients().subscribe({
       next: (response) => {
         this.clients = response.clients || [];
         this.calculateStats();
         this.updatePagination();
+        this.isLoading = false;
       },
       error: (error) => {
         console.error('Error loading clients:', error);
@@ -89,6 +94,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.clients = [];
         this.calculateStats();
         this.updatePagination();
+        this.isLoading = false;
       }
     });
   }

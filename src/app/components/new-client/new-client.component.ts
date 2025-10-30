@@ -1,6 +1,7 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, NgZone } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, NavigationExtras } from '@angular/router';
+import { Location } from '@angular/common';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ClientService } from '../../services/client.service';
 import { EnquiryTransferService } from '../../services/enquiry-transfer.service';
@@ -142,6 +143,8 @@ export class NewClientComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private router: Router,
+    private location: Location,
+    private ngZone: NgZone,
     private clientService: ClientService,
     private userService: UserService,
     private enquiryService: EnquiryService,
@@ -250,7 +253,22 @@ export class NewClientComponent implements OnInit {
 
   loadEnquiryData(): void {
     // Check if there's enquiry data from service
-    const enquiryData = this.enquiryTransferService.getAndClearEnquiryData();
+    let enquiryData = this.enquiryTransferService.getAndClearEnquiryData();
+    
+    // Fallback: Check sessionStorage if service data is not available
+    if (!enquiryData) {
+      const sessionData = sessionStorage.getItem('enquiry_data_for_client');
+      if (sessionData) {
+        try {
+          enquiryData = JSON.parse(sessionData);
+          console.log('Loaded enquiry data from sessionStorage:', enquiryData);
+          sessionStorage.removeItem('enquiry_data_for_client'); // Clear after loading
+        } catch (error) {
+          console.error('Error parsing sessionStorage enquiry data:', error);
+        }
+      }
+    }
+    
     if (enquiryData) {
       try {
         this.enquiryData = enquiryData;
@@ -262,8 +280,6 @@ export class NewClientComponent implements OnInit {
         // Pre-fill the forms with enquiry data
         this.prefillFormsWithEnquiryData();
         
-        // Data already cleared by getAndClearEnquiryData()
-        
         // Clear success message after 5 seconds
         setTimeout(() => {
           this.success = '';
@@ -271,11 +287,14 @@ export class NewClientComponent implements OnInit {
       } catch (error) {
         console.error('Error loading enquiry data:', error);
         this.enquiryTransferService.clearEnquiryData();
+        sessionStorage.removeItem('enquiry_data_for_client');
         this.error = 'Failed to load enquiry data. Please fill the form manually.';
         setTimeout(() => {
           this.error = '';
         }, 5000);
       }
+    } else {
+      console.log('No enquiry data found in service or sessionStorage');
     }
   }
 
@@ -720,18 +739,52 @@ export class NewClientComponent implements OnInit {
         this.loading = false;
         this.success = 'Client created successfully!';
         
-        // Sync data back to enquiry if this came from an enquiry
+        // Show success message with snackbar
+        this.snackBar.open('✅ Client created successfully! Redirecting to clients page...', 'Close', {
+          duration: 2500,
+          horizontalPosition: 'center',
+          verticalPosition: 'top',
+          panelClass: ['success-snackbar']
+        });
+        
+        // Sync data back to enquiry if this came from an enquiry (non-blocking)
         if (this.enquiryData?.enquiry_id) {
           this.syncClientDataBackToEnquiry(response.client, this.enquiryData.enquiry_id);
         }
         
+        // Redirect to clients page after showing success message
+        // Using NgZone to ensure navigation happens outside Angular's zone
         setTimeout(() => {
-          this.router.navigate(['/dashboard']);
-        }, 1500);
+          this.ngZone.run(() => {
+            console.log('✅ Client created successfully. Redirecting to clients page...');
+            
+            // Try multiple navigation approaches for reliability
+            this.router.navigateByUrl('/clients', { replaceUrl: true }).then(
+              (navigated) => {
+                if (navigated) {
+                  console.log('✅ Successfully navigated to clients page');
+                } else {
+                  console.warn('⚠️ Navigation blocked, trying alternative method...');
+                  // Fallback: Force navigation using window.location
+                  window.location.href = '/clients';
+                }
+              },
+              (error) => {
+                console.error('❌ Navigation error, using fallback:', error);
+                // Fallback: Force navigation using window.location
+                window.location.href = '/clients';
+              }
+            );
+          });
+        }, 2000);
       },
       error: (error) => {
         this.error = error.error?.error || 'Failed to create client';
         this.loading = false;
+        this.snackBar.open(this.error, 'Close', {
+          duration: 5000,
+          panelClass: ['error-snackbar']
+        });
       }
     });
   }
@@ -1860,6 +1913,17 @@ export class NewClientComponent implements OnInit {
     }
     
     return changes;
+  }
+
+  // Navigate to edit enquiry page
+  editEnquiry(): void {
+    if (!this.enquiryData?.enquiry_id) {
+      this.snackBar.open('No enquiry data available to edit', 'Close', { duration: 3000 });
+      return;
+    }
+    
+    // Navigate to enquiry details page
+    this.router.navigate(['/enquiry-details', this.enquiryData.enquiry_id]);
   }
 
   // Method to sync form changes back to enquiry in real-time (optional)

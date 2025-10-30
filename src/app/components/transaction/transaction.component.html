@@ -1,14 +1,55 @@
 <!-- Modern Transaction Management Page -->
 <div class="transaction-page">
   <div class="page-container">
-    <!-- Loading State -->
-    <div *ngIf="loading" class="loading-state">
-      <mat-spinner diameter="40"></mat-spinner>
-      <p>Loading approved clients...</p>
+    <!-- Loading Skeleton -->
+    <div *ngIf="isLoading" class="clients-list-container">
+      <div class="list-header">
+        <div class="animate-pulse">
+          <div class="h-8 bg-gray-300 rounded w-48"></div>
+        </div>
+      </div>
+      
+      <div class="clients-list">
+        <div *ngFor="let item of [1,2,3,4,5,6]" class="client-list-item">
+          <div class="animate-pulse flex items-center w-full">
+            <!-- Avatar Skeleton -->
+            <div class="client-avatar">
+              <div class="w-16 h-16 bg-gray-300 rounded-full"></div>
+            </div>
+
+            <!-- Client Info Skeleton -->
+            <div class="client-info flex-1">
+              <div class="space-y-2">
+                <div class="h-5 bg-gray-300 rounded w-48"></div>
+                <div class="h-4 bg-gray-300 rounded w-32"></div>
+              </div>
+            </div>
+
+            <!-- Transaction Stats Skeleton -->
+            <div class="transaction-stats">
+              <div class="flex gap-4">
+                <div class="space-y-2">
+                  <div class="h-4 bg-gray-300 rounded w-24"></div>
+                  <div class="h-5 bg-gray-300 rounded w-16"></div>
+                </div>
+                <div class="space-y-2">
+                  <div class="h-4 bg-gray-300 rounded w-24"></div>
+                  <div class="h-5 bg-gray-300 rounded w-20"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Arrow Skeleton -->
+            <div class="client-action">
+              <div class="w-6 h-6 bg-gray-300 rounded"></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- No Clients State -->
-    <div *ngIf="!loading && approvedClients.length === 0" class="empty-state">
+    <div *ngIf="!isLoading && !loading && approvedClients.length === 0" class="empty-state">
       <div class="empty-icon">
         <mat-icon>verified_user</mat-icon>
       </div>
@@ -17,7 +58,7 @@
     </div>
 
     <!-- Approved Clients List -->
-    <div *ngIf="!loading && approvedClients.length > 0" class="clients-list-container">
+    <div *ngIf="!isLoading && !loading && approvedClients.length > 0" class="clients-list-container">
       <div class="list-header">
         <h2>Approved Clients ({{ approvedClients.length }})</h2>
       </div>

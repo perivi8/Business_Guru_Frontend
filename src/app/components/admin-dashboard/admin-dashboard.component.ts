@@ -18,6 +18,7 @@ export class AdminDashboardComponent implements OnInit {
   clients: Client[] = [];
   users: User[] = [];
   loading = true;
+  isLoading = true; // Track initial data loading state
   displayedColumns: string[] = ['serial', 'name', 'business', 'staff', 'status', 'created', 'actions'];
   
   
@@ -108,9 +109,11 @@ export class AdminDashboardComponent implements OnInit {
       this.filterWeeklyData();
       
       this.loading = false;
+      this.isLoading = false;
     }).catch((error) => {
       console.error('Error loading dashboard data:', error);
       this.loading = false;
+      this.isLoading = false;
     });
     
     this.initializeWeekRanges();

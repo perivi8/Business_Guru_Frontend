@@ -15,13 +15,44 @@
       </div>
     </div>
     
-    <!-- Loading State -->
-    <div *ngIf="loading" class="flex flex-col items-center justify-center py-24 bg-white rounded-2xl shadow-sm">
-      <div class="relative mb-6">
-        <mat-spinner diameter="60"></mat-spinner>
+    <!-- Loading Skeleton -->
+    <div *ngIf="isLoading">
+      <!-- Stats Bar Skeleton -->
+      <div class="bg-white rounded-xl shadow-sm p-6 mb-6 border border-gray-200">
+        <div class="animate-pulse flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-gray-300 rounded-xl"></div>
+            <div>
+              <div class="h-4 bg-gray-300 rounded w-24 mb-2"></div>
+              <div class="h-6 bg-gray-300 rounded w-16"></div>
+            </div>
+          </div>
+          <div class="h-10 bg-gray-300 rounded-lg w-32"></div>
+        </div>
       </div>
-      <p class="text-gray-700 font-semibold text-lg">Loading team members...</p>
-      <p class="text-gray-500 text-sm mt-1">Please wait</p>
+
+      <!-- Team Cards Grid Skeleton -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div *ngFor="let item of [1,2,3,4,5,6,7,8]" class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200">
+          <div class="animate-pulse">
+            <!-- Header Skeleton -->
+            <div class="h-24 bg-gray-300"></div>
+            
+            <!-- Body Skeleton -->
+            <div class="p-6">
+              <div class="mt-12">
+                <div class="h-6 bg-gray-300 rounded w-3/4 mb-2"></div>
+                <div class="h-4 bg-gray-300 rounded w-full mb-4"></div>
+                <div class="h-4 bg-gray-300 rounded w-1/2 mb-4"></div>
+                <div class="flex gap-2">
+                  <div class="h-10 bg-gray-300 rounded flex-1"></div>
+                  <div class="h-10 bg-gray-300 rounded w-10"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Error State -->
@@ -42,7 +73,7 @@
     </div>
 
     <!-- No Users State -->
-    <div *ngIf="!loading && !error && users.length === 0" class="bg-white rounded-2xl shadow-sm p-12">
+    <div *ngIf="!isLoading && !loading && !error && users.length === 0" class="bg-white rounded-2xl shadow-sm p-12">
       <div class="text-center max-w-md mx-auto">
         <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
           <mat-icon class="!text-6xl text-gray-400">group_off</mat-icon>
@@ -55,7 +86,7 @@
     </div>
 
     <!-- Team Grid View -->
-    <div *ngIf="!loading && !error && users.length > 0">
+    <div *ngIf="!isLoading && !loading && !error && users.length > 0">
       
       <!-- Stats Bar -->
       <div class="bg-white rounded-xl shadow-sm p-6 mb-6 border border-gray-200">

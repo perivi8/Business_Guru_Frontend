@@ -1,9 +1,55 @@
 <!-- Main Container with Modern Gradient Background -->
 <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-  <!-- Loading State -->
-  <div *ngIf="loading" class="flex flex-col items-center justify-center min-h-screen">
-    <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent mb-4"></div>
-    <p class="text-gray-600 text-lg">Loading client details...</p>
+  <!-- Loading Skeleton -->
+  <div *ngIf="isLoading" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <!-- Header Skeleton -->
+    <div class="backdrop-blur-xl bg-white/95 rounded-3xl shadow-2xl border border-gray-100 mb-6 p-6">
+      <div class="animate-pulse">
+        <div class="flex items-center gap-5">
+          <div class="w-16 h-16 bg-gray-300 rounded-full"></div>
+          <div class="flex-1">
+            <div class="h-8 bg-gray-300 rounded w-64 mb-2"></div>
+            <div class="h-5 bg-gray-300 rounded w-48 mb-2"></div>
+            <div class="h-4 bg-gray-300 rounded w-32"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Skeleton -->
+    <div class="backdrop-blur-xl bg-white/95 rounded-3xl shadow-2xl border border-gray-100 p-6">
+      <div class="animate-pulse space-y-6">
+        <!-- Section 1 -->
+        <div class="space-y-4">
+          <div class="h-6 bg-gray-300 rounded w-48 mb-4"></div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div *ngFor="let item of [1,2,3,4,5,6]" class="space-y-2">
+              <div class="h-4 bg-gray-300 rounded w-32"></div>
+              <div class="h-6 bg-gray-300 rounded w-full"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2 -->
+        <div class="border-t border-gray-200 pt-6 space-y-4">
+          <div class="h-6 bg-gray-300 rounded w-48 mb-4"></div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div *ngFor="let item of [1,2,3,4]" class="space-y-2">
+              <div class="h-4 bg-gray-300 rounded w-32"></div>
+              <div class="h-6 bg-gray-300 rounded w-full"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Documents Section -->
+        <div class="border-t border-gray-200 pt-6">
+          <div class="h-6 bg-gray-300 rounded w-48 mb-4"></div>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div *ngFor="let item of [1,2,3,4,5,6,7,8]" class="h-32 bg-gray-300 rounded-lg"></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Saving Status Changes Loading Overlay -->
@@ -35,7 +81,7 @@
   </div>
 
   <!-- Client Details -->
-  <div *ngIf="!loading && !error && client" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+  <div *ngIf="!isLoading && !loading && !error && client" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
     <!-- Header Section -->
     <div class="backdrop-blur-xl bg-white/95 rounded-3xl shadow-2xl border border-gray-100 sticky top-0 z-40 mb-6">
       <!-- Header Content: Client Info on Left, Stepper on Right -->
@@ -383,13 +429,22 @@
         <!-- Business Information Card -->
         <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
           <div class="p-6 border-b border-gray-200">
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                </svg>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                  </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-800">Business Information</h3>
               </div>
-              <h3 class="text-lg font-semibold text-gray-800">Business Information</h3>
+              <button (click)="editClient()" 
+                      class="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors shadow-md hover:shadow-lg">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+                <span class="text-sm font-semibold">Edit Client</span>
+              </button>
             </div>
           </div>
           <div class="p-6">
@@ -463,6 +518,52 @@
                     <div class="flex-1 min-w-0">
                       <p class="text-xs font-medium text-gray-500">Constitution Type</p>
                       <p class="text-sm font-semibold text-gray-800 break-words">{{ client.constitution_type || 'N/A' }}</p>
+                    </div>
+                  </div>
+                  <div *ngIf="client.constitution_type === 'Partnership'" class="flex items-start gap-3 py-2">
+                    <div class="w-9 h-9 bg-amber-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                      </svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-xs font-medium text-gray-500">Number of Partners</p>
+                      <p class="text-sm font-semibold text-gray-800 break-words">{{ client.number_of_partners || 'N/A' }}</p>
+                    </div>
+                  </div>
+                  <div *ngIf="client.business_pan_name || client.business_pan_date || client.has_business_pan" class="flex items-start gap-3 py-2">
+                    <div class="w-9 h-9 bg-indigo-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"></path>
+                      </svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-xs font-medium text-gray-500">Business PAN</p>
+                      <p class="text-sm font-semibold text-gray-800 break-words">
+                        {{ (client.business_pan_name || client.business_pan_date) ? 'Yes' : (client.has_business_pan === 'yes' ? 'Yes' : (client.has_business_pan === 'no' ? 'No' : 'N/A')) }}
+                      </p>
+                    </div>
+                  </div>
+                  <div *ngIf="client.business_pan_name" class="flex items-start gap-3 py-2">
+                    <div class="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                      </svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-xs font-medium text-gray-500">Business PAN Name</p>
+                      <p class="text-sm font-semibold text-gray-800 break-words">{{ client.business_pan_name }}</p>
+                    </div>
+                  </div>
+                  <div *ngIf="client.business_pan_date" class="flex items-start gap-3 py-2">
+                    <div class="w-9 h-9 bg-teal-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                      </svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-xs font-medium text-gray-500">Business PAN Date</p>
+                      <p class="text-sm font-semibold text-gray-800 break-words">{{ client.business_pan_date | date:'dd MMM yyyy' }}</p>
                     </div>
                   </div>
                 </div>
@@ -625,39 +726,6 @@
                   Additional Details
                 </h4>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div *ngIf="getClientProperty('business_pan_name')" class="flex items-start gap-3 py-2">
-                    <div class="w-9 h-9 bg-violet-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <svg class="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"></path>
-                      </svg>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                      <p class="text-xs font-medium text-gray-500">Business PAN Name</p>
-                      <p class="text-sm font-semibold text-gray-800 break-words">{{ getClientProperty('business_pan_name') }}</p>
-                    </div>
-                  </div>
-                  <div *ngIf="getClientProperty('business_pan_date')" class="flex items-start gap-3 py-2">
-                    <div class="w-9 h-9 bg-fuchsia-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <svg class="w-5 h-5 text-fuchsia-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                      </svg>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                      <p class="text-xs font-medium text-gray-500">Business PAN Date</p>
-                      <p class="text-sm font-semibold text-gray-800 break-words">{{ getClientProperty('business_pan_date') | date:'dd/MM/yyyy' }}</p>
-                    </div>
-                  </div>
-                  <div *ngIf="client.number_of_partners" class="flex items-start gap-3 py-2">
-                    <div class="w-9 h-9 bg-amber-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                      </svg>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                      <p class="text-xs font-medium text-gray-500">Number of Partners</p>
-                      <p class="text-sm font-semibold text-gray-800 break-words">{{ client.number_of_partners }}</p>
-                    </div>
-                  </div>
                   <div class="flex items-start gap-3 py-2">
                     <div class="w-9 h-9 bg-lime-50 rounded-lg flex items-center justify-center flex-shrink-0">
                       <svg class="w-5 h-5 text-lime-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -820,13 +888,22 @@
       <div *ngIf="isStepActive(2)" class="grid grid-cols-1 gap-6">
         <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
           <div class="p-6 border-b border-gray-200">
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                  <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-800">Financial Information</h3>
               </div>
-              <h3 class="text-lg font-semibold text-gray-800">Financial Information</h3>
+              <button (click)="editClient()" 
+                      class="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors shadow-md hover:shadow-lg">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+                <span class="text-sm font-semibold">Edit Client</span>
+              </button>
             </div>
           </div>
           <div class="p-6">
@@ -1016,6 +1093,29 @@
 
       <!-- Step 3: Documents & Images -->
       <div *ngIf="isStepActive(3)" class="space-y-6">
+        
+        <!-- Step 3 Header with Edit Button -->
+        <div class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                  <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                  </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-800">Documents & Images</h3>
+              </div>
+              <button (click)="editClient()" 
+                      class="flex items-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors shadow-md hover:shadow-lg">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+                <span class="text-sm font-semibold">Edit Client</span>
+              </button>
+            </div>
+          </div>
+        </div>
         
         <!-- Product Images Section -->
         <div *ngIf="hasProductImages()" class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
@@ -1221,13 +1321,22 @@
       <!-- Step 4: Payment Gateway Information Card -->
       <div *ngIf="isStepActive(4)" class="backdrop-blur-xl bg-white/70 rounded-2xl shadow-xl border border-white/20 overflow-hidden">
         <div class="p-6 border-b border-gray-200">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-lg flex items-center justify-center">
-              <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-              </svg>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-800">Payment Gateway</h3>
             </div>
-            <h3 class="text-lg font-semibold text-gray-800">Payment Gateway</h3>
+            <button *ngIf="isAdmin()" (click)="editEnquiry()" 
+                    class="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors shadow-md hover:shadow-lg">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+              </svg>
+              <span class="text-sm font-semibold">Edit Enquiry</span>
+            </button>
           </div>
         </div>
         <div class="p-6">

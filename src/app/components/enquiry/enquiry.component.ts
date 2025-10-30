@@ -35,6 +35,7 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   registrationForm: FormGroup;
   showRegistrationForm = false;
   loading = false; // Only used for form submission, not for data loading
+  isLoading = true; // Track initial data loading state
   isBackgroundRefresh = false; // Track if this is a background refresh
   searchTerm = '';
   
@@ -336,7 +337,10 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   }
 
   loadEnquiries(isBackgroundRefresh: boolean = false): void {
-    // Never show loading indicator for data refresh (instant display)
+    // Show loading indicator only on initial load
+    if (!isBackgroundRefresh) {
+      this.isLoading = true;
+    }
     this.isBackgroundRefresh = isBackgroundRefresh;
     
     this.enquiryService.getAllEnquiries()
@@ -349,6 +353,7 @@ export class EnquiryComponent implements OnInit, OnDestroy {
           }));
           this.extractUniqueStaffMembers();
           this.applyFilters();
+          this.isLoading = false;
           this.isBackgroundRefresh = false;
         },
         error: (error) => {
@@ -357,6 +362,7 @@ export class EnquiryComponent implements OnInit, OnDestroy {
           if (!isBackgroundRefresh) {
             this.snackBar.open('Error loading enquiries', 'Close', { duration: 3000 });
           }
+          this.isLoading = false;
           this.isBackgroundRefresh = false;
         }
       });
@@ -1976,7 +1982,12 @@ export class EnquiryComponent implements OnInit, OnDestroy {
 
       // Combine country code with mobile numbers FIRST
       const countryCodeDigits = formData.country_code.replace('+', ''); // Remove + sign
-      const fullMobileNumber = countryCodeDigits + formData.mobile_number;
+      
+      // Only add country code if mobile number is exactly 10 digits (doesn't already have country code)
+      let fullMobileNumber = formData.mobile_number;
+      if (/^\d{10}$/.test(formData.mobile_number)) {
+        fullMobileNumber = countryCodeDigits + formData.mobile_number;
+      }
       
       console.log('📱 Country code digits:', countryCodeDigits);
       console.log('📱 Mobile number digits:', formData.mobile_number);
@@ -1992,20 +2003,20 @@ export class EnquiryComponent implements OnInit, OnDestroy {
       // Set the combined mobile number
       formData.mobile_number = fullMobileNumber;
 
-      // Handle secondary mobile number - use the same country code as primary
+      // Handle secondary mobile number - only add country code if it's exactly 10 digits
       if (formData.secondary_mobile_number && formData.secondary_mobile_number.trim() !== '') {
-        formData.secondary_mobile_number = countryCodeDigits + formData.secondary_mobile_number;
+        if (/^\d{10}$/.test(formData.secondary_mobile_number)) {
+          formData.secondary_mobile_number = countryCodeDigits + formData.secondary_mobile_number;
+        }
         console.log('📱 Secondary full mobile number:', formData.secondary_mobile_number);
       } else {
         formData.secondary_mobile_number = null;
       }
 
-      // Handle phone number - add country code if it's a 10-digit number
+      // Handle phone number - keep as-is without country code
       if (formData.phone_number && formData.phone_number.trim() !== '') {
-        if (/^\d{10}$/.test(formData.phone_number)) {
-          formData.phone_number = countryCodeDigits + formData.phone_number;
-          console.log('📱 Phone number with country code:', formData.phone_number);
-        }
+        // Keep phone number as entered (don't add country code)
+        console.log('📱 Phone number (without country code):', formData.phone_number);
       } else {
         formData.phone_number = null;
       }
@@ -3163,7 +3174,7 @@ export class EnquiryComponent implements OnInit, OnDestroy {
       return;
     }
     
-    // Store enquiry data in session storage for the new client form
+    // Store enquiry data using the transfer service for the new client form
     const enquiryData = {
       owner_name: ownerName,
       business_name: enquiry.business_name || '',
@@ -3173,13 +3184,22 @@ export class EnquiryComponent implements OnInit, OnDestroy {
       loan_amount: enquiry.loan_amount || '',
       loan_purpose: enquiry.loan_purpose || '',
       annual_revenue: enquiry.annual_revenue || '',
+      gst: enquiry.gst || '',
+      gst_status: enquiry.gst_status || '',
+      business_type: enquiry.business_type || '',
       business_document_url: enquiry.business_document_url || null,
       enquiry_id: enquiry._id,
       verified_date: new Date().toISOString(),
       shortlisted_via_button: true // Flag to indicate this came from shortlist button
     };
     
+    // Use the transfer service to pass data to new-client component
+    this.enquiryTransferService.setEnquiryData(enquiryData);
+    
+    // Also store in sessionStorage as backup
     sessionStorage.setItem('enquiry_data_for_client', JSON.stringify(enquiryData));
+    
+    console.log('Enquiry data set for transfer:', enquiryData);
     
     // Show success message and redirect
     this.snackBar.open('Enquiry shortlisted! Redirecting to new client form...', 'Close', { 
