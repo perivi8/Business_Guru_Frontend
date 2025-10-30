@@ -15,7 +15,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   currentUser: User | null = null;
   clients: Client[] = [];
   paginatedClients: Client[] = []; // Paginated data for display
-  loading = true;
+  loading = false; // Removed loading state for instant display
   private destroy$ = new Subject<void>();
   
   // Pagination properties
@@ -54,23 +54,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
     });
     
-    // Auto-refresh recent clients every 1 second
+    // Smart refresh: Only update changed rows every 1 second
     timer(1000, 1000)
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
-        // Silently refresh without showing loading indicator
-        this.clientService.getMyClients().subscribe({
-          next: (response) => {
-            if (response && response.clients) {
-              this.clients = response.clients;
-              this.calculateStats();
-              this.updatePagination();
-            }
-          },
-          error: (error) => {
-            console.error('Auto-refresh failed:', error);
-          }
-        });
+        // Smart refresh - only update changed clients
+        this.smartRefreshClients();
       });
   }
 
@@ -81,7 +70,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.clients = response.clients || [];
         this.calculateStats();
         this.updatePagination();
-        this.loading = false;
       },
       error: (error) => {
         console.error('Error loading clients:', error);
@@ -101,7 +89,62 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.clients = [];
         this.calculateStats();
         this.updatePagination();
-        this.loading = false;
+      }
+    });
+  }
+
+  /**
+   * Smart refresh: Only updates clients that have changed
+   * Much more efficient for large datasets (5000+ records)
+   */
+  smartRefreshClients(): void {
+    this.clientService.getMyClients().subscribe({
+      next: (response) => {
+        if (response && response.clients) {
+          const freshClients = response.clients;
+          let hasChanges = false;
+          
+          // Check if count changed (new clients added or deleted)
+          if (freshClients.length !== this.clients.length) {
+            hasChanges = true;
+            this.clients = freshClients;
+          } else {
+            // Compare each client and update only changed ones
+            freshClients.forEach((freshClient: Client, index: number) => {
+              const existingClient = this.clients[index];
+              
+              if (existingClient && existingClient._id === freshClient._id) {
+                // Compare critical fields to detect changes
+                const hasFieldChanges = 
+                  existingClient.status !== freshClient.status ||
+                  existingClient.comments !== freshClient.comments ||
+                  (existingClient as any).loan_status !== (freshClient as any).loan_status ||
+                  JSON.stringify(existingClient.updated_at) !== JSON.stringify(freshClient.updated_at);
+                
+                if (hasFieldChanges) {
+                  // Update only this specific client
+                  this.clients[index] = freshClient;
+                  hasChanges = true;
+                }
+              } else if (!existingClient || existingClient._id !== freshClient._id) {
+                // IDs don't match, need full refresh
+                hasChanges = true;
+                this.clients = freshClients;
+                return; // Exit forEach
+              }
+            });
+          }
+          
+          // Only recalculate stats and update pagination if something changed
+          if (hasChanges) {
+            this.calculateStats();
+            this.updatePagination();
+          }
+        }
+      },
+      error: (error) => {
+        console.error('Smart refresh failed:', error);
+        // Silently fail - don't disrupt user experience
       }
     });
   }

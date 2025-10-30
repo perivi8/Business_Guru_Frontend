@@ -21,8 +21,8 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   filteredEnquiries: Enquiry[] = [];
   paginatedEnquiries: Enquiry[] = []; // Paginated data for display
   displayedColumns: string[] = [
-    'sno', 'date', 'owner_name', 'phone_number',
-    'gst', 'business_name', 'staff', 'suggested_staff', 'comments', 'shortlist', 'actions'
+    'sno', 'date', 'owner_name', 'business_name', 'phone_number',
+    'gst', 'staff', 'suggested_staff', 'comments', 'shortlist', 'actions'
   ];
   
   // Pagination properties
@@ -34,7 +34,7 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   uniqueStaffMembers: string[] = [];
   registrationForm: FormGroup;
   showRegistrationForm = false;
-  loading = false;
+  loading = false; // Only used for form submission, not for data loading
   isBackgroundRefresh = false; // Track if this is a background refresh
   searchTerm = '';
   
@@ -212,13 +212,13 @@ export class EnquiryComponent implements OnInit, OnDestroy {
       this.checkExistingClients();
     });
     
-    // Auto-refresh enquiries every 1 second to show new submissions from public form
+    // Smart refresh: Only update changed rows every 1 second
     timer(1000, 1000)
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
         // Only refresh if not currently editing to avoid disrupting user
         if (!this.showRegistrationForm) {
-          this.loadEnquiries(true); // Pass true for silent background refresh
+          this.smartRefreshEnquiries(); // Smart refresh - only changed rows
         }
       });
     
@@ -336,10 +336,7 @@ export class EnquiryComponent implements OnInit, OnDestroy {
   }
 
   loadEnquiries(isBackgroundRefresh: boolean = false): void {
-    // Only show loading indicator if this is not a background refresh
-    if (!isBackgroundRefresh) {
-      this.loading = true;
-    }
+    // Never show loading indicator for data refresh (instant display)
     this.isBackgroundRefresh = isBackgroundRefresh;
     
     this.enquiryService.getAllEnquiries()
@@ -352,7 +349,6 @@ export class EnquiryComponent implements OnInit, OnDestroy {
           }));
           this.extractUniqueStaffMembers();
           this.applyFilters();
-          this.loading = false;
           this.isBackgroundRefresh = false;
         },
         error: (error) => {
@@ -361,8 +357,73 @@ export class EnquiryComponent implements OnInit, OnDestroy {
           if (!isBackgroundRefresh) {
             this.snackBar.open('Error loading enquiries', 'Close', { duration: 3000 });
           }
-          this.loading = false;
           this.isBackgroundRefresh = false;
+        }
+      });
+  }
+
+  /**
+   * Smart refresh: Only updates rows that have changed
+   * Much more efficient for large datasets (5000+ records)
+   */
+  smartRefreshEnquiries(): void {
+    this.enquiryService.getAllEnquiries()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (freshEnquiries) => {
+          let hasChanges = false;
+          
+          // Check if count changed (new enquiries added or deleted)
+          if (freshEnquiries.length !== this.enquiries.length) {
+            hasChanges = true;
+            // Full refresh if count changed
+            this.enquiries = freshEnquiries.map((enquiry, index) => ({
+              ...enquiry,
+              sno: index + 1
+            }));
+          } else {
+            // Compare each enquiry and update only changed ones
+            freshEnquiries.forEach((freshEnquiry, index) => {
+              const existingEnquiry = this.enquiries[index];
+              
+              // Check if this enquiry has changed by comparing updated_at or key fields
+              if (existingEnquiry && existingEnquiry._id === freshEnquiry._id) {
+                // Compare critical fields to detect changes
+                const hasFieldChanges = 
+                  existingEnquiry.staff !== freshEnquiry.staff ||
+                  existingEnquiry.comments !== freshEnquiry.comments ||
+                  existingEnquiry.business_name !== freshEnquiry.business_name ||
+                  existingEnquiry.additional_comments !== freshEnquiry.additional_comments ||
+                  existingEnquiry.business_type !== freshEnquiry.business_type ||
+                  existingEnquiry.gst_status !== freshEnquiry.gst_status ||
+                  JSON.stringify(existingEnquiry.updated_at) !== JSON.stringify(freshEnquiry.updated_at);
+                
+                if (hasFieldChanges) {
+                  // Update only this specific enquiry
+                  this.enquiries[index] = { ...freshEnquiry, sno: index + 1 };
+                  hasChanges = true;
+                }
+              } else if (!existingEnquiry || existingEnquiry._id !== freshEnquiry._id) {
+                // IDs don't match, need full refresh
+                hasChanges = true;
+                this.enquiries = freshEnquiries.map((enquiry, idx) => ({
+                  ...enquiry,
+                  sno: idx + 1
+                }));
+                return; // Exit forEach
+              }
+            });
+          }
+          
+          // Only re-apply filters and update UI if something changed
+          if (hasChanges) {
+            this.extractUniqueStaffMembers();
+            this.applyFilters();
+          }
+        },
+        error: (error) => {
+          console.error('Error in smart refresh:', error);
+          // Silently fail - don't disrupt user experience
         }
       });
   }

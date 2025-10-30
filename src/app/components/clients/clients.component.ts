@@ -21,7 +21,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
   paginatedClients: Client[] = []; // Paginated data for display
   users: User[] = [];
   uniqueStaffMembers: any[] = [];
-  loading = true;
+  loading = false; // Removed loading state for instant display
   error = '';
   
   // Pagination properties
@@ -94,24 +94,70 @@ export class ClientsComponent implements OnInit, OnDestroy {
       }
     });
     
-    // Auto-refresh clients every 1 second
+    // Smart refresh: Only update changed rows every 1 second
     timer(1000, 1000)
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
-        // Silently refresh without showing loading indicator
-        this.clientService.getClients().subscribe({
-          next: (response) => {
-            if (response && response.clients) {
-              this.clients = response.clients;
-              this.applySpecialFilters();
-              this.applyFilters();
-            }
-          },
-          error: (error) => {
-            console.error('Auto-refresh failed:', error);
-          }
-        });
+        // Smart refresh - only update changed clients
+        this.smartRefreshClients();
       });
+  }
+
+  /**
+   * Smart refresh: Only updates clients that have changed
+   * Much more efficient for large datasets (5000+ records)
+   */
+  smartRefreshClients(): void {
+    this.clientService.getClients().subscribe({
+      next: (response) => {
+        if (response && response.clients) {
+          const freshClients = response.clients;
+          let hasChanges = false;
+          
+          // Check if count changed (new clients added or deleted)
+          if (freshClients.length !== this.clients.length) {
+            hasChanges = true;
+            this.clients = freshClients;
+          } else {
+            // Compare each client and update only changed ones
+            freshClients.forEach((freshClient: Client, index: number) => {
+              const existingClient = this.clients[index];
+              
+              if (existingClient && existingClient._id === freshClient._id) {
+                // Compare critical fields to detect changes
+                const hasFieldChanges = 
+                  existingClient.status !== freshClient.status ||
+                  existingClient.comments !== freshClient.comments ||
+                  existingClient.staff_email !== freshClient.staff_email ||
+                  (existingClient as any).loan_status !== (freshClient as any).loan_status ||
+                  JSON.stringify(existingClient.updated_at) !== JSON.stringify(freshClient.updated_at);
+                
+                if (hasFieldChanges) {
+                  // Update only this specific client
+                  this.clients[index] = freshClient;
+                  hasChanges = true;
+                }
+              } else if (!existingClient || existingClient._id !== freshClient._id) {
+                // IDs don't match, need full refresh
+                hasChanges = true;
+                this.clients = freshClients;
+                return; // Exit forEach
+              }
+            });
+          }
+          
+          // Only re-apply filters and update UI if something changed
+          if (hasChanges) {
+            this.applySpecialFilters();
+            this.applyFilters();
+          }
+        }
+      },
+      error: (error) => {
+        console.error('Smart refresh failed:', error);
+        // Silently fail - don't disrupt user experience
+      }
+    });
   }
 
   checkMobileView(): void {
@@ -159,7 +205,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
     console.log('=== FRONTEND CLIENT LOADING DEBUG ===');
     console.log('Starting client load process... Attempt:', retryCount + 1);
     
-    this.loading = true;
+    // No loading state - instant display
     this.error = '';
     
     this.clientService.getClients().subscribe({
@@ -198,7 +244,6 @@ export class ClientsComponent implements OnInit, OnDestroy {
           this.filteredClients = [];
         }
         
-        this.loading = false;
         console.log('Client loading completed successfully');
       },
       error: (error) => {
@@ -237,7 +282,6 @@ export class ClientsComponent implements OnInit, OnDestroy {
         
         this.clients = [];
         this.filteredClients = [];
-        this.loading = false;
         console.log('Client loading failed with error:', this.error);
         
         // Show retry button for failed requests

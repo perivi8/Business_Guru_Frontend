@@ -98,7 +98,7 @@ export class PublicEnquiryComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  // Custom validator for loan amount: must be between 500000 and 50000000
+  // Custom validator for loan amount: must be a valid number
   loanAmountValidator(control: AbstractControl): ValidationErrors | null {
     if (!control.value) {
       return null; // Let required validator handle empty values
@@ -108,14 +108,6 @@ export class PublicEnquiryComponent implements OnInit, OnDestroy {
     
     if (isNaN(amount)) {
       return { invalidAmount: true };
-    }
-    
-    if (amount < 500000) {
-      return { minAmount: { requiredMin: 500000, actualAmount: amount } };
-    }
-    
-    if (amount > 50000000) {
-      return { maxAmount: { requiredMax: 50000000, actualAmount: amount } };
     }
     
     return null;
