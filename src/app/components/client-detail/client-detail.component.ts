@@ -6,6 +6,7 @@ import { ClientService, Client } from '../../services/client.service';
 import { AuthService } from '../../services/auth.service';
 import { OptimizedStatusService } from '../../services/optimized-status.service';
 import { ConfirmDeleteDialogComponent } from '../confirm-delete-dialog/confirm-delete-dialog.component';
+import { ConfirmDialogComponent, ConfirmDialogData } from '../confirm-dialog/confirm-dialog.component';
 import { catchError, throwError } from 'rxjs';
 
 @Component({
@@ -34,9 +35,10 @@ export class ClientDetailComponent implements OnInit {
     'Financial Information',
     'Documents & Images',
     'Payment Gateway',
-    'Loan Status'
+    'Loan Status',
+    'Transaction'
   ];
-  maxSteps = 5;
+  maxSteps = 6;
 
   constructor(
     private route: ActivatedRoute,
@@ -1372,6 +1374,57 @@ export class ClientDetailComponent implements OnInit {
   toggleGatewayApproval(gateway: string, status: 'approved' | 'not_approved'): void {
     if (!this.client || !this.isAdmin() || this.updatingGatewayStatus === gateway) return;
     
+    // Store original status for rollback
+    const originalStatus = this.getPaymentGatewayStatus(gateway);
+    
+    // Prevent re-selecting the same status
+    if (originalStatus === status) {
+      this.snackBar.open(`${gateway} is already ${status}`, 'Close', { 
+        duration: 2000,
+        panelClass: ['info-snackbar']
+      });
+      return;
+    }
+    
+    // Set the new status
+    const newStatus = status;
+    
+    // Determine dialog type based on status
+    let dialogType: 'success' | 'danger' | 'warning' | 'info' = 'warning';
+    switch (newStatus) {
+      case 'approved':
+        dialogType = 'success'; // Green for approved
+        break;
+      case 'not_approved':
+        dialogType = 'danger'; // Red for not approved
+        break;
+    }
+    
+    // Show confirmation dialog
+    const dialogData: ConfirmDialogData = {
+      title: 'Confirm Payment Gateway Status Change',
+      message: `Are you sure you want to change ${gateway} status to "${newStatus}"?`,
+      highlightText: gateway, // Highlight the gateway name
+      confirmText: 'Yes, Update',
+      cancelText: 'Cancel',
+      type: dialogType
+    };
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '450px',
+      data: dialogData,
+      disableClose: false
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === true) {
+        // User confirmed, proceed with update
+        this.performGatewayStatusUpdate(gateway, newStatus, originalStatus);
+      }
+    });
+  }
+
+  private performGatewayStatusUpdate(gateway: string, newStatus: string, originalStatus: string): void {
     // Set loading state briefly for visual feedback
     this.updatingGatewayStatus = gateway;
     
@@ -1379,12 +1432,6 @@ export class ClientDetailComponent implements OnInit {
     if (!(this.client as any).payment_gateways_status) {
       (this.client as any).payment_gateways_status = {};
     }
-    
-    // Store original status for rollback
-    const originalStatus = this.getPaymentGatewayStatus(gateway);
-    
-    // Toggle status - if clicking the same status, set to pending, otherwise set to the clicked status
-    const newStatus = originalStatus === status ? 'pending' : status;
     
     // INSTANT UI UPDATE: Update local state immediately for responsive UI
     const updatedGatewayStatus = { ...(this.client as any).payment_gateways_status };
@@ -1401,7 +1448,7 @@ export class ClientDetailComponent implements OnInit {
     });
     
     // BACKGROUND SYNC: Update backend without blocking UI
-    this.optimizedStatusService.updatePaymentGatewayStatus(this.client._id, gateway, newStatus as 'approved' | 'not_approved' | 'pending').subscribe({
+    this.optimizedStatusService.updatePaymentGatewayStatus(this.client!._id, gateway, newStatus as 'approved' | 'not_approved' | 'pending').subscribe({
       next: (response: any) => {
         if (response.success) {
           console.log(`✅ Gateway ${gateway} status synced to backend: ${newStatus}`);
@@ -1461,11 +1508,61 @@ export class ClientDetailComponent implements OnInit {
   updateLoanStatus(status: 'approved' | 'hold' | 'processing' | 'rejected'): void {
     if (!this.client || !this.isAdmin() || this.updatingLoanStatus) return;
     
-    // Set loading state briefly for visual feedback
-    this.updatingLoanStatus = true;
-    
     // Store the original status for potential rollback
     const originalStatus = (this.client as any).loan_status || 'soon';
+    
+    // Prevent re-selecting the same status
+    if (originalStatus === status) {
+      this.snackBar.open(`Loan status is already ${status}`, 'Close', { 
+        duration: 2000,
+        panelClass: ['info-snackbar']
+      });
+      return;
+    }
+    
+    // Determine dialog type based on status
+    let dialogType: 'success' | 'danger' | 'warning' | 'info' = 'warning';
+    switch (status) {
+      case 'approved':
+        dialogType = 'success'; // Green for approved
+        break;
+      case 'rejected':
+        dialogType = 'danger'; // Red for rejected
+        break;
+      case 'hold':
+        dialogType = 'warning'; // Orange for hold
+        break;
+      case 'processing':
+        dialogType = 'info'; // Blue for processing
+        break;
+    }
+    
+    // Show confirmation dialog
+    const dialogData: ConfirmDialogData = {
+      title: 'Confirm Loan Status Change',
+      message: `Are you sure you want to change the loan status to "${status}"? This will notify the client.`,
+      confirmText: 'Yes, Update',
+      cancelText: 'Cancel',
+      type: dialogType
+    };
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '450px',
+      data: dialogData,
+      disableClose: false
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === true) {
+        // User confirmed, proceed with update
+        this.performLoanStatusUpdate(status, originalStatus);
+      }
+    });
+  }
+
+  private performLoanStatusUpdate(status: 'approved' | 'hold' | 'processing' | 'rejected', originalStatus: string): void {
+    // Set loading state briefly for visual feedback
+    this.updatingLoanStatus = true;
     
     // INSTANT UI UPDATE: Update local state immediately for responsive UI
     (this.client as any).loan_status = status;
@@ -1480,7 +1577,7 @@ export class ClientDetailComponent implements OnInit {
     });
     
     // BACKGROUND SYNC: Update backend without blocking UI
-    this.optimizedStatusService.updateLoanStatus(this.client._id, status).subscribe({
+    this.optimizedStatusService.updateLoanStatus(this.client!._id, status).subscribe({
       next: (response: any) => {
         console.log('🔍 Loan status update response:', response);
         
@@ -1573,6 +1670,15 @@ export class ClientDetailComponent implements OnInit {
   // Stepper methods
   setActiveStep(step: number): void {
     console.log(`🔄 Switching to step ${step}`);
+    
+    // If step 6 (Transaction), navigate to approved-clients page with client filter
+    if (step === 6 && this.client) {
+      this.router.navigate(['/approved-clients'], {
+        queryParams: { clientId: this.client._id }
+      });
+      return;
+    }
+    
     this.activeStep = step;
     // Scroll to top of content when changing steps
     window.scrollTo({ top: 0, behavior: 'smooth' });

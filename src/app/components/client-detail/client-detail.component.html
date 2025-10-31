@@ -98,7 +98,7 @@
           <!-- Client Details -->
           <div class="flex-1 min-w-0">
             <!-- Name and Status Row -->
-            <div class="flex items-baseline gap-3">
+            <div class="flex items-baseline gap-3 flex-wrap">
               <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">
                 {{ client.legal_name || client.user_name }}
               </h1>
@@ -112,12 +112,36 @@
                     }">
                 {{ (client.status || 'pending') | titlecase }}
               </span>
+              <!-- Loan Status Tag -->
+              <span class="inline-flex items-center px-3 py-1 text-xs font-bold rounded-full text-white shadow-md flex-shrink-0"
+                    [ngClass]="{
+                      'bg-green-600': getLoanStatus() === 'approved',
+                      'bg-red-600': getLoanStatus() === 'rejected',
+                      'bg-orange-600': getLoanStatus() === 'hold',
+                      'bg-blue-600': getLoanStatus() === 'processing',
+                      'bg-gray-500': getLoanStatus() === 'soon'
+                    }">
+                Loan: {{ getLoanStatus() | titlecase }}
+              </span>
             </div>
             
-            <!-- Business Name -->
-            <p class="text-gray-600 text-base mb-2">
-              {{ client.trade_name || client.business_name || 'N/A' }}
-            </p>
+            <!-- Business Name and Mobile Number -->
+            <div class="flex items-center gap-3 mb-2">
+              <p class="text-gray-600 text-base">
+                {{ client.trade_name || client.business_name || 'N/A' }}
+              </p>
+              <span class="text-gray-400">•</span>
+              <a *ngIf="client.mobile_number" 
+                 [href]="'https://wa.me/' + client.mobile_number" 
+                 target="_blank"
+                 class="flex items-center gap-1.5 text-green-600 hover:text-green-700 transition-colors duration-200 cursor-pointer group">
+                <svg class="w-4 h-4 group-hover:scale-110 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                </svg>
+                <span class="text-sm font-medium underline decoration-dotted underline-offset-2">{{ client.mobile_number }}</span>
+              </a>
+              <span *ngIf="!client.mobile_number" class="text-gray-500 text-sm">N/A</span>
+            </div>
             
             <!-- Staff Name -->
             <div class="flex items-center gap-2">
@@ -279,10 +303,40 @@
                       'text-gray-600': activeStep !== 5
                     }">Loan</span>
             </button>
+
+            <!-- Connector -->
+            <div *ngIf="isAdmin()" class="h-0.5 w-4 bg-gray-300"></div>
+
+            <!-- Step 6: Transaction (Admin Only) -->
+            <button *ngIf="isAdmin()" (click)="setActiveStep(6)" 
+                    class="flex flex-col items-center gap-1.5 px-3 py-2 rounded-xl transition-all duration-300 group focus:outline-none"
+                    [ngClass]="{
+                      'bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg': activeStep === 6,
+                      'hover:bg-amber-50': activeStep !== 6
+                    }">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300"
+                   [ngClass]="{
+                     'bg-white/20': activeStep === 6,
+                     'bg-amber-100': activeStep !== 6
+                   }">
+                <svg class="w-5 h-5 transition-all duration-300"
+                     [ngClass]="{
+                       'text-white': activeStep === 6,
+                       'text-amber-600': activeStep !== 6
+                     }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+              </div>
+              <span class="text-[10px] font-semibold transition-all duration-300"
+                    [ngClass]="{
+                      'text-white': activeStep === 6,
+                      'text-gray-600': activeStep !== 6
+                    }">Transaction</span>
+            </button>
           </div>
 
           <!-- Mobile & Tablet: Grid Stepper -->
-          <div class="grid grid-cols-5 gap-2 lg:hidden">
+          <div class="grid grid-cols-6 gap-2 lg:hidden">
             <!-- Step 1 -->
             <button (click)="setActiveStep(1)" 
                     class="flex flex-col items-center gap-1 p-2 rounded-lg transition-all duration-300 focus:outline-none"
@@ -416,6 +470,33 @@
                       'text-white': activeStep === 5,
                       'text-gray-600': activeStep !== 5
                     }">Loan</span>
+            </button>
+
+            <!-- Step 6 (Admin Only) -->
+            <button *ngIf="isAdmin()" (click)="setActiveStep(6)" 
+                    class="flex flex-col items-center gap-1 p-2 rounded-lg transition-all duration-300 focus:outline-none"
+                    [ngClass]="{
+                      'bg-gradient-to-br from-amber-500 to-orange-600 shadow-md': activeStep === 6,
+                      'bg-white/70 hover:bg-amber-50': activeStep !== 6
+                    }">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center"
+                   [ngClass]="{
+                     'bg-white/20': activeStep === 6,
+                     'bg-amber-100': activeStep !== 6
+                   }">
+                <svg class="w-4 h-4"
+                     [ngClass]="{
+                       'text-white': activeStep === 6,
+                       'text-amber-600': activeStep !== 6
+                     }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+              </div>
+              <span class="text-[9px] font-semibold"
+                    [ngClass]="{
+                      'text-white': activeStep === 6,
+                      'text-gray-600': activeStep !== 6
+                    }">Trans</span>
             </button>
           </div>
         </div>

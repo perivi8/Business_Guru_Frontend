@@ -44,6 +44,7 @@ import { NewClientComponent } from './components/new-client/new-client.component
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { ClientDetailsDialogComponent } from './components/client-details-dialog/client-details-dialog.component';
 import { ConfirmDeleteDialogComponent } from './components/confirm-delete-dialog/confirm-delete-dialog.component';
+import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
 import { DeleteProgressDialogComponent } from './components/delete-progress-dialog/delete-progress-dialog.component';
 import { ClientDetailComponent } from './components/client-detail/client-detail.component';
 import { EditClientComponent } from './components/edit-client/edit-client.component';
@@ -82,6 +83,7 @@ import { SocketService } from './services/socket.service';
     NavbarComponent,
     ClientDetailsDialogComponent,
     ConfirmDeleteDialogComponent,
+    ConfirmDialogComponent,
     DeleteProgressDialogComponent,
     ClientDetailComponent,
     EditClientComponent,

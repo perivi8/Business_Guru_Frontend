@@ -48,16 +48,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
   isMobileMenuOpen = false;
   showLogoutModal = false;
 
-  // Routes that should show back button
-  private backButtonRoutes = [
-    '/clients',
-    '/contact-us', 
-    '/enquiry',
-    '/new-client',
-    '/team',
-    '/client-detail',
-    '/edit-client',
-    '/notifications'
+  // Routes that should NOT show back button (dashboards only)
+  private noDashboardRoutes = [
+    '/dashboard',
+    '/admin-dashboard'
   ];
 
   constructor(
@@ -709,10 +703,19 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   // Back button functionality
   updateBackButtonVisibility(): void {
-    // Check if current route should show back button
-    this.showBackButton = this.backButtonRoutes.some(route => 
-      this.currentRoute.startsWith(route)
+    // Show back button on all pages EXCEPT dashboards
+    // Check if current route is NOT a dashboard
+    const isDashboard = this.noDashboardRoutes.some(route => 
+      this.currentRoute === route || this.currentRoute.startsWith(route + '?')
     );
+    
+    // Also hide on login, register, and root path
+    const isAuthPage = this.currentRoute === '/login' || 
+                       this.currentRoute === '/register' || 
+                       this.currentRoute === '/' ||
+                       this.currentRoute === '';
+    
+    this.showBackButton = !isDashboard && !isAuthPage;
   }
 
   goBack(): void {
